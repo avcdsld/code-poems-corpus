@@ -1,0 +1,3 @@
+if (humans!=robots) {
+  reality();
+}
