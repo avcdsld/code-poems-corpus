@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEI コード詩ビューア</title>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .left-panel {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .right-panel {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .code-line {
+            font-family: 'Fira Code', monospace;
+            white-space: pre;
+            padding: 2px 5px;
+            margin: 2px 0;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+        .code-line:hover {
+            background-color: #f0f0f0;
+        }
+        .code-line.selected {
+            background-color: #e0f7fa;
+        }
+        .annotation-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #009688;
+        }
+        .file-upload {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            text-align: center;
+        }
+        h1, h2, h3 {
+            color: #00796b;
+        }
+        button {
+            background-color: #009688;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #00897b;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #009688;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .file-label:hover {
+            background-color: #00897b;
+        }
+        .file-name {
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .controls {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f1f8e9;
+            border-radius: 8px;
+        }
+        .symbol { color: #e91e63; }
+        .index { color: #2196f3; }
+        .icon { color: #ff9800; }
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 100;
+            display: none;
+        }
+        .note-container {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9fbe7;
+            border-radius: 5px;
+        }
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        .ai-interpretation {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            border-left: 4px solid #2196f3;
+        }
+        .saved-notes {
+            margin-top: 20px;
+        }
+        .note-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff8e1;
+            border-radius: 5px;
+            border-left: 3px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1>TEI コード詩ビューア</h1>
+            
+            <div class="file-upload">
+                <label for="file-input" class="file-label">TEIファイルを選択</label>
+                <input type="file" id="file-input" accept=".xml,.tei">
+                <div class="file-name" id="file-name"></div>
+            </div>
+            
+            <div class="controls">
+                <h3>表示オプション</h3>
+                <div>
+                    <input type="checkbox" id="highlight-syntax" name="highlight-syntax">
+                    <label for="highlight-syntax">構文タイプを色分け表示</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="show-line-numbers" name="show-line-numbers" checked>
+                    <label for="show-line-numbers">行番号を表示</label>
+                </div>
+            </div>
+            
+            <div id="code-container">
+                <h2>コード詩</h2>
+                <div id="code-content"></div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <h2>情報パネル</h2>
+            
+            <div class="annotation-panel" id="selection-info">
+                <h3>選択部分の情報</h3>
+                <div id="selection-details">コード詩の部分を選択してください。</div>
+            </div>
+            
+            <div class="annotation-panel">
+                <h3>注釈を追加</h3>
+                <div class="note-container">
+                    <textarea id="note-text" placeholder="選択した部分に対する注釈を入力してください..."></textarea>
+                    <button id="save-note">注釈を保存</button>
+                </div>
+                <div id="saved-notes" class="saved-notes">
+                    <h4>保存された注釈</h4>
+                    <div id="notes-list"></div>
+                </div>
+            </div>
+            
+            <div class="annotation-panel">
+                <h3>AI解釈</h3>
+                <button id="ai-interpret">選択行のAI解釈を表示</button>
+                <div id="ai-result" class="ai-interpretation"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 要素の参照
+            const fileInput = document.getElementById('file-input');
+            const fileName = document.getElementById('file-name');
+            const codeContent = document.getElementById('code-content');
+            const selectionDetails = document.getElementById('selection-details');
+            const highlightSyntax = document.getElementById('highlight-syntax');
+            const showLineNumbers = document.getElementById('show-line-numbers');
+            const noteText = document.getElementById('note-text');
+            const saveNoteBtn = document.getElementById('save-note');
+            const notesList = document.getElementById('notes-list');
+            const aiInterpretBtn = document.getElementById('ai-interpret');
+            const aiResult = document.getElementById('ai-result');
+            
+            // データ保存用
+            let teiData = null;
+            let selectedElement = null;
+            let selectedText = '';
+            let selectedLine = '';
+            let selectedLineId = '';
+            let notes = {};
+            
+            // XMLの読み込み処理
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    fileName.textContent = file.name;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        parseAndDisplayTEI(e.target.result);
+                    };
+                    reader.readAsText(file);
+                }
+            });
+            
+            // チェックボックスの変更イベント
+            highlightSyntax.addEventListener('change', function() {
+                updateCodeDisplay();
+            });
+            
+            showLineNumbers.addEventListener('change', function() {
+                updateCodeDisplay();
+            });
+            
+            // 注釈保存処理
+            saveNoteBtn.addEventListener('click', function() {
+                if (selectedLineId && noteText.value.trim()) {
+                    if (!notes[selectedLineId]) {
+                        notes[selectedLineId] = [];
+                    }
+                    
+                    notes[selectedLineId].push({
+                        text: noteText.value.trim(),
+                        timestamp: new Date().toLocaleString()
+                    });
+                    
+                    noteText.value = '';
+                    updateNotesList();
+                    
+                    // ローカルストレージに保存
+                    localStorage.setItem('tei-viewer-notes', JSON.stringify(notes));
+                }
+            });
+            
+            // AI解釈ボタン
+            aiInterpretBtn.addEventListener('click', function() {
+                if (selectedLine) {
+                    interpretWithAI(selectedLine);
+                } else {
+                    aiResult.textContent = '行を選択してください。';
+                }
+            });
+            
+            // TEIデータのパースと表示
+            function parseAndDisplayTEI(xmlString) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+                
+                // 名前空間URIを取得
+                const teiNS = xmlDoc.documentElement.namespaceURI;
+                
+                // コード要素を取得
+                const codeDiv = xmlDoc.querySelector('div[type="code"]');
+                if (!codeDiv) {
+                    codeContent.innerHTML = '<p>コードが見つかりませんでした。</p>';
+                    return;
+                }
+                
+                // spanGrp要素を取得（注釈情報）
+                const spanGroup = xmlDoc.querySelector('spanGrp');
+                
+                // データ保存
+                teiData = {
+                    code: codeDiv,
+                    spans: spanGroup ? Array.from(spanGroup.getElementsByTagName('span')) : [],
+                    ns: teiNS
+                };
+                
+                updateCodeDisplay();
+                loadNotes();
+            }
+            
+            // 表示の更新
+            function updateCodeDisplay() {
+                if (!teiData) return;
+                
+                const showHighlight = highlightSyntax.checked;
+                const showNumbers = showLineNumbers.checked;
+                
+                codeContent.innerHTML = '';
+                
+                // 各行を取得して表示
+                const lines = Array.from(teiData.code.getElementsByTagName('l'));
+                lines.forEach(line => {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'code-line';
+                    lineDiv.dataset.id = line.getAttribute('xml:id');
+                    
+                    // 行番号の表示
+                    let lineText = line.textContent;
+                    if (showNumbers) {
+                        const lineId = line.getAttribute('xml:id');
+                        const lineNumber = lineId ? lineId.replace('l', '') : '';
+                        lineText = `${lineNumber.padStart(2, ' ')}: ${lineText}`;
+                    }
+                    
+                    if (showHighlight) {
+                        // 構文ハイライト表示
+                        lineDiv.innerHTML = createHighlightedHTML(line);
+                    } else {
+                        lineDiv.textContent = lineText;
+                    }
+                    
+                    // クリックイベント
+                    lineDiv.addEventListener('click', function() {
+                        const allLines = document.querySelectorAll('.code-line');
+                        allLines.forEach(l => l.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        selectedElement = line;
+                        selectedText = line.textContent;
+                        selectedLine = lineText;
+                        selectedLineId = line.getAttribute('xml:id');
+                        
+                        updateSelectionInfo(line);
+                    });
+                    
+                    codeContent.appendChild(lineDiv);
+                });
+            }
+            
+            // 構文ハイライト用のHTML生成
+            function createHighlightedHTML(lineElement) {
+                const lineId = lineElement.getAttribute('xml:id');
+                const lineText = lineElement.textContent;
+                const lineNumber = lineId ? lineId.replace('l', '') : '';
+                const prefix = showLineNumbers.checked ? `${lineNumber.padStart(2, ' ')}: ` : '';
+                
+                // 元のテキストを表示するHTML
+                let html = prefix;
+                
+                // spanからクラス情報を収集
+                const spans = teiData.spans.filter(span => {
+                    const from = span.getAttribute('from');
+                    return from && from.startsWith(`#${lineId}`);
+                });
+                
+                if (spans.length === 0) {
+                    return prefix + lineText;
+                }
+                
+                // スパンの位置情報をパース
+                const segments = [];
+                spans.forEach(span => {
+                    const from = span.getAttribute('from');
+                    const to = span.getAttribute('to');
+                    
+                    // #l1:0 形式から位置情報を抽出
+                    const fromParts = from.split(':');
+                    const toParts = to.split(':');
+                    
+                    if (fromParts.length === 2 && toParts.length === 2) {
+                        const fromPos = parseInt(fromParts[1]);
+                        const toPos = parseInt(toParts[1]);
+                        
+                        segments.push({
+                            start: fromPos,
+                            end: toPos,
+                            type: span.getAttribute('ana').replace('#', '')
+                        });
+                    }
+                });
+                
+                // セグメントをソート
+                segments.sort((a, b) => a.start - b.start);
+                
+                // HTML構築
+                let lastPos = 0;
+                let result = prefix;
+                
+                segments.forEach(segment => {
+                    // 非ハイライト部分
+                    if (segment.start > lastPos) {
+                        result += lineText.substring(lastPos, segment.start);
+                    }
+                    
+                    // ハイライト部分
+                    const highlighted = lineText.substring(segment.start, segment.end);
+                    result += `<span class="${segment.type}" 
+                                     data-type="${segment.type}" 
+                                     data-start="${segment.start}" 
+                                     data-end="${segment.end}">${highlighted}</span>`;
+                    
+                    lastPos = segment.end;
+                });
+                
+                // 残りの部分
+                if (lastPos < lineText.length) {
+                    result += lineText.substring(lastPos);
+                }
+                
+                return result;
+            }
+            
+            // 選択情報の表示更新
+            function updateSelectionInfo(lineElement) {
+                const lineId = lineElement.getAttribute('xml:id');
+                
+                // 基本情報表示
+                let info = `<p><strong>行ID:</strong> ${lineId}</p>`;
+                info += `<p><strong>テキスト:</strong> ${lineElement.textContent}</p>`;
+                
+                // 構文情報取得
+                const spans = teiData.spans.filter(span => {
+                    const from = span.getAttribute('from');
+                    return from && from.startsWith(`#${lineId}`);
+                });
+                
+                if (spans.length > 0) {
+                    info += '<p><strong>構文タイプ:</strong></p><ul>';
+                    spans.forEach(span => {
+                        const type = span.getAttribute('ana').replace('#', '');
+                        const from = span.getAttribute('from').split(':')[1];
+                        const to = span.getAttribute('to').split(':')[1];
+                        const text = lineElement.textContent.substring(from, to);
+                        
+                        info += `<li><span class="${type}">${type}</span>: "${text}" (位置: ${from}-${to})</li>`;
+                    });
+                    info += '</ul>';
+                } else {
+                    info += '<p>この行には構文タイプ情報がありません。</p>';
+                }
+                
+                // 注釈情報表示
+                if (notes[lineId] && notes[lineId].length > 0) {
+                    info += '<p><strong>注釈:</strong></p><ul>';
+                    notes[lineId].forEach(note => {
+                        info += `<li>${note.text} <small>(${note.timestamp})</small></li>`;
+                    });
+                    info += '</ul>';
+                }
+                
+                selectionDetails.innerHTML = info;
+            }
+            
+            // 注釈リストの更新
+            function updateNotesList() {
+                notesList.innerHTML = '';
+                
+                let hasNotes = false;
+                for (const lineId in notes) {
+                    if (notes[lineId].length > 0) {
+                        hasNotes = true;
+                        const lineHeader = document.createElement('h5');
+                        lineHeader.textContent = `行 ${lineId.replace('l', '')}`;
+                        notesList.appendChild(lineHeader);
+                        
+                        notes[lineId].forEach((note, index) => {
+                            const noteDiv = document.createElement('div');
+                            noteDiv.className = 'note-item';
+                            noteDiv.innerHTML = `
+                                <p>${note.text}</p>
+                                <small>${note.timestamp}</small>
+                                <button class="delete-note" data-line="${lineId}" data-index="${index}">削除</button>
+                            `;
+                            notesList.appendChild(noteDiv);
+                        });
+                    }
+                }
+                
+                if (!hasNotes) {
+                    notesList.innerHTML = '<p>保存された注釈はありません。</p>';
+                }
+                
+                // 削除ボタンのイベント設定
+                document.querySelectorAll('.delete-note').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const lineId = this.dataset.line;
+                        const index = parseInt(this.dataset.index);
+                        
+                        if (notes[lineId] && notes[lineId][index]) {
+                            notes[lineId].splice(index, 1);
+                            if (notes[lineId].length === 0) {
+                                delete notes[lineId];
+                            }
+                            
+                            updateNotesList();
+                            if (selectedLineId === lineId) {
+                                updateSelectionInfo(selectedElement);
+                            }
+                            
+                            // ローカルストレージに保存
+                            localStorage.setItem('tei-viewer-notes', JSON.stringify(notes));
+                        }
+                    });
+                });
+            }
+            
+            // 注釈のロード
+            function loadNotes() {
+                const savedNotes = localStorage.getItem('tei-viewer-notes');
+                if (savedNotes) {
+                    try {
+                        notes = JSON.parse(savedNotes);
+                        updateNotesList();
+                    } catch (e) {
+                        console.error('注釈の読み込みに失敗しました:', e);
+                    }
+                }
+            }
+            
+            // AI解釈
+            function interpretWithAI(line) {
+                // 実際のAI処理はここで行うことができますが、ここではサンプル解釈を提供します
+                const interpretations = {
+                    'String silence="                  ";': '詩の基盤として、空白（沈黙）の定義。コード詩の中で沈黙が実体としてプログラム的に扱われる。',
+                    'String idea="This is\'nt p0etry.";': '詩の原点となる「これは詩ではない」という逆説的な主張。意図的なミススペルで言語と規則への挑戦を示す。',
+                    'String draft;': '未完成の詩的表現のための変数。創作過程における一時的状態の象徴。',
+                    'String[]poem=new String[idea.length()];': '詩を文字の配列として定義。「考え」の長さによって制限される詩の構造化。',
+                    'void setup(){': 'プログラムの初期化。詩的創造の準備段階を表現。',
+                    ' draft=idea;': '最初の創作は単なる考えのコピー。創作の出発点。',
+                    ' Write();': '書くという行為の機械的実行。詩人の行為をコードとして抽象化。',
+                    ' ReThink();': '詩的思考の再構築プロセス。創作における再考の重要性。',
+                    '}': 'セットアップの完了。詩的準備の終了を示す構造的要素。',
+                    'void draw(){': '継続的な創作サイクルの開始。詩が時間とともに展開する過程の表現。',
+                    'ReWrite();}': '詩の書き直しを繰り返す無限ループ。創作が終わらない永続的プロセスであることの表現。',
+                    'void Write(){': '書くという行為を関数として定義。創作行為の形式化。',
+                    'println (draft);}': '創作を表示する行為。詩の公開と共有のメタファー。',
+                    'void ReThink(){': '思考の再構築プロセスの開始。詩的反省の形式化。',
+                    'for(int decomp=0;decomp<draft.length();decomp++)': '詩の分解と再構成。言語を最小単位（文字）に分解する分析的プロセス。',
+                    '{poem[decomp]=draft.substring(decomp,decomp+1);}': '詩を一文字ずつ再構成。言語の原子的要素への還元と再構築。',
+                    '}': '再考プロセスの完了。思考の変換過程の終了。',
+                    'void ReWrite(){': '再書き込みプロセスの開始。詩の変容と進化の表現。',
+                    ' byte seek=byte(random(0, poem.length));': 'ランダムな位置を選択。偶然性と不確実性の詩的プロセスへの導入。',
+                    ' poem[seek]=" ";': '選ばれた文字を空白に置換。消去による創造の逆説的表現。',
+                    ' String poetry=join(poem,"");': '分解された詩を再結合。断片から全体への再統合のプロセス。',
+                    ' printIn(poetry);': '変化した詩の表示。進化する芸術作品の公開。',
+                    ' if(poetry.equals(silence)){': '詩が完全な沈黙になったかの確認。消滅への道筋のチェック。',
+                    ' println("."); noLoop();}': '詩が沈黙になった時、最後のピリオドを打ち、プロセスを停止。死と完成の同時表現。',
+                    '}': 'コード詩の構造的完結。循環的創作プロセスの形式的終了。'
+                };
+                
+                // 行からスペースと行番号を削除して一致を検索
+                const cleanLine = line.replace(/^\s*\d+:\s*/, '');
+                
+                if (interpretations[cleanLine]) {
+                    aiResult.textContent = interpretations[cleanLine];
+                } else {
+                    aiResult.textContent = '「選択された行は進行的な消失のプロセスを表現する創作詩の一部です。コードと詩が融合し、言語が徐々に沈黙へと変換されていきます。」';
+                }
+            }
+            
+            // ツールチップの設定
+            document.addEventListener('mouseover', function(e) {
+                if (e.target.classList.contains('symbol') || 
+                    e.target.classList.contains('index') || 
+                    e.target.classList.contains('icon')) {
+                    
+                    const type = e.target.dataset.type;
+                    
+                    let tooltip = document.getElementById('tooltip');
+                    if (!tooltip) {
+                        tooltip = document.createElement('div');
+                        tooltip.id = 'tooltip';
+                        tooltip.className = 'tooltip';
+                        document.body.appendChild(tooltip);
+                    }
+                    
+                    tooltip.textContent = `タイプ: ${type}`;
+                    tooltip.style.left = e.pageX + 10 + 'px';
+                    tooltip.style.top = e.pageY + 10 + 'px';
+                    tooltip.style.display = 'block';
+                }
+            });
+            
+            document.addEventListener('mouseout', function(e) {
+                if (e.target.classList.contains('symbol') || 
+                    e.target.classList.contains('index') || 
+                    e.target.classList.contains('icon')) {
+                    
+                    const tooltip = document.getElementById('tooltip');
+                    if (tooltip) {
+                        tooltip.style.display = 'none';
+                    }
+                }
+            });
+            
+            // デフォルトでサンプルデータを読み込む
+            if (document.querySelector('document_content')) {
+                const xmlContent = document.querySelector('document_content').textContent;
+                parseAndDisplayTEI(xmlContent);
+            }
+        });
+    </script>
+</body>
+</html>
