@@ -150,6 +150,72 @@
             border-radius: 5px;
             border-left: 3px solid #ffc107;
         }
+        .display-mode {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8eaf6;
+            border-radius: 8px;
+        }
+        .runtime-icon { 
+            color: #ff9800; 
+            text-decoration: underline;
+            background-color: rgba(255, 152, 0, 0.1);
+        }
+        .transposition-marker {
+            font-size: 0.7em;
+            color: #9c27b0;
+            margin-left: 4px;
+            vertical-align: super;
+            cursor: help;
+        }
+        .transposed-text {
+        position: relative;
+        box-shadow: 0 -2px 0 #9c27b0 inset;
+        }
+        .transposition-label {
+            position: relative;
+            display: inline-block;
+            font-size: 8px;
+            line-height: 1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            background-color: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+            font-weight: bold;
+            margin-left: 2px;
+            vertical-align: super;
+            cursor: help;
+        }
+        .transposition-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background: linear-gradient(to right, 
+                rgba(33, 150, 243, 0.05) 0%, 
+                rgba(255, 152, 0, 0.15) 100%);
+            z-index: -1;
+            opacity: 0.7;
+        }
+        
+        .index-to-icon { color: #2196f3; }
+        .index-to-icon::after { 
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, #2196f3, #ff9800);
+        }
+        .symbol-to-index .transposition-overlay { 
+            background: linear-gradient(to right, rgba(233, 30, 99, 0.1), rgba(33, 150, 243, 0.2)); 
+        }
+        .icon-to-symbol .transposition-overlay { 
+            background: linear-gradient(to right, rgba(255, 152, 0, 0.1), rgba(233, 30, 99, 0.2)); 
+        }
     </style>
 </head>
 <body>
@@ -166,12 +232,28 @@
             <div class="controls">
                 <h3>表示オプション</h3>
                 <div>
-                    <input type="checkbox" id="highlight-syntax" name="highlight-syntax">
+                    <input type="checkbox" id="highlight-syntax" name="highlight-syntax" checked>
                     <label for="highlight-syntax">構文タイプを色分け表示</label>
                 </div>
                 <div>
                     <input type="checkbox" id="show-line-numbers" name="show-line-numbers" checked>
                     <label for="show-line-numbers">行番号を表示</label>
+                </div>
+            </div>
+            
+            <div class="display-mode">
+                <h3>記号分類表示モード</h3>
+                <div>
+                    <input type="radio" id="static-mode" name="sign-mode" value="static" checked>
+                    <label for="static-mode">静的記号分類</label>
+                </div>
+                <div>
+                    <input type="radio" id="runtime-mode" name="sign-mode" value="runtime">
+                    <label for="runtime-mode">実行時記号分類</label>
+                </div>
+                <div>
+                    <input type="radio" id="transposition-mode" name="sign-mode" value="transposition">
+                    <label for="transposition-mode">記号転位の表示</label>
                 </div>
             </div>
             
@@ -206,6 +288,19 @@
                 <button id="ai-interpret">選択行のAI解釈を表示</button>
                 <div id="ai-result" class="ai-interpretation"></div>
             </div>
+            
+            <div class="annotation-panel">
+                <h3>パース記号論</h3>
+                <div>
+                    <p><strong>記号分類:</strong></p>
+                    <ul>
+                        <li><span class="symbol">Symbol</span>: キーワード、演算子など（規約・法則に基づく記号）</li>
+                        <li><span class="index">Index</span>: 変数名、関数名など（対象を指し示す記号）</li>
+                        <li><span class="icon">Icon</span>: リテラル、コメントなど（対象との類似性に基づく記号）</li>
+                    </ul>
+                    <p><strong>記号転位:</strong> 実行時に記号分類が変化する現象</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -223,6 +318,7 @@
             const notesList = document.getElementById('notes-list');
             const aiInterpretBtn = document.getElementById('ai-interpret');
             const aiResult = document.getElementById('ai-result');
+            const signModeRadios = document.getElementsByName('sign-mode');
             
             // データ保存用
             let teiData = null;
@@ -255,6 +351,13 @@
                 updateCodeDisplay();
             });
             
+            // 記号モードラジオボタンの変更イベント
+            signModeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updateCodeDisplay();
+                });
+            });
+            
             // 注釈保存処理
             saveNoteBtn.addEventListener('click', function() {
                 if (selectedLineId && noteText.value.trim()) {
@@ -284,6 +387,12 @@
                 }
             });
             
+            // 現在の記号表示モードを取得
+            function getCurrentSignMode() {
+                const selected = document.querySelector('input[name="sign-mode"]:checked');
+                return selected ? selected.value : 'static';
+            }
+            
             // TEIデータのパースと表示
             function parseAndDisplayTEI(xmlString) {
                 const parser = new DOMParser();
@@ -308,7 +417,24 @@
                     spans: spanGroup ? Array.from(spanGroup.getElementsByTagName('span')) : [],
                     ns: teiNS
                 };
+
+                // デバッグ出力
+                console.log('Loaded XML document:', xmlDoc);
+                console.log('Spans found:', teiData.spans.length);
                 
+                // スパンの属性を確認
+                teiData.spans.forEach((span, i) => {
+                    console.log(`Span ${i}:`, {
+                        id: span.getAttribute('xml:id'),
+                        static: span.getAttribute('static-sign'),
+                        runtime: span.getAttribute('runtime-sign'),
+                        from: span.getAttribute('from'),
+                        to: span.getAttribute('to'),
+                        text: span.getAttribute('text'),
+                        note: span.querySelector('note')?.textContent
+                    });
+                });
+
                 updateCodeDisplay();
                 loadNotes();
             }
@@ -319,6 +445,7 @@
                 
                 const showHighlight = highlightSyntax.checked;
                 const showNumbers = showLineNumbers.checked;
+                const signMode = getCurrentSignMode();
                 
                 codeContent.innerHTML = '';
                 
@@ -339,7 +466,7 @@
                     
                     if (showHighlight) {
                         // 構文ハイライト表示
-                        lineDiv.innerHTML = createHighlightedHTML(line);
+                        lineDiv.innerHTML = createHighlightedHTML(line, signMode);
                     } else {
                         lineDiv.textContent = lineText;
                     }
@@ -361,34 +488,38 @@
                     codeContent.appendChild(lineDiv);
                 });
             }
-            
+
             // 構文ハイライト用のHTML生成
-            function createHighlightedHTML(lineElement) {
+            function createHighlightedHTML(lineElement, signMode = 'static') {
                 const lineId = lineElement.getAttribute('xml:id');
                 const lineText = lineElement.textContent;
                 const lineNumber = lineId ? lineId.replace('l', '') : '';
                 const prefix = showLineNumbers.checked ? `${lineNumber.padStart(2, ' ')}: ` : '';
                 
-                // 元のテキストを表示するHTML
-                let html = prefix;
+                // 選択された表示モードに基づいて使用する属性を決定
+                const signAttribute = signMode === 'static' ? 'static-sign' : 
+                                      signMode === 'runtime' ? 'runtime-sign' : 'static-sign';
                 
                 // spanからクラス情報を収集
                 const spans = teiData.spans.filter(span => {
                     const from = span.getAttribute('from');
-                    return from && from.startsWith(`#${lineId}`);
+                    // 'l1:0'形式から行IDのみを取得して比較
+                    return from && from.split(':')[0] === lineId;
                 });
                 
                 if (spans.length === 0) {
                     return prefix + lineText;
                 }
                 
-                // スパンの位置情報をパース
-                const segments = [];
+                // 文字ごとにスタイル情報を収集
+                const charStyles = new Array(lineText.length).fill(null);
+                const transpositions = new Array(lineText.length).fill(false);
+                
                 spans.forEach(span => {
                     const from = span.getAttribute('from');
                     const to = span.getAttribute('to');
                     
-                    // #l1:0 形式から位置情報を抽出
+                    // l1:0 形式から位置情報を抽出
                     const fromParts = from.split(':');
                     const toParts = to.split(':');
                     
@@ -396,40 +527,139 @@
                         const fromPos = parseInt(fromParts[1]);
                         const toPos = parseInt(toParts[1]);
                         
-                        segments.push({
-                            start: fromPos,
-                            end: toPos,
-                            type: span.getAttribute('ana').replace('#', '')
-                        });
+                        // 静的記号分類を取得
+                        const staticType = span.getAttribute('static-sign');
+                        // 実行時記号分類を取得（存在する場合）
+                        const runtimeType = span.getAttribute('runtime-sign');
+                        
+                        // 現在のモードに基づいて使用するタイプを決定
+                        let type;
+                        if (signMode === 'static' || !runtimeType) {
+                            type = staticType;
+                        } else if (signMode === 'runtime') {
+                            type = runtimeType || staticType;
+                        } else if (signMode === 'transposition') {
+                            type = staticType;
+                            // 転位が存在する場合はマークする
+                            if (runtimeType && runtimeType !== staticType) {
+                                for (let i = fromPos; i < toPos; i++) {
+                                    if (i < lineText.length) {
+                                        transpositions[i] = {
+                                            from: staticType,
+                                            to: runtimeType
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // 各文字にスタイル情報を設定
+                        for (let i = fromPos; i < toPos; i++) {
+                            if (i < lineText.length) {
+                                // 優先度に基づいて既存のスタイルを上書きするかどうか決定
+                                const stylePriority = {
+                                    'symbol': 3,
+                                    'index': 2,
+                                    'icon': 1
+                                };
+                                
+                                // 新しいスタイルの方が優先度が高い場合、または
+                                // まだスタイルが設定されていない場合にのみ設定
+                                if (!charStyles[i] || 
+                                    (type && stylePriority[type] > stylePriority[charStyles[i]])) {
+                                    charStyles[i] = type;
+                                }
+                            }
+                        }
                     }
                 });
-                
-                // セグメントをソート
-                segments.sort((a, b) => a.start - b.start);
-                
+
                 // HTML構築
-                let lastPos = 0;
                 let result = prefix;
+                let currentType = null;
+                let currentTransposition = null;
+                let currentSpan = '';
                 
-                segments.forEach(segment => {
-                    // 非ハイライト部分
-                    if (segment.start > lastPos) {
-                        result += lineText.substring(lastPos, segment.start);
+                // 文字ごとに適切なスタイルを適用
+                for (let i = 0; i < lineText.length; i++) {
+                    const char = lineText[i];
+                    const type = charStyles[i];
+                    const transposition = transpositions[i];
+                    
+                    // タイプまたは転位状態が変わったら新しいスパンを開始
+                    if (type !== currentType || 
+                        JSON.stringify(transposition) !== JSON.stringify(currentTransposition)) {
+                        // 前のスパンを閉じる
+                        if (currentType) {
+                            let classes = [currentType];
+                            let attrs = '';
+                            
+                            // 転位モードで転位がある場合
+                            if (signMode === 'transposition' && currentTransposition) {
+                                const transType = `${currentTransposition.from}-to-${currentTransposition.to}`;
+                                classes.push('transposed-text');
+                                classes.push(transType);
+                                attrs += ` data-from="${currentTransposition.from}" data-to="${currentTransposition.to}"`;
+                                attrs += ` title="転位: ${currentTransposition.from} → ${currentTransposition.to}"`;
+                            }
+                            
+                            let spanHtml = `<span class="${classes.join(' ')}" data-type="${currentType}"${attrs}>`;
+                            
+                            // 転位のオーバーレイとラベル
+                            if (signMode === 'transposition' && currentTransposition) {
+                                spanHtml += `<span class="transposition-overlay"></span>`;
+                                spanHtml += currentSpan;
+                                spanHtml += `<span class="transposition-label">${currentTransposition.to.charAt(0)}</span>`;
+                            } else {
+                                spanHtml += currentSpan;
+                            }
+                            
+                            spanHtml += `</span>`;
+                            result += spanHtml;
+                            currentSpan = '';
+                        }
+                        
+                        // 新しいタイプの開始
+                        currentType = type;
+                        currentTransposition = transposition;
                     }
                     
-                    // ハイライト部分
-                    const highlighted = lineText.substring(segment.start, segment.end);
-                    result += `<span class="${segment.type}" 
-                                     data-type="${segment.type}" 
-                                     data-start="${segment.start}" 
-                                     data-end="${segment.end}">${highlighted}</span>`;
-                    
-                    lastPos = segment.end;
-                });
+                    // 現在のスパンに文字を追加
+                    if (currentType) {
+                        currentSpan += char;
+                    } else {
+                        // スタイルなしの場合はそのまま追加
+                        result += char;
+                    }
+                }
                 
-                // 残りの部分
-                if (lastPos < lineText.length) {
-                    result += lineText.substring(lastPos);
+                // 最後のスパンを閉じる
+                if (currentType && currentSpan) {
+                    let classes = [currentType];
+                    let attrs = '';
+                    
+                    // 転位モードで転位がある場合
+                    if (signMode === 'transposition' && currentTransposition) {
+                        const transType = `${currentTransposition.from}-to-${currentTransposition.to}`;
+                        classes.push('transposed-text');
+                        classes.push(transType);
+                        attrs += ` data-from="${currentTransposition.from}" data-to="${currentTransposition.to}"`;
+                        attrs += ` title="転位: ${currentTransposition.from} → ${currentTransposition.to}"`;
+                    }
+                    
+                    let spanHtml = `<span class="${classes.join(' ')}" data-type="${currentType}"${attrs}>`;
+                    
+                    // 転位のオーバーレイとラベル
+                    if (signMode === 'transposition' && currentTransposition) {
+                        spanHtml += `<span class="transposition-overlay"></span>`;
+                        spanHtml += currentSpan;
+                        spanHtml += `<span class="transposition-label">${currentTransposition.to.charAt(0)}</span>`;
+                    } else {
+                        spanHtml += currentSpan;
+                    }
+                    
+                    spanHtml += `</span>`;
+                    result += spanHtml;
                 }
                 
                 return result;
@@ -438,6 +668,7 @@
             // 選択情報の表示更新
             function updateSelectionInfo(lineElement) {
                 const lineId = lineElement.getAttribute('xml:id');
+                const signMode = getCurrentSignMode();
                 
                 // 基本情報表示
                 let info = `<p><strong>行ID:</strong> ${lineId}</p>`;
@@ -446,22 +677,54 @@
                 // 構文情報取得
                 const spans = teiData.spans.filter(span => {
                     const from = span.getAttribute('from');
-                    return from && from.startsWith(`#${lineId}`);
+                    return from && from.startsWith(`${lineId}:`);
                 });
                 
                 if (spans.length > 0) {
-                    info += '<p><strong>構文タイプ:</strong></p><ul>';
-                    spans.forEach(span => {
-                        const type = span.getAttribute('ana').replace('#', '');
-                        const from = span.getAttribute('from').split(':')[1];
-                        const to = span.getAttribute('to').split(':')[1];
+                    // 異常なスパンを除外するフィルター
+                    const validSpans = spans.filter(span => {
+                        const from = parseInt(span.getAttribute('from').split(':')[1]);
+                        const to = parseInt(span.getAttribute('to').split(':')[1]);
                         const text = lineElement.textContent.substring(from, to);
                         
-                        info += `<li><span class="${type}">${type}</span>: "${text}" (位置: ${from}-${to})</li>`;
+                        // 空の文字列や異常に長いスパンを除外
+                        return text.trim().length > 0 && (to - from) < 30;
                     });
-                    info += '</ul>';
+                    
+                    // 記号分類情報を表示
+                    info += `<p><strong>記号分類:</strong></p><ul>`;
+                    
+                    validSpans.forEach(span => {
+                        const from = parseInt(span.getAttribute('from').split(':')[1]);
+                        const to = parseInt(span.getAttribute('to').split(':')[1]);
+                        const text = lineElement.textContent.substring(from, to);
+                        
+                        // 静的記号分類
+                        const staticSign = span.getAttribute('static-sign');
+                        // 実行時記号分類（存在する場合）
+                        const runtimeSign = span.getAttribute('runtime-sign');
+                        
+                        if (staticSign) {
+                            info += `<li><span class="${staticSign}">${staticSign}</span>: "${text}" (位置: ${from}-${to})`;
+                            
+                            // 実行時分類が存在し、かつ異なる場合は転位情報を表示
+                            if (runtimeSign && runtimeSign !== staticSign) {
+                                info += ` <strong>→ 実行時:</strong> <span class="${runtimeSign}">${runtimeSign}</span>`;
+                                
+                                // 説明が存在する場合は表示
+                                const note = span.querySelector('note');
+                                if (note && note.textContent) {
+                                    info += `<br><small>${note.textContent}</small>`;
+                                }
+                            }
+                            
+                            info += `</li>`;
+                        }
+                    });
+                    
+                    info += `</ul>`;
                 } else {
-                    info += '<p>この行には構文タイプ情報がありません。</p>';
+                    info += '<p>この行には記号分類情報がありません。</p>';
                 }
                 
                 // 注釈情報表示
@@ -570,7 +833,22 @@
                     ' printIn(poetry);': '変化した詩の表示。進化する芸術作品の公開。',
                     ' if(poetry.equals(silence)){': '詩が完全な沈黙になったかの確認。消滅への道筋のチェック。',
                     ' println("."); noLoop();}': '詩が沈黙になった時、最後のピリオドを打ち、プロセスを停止。死と完成の同時表現。',
-                    '}': 'コード詩の構造的完結。循環的創作プロセスの形式的終了。'
+                    '}': 'コード詩の構造的完結。循環的創作プロセスの形式的終了。',
+                    
+                    // disfunction.js の解釈
+                    'function disfunction(){': '機能不全を表現する関数の定義。詩的プロセスの始まり。',
+                    'if(weCannotStart&&weWillNotStop) {': '矛盾を内包する条件式。始められないが止まれないという逆説。',
+                    'if(iCannotRun&&uCannotWalk) { if(thereIsNoWay&&thereIsNoOne) { ': '個人の不能と孤独の入れ子構造。人間関係の複雑さの表現。',
+                    'if(uHoldYourFlag&&iHoldMyGun) { while(timePassesBy&&hopePassesOut) {': '対立と時間の経過による希望の消失。',
+                    'while(someRemainSilent&&someOnlyShout){': 'コミュニケーションの極端な二極化。',
+                    'while(someWaitForJesus&&someWaitForFood){': '精神的救済と物質的欲求の対比。',
+                    'while(uChangeYouClothes&&iChangeMyMood){': '表面的変化と内面的変化の並置。',
+                    'try{settlingDown||openingUp;': '社会的適応か自己開示かという二者択一。',
+                    '//try': 'コメントとしての「試み」。実行されない願望の表現。',
+                    'listeningIn||!actingOut;': '受動的理解か積極的反抗の否定か。',
+                    '[anything,something,whatever,whoCares];': '無関心と虚無への到達。価値の相対化。',
+                    '//all that\'s left when you': '残されたものについての未完のコメント。中断された思考。',
+                    'catch(me){isAskingWhosThere;}}}}}}}}}}}': '他者への呼びかけと応答の不確かさ。閉じすぎた括弧は抜け出せない循環を表現。'
                 };
                 
                 // 行からスペースと行番号を削除して一致を検索
@@ -579,7 +857,7 @@
                 if (interpretations[cleanLine]) {
                     aiResult.textContent = interpretations[cleanLine];
                 } else {
-                    aiResult.textContent = '「選択された行は進行的な消失のプロセスを表現する創作詩の一部です。コードと詩が融合し、言語が徐々に沈黙へと変換されていきます。」';
+                    aiResult.textContent = 'この行の解釈は利用できません。選択した行は、プログラミング言語の構文を通じて人間関係や社会の機能不全を表現するコード詩の一部です。';
                 }
             }
             
