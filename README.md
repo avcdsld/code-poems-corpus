@@ -61,7 +61,7 @@ permission from the original authors.
 | 20 | RISING | Vilson Vieira, Renato Fabbri | Python | `corpus_raw/python/20_rising.py` |
 | 21 | OSLO | David Berry | Ruby | `corpus_raw/ruby/21_oslo.rb` |
 | 22 | THE RUMOR | Pall Thayer | Perl | `corpus_raw/perl/22_the_rumor.pl` |
-| 23 | JUDGMENT | Guilherme Kerr | JavaScript | `corpus_raw/js/23_judgment.js` |
+| 23 | JUDGMENT | Guilherme Kerr | HTML | `corpus_raw/html/23_judgment.html` |
 | 24 | NESTING | Dan Brown | HTML | `corpus_raw/html/24_nesting.html` |
 | 25 | THE GAME | Ryan Christiansen | Rebol | `corpus_raw/rebol/25_the_game.reb` |
 | 26 | A VOLATILE SKETCHBOOK | Aymeric Mansoux | Forth | `corpus_raw/forth/26_a_volatile_sketchbook.fs` |
@@ -107,4 +107,9 @@ pip install -r requirements.txt
 python tools/parser/parse_corpus.py
 
 deactivate
+```
+
+```bash
+python -m tools.parser.parse_corpus --lang js
+python -m tools.icon_scanner.scan_corpus --lang js
 ```

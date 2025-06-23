@@ -1,8 +1,10 @@
 function disfunction(){
 
 if(weCannotStart&&weWillNotStop) {
-if(iCannotRun&&uCannotWalk) { if(thereIsNoWay&&thereIsNoOne) { 
-if(uHoldYourFlag&&iHoldMyGun) { while(timePassesBy&&hopePassesOut) {
+if(iCannotRun&&uCannotWalk) {
+if(thereIsNoWay&&thereIsNoOne) { 
+if(uHoldYourFlag&&iHoldMyGun) {
+while(timePassesBy&&hopePassesOut) {
 while(someRemainSilent&&someOnlyShout){
 while(someWaitForJesus&&someWaitForFood){
 while(uChangeYouClothes&&iChangeMyMood){
