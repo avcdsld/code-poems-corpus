@@ -114,3 +114,129 @@ python -m tools.parser.parse_corpus --lang js
 python tools/parser/list_node_types.py
 python tools/parser/annotate_ast.py
 ```
+
+---
+
+## Semiotic Displacement Analysis
+
+This repository includes a **semiotic displacement analysis system** based on Charles Sanders Peirce's sign classification theory, designed to study the poetic effects in code poetry through quantitative analysis of sign transformations.
+
+### Theoretical Framework
+
+The system applies Peirce's triadic sign classification to programming code:
+
+- **Icon** (類像): Literal values, comments → direct resemblance to objects
+- **Index** (指標): Variable names, function names → causal relationship to objects  
+- **Symbol** (象徴): Keywords, operators → conventional meaning relationship
+
+**Semiotic Displacement** is defined as the deviation from expected sign classification during code execution, which creates poetic effects in code poetry.
+
+### Quick Analysis
+
+#### 1. Basic Displacement Analysis
+```bash
+# List available poems
+python analyze_displacement.py list
+
+# Analyze specific poems
+python analyze_displacement.py analyze 5_disfunction
+python analyze_displacement.py analyze 52_desperate_program
+
+# Analyze with automatic visualization
+python analyze_displacement.py analyze 5_disfunction --viz
+```
+
+#### 2. Interactive Visualization
+```bash
+# Generate HTML visualization
+python analyze_displacement.py visualize 5_disfunction
+python analyze_displacement.py visualize 52_desperate_program
+
+# Open generated HTML files in browser
+open 5_disfunction_displacement_visualization.html
+open 52_desperate_program_displacement_visualization.html
+```
+
+#### 3. Comparative Analysis
+```bash
+# Compare multiple poems
+python analyze_displacement.py compare 5_disfunction 52_desperate_program 35_immediate_function
+
+# Results saved to poem_comparison_N_works.json
+```
+
+### Analysis Results
+
+The system detects various displacement patterns:
+
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| **Emotional Expression** | Variables expressing emotional states | `weCannotStart`, `iCannotRun` |
+| **Visual Poetry** | Syntactic structures creating visual effects | Nested if/while statements |
+| **Metaphorical Syntax** | Program constructs used metaphorically | `catch(me)` - personification |
+| **Semantic Inversion** | Abstract concepts as concrete variables | `[anything, something, whatever]` |
+| **Temporal Expression** | Code structures expressing time/duration | Repetitive loops, sequential actions |
+
+### Currently Analyzed Works
+
+| Work | Displacements | Max Intensity | Dominant Patterns |
+|------|---------------|---------------|-------------------|
+| `5_disfunction` | 26 | 0.95 | Visual poetry, metaphorical syntax |
+| `52_desperate_program` | 13 | 0.85 | Semantic inversion, emotional expression |
+| `35_immediate_function` | 0 | - | Technical code (no poetic displacement) |
+
+### Output Files
+
+- **`{poem_id}_analysis.json`**: Detailed displacement analysis data
+- **`{poem_id}_visualization.html`**: Interactive visualization with statistics
+- **Console output**: Summary statistics and top displacement events
+
+### Research Applications
+
+This system enables quantitative analysis for:
+
+- **Literary criticism**: Measuring poetic effects in code poetry
+- **Computational aesthetics**: Understanding human-computer interaction through poetry
+- **Semiotic theory**: Validating Peirce's sign theory in digital contexts
+- **Reader studies**: Correlating displacement patterns with reader attention
+
+### Advanced Usage
+
+#### Custom Displacement Detection
+```bash
+# Modify detection patterns in:
+tools/displacement_patterns.py
+
+# Add new poetry patterns to:
+self.patterns = {
+    'your_pattern': [...],
+}
+```
+
+#### Extending to Other Languages
+```bash
+# Add language support in:
+tools/parser/plugins/your_language.py
+
+# Update configuration:
+config.yml
+```
+
+### Dependencies
+
+```bash
+# Required for displacement analysis
+pip install tree-sitter tree-sitter-languages PyYAML
+
+# Optional: for advanced analysis
+pip install numpy pandas matplotlib
+```
+
+### Research Citation
+
+If you use this displacement analysis system in your research, please cite:
+
+```
+[Your research paper on semiotic displacement in code poetry]
+"Semiotic Displacement and Peirce's Sign Classification in Code Poetry"
+```
