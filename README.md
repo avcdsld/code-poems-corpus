@@ -187,9 +187,12 @@ The system detects various displacement patterns:
 
 ### Output Files
 
-- **`{poem_id}_analysis.json`**: Detailed displacement analysis data
-- **`{poem_id}_visualization.html`**: Interactive visualization with statistics
+- **`output/analysis/{poem_id}_displacement_analysis.json`**: Detailed displacement analysis data
+- **`output/visualization/{poem_id}_displacement_visualization.html`**: Interactive visualization with statistics
+- **`output/comparison/poem_comparison_N_works.json`**: Comparative analysis results
 - **Console output**: Summary statistics and top displacement events
+
+> **Note**: Output files are organized in the `output/` directory and can be safely deleted after use. They are automatically recreated when running analysis commands.
 
 ### Research Applications
 

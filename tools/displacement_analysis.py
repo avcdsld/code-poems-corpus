@@ -37,7 +37,7 @@ class DisplacementAnalyzer:
                            displacements: List[DisplacementEvent],
                            code_lines: List[str],
                            parent_type: str = None):
-        """ASTを再帰的に走査して詩的使用を検出"""
+        """ASTを再帰的に走査して語彙的転位を検出（未宣言識別子の意味転位）"""
         
         if not isinstance(node, dict):
             return
