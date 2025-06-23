@@ -111,5 +111,6 @@ deactivate
 
 ```bash
 python -m tools.parser.parse_corpus --lang js
-python -m tools.icon_scanner.scan_corpus --lang js
+python tools/parser/list_node_types.py
+python tools/parser/annotate_ast.py
 ```
