@@ -44,12 +44,36 @@ class MinimalDisplacementAnalyzer:
         
         # 未宣言識別子の転位を検出
         if node_type == 'identifier' and node_text:
-            is_declared = node_text in declared_vars
-            displacement = self.displacement_detector.detect_undeclared_identifier_displacement(
-                node_text, node_type, start_pos, end_pos, is_declared
-            )
-            if displacement:
-                displacements.append(displacement)
+            # 言語固有のフィルタリング
+            if language == "java":
+                # Javaの場合、メンバーアクセスやメソッド呼び出しの一部は除外
+                if parent_type in ['member_access', 'method_invocation', 'scoped_identifier']:
+                    pass  # これらのコンテキストでは検出しない
+                else:
+                    is_declared = node_text in declared_vars
+                    displacement = self.displacement_detector.detect_undeclared_identifier_displacement(
+                        node_text, node_type, start_pos, end_pos, is_declared
+                    )
+                    if displacement:
+                        displacements.append(displacement)
+            elif language in ["c", "cpp"]:
+                # C/C++の場合、型宣言やパラメータ宣言の一部は除外
+                if parent_type in ['parameter_declaration', 'field_identifier', 'type_identifier']:
+                    pass  # これらのコンテキストでは検出しない
+                else:
+                    is_declared = node_text in declared_vars
+                    displacement = self.displacement_detector.detect_undeclared_identifier_displacement(
+                        node_text, node_type, start_pos, end_pos, is_declared
+                    )
+                    if displacement:
+                        displacements.append(displacement)
+            else:
+                is_declared = node_text in declared_vars
+                displacement = self.displacement_detector.detect_undeclared_identifier_displacement(
+                    node_text, node_type, start_pos, end_pos, is_declared
+                )
+                if displacement:
+                    displacements.append(displacement)
         
         # HTMLの詩的エラー要素を転位として検出
         elif node_type == 'ERROR' and node_text and language == "html":
@@ -78,6 +102,18 @@ class MinimalDisplacementAnalyzer:
         elif language == "html":
             from .parser.plugins.html_displacement import create_html_adapter
             adapter = create_html_adapter()
+            return adapter.extract_declared_variables(ast_data)
+        elif language == "c":
+            from .parser.plugins.c_displacement import create_c_adapter
+            adapter = create_c_adapter()
+            return adapter.extract_declared_variables(ast_data)
+        elif language == "java":
+            from .parser.plugins.java_displacement import create_java_adapter
+            adapter = create_java_adapter()
+            return adapter.extract_declared_variables(ast_data)
+        elif language == "cpp":
+            from .parser.plugins.cpp_displacement import create_cpp_adapter
+            adapter = create_cpp_adapter()
             return adapter.extract_declared_variables(ast_data)
         else:
             # JavaScript (デフォルト)
@@ -216,6 +252,12 @@ def load_poem_data(poem_id: str, language: str = "js") -> tuple[Dict[str, Any], 
         code_path = Path(f"corpus_raw/{language}/{poem_id}.py")
     elif language == "html":
         code_path = Path(f"corpus_raw/{language}/{poem_id}.html")
+    elif language == "c":
+        code_path = Path(f"corpus_raw/{language}/{poem_id}.c")
+    elif language == "java":
+        code_path = Path(f"corpus_raw/{language}/{poem_id}.java")
+    elif language == "cpp":
+        code_path = Path(f"corpus_raw/{language}/{poem_id}.cpp")
     else:
         code_path = Path(f"corpus_raw/{language}/{poem_id}.{language}")
     
