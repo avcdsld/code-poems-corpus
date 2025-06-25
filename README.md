@@ -14,10 +14,25 @@ with stand-off syntax annotations generated via Tree-sitter.
 
 ```
 code-poems-corpus/
-├── LICENSE # CC BY-NC-ND 3.0 – original poems
-├── README.md # ← you are here
-├── corpus_raw/ # ① raw corpus
-└── corpus_tei/ # ② annotated corpus (TEI + standOff)
+├── LICENSE                     # CC BY-NC-ND 3.0 – original poems
+├── README.md                   # ← you are here
+├── requirements.txt            # Python dependencies
+├── analyze_displacement.py     # Main analysis script
+├── config.yml                  # Configuration file
+├── corpus_raw/                 # ① raw corpus (original poems)
+├── corpus_processed/           # ② tree-sitter parsed data (AST/tokens)
+├── corpus_tei/                 # ③ annotated corpus (TEI + standOff)
+├── tools/                      # analysis and processing pipeline
+│   ├── displacement_analysis.py   # core displacement detection
+│   ├── displacement_patterns.py   # pattern definitions
+│   ├── visualization.py           # HTML visualization
+│   └── parser/                     # corpus processing tools
+├── docs/                       # theoretical documentation
+└── output/                     # generated analysis results
+    ├── analysis/               # JSON analysis data
+    ├── ast/                    # syntax tree outputs
+    ├── visualization/          # HTML visualizations
+    └── comparison/             # comparative analysis
 ```
 
 ---
@@ -133,12 +148,22 @@ The system applies Peirce's triadic sign classification to programming code:
 
 ### Quick Analysis
 
-#### 1. Basic Displacement Analysis
+#### 1. AST Output (Syntax Analysis)
 ```bash
 # List available poems
 python analyze_displacement.py list
 
-# Analyze specific poems
+# View syntax analysis results only
+python analyze_displacement.py ast 5_disfunction
+python analyze_displacement.py ast 5_disfunction --lang js
+
+# Save AST to file
+python analyze_displacement.py ast 5_disfunction --output file
+```
+
+#### 2. Displacement Analysis
+```bash
+# Analyze semiotic displacements
 python analyze_displacement.py analyze 5_disfunction
 python analyze_displacement.py analyze 52_desperate_program
 
@@ -146,7 +171,7 @@ python analyze_displacement.py analyze 52_desperate_program
 python analyze_displacement.py analyze 5_disfunction --viz
 ```
 
-#### 2. Interactive Visualization
+#### 3. Interactive Visualization
 ```bash
 # Generate HTML visualization
 python analyze_displacement.py visualize 5_disfunction
@@ -157,7 +182,7 @@ open 5_disfunction_displacement_visualization.html
 open 52_desperate_program_displacement_visualization.html
 ```
 
-#### 3. Comparative Analysis
+#### 4. Comparative Analysis
 ```bash
 # Compare multiple poems
 python analyze_displacement.py compare 5_disfunction 52_desperate_program 35_immediate_function
@@ -187,6 +212,7 @@ The system detects various displacement patterns:
 
 ### Output Files
 
+- **`output/ast/{poem_id}_ast_{lang}.txt`**: Syntax analysis (AST) output files
 - **`output/analysis/{poem_id}_displacement_analysis.json`**: Detailed displacement analysis data
 - **`output/visualization/{poem_id}_displacement_visualization.html`**: Interactive visualization with statistics
 - **`output/comparison/poem_comparison_N_works.json`**: Comparative analysis results
@@ -225,13 +251,34 @@ tools/parser/plugins/your_language.py
 config.yml
 ```
 
-### Dependencies
+### Installation
 
 ```bash
-# Required for displacement analysis
-pip install tree-sitter tree-sitter-languages PyYAML
+# Clone repository
+git clone https://github.com/username/code-poems-corpus.git
+cd code-poems-corpus
 
-# Optional: for advanced analysis
+# Set up Python environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### Dependencies
+
+The core dependencies are listed in `requirements.txt`:
+
+```bash
+tree-sitter>=0.20.0
+tree-sitter-languages>=1.5.0
+PyYAML>=6.0
+```
+
+Optional dependencies for advanced analysis:
+```bash
 pip install numpy pandas matplotlib
 ```
 

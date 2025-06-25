@@ -11,24 +11,73 @@ from pathlib import Path
 
 # tools モジュールをインポート
 sys.path.append('.')
-from tools.displacement_analysis import analyze_single_poem, load_poem_data, DisplacementAnalyzer
+from tools.displacement_analysis import analyze_single_poem, load_poem_data, MinimalDisplacementAnalyzer
 from tools.visualization import DisplacementVisualizer
 
 
 def list_available_poems():
     """利用可能な詩作品をリスト"""
-    print("利用可能な作品:")
+    languages = ["js", "python"] 
     
-    js_dir = Path("corpus_processed/js")
-    if js_dir.exists():
-        for poem_dir in js_dir.iterdir():
-            if poem_dir.is_dir() and poem_dir.name != "_cache":
-                print(f"  {poem_dir.name}")
+    print("利用可能な作品:")
+    for lang in languages:
+        lang_dir = Path(f"corpus_processed/{lang}")
+        if lang_dir.exists():
+            print(f"\n{lang.upper()}:")
+            poem_files = []
+            for poem_dir in lang_dir.iterdir():
+                if poem_dir.is_dir() and poem_dir.name != "_cache":
+                    poem_files.append(poem_dir.name)
+            
+            for poem_id in sorted(poem_files):
+                print(f"  {poem_id}")
+        else:
+            print(f"\n{lang.upper()}: (処理済みファイルなし)")
 
+
+def show_ast_command(poem_id: str, language: str = "js", output_to_file: bool = False):
+    """構文解析結果（AST）を表示"""
+    
+    print(f"=== {poem_id} の構文解析結果 (AST) ===")
+    
+    try:
+        # ASTデータを読み込み
+        ast_data, code_text = load_poem_data(poem_id, language)
+        
+        # 出力内容を準備
+        output_lines = []
+        output_lines.append(f"=== {poem_id} の構文解析結果 (AST) ===")
+        output_lines.append("")
+        output_lines.append("ソースコード:")
+        output_lines.append("-" * 40)
+        for i, line in enumerate(code_text.splitlines(), 1):
+            output_lines.append(f"{i:2}: {line}")
+        
+        output_lines.append("")
+        output_lines.append("構文解析結果 (AST):")
+        output_lines.append("-" * 40)
+        output_lines.append(json.dumps(ast_data, indent=2, ensure_ascii=False))
+        
+        # 画面に出力
+        for line in output_lines:
+            print(line)
+        
+        # ファイルに出力（オプション）
+        if output_to_file:
+            os.makedirs('output/ast', exist_ok=True)
+            output_file = f"output/ast/{poem_id}_ast_{language}.txt"
+            with open(output_file, 'w', encoding='utf-8') as f:
+                f.write("\n".join(output_lines))
+            print(f"\n構文解析結果をファイルに保存: {output_file}")
+        
+    except FileNotFoundError as e:
+        print(f"エラー: {e}")
+    except Exception as e:
+        print(f"分析中にエラーが発生しました: {e}")
 
 def analyze_poem_command(poem_id: str, language: str = "js", 
                         generate_visualization: bool = False):
-    """詩作品を分析"""
+    """詩作品を分析（記号転位検出のみ）"""
     
     print(f"=== {poem_id} の記号転位分析 ===")
     
@@ -47,24 +96,20 @@ def analyze_poem_command(poem_id: str, language: str = "js",
         print(f"検出された転位: {analysis['total_displacements']}")
         
         if analysis['total_displacements'] > 0:
-            print(f"最大強度: {analysis['max_intensity']:.2f}")
-            print(f"平均強度: {analysis['avg_intensity']:.2f}")
-            
-            print("\n主要な転位:")
-            for disp in analysis['top_displacements']:
+            print("\n検出された記号転位:")
+            for disp in analysis['detected_displacements']:
                 print(f"  行{disp['line']}: {disp['text']}")
                 print(f"    → {disp['description']}")
-                print(f"    パターン: {disp['pattern']}, 強度: {disp['intensity']:.2f}")
+                print(f"    転位: {disp['expected_sign_type']} → {disp['actual_sign_type']}")
+                print(f"    根拠: {disp['theoretical_basis']}")
                 print()
             
-            print("詩的解釈:")
-            print(analysis['poetic_interpretation'])
+            print("理論的要約:")
+            print(analysis['theoretical_summary'])
         else:
-            print("詩的転位が検出されませんでした。")
-            if 'suggestions' in analysis:
-                print("提案:")
-                for suggestion in analysis['suggestions']:
-                    print(f"  - {suggestion}")
+            print(analysis['message'])
+            if 'theoretical_summary' in analysis:
+                print(analysis['theoretical_summary'])
         
         # 結果をJSONファイルに保存
         os.makedirs('output/analysis', exist_ok=True)
@@ -179,9 +224,10 @@ def main():
         print()
         print("使用法:")
         print("  python analyze_displacement.py list")
-        print("  python analyze_displacement.py analyze <poem_id> [--viz]")
-        print("  python analyze_displacement.py visualize <poem_id>")
-        print("  python analyze_displacement.py compare <poem_id1> <poem_id2> ...")
+        print("  python analyze_displacement.py ast <poem_id> [--lang js|python] [--output file]")
+        print("  python analyze_displacement.py analyze <poem_id> [--lang js|python] [--viz]")
+        print("  python analyze_displacement.py visualize <poem_id> [--lang js|python]")
+        print("  python analyze_displacement.py compare <poem_id1> <poem_id2> ... [--lang js|python]")
         print()
         list_available_poems()
         return
@@ -191,14 +237,35 @@ def main():
     if command == "list":
         list_available_poems()
     
+    elif command == "ast":
+        if len(sys.argv) < 3:
+            print("エラー: 詩作品IDを指定してください")
+            return
+        
+        poem_id = sys.argv[2]
+        language = "js"  # デフォルト
+        if "--lang" in sys.argv:
+            lang_idx = sys.argv.index("--lang")
+            if lang_idx + 1 < len(sys.argv):
+                language = sys.argv[lang_idx + 1]
+        
+        output_to_file = "--output" in sys.argv and "file" in sys.argv
+        show_ast_command(poem_id, language, output_to_file)
+    
     elif command == "analyze":
         if len(sys.argv) < 3:
             print("エラー: 詩作品IDを指定してください")
             return
         
         poem_id = sys.argv[2]
+        language = "js"  # デフォルト
+        if "--lang" in sys.argv:
+            lang_idx = sys.argv.index("--lang")
+            if lang_idx + 1 < len(sys.argv):
+                language = sys.argv[lang_idx + 1]
+        
         generate_viz = "--viz" in sys.argv
-        analyze_poem_command(poem_id, generate_visualization=generate_viz)
+        analyze_poem_command(poem_id, language, generate_viz)
     
     elif command == "visualize":
         if len(sys.argv) < 3:
@@ -218,7 +285,7 @@ def main():
     
     else:
         print(f"不明なコマンド: {command}")
-        print("利用可能なコマンド: list, analyze, visualize, compare")
+        print("利用可能なコマンド: list, ast, analyze, visualize, compare")
 
 
 if __name__ == "__main__":

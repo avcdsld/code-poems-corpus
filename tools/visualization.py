@@ -4,20 +4,15 @@
 """
 
 from typing import List, Dict, Any
-from .displacement_patterns import DisplacementEvent, PoetryPattern
+from .displacement_patterns import DisplacementEvent, DisplacementType
 
 
 class DisplacementVisualizer:
     """記号転位可視化器"""
     
     def __init__(self):
-        self.pattern_colors = {
-            PoetryPattern.EMOTIONAL_EXPRESSION: "#ff6b6b",
-            PoetryPattern.NARRATIVE_IDENTIFIER: "#4ecdc4", 
-            PoetryPattern.METAPHORICAL_SYNTAX: "#6c5ce7",
-            PoetryPattern.SEMANTIC_INVERSION: "#f9ca24",
-            PoetryPattern.VISUAL_POETRY: "#45b7d1",
-            PoetryPattern.TEMPORAL_EXPRESSION: "#ff7675",
+        self.displacement_colors = {
+            DisplacementType.UNDECLARED_IDENTIFIER: "#ff6b6b",
         }
     
     def generate_html_visualization(self, 
@@ -105,10 +100,10 @@ class DisplacementVisualizer:
         if displacements:
             info_items = []
             for disp in displacements:
-                color = self.pattern_colors.get(disp.pattern, "#ddd")
+                color = self.displacement_colors.get(disp.displacement_type, "#ddd")
                 info_items.append(f'''
                 <div class="displacement-item" style="border-left-color: {color};">
-                    <div class="disp-pattern">{disp.pattern.value}</div>
+                    <div class="disp-pattern">{disp.displacement_type.value}</div>
                     <div class="disp-intensity">強度: {disp.intensity:.2f}</div>
                     <div class="disp-description">{disp.description}</div>
                 </div>
@@ -137,20 +132,52 @@ class DisplacementVisualizer:
         if not displacements:
             return self._escape_html(line_text)
         
-        highlighted = self._escape_html(line_text)
+        # 文字位置ごとの転位情報を管理
+        char_displacements = {}
         for disp in displacements:
             if disp.node_text in line_text:
-                pattern_class = f"displacement {disp.pattern.value}"
-                color = self.pattern_colors.get(disp.pattern, "#ddd")
-                
-                highlighted = highlighted.replace(
-                    self._escape_html(disp.node_text),
-                    f'<span class="{pattern_class}" style="border-bottom-color: {color};" '
-                    f'title="{self._escape_html(disp.description)}">'
-                    f'{self._escape_html(disp.node_text)}</span>'
-                )
+                start_idx = line_text.index(disp.node_text)
+                end_idx = start_idx + len(disp.node_text)
+                for i in range(start_idx, end_idx):
+                    if i not in char_displacements:
+                        char_displacements[i] = []
+                    char_displacements[i].append(disp)
         
-        return highlighted
+        # 文字列を構築
+        result = []
+        escaped_text = self._escape_html(line_text)
+        current_disps = []
+        
+        for i, char in enumerate(line_text):
+            # 新しい転位の開始タグを追加
+            new_disps = [d for d in char_displacements.get(i, []) 
+                        if d not in current_disps]
+            for disp in new_disps:
+                displacement_class = f"displacement {disp.displacement_type.value}"
+                color = self.displacement_colors.get(disp.displacement_type, "#ddd")
+                result.append(
+                    f'<span class="{displacement_class}" '
+                    f'style="border-bottom-color: {color};" '
+                    f'title="{self._escape_html(disp.description)}">'
+                )
+                current_disps.append(disp)
+            
+            # 終了した転位のタグを閉じる
+            if i > 0:
+                ended_disps = [d for d in current_disps 
+                             if i >= line_text.index(d.node_text) + len(d.node_text)]
+                for _ in ended_disps:
+                    result.append('</span>')
+                    current_disps.remove(_)
+            
+            # 文字を追加
+            result.append(self._escape_html(char))
+        
+        # 残りの転位タグを閉じる
+        for _ in current_disps:
+            result.append('</span>')
+        
+        return ''.join(result)
     
     def _generate_statistics_panel(self, analysis_report: Dict[str, Any]) -> str:
         """統計パネルを生成"""
@@ -167,20 +194,20 @@ class DisplacementVisualizer:
         max_intensity = analysis_report.get('max_intensity', 0)
         avg_intensity = analysis_report.get('avg_intensity', 0)
         
-        # パターン別統計
-        pattern_stats = ""
-        patterns = analysis_report.get('pattern_distribution', {})
-        for pattern_name, stats in patterns.items():
-            color = self.pattern_colors.get(
-                PoetryPattern(pattern_name), "#ddd"
+        # 転位タイプ別統計
+        displacement_stats = ""
+        types = analysis_report.get('type_distribution', {})
+        for type_name, stats in types.items():
+            color = self.displacement_colors.get(
+                DisplacementType(type_name), "#ddd"
             )
             percentage = (stats['count'] / total) * 100
             
-            pattern_stats += f'''
+            displacement_stats += f'''
             <div class="pattern-stat">
                 <div class="pattern-info">
                     <span class="pattern-color" style="background: {color};"></span>
-                    <span class="pattern-name">{pattern_name}</span>
+                    <span class="pattern-name">{type_name}</span>
                 </div>
                 <div class="pattern-count">{stats['count']}回 ({percentage:.1f}%)</div>
             </div>
@@ -207,9 +234,9 @@ class DisplacementVisualizer:
                 </div>
             </div>
             
-            <h4>パターン分布</h4>
+            <h4>転位分布</h4>
             <div class="pattern-stats">
-                {pattern_stats}
+                {displacement_stats}
             </div>
             
             <h4>詩的解釈</h4>

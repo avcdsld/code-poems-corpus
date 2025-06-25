@@ -5,37 +5,31 @@
 
 from typing import List, Dict, Any
 import json
+import re
 from pathlib import Path
-from .displacement_patterns import PatternDetector, DisplacementEvent, PoetryPattern
+from .displacement_patterns import MinimalDisplacementDetector, DisplacementEvent, DisplacementType
 
 
-class DisplacementAnalyzer:
-    """記号転位分析器"""
+class MinimalDisplacementAnalyzer:
+    """最小限の確実な記号転位分析器"""
     
     def __init__(self):
-        self.pattern_detector = PatternDetector()
+        self.displacement_detector = MinimalDisplacementDetector()
     
-    def analyze_poem(self, ast_data: Dict[str, Any], code_text: str) -> List[DisplacementEvent]:
-        """詩作品の記号転位を分析"""
+    def analyze_poem(self, ast_data: Dict[str, Any], code_text: str, language: str = "js") -> List[DisplacementEvent]:
+        """詩作品の記号転位を分析（最小限の確実な検出のみ）"""
         displacements = []
-        code_lines = code_text.splitlines()
+        declared_vars = self._extract_declared_variables(ast_data, language)
         
-        # ASTを走査して詩的パターンを検出
-        self._traverse_for_poetry(ast_data, displacements, code_lines)
-        
-        # 構造的パターンを検出
-        structural_displacements = self.pattern_detector.analyze_structural_patterns(ast_data)
-        displacements.extend(structural_displacements)
-        
-        # 強度でソート
-        displacements.sort(key=lambda d: d.intensity, reverse=True)
+        # ASTを走査して未宣言識別子の転位を検出
+        self._traverse_for_poetry(ast_data, displacements, declared_vars)
         
         return displacements
     
     def _traverse_for_poetry(self, 
                            node: Dict[str, Any], 
                            displacements: List[DisplacementEvent],
-                           code_lines: List[str],
+                           declared_vars: set,
                            parent_type: str = None):
         """ASTを再帰的に走査して語彙的転位を検出（未宣言識別子の意味転位）"""
         
@@ -47,101 +41,118 @@ class DisplacementAnalyzer:
         start_pos = node.get('start', [0, 0])
         end_pos = node.get('end', [0, 0])
         
-        # 識別子の詩的使用を検出
+        # 未宣言識別子の転位を検出
         if node_type == 'identifier' and node_text:
-            displacement = self.pattern_detector.analyze_identifier(
-                node_text, node_type, start_pos, end_pos, parent_type
+            is_declared = node_text in declared_vars
+            displacement = self.displacement_detector.detect_undeclared_identifier_displacement(
+                node_text, node_type, start_pos, end_pos, is_declared
             )
             if displacement:
                 displacements.append(displacement)
         
-        # コメントの詩的機能を検出
-        elif node_type == 'comment':
-            displacement = self._analyze_comment_poetry(node_text, start_pos, end_pos)
-            if displacement:
-                displacements.append(displacement)
+        # 最小限の実装ではコメント検出は除外
         
         # 子ノードを再帰的に処理
         for child in node.get('children', []):
-            self._traverse_for_poetry(child, displacements, code_lines, node_type)
+            self._traverse_for_poetry(child, displacements, declared_vars, node_type)
     
-    def _analyze_comment_poetry(self, comment_text: str, start_pos: List[int], end_pos: List[int]) -> DisplacementEvent:
-        """コメントの詩的機能を分析"""
+    def _extract_declared_variables(self, ast_data: Dict[str, Any], language: str = "js") -> set:
+        """宣言された変数を抽出（言語固有セマンティクスに基づく）"""
+        if language == "python":
+            from .parser.plugins.python_displacement import create_python_adapter
+            adapter = create_python_adapter()
+            return adapter.extract_declared_variables(ast_data)
+        else:
+            # JavaScript (デフォルト)
+            declared_vars = set()
+            self._collect_declarations(ast_data, declared_vars)
+            return declared_vars
+    
+    def _collect_declarations(self, node: Dict[str, Any], declared_vars: set):
+        """再帰的に宣言を収集"""
+        if not isinstance(node, dict):
+            return
         
-        if comment_text.strip() in ['//try', '//all that\'s left when you']:
-            return DisplacementEvent(
-                pattern=PoetryPattern.NARRATIVE_IDENTIFIER,
-                node_type='comment',
-                node_text=comment_text,
-                line_number=start_pos[0],
-                column_start=start_pos[1],
-                column_end=end_pos[1],
-                intensity=0.9,
-                description=f"コメント '{comment_text}' による物語的進行",
-                poetic_function="コードと自然言語の橋渡し"
-            )
+        node_type = node.get('type', '')
+        
+        # JavaScript の変数宣言パターン
+        if node_type in ['variable_declarator', 'function_declaration', 'parameter']:
+            name = node.get('name') or node.get('text')
+            if name:
+                declared_vars.add(name)
+        
+        # 子ノードを再帰的に処理
+        for child in node.get('children', []):
+            self._collect_declarations(child, declared_vars)
+    
+    def _analyze_comment_displacement(self, comment_text: str, start_pos: List[int], end_pos: List[int]) -> DisplacementEvent:
+        """コメントの記号転位を分析（理論的基準）"""
+        
+        comment = comment_text.strip()
+        
+        # 技術的コメントの特徴（期待される機能）
+        technical_patterns = [
+            r'^//\s*TODO:', r'^//\s*FIXME:', r'^//\s*NOTE:',
+            r'^//\s*\w+\s*\(.*\)', r'^//\s*\d+', r'^//\s*@'
+        ]
+        
+        # 技術的でないコメントを検出
+        is_technical = any(re.match(pattern, comment, re.IGNORECASE) 
+                          for pattern in technical_patterns)
+        
+        # 短く、技術的説明ではない場合は転位の可能性
+        if not is_technical and len(comment) < 50:
+            # 人称代名詞の使用（読者との対話性）
+            has_personal_pronouns = bool(re.search(r'\b(you|me|i|we|us)\b', comment, re.IGNORECASE))
+            
+            # 感情的・詩的語彙
+            has_poetic_language = bool(re.search(r'\b(try|left|when|all|that)\b', comment, re.IGNORECASE))
+            
+            if has_personal_pronouns or has_poetic_language:
+                intensity = 0.6 + (0.3 if has_personal_pronouns else 0) + (0.1 if has_poetic_language else 0)
+                
+                return DisplacementEvent(
+                    pattern=PoetryPattern.NARRATIVE_IDENTIFIER,
+                    node_type='comment',
+                    node_text=comment_text,
+                    line_number=start_pos[0],
+                    column_start=start_pos[1],
+                    column_end=end_pos[1],
+                    intensity=min(intensity, 1.0),
+                    description=f"技術的説明から詩的語りかけへの転位: '{comment}'",
+                    poetic_function="コメントの詩的・対話的機能への転位"
+                )
         
         return None
     
     def generate_analysis_report(self, displacements: List[DisplacementEvent]) -> Dict[str, Any]:
-        """分析レポートを生成"""
+        """分析レポートを生成（最小限の実装）"""
         
         if not displacements:
             return {
                 "total_displacements": 0,
-                "message": "詩的転位が検出されませんでした",
-                "suggestions": [
-                    "識別子により明確な詩的意味を持たせる",
-                    "構文構造による視覚的・リズム的効果を追加",
-                    "コメントとコードの相互作用を強化"
-                ]
+                "message": "未宣言識別子による記号転位は検出されませんでした",
+                "theoretical_summary": "このコードは技術的機能を主体としており、Peirce記号論的な転位は観察されません。"
             }
-        
-        # パターン別統計
-        pattern_stats = {}
-        for disp in displacements:
-            pattern_name = disp.pattern.value
-            if pattern_name not in pattern_stats:
-                pattern_stats[pattern_name] = {
-                    'count': 0,
-                    'avg_intensity': 0,
-                    'examples': []
-                }
-            
-            pattern_stats[pattern_name]['count'] += 1
-            pattern_stats[pattern_name]['avg_intensity'] += disp.intensity
-            
-            if len(pattern_stats[pattern_name]['examples']) < 3:
-                pattern_stats[pattern_name]['examples'].append({
-                    'text': disp.node_text,
-                    'description': disp.description,
-                    'function': disp.poetic_function
-                })
-        
-        # 平均強度を計算
-        for stats in pattern_stats.values():
-            stats['avg_intensity'] /= stats['count']
         
         return {
             "total_displacements": len(displacements),
-            "max_intensity": max(d.intensity for d in displacements),
-            "avg_intensity": sum(d.intensity for d in displacements) / len(displacements),
-            "pattern_distribution": pattern_stats,
-            "top_displacements": [
+            "detected_displacements": [
                 {
                     "line": d.line_number + 1,
                     "text": d.node_text,
-                    "pattern": d.pattern.value,
-                    "intensity": d.intensity,
-                    "description": d.description,
-                    "poetic_function": d.poetic_function
+                    "displacement_type": d.displacement_type.value,
+                    "expected_sign_type": d.expected_sign_type,
+                    "actual_sign_type": d.actual_sign_type,
+                    "theoretical_basis": d.theoretical_basis,
+                    "description": d.description
                 }
-                for d in displacements[:5]
+                for d in displacements
             ],
-            "poetic_interpretation": self._generate_interpretation(displacements)
+            "theoretical_summary": f"検出された記号転位: {len(displacements)}個。JavaScript未宣言識別子のIndex→Icon転位により、技術的指示機能から直接的表現機能への転位が確認されました。"
         }
     
-    def _generate_interpretation(self, displacements: List[DisplacementEvent]) -> str:
+    # 最小限の実装では詩的解釈は除外（主観的判断のため）
         """詩的解釈を生成"""
         
         high_intensity = [d for d in displacements if d.intensity > 0.8]
@@ -184,7 +195,11 @@ def load_poem_data(poem_id: str, language: str = "js") -> tuple[Dict[str, Any], 
         ast_data = json.load(f)
     
     # ソースコードを読み込み
-    code_path = Path(f"corpus_raw/{language}/{poem_id}.{language}")
+    if language == "python":
+        code_path = Path(f"corpus_raw/{language}/{poem_id}.py")
+    else:
+        code_path = Path(f"corpus_raw/{language}/{poem_id}.{language}")
+    
     if not code_path.exists():
         raise FileNotFoundError(f"ソースファイルが見つかりません: {code_path}")
     
@@ -202,8 +217,8 @@ def analyze_single_poem(poem_id: str, language: str = "js") -> Dict[str, Any]:
     except FileNotFoundError as e:
         return {"error": str(e)}
     
-    analyzer = DisplacementAnalyzer()
-    displacements = analyzer.analyze_poem(ast_data, code_text)
+    analyzer = MinimalDisplacementAnalyzer()
+    displacements = analyzer.analyze_poem(ast_data, code_text, language)
     report = analyzer.generate_analysis_report(displacements)
     
     return {
@@ -212,13 +227,14 @@ def analyze_single_poem(poem_id: str, language: str = "js") -> Dict[str, Any]:
         "analysis": report,
         "displacements": [
             {
-                "pattern": d.pattern.value,
+                "displacement_type": d.displacement_type.value,
                 "node_type": d.node_type,
                 "node_text": d.node_text,
                 "line_number": d.line_number + 1,
-                "intensity": d.intensity,
-                "description": d.description,
-                "poetic_function": d.poetic_function
+                "expected_sign_type": d.expected_sign_type,
+                "actual_sign_type": d.actual_sign_type,
+                "theoretical_basis": d.theoretical_basis,
+                "description": d.description
             }
             for d in displacements
         ]
