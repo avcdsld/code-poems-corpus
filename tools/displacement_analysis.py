@@ -22,7 +22,7 @@ class MinimalDisplacementAnalyzer:
         declared_vars = self._extract_declared_variables(ast_data, language)
         
         # ASTを走査して未宣言識別子の転位を検出
-        self._traverse_for_poetry(ast_data, displacements, declared_vars)
+        self._traverse_for_poetry(ast_data, displacements, declared_vars, language)
         
         return displacements
     
@@ -30,6 +30,7 @@ class MinimalDisplacementAnalyzer:
                            node: Dict[str, Any], 
                            displacements: List[DisplacementEvent],
                            declared_vars: set,
+                           language: str = "js",
                            parent_type: str = None):
         """ASTを再帰的に走査して語彙的転位を検出（未宣言識別子の意味転位）"""
         
@@ -50,11 +51,23 @@ class MinimalDisplacementAnalyzer:
             if displacement:
                 displacements.append(displacement)
         
+        # HTMLの詩的エラー要素を転位として検出
+        elif node_type == 'ERROR' and node_text and language == "html":
+            # HTML詩的コメント <!-word-> の検出
+            if node_text.startswith('-') and node_text.endswith('-') and len(node_text) > 2:
+                word = node_text[1:-1]  # - を除去
+                if word and word.isalpha():
+                    displacement = self.displacement_detector.detect_undeclared_identifier_displacement(
+                        word, 'poetic_html_comment', start_pos, end_pos, False
+                    )
+                    if displacement:
+                        displacements.append(displacement)
+        
         # 最小限の実装ではコメント検出は除外
         
         # 子ノードを再帰的に処理
         for child in node.get('children', []):
-            self._traverse_for_poetry(child, displacements, declared_vars, node_type)
+            self._traverse_for_poetry(child, displacements, declared_vars, language, node_type)
     
     def _extract_declared_variables(self, ast_data: Dict[str, Any], language: str = "js") -> set:
         """宣言された変数を抽出（言語固有セマンティクスに基づく）"""
