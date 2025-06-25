@@ -1,12 +1,12 @@
 from __future__ import annotations
 from typing import Any, Dict, List
 
-from tree_sitter import Parser, Language
-import tree_sitter_html as tshtml
+from tree_sitter import Parser
+from tree_sitter_languages import get_language
 
 from tools.parser.parse_corpus import ParserPlugin
 
-HTML_LANGUAGE = Language(tshtml.language())
+HTML_LANGUAGE = get_language("html")
 
 
 class Plugin(ParserPlugin):
@@ -14,7 +14,7 @@ class Plugin(ParserPlugin):
 
     def __init__(self):
         self._parser = Parser()
-        self._parser.language = HTML_LANGUAGE
+        self._parser.set_language(HTML_LANGUAGE)
 
     # ── Token list (葉ノードのみ) ───────────────────────────
     def tokenise(self, code: str) -> List[Dict[str, Any]]:
@@ -50,8 +50,7 @@ def _to_dict(node, src: str):
         "start": node.start_point,
         "end": node.end_point,
     }
-    if node.child_count == 0:
-        d["text"] = src[node.start_byte : node.end_byte]
-    else:
+    d["text"] = src[node.start_byte : node.end_byte]
+    if node.child_count > 0:
         d["children"] = [_to_dict(c, src) for c in node.children]
     return d
