@@ -17,7 +17,7 @@ from tools.visualization import DisplacementVisualizer
 
 def list_available_poems():
     """利用可能な詩作品をリスト"""
-    languages = ["js", "python"] 
+    languages = ["js", "python", "html"] 
     
     print("利用可能な作品:")
     for lang in languages:

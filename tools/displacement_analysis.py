@@ -62,6 +62,10 @@ class MinimalDisplacementAnalyzer:
             from .parser.plugins.python_displacement import create_python_adapter
             adapter = create_python_adapter()
             return adapter.extract_declared_variables(ast_data)
+        elif language == "html":
+            from .parser.plugins.html_displacement import create_html_adapter
+            adapter = create_html_adapter()
+            return adapter.extract_declared_variables(ast_data)
         else:
             # JavaScript (デフォルト)
             declared_vars = set()
@@ -197,6 +201,8 @@ def load_poem_data(poem_id: str, language: str = "js") -> tuple[Dict[str, Any], 
     # ソースコードを読み込み
     if language == "python":
         code_path = Path(f"corpus_raw/{language}/{poem_id}.py")
+    elif language == "html":
+        code_path = Path(f"corpus_raw/{language}/{poem_id}.html")
     else:
         code_path = Path(f"corpus_raw/{language}/{poem_id}.{language}")
     
