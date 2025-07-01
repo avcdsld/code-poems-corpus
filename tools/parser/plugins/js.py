@@ -1,23 +1,25 @@
-from __future__ import annotations
-from typing import Any, Dict, List
+"""JavaScript language parser plugin for tree-sitter."""
 
+from typing import Dict, List, Any
 from tree_sitter import Parser
 from tree_sitter_languages import get_language
 
-from tools.parser.parse_corpus import ParserPlugin
+from . import ParserPlugin
 
 JS_LANGUAGE = get_language("javascript")
 
 
 class Plugin(ParserPlugin):
-    extensions = [".js", ".mjs", ".cjs"]
-
-    def __init__(self, *args, **kwargs):
+    """JavaScript language parser plugin."""
+    
+    extensions = ['.js']
+    
+    def __init__(self):
         self._parser = Parser()
         self._parser.set_language(JS_LANGUAGE)
-
-    # ── Token list (葉ノードのみ) ───────────────────────────
-    def tokenise(self, code: str) -> List[Dict[str, Any]]:
+    
+    def tokenise(self, code: str) -> List[Dict]:
+        """Tokenize JavaScript code using tree-sitter."""
         tree = self._parser.parse(code.encode())
         out: List[Dict[str, Any]] = []
         stack = [tree.walk()]
@@ -28,30 +30,32 @@ class Plugin(ParserPlugin):
                 out.append(
                     dict(
                         type=node.type,
-                        text=code[node.start_byte : node.end_byte],
+                        text=code[node.start_byte:node.end_byte].decode(),
                         start=node.start_point,
                         end=node.end_point,
                     )
                 )
             else:
-                for child in reversed(node.children):
-                    stack.append(child.walk())
+                for child in node.children:
+                    stack.append(cur.goto_first_child())
+                    cur.goto_parent()
         return out
 
-    # ── フル AST をネスト辞書で ───────────────────────────
-    def parse_ast(self, code: str):
+    def parse_ast(self, code: str) -> Dict:
+        """Parse JavaScript code into AST using tree-sitter."""
         tree = self._parser.parse(code.encode())
-        return _to_dict(tree.root_node, code)
-
-
-def _to_dict(node, src: str):
-    d: Dict[str, Any] = {
-        "type": node.type,
-        "start": node.start_point,
-        "end": node.end_point,
-    }
-    if node.child_count == 0:
-        d["text"] = src[node.start_byte : node.end_byte]
-    else:
-        d["children"] = [_to_dict(c, src) for c in node.children]
-    return d
+        
+        def convert_node(node):
+            result = {
+                'type': node.type,
+                'start': {'row': node.start_point[0], 'column': node.start_point[1]},
+                'end': {'row': node.end_point[0], 'column': node.end_point[1]},
+                'text': code[node.start_byte:node.end_byte]
+            }
+            
+            if node.children:
+                result['children'] = [convert_node(child) for child in node.children]
+                
+            return result
+            
+        return convert_node(tree.root_node)

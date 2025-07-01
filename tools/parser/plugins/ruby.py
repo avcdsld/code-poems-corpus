@@ -1,25 +1,25 @@
-"""Java language parser plugin for tree-sitter."""
+"""Ruby language parser plugin for tree-sitter."""
 
 from typing import Dict, List, Any
 from tree_sitter import Parser
 from tree_sitter_languages import get_language
 
-from .. import ParserPlugin
+from . import ParserPlugin
 
-JAVA_LANGUAGE = get_language("java")
+RUBY_LANGUAGE = get_language("ruby")
 
 
 class Plugin(ParserPlugin):
-    """Java language parser plugin."""
+    """Ruby language parser plugin."""
     
-    extensions = ['.java']
+    extensions = ['.rb']
     
     def __init__(self):
         self._parser = Parser()
-        self._parser.set_language(JAVA_LANGUAGE)
+        self._parser.set_language(RUBY_LANGUAGE)
     
     def tokenise(self, code: str) -> List[Dict]:
-        """Tokenize Java code using tree-sitter."""
+        """Tokenize Ruby code using tree-sitter."""
         tree = self._parser.parse(code.encode())
         out: List[Dict[str, Any]] = []
         stack = [tree.walk()]
@@ -42,7 +42,7 @@ class Plugin(ParserPlugin):
         return out
 
     def parse_ast(self, code: str) -> Dict:
-        """Parse Java code into AST using tree-sitter."""
+        """Parse Ruby code into AST using tree-sitter."""
         tree = self._parser.parse(code.encode())
         
         def convert_node(node):
@@ -58,4 +58,4 @@ class Plugin(ParserPlugin):
                 
             return result
             
-        return convert_node(tree.root_node)
+        return convert_node(tree.root_node) 
