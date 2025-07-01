@@ -1,7 +1,0 @@
-function SphereMercator(params) {
-    /*  =========== parameters  =  ===================== */
-  params = params || {};
-  SpatialReference.call(this, params);
-    this.a_ = (params.semi_major || 6378137.0) / (params.unit || 1);
-    this.lamda0_ = (params.central_meridian || 0.0) * RAD_DEG;
-}

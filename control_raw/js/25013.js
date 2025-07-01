@@ -1,9 +1,0 @@
-function buildDocs(file) {
-    if (file != "docs/json/index.json") {
-      var doc = JSON.parse(fs.read(file)),
-        destination = file.replace('/json', "").replace('.json', ".md"),
-        md = buildMarkdown(doc);
-
-      fs.write(destination, md, false);
-    }
-  }

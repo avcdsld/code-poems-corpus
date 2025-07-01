@@ -1,8 +1,0 @@
-private void drawInterfere(Graphics2D g) {
-		final ThreadLocalRandom random = RandomUtil.getRandom();
-
-		for (int i = 0; i < this.interfereCount; i++) {
-			g.setColor(ImgUtil.randomColor(random));
-			g.drawOval(random.nextInt(width), random.nextInt(height), random.nextInt(height >> 1), random.nextInt(height >> 1));
-		}
-	}

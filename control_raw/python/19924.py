@@ -1,7 +1,0 @@
-def _clone_file_everywhere(self, finfo):
-        """Clone file (*src_editor* widget) in all editorstacks
-        Cloning from the first editorstack in which every single new editor
-        is created (when loading or creating a new file)"""
-        for editorstack in self.editorstacks[1:]:
-            editor = editorstack.clone_editor_from(finfo, set_current=False)
-            self.register_widget_shortcuts(editor)

@@ -1,6 +1,0 @@
-def get_focus_client(self):
-        """Return current client with focus, if any"""
-        widget = QApplication.focusWidget()
-        for client in self.get_clients():
-            if widget is client or widget is client.get_control():
-                return client

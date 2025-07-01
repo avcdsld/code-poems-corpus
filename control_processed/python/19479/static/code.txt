@@ -1,4 +1,0 @@
-def go_to_new_line(self):
-        """Go to the end of the current line and create a new line"""
-        self.stdkey_end(False, False)
-        self.insert_text(self.get_line_separator())

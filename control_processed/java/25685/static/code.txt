@@ -1,9 +1,0 @@
-@Override
-  public Collection<TypeV> values() {
-    return new AbstractCollection<TypeV>() {
-      @Override public void    clear   (          ) {        NonBlockingHashMap.this.clear        ( ); }
-      @Override public int     size    (          ) { return NonBlockingHashMap.this.size         ( ); }
-      @Override public boolean contains( Object v ) { return NonBlockingHashMap.this.containsValue(v); }
-      @Override public Iterator<TypeV> iterator()   { return new SnapshotV(); }
-    };
-  }

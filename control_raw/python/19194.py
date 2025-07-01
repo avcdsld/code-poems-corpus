@@ -1,6 +1,0 @@
-def setup_fs_model(self):
-        """Setup filesystem model"""
-        filters = QDir.AllDirs | QDir.Files | QDir.Drives | QDir.NoDotAndDotDot
-        self.fsmodel = QFileSystemModel(self)
-        self.fsmodel.setFilter(filters)
-        self.fsmodel.setNameFilterDisables(False)

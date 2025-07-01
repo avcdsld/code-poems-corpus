@@ -1,3 +1,0 @@
-public Sftp put(String srcFilePath, String destPath) {
-		return put(srcFilePath, destPath, Mode.OVERWRITE);
-	}

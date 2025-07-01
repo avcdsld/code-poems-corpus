@@ -1,3 +1,0 @@
-public static File writeString(String content, File file, String charset) throws IORuntimeException {
-		return FileWriter.create(file, CharsetUtil.charset(charset)).write(content);
-	}

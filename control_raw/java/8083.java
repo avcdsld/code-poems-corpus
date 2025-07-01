@@ -1,9 +1,0 @@
-public static <T> T[] removeNull(T[] array) {
-		return filter(array, new Editor<T>() {
-			@Override
-			public T edit(T t) {
-				// 返回null便不加入集合
-				return t;
-			}
-		});
-	}

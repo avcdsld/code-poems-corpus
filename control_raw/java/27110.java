@@ -1,9 +1,0 @@
-@Override
-	public Set<Class<?>> getServiceTransactionTypeSet(Class<?> rootType){
-		Map<Class<?>, List<Object>> map = mapBusinessProvider.get(rootType);
-		if(map != null){
-			return  Collections.unmodifiableSet(map.keySet());
-		}else{
-			return null;
-		}
-	}

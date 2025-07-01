@@ -1,3 +1,0 @@
-public static BufferedImage pressImage(Image srcImage, Image pressImg, Rectangle rectangle, float alpha) {
-		return Img.from(srcImage).pressImage(pressImg, rectangle, alpha).getImg();
-	}

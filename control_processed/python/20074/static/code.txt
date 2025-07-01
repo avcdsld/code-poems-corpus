@@ -1,7 +1,0 @@
-def edit_item(self):
-        """Edit item"""
-        index = self.currentIndex()
-        if not index.isValid():
-            return
-        # TODO: Remove hard coded "Value" column number (3 here)
-        self.edit(index.child(index.row(), 3))

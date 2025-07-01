@@ -1,6 +1,0 @@
-public UploadFile[] getFiles(String paramName) {
-		if (requestFiles == null) {
-			return null;
-		}
-		return requestFiles.get(paramName);
-	}
