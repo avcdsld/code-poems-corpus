@@ -1001,13 +1001,53 @@ class CodePoetryAnalyzer:
             poetry_values = [poetry_normalized.get(t, 0) for t in top_types]
             control_values = [control_normalized.get(t, 0) for t in top_types]
             
+            # サンプル間標準誤差でエラーバーを計算
+            def get_sample_ratios(samples, top_types):
+                ratios_per_type = {t: [] for t in top_types}
+                for sample in samples:
+                    node_counts = defaultdict(int)
+                    total = 0
+                    def count_node_types(node):
+                        nonlocal total
+                        if not isinstance(node, dict):
+                            return
+                        node_type = node.get('type', 'unknown')
+                        if node_type in top_types:
+                            node_counts[node_type] += 1
+                        if 'children' in node:
+                            for child in node['children']:
+                                count_node_types(child)
+                        if node_type in top_types:
+                            total += 1
+                    count_node_types(sample['ast'])
+                    for t in top_types:
+                        ratio = (node_counts[t] / total * 100) if total > 0 else 0
+                        ratios_per_type[t].append(ratio)
+                return ratios_per_type
+            def sample_std_error(ratios):
+                n = len(ratios)
+                if n <= 1:
+                    return 0
+                return np.std(ratios, ddof=1) / np.sqrt(n)
+            # サンプルリストを取得
+            poetry_samples = self.poetry_data[lang]
+            control_samples = self.control_data[lang][:20]
+            poetry_ratios = get_sample_ratios(poetry_samples, top_types)
+            control_ratios = get_sample_ratios(control_samples, top_types)
+            poetry_errors = [sample_std_error(poetry_ratios[t]) for t in top_types]
+            control_errors = [sample_std_error(control_ratios[t]) for t in top_types]
+            
             # プロット
             x = np.arange(len(top_types))
             width = 0.35
             
             ax = plt.gca()
-            rects1 = ax.bar(x - width/2, poetry_values, width, label='Code Poetry', color='#2ecc71', alpha=0.8)
-            rects2 = ax.bar(x + width/2, control_values, width, label='Control Group', color='#e74c3c', alpha=0.8)
+            rects1 = ax.bar(x - width/2, poetry_values, width, yerr=poetry_errors, 
+                          label='Code Poetry', color='#2ecc71', alpha=0.8,
+                          capsize=5, error_kw={'ecolor': '#27ae60', 'capthick': 2})
+            rects2 = ax.bar(x + width/2, control_values, width, yerr=control_errors,
+                          label='Control Group', color='#e74c3c', alpha=0.8,
+                          capsize=5, error_kw={'ecolor': '#c0392b', 'capthick': 2})
             
             # グラフの装飾
             plt.title(f'{lang.upper()}\nNode Type Usage Frequency (%)', pad=20)
