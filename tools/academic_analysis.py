@@ -14,10 +14,12 @@ from typing import Dict, List, Tuple, Optional
 from collections import defaultdict, Counter
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy import stats
+import scipy.stats as stats
 from dataclasses import dataclass, field, asdict
 import logging
 from datetime import datetime
+import sys
+import os
 
 # ロギング設定
 logging.basicConfig(
@@ -963,89 +965,48 @@ class CodePoetryAnalyzer:
         
         return report_text
     
-    def create_node_type_visualizations(self, usage_stats: Dict[str, Dict[str, Dict[str, int]]]):
+    def _create_node_type_visualizations(self, node_type_analysis: Dict):
         """ノードタイプ使用頻度の可視化"""
         logger.info("ノードタイプ使用頻度の可視化開始")
         
         # プレゼンテーション用のスタイル設定
-        plt.style.use('seaborn-v0_8-talk')  # より大きなフォントとクリアな表示
+        plt.style.use('seaborn-v0_8-talk')
         
-        # 1. 言語別の上位ノードタイプ棒グラフ（プレゼン用）
+        # 1. 言語別の上位ノードタイプ棒グラフ
         for lang in ['java', 'python', 'js']:
-            plt.figure(figsize=(16, 9))  # 16:9のアスペクト比
+            plt.figure(figsize=(16, 9))
             
-            # データ準備
-            poetry_data = usage_stats['poetry'][lang]
-            control_data = usage_stats['control'][lang]
+            # 上位ノードタイプを選択（平均値の大きい順）
+            poetry_summary = node_type_analysis[lang]['poetry']['summary']
+            control_summary = node_type_analysis[lang]['control']['summary']
             
-            # データ正規化
-            poetry_total = sum(poetry_data.values())
-            control_total = sum(control_data.values())
-            
-            # 正規化したデータを作成
-            poetry_normalized = {k: v / poetry_total * 100 for k, v in poetry_data.items()}
-            control_normalized = {k: v / control_total * 100 for k, v in control_data.items()}
-            
-            # 全ノードタイプの平均使用頻度を計算してソート
-            all_types = set(poetry_normalized.keys()) | set(control_normalized.keys())
-            type_avg_freq = {
-                t: (poetry_normalized.get(t, 0) + control_normalized.get(t, 0)) / 2
+            # 全ノードタイプの平均値を計算
+            all_types = set(poetry_summary.keys()) | set(control_summary.keys())
+            type_avg = {
+                t: (poetry_summary.get(t, {}).get('mean', 0) + 
+                    control_summary.get(t, {}).get('mean', 0)) / 2
                 for t in all_types
             }
             
-            # 平均頻度で降順ソート
-            sorted_types = sorted(type_avg_freq.items(), key=lambda x: x[1], reverse=True)[:8]
-            top_types = [t[0] for t in sorted_types]
+            # 平均値で降順ソート
+            sorted_types = sorted(type_avg.items(), key=lambda x: x[1], reverse=True)
+            top_types = [t[0] for t in sorted_types[:8]]  # 上位8個を表示
             
             # データ準備
-            poetry_values = [poetry_normalized.get(t, 0) for t in top_types]
-            control_values = [control_normalized.get(t, 0) for t in top_types]
-            
-            # サンプル間標準誤差でエラーバーを計算
-            def get_sample_ratios(samples, top_types):
-                ratios_per_type = {t: [] for t in top_types}
-                for sample in samples:
-                    node_counts = defaultdict(int)
-                    total = 0
-                    def count_node_types(node):
-                        nonlocal total
-                        if not isinstance(node, dict):
-                            return
-                        node_type = node.get('type', 'unknown')
-                        if node_type in top_types:
-                            node_counts[node_type] += 1
-                        if 'children' in node:
-                            for child in node['children']:
-                                count_node_types(child)
-                        if node_type in top_types:
-                            total += 1
-                    count_node_types(sample['ast'])
-                    for t in top_types:
-                        ratio = (node_counts[t] / total * 100) if total > 0 else 0
-                        ratios_per_type[t].append(ratio)
-                return ratios_per_type
-            def sample_std_error(ratios):
-                n = len(ratios)
-                if n <= 1:
-                    return 0
-                return np.std(ratios, ddof=1) / np.sqrt(n)
-            # サンプルリストを取得
-            poetry_samples = self.poetry_data[lang]
-            control_samples = self.control_data[lang][:20]
-            poetry_ratios = get_sample_ratios(poetry_samples, top_types)
-            control_ratios = get_sample_ratios(control_samples, top_types)
-            poetry_errors = [sample_std_error(poetry_ratios[t]) for t in top_types]
-            control_errors = [sample_std_error(control_ratios[t]) for t in top_types]
+            poetry_means = [poetry_summary.get(t, {}).get('mean', 0) for t in top_types]
+            poetry_errors = [poetry_summary.get(t, {}).get('std_err', 0) for t in top_types]
+            control_means = [control_summary.get(t, {}).get('mean', 0) for t in top_types]
+            control_errors = [control_summary.get(t, {}).get('std_err', 0) for t in top_types]
             
             # プロット
             x = np.arange(len(top_types))
             width = 0.35
             
             ax = plt.gca()
-            rects1 = ax.bar(x - width/2, poetry_values, width, yerr=poetry_errors, 
+            rects1 = ax.bar(x - width/2, poetry_means, width, yerr=poetry_errors,
                           label='Code Poetry', color='#2ecc71', alpha=0.8,
                           capsize=5, error_kw={'ecolor': '#27ae60', 'capthick': 2})
-            rects2 = ax.bar(x + width/2, control_values, width, yerr=control_errors,
+            rects2 = ax.bar(x + width/2, control_means, width, yerr=control_errors,
                           label='Control Group', color='#e74c3c', alpha=0.8,
                           capsize=5, error_kw={'ecolor': '#c0392b', 'capthick': 2})
             
@@ -1055,7 +1016,7 @@ class CodePoetryAnalyzer:
             plt.ylabel('Usage Frequency (%)', labelpad=15)
             
             # X軸ラベルを見やすく調整
-            plt.xticks(x, [t.replace('_', '\n') for t in top_types], rotation=0)
+            plt.xticks(x, [t.replace('_', '\n') for t in top_types], rotation=30, ha='right')
             
             # 凡例を見やすい位置に
             plt.legend(loc='upper right', bbox_to_anchor=(1, 1))
@@ -1064,18 +1025,18 @@ class CodePoetryAnalyzer:
             plt.grid(True, alpha=0.3, axis='y')
             
             # 値のラベルを追加
-            def autolabel(rects):
-                for rect in rects:
+            def autolabel(rects, errors):
+                for rect, error in zip(rects, errors):
                     height = rect.get_height()
-                    ax.annotate(f'{height:.1f}%',
+                    ax.annotate(f'{height:.1f}±{error:.1f}%',
                               xy=(rect.get_x() + rect.get_width() / 2, height),
                               xytext=(0, 3),  # 3 points vertical offset
                               textcoords="offset points",
                               ha='center', va='bottom',
                               fontsize=10)
             
-            autolabel(rects1)
-            autolabel(rects2)
+            autolabel(rects1, poetry_errors)
+            autolabel(rects2, control_errors)
             
             # レイアウト調整
             plt.tight_layout()
@@ -1085,266 +1046,160 @@ class CodePoetryAnalyzer:
                        dpi=300, bbox_inches='tight', facecolor='white')
             plt.close()
         
-        # 2. 比率のヒートマップ（プレゼン用）
-        plt.figure(figsize=(16, 9))
-        
-        # データ準備
-        languages = ['java', 'python', 'js']
-        node_types = set()
-        
-        # 全言語の主要なノードタイプを収集（上位8個に制限）
-        for lang in languages:
-            poetry_data = usage_stats['poetry'][lang]
-            control_data = usage_stats['control'][lang]
-            
-            poetry_total = sum(poetry_data.values())
-            control_total = sum(control_data.values())
-            
-            poetry_normalized = {k: v / poetry_total * 100 for k, v in poetry_data.items()}
-            control_normalized = {k: v / control_total * 100 for k, v in control_data.items()}
-            
-            # 平均使用頻度でソート
-            all_types = set(poetry_normalized.keys()) | set(control_normalized.keys())
-            type_avg_freq = {
-                t: (poetry_normalized.get(t, 0) + control_normalized.get(t, 0)) / 2
-                for t in all_types
-            }
-            sorted_types = sorted(type_avg_freq.items(), key=lambda x: x[1], reverse=True)[:8]
-            node_types.update(t[0] for t in sorted_types)
-        
-        node_types = sorted(node_types, key=lambda t: max(
-            [type_avg_freq.get(t, 0) for lang in languages]
-        ), reverse=True)
-        
-        # 比率行列の作成
-        ratio_matrix = np.zeros((len(languages), len(node_types)))
-        
-        for i, lang in enumerate(languages):
-            poetry_data = usage_stats['poetry'][lang]
-            control_data = usage_stats['control'][lang]
-            
-            poetry_total = sum(poetry_data.values())
-            control_total = sum(control_data.values())
-            
-            for j, node_type in enumerate(node_types):
-                poetry_ratio = poetry_data.get(node_type, 0) / poetry_total if poetry_total > 0 else 0
-                control_ratio = control_data.get(node_type, 0) / control_total if control_total > 0 else 0
-                
-                if control_ratio > 0:
-                    ratio = np.log2(poetry_ratio / control_ratio)
-                else:
-                    ratio = 0
-                ratio_matrix[i, j] = ratio
-        
-        # ヒートマップの作成
-        sns.heatmap(ratio_matrix,
-                   xticklabels=[t.replace('_', '\n') for t in node_types],
-                   yticklabels=[l.upper() for l in languages],
-                   cmap='RdBu_r',
-                   center=0,
-                   annot=True,
-                   fmt='.2f',
-                   cbar_kws={'label': 'Code Poetry/Control Group Ratio (log2)'},
-                   square=True)
-        
-        plt.title('Node Type Usage Ratio by Language\n(Code Poetry vs Control Group)', pad=20)
-        plt.tight_layout()
-        
-        # 保存
-        plt.savefig(self.output_dir / "node_type_ratio_heatmap_presentation.png",
-                   dpi=300, bbox_inches='tight', facecolor='white')
-        plt.close()
-        
-        logger.info("ノードタイプ使用頻度の可視化を完了")
+        logger.info("ノードタイプ使用頻度の可視化完了")
 
-    def analyze_node_type_usage(self) -> Dict[str, Dict[str, Dict[str, int]]]:
-        """各言語のノードタイプ使用頻度を分析"""
-        logger.info("ノードタイプ使用頻度の分析開始")
-        
-        usage_stats = {
-            'poetry': defaultdict(lambda: defaultdict(int)),
-            'control': defaultdict(lambda: defaultdict(int))
-        }
-        
-        def count_node_types(node: Dict, language: str, group: str):
-            """ノードタイプを再帰的にカウント"""
+    def _analyze_single_sample(self, ast: Dict) -> Dict:
+        """単一のサンプル（作品）のノードタイプを分析"""
+        node_counts = defaultdict(int)
+        total_nodes = 0
+
+        def traverse(node: Dict):
+            nonlocal total_nodes
             if not isinstance(node, dict):
                 return
             
             node_type = node.get('type', 'unknown')
             if self._is_structural_node(node_type):
-                usage_stats[group][language][node_type] += 1
+                node_counts[node_type] += 1
+                total_nodes += 1
             
             for child in node.get('children', []):
-                count_node_types(child, language, group)
+                traverse(child)
         
-        # 詩的コードの分析
+        traverse(ast)
+        
+        # 割合（%）を計算
+        node_type_ratios = {}
+        if total_nodes > 0:
+            for node_type, count in node_counts.items():
+                node_type_ratios[node_type] = (count / total_nodes) * 100
+        
+        return {
+            'node_types': node_type_ratios,
+            'total_nodes': total_nodes
+        }
+
+    def _calculate_summary_stats(self, samples: List[Dict]) -> Dict:
+        """サンプル群の要約統計量を計算"""
+        if not samples:
+            return {}
+        
+        # 全サンプルで出現したノードタイプを収集
+        all_node_types = set()
+        for sample in samples:
+            all_node_types.update(sample['node_types'].keys())
+        
+        # ノードタイプごとに統計量を計算
+        summary = {}
+        for node_type in all_node_types:
+            # そのノードタイプの割合（%）を全サンプルから収集
+            ratios = [
+                sample['node_types'].get(node_type, 0)
+                for sample in samples
+            ]
+            
+            summary[node_type] = {
+                'mean': np.mean(ratios),
+                'std_err': np.std(ratios, ddof=1) / np.sqrt(len(ratios)) if len(ratios) > 1 else 0,
+                'n': len(samples)
+            }
+        
+        return summary
+
+    def analyze_node_type_usage(self):
+        """ノードタイプ使用頻度の分析"""
+        logger.info("ノードタイプ使用頻度の分析開始")
+        
+        # 1. 各言語の分析
+        node_type_analysis = {}
         for lang in ['java', 'python', 'js']:
+            logger.info(f"{lang}の分析開始")
+            node_type_analysis[lang] = {
+                'poetry': {'samples': [], 'summary': {}},
+                'control': {'samples': [], 'summary': {}}
+            }
+            
+            # Poetry samples
             for sample in self.poetry_data[lang]:
-                count_node_types(sample['ast'], lang, 'poetry')
-        
-        # 対照群の分析（各言語から最初の20サンプルのみ）
-        for lang in ['java', 'python', 'js']:
+                try:
+                    sample_analysis = self._analyze_single_sample(sample['ast'])
+                    node_type_analysis[lang]['poetry']['samples'].append(sample_analysis)
+                except Exception as e:
+                    logger.error(f"Poetry sample分析中にエラー: {e}")
+            
+            # Control samples (first 20)
             for sample in self.control_data[lang][:20]:
-                count_node_types(sample['ast'], lang, 'control')
+                try:
+                    sample_analysis = self._analyze_single_sample(sample['ast'])
+                    node_type_analysis[lang]['control']['samples'].append(sample_analysis)
+                except Exception as e:
+                    logger.error(f"Control sample分析中にエラー: {e}")
+            
+            # Calculate summary statistics
+            node_type_analysis[lang]['poetry']['summary'] = \
+                self._calculate_summary_stats(node_type_analysis[lang]['poetry']['samples'])
+            node_type_analysis[lang]['control']['summary'] = \
+                self._calculate_summary_stats(node_type_analysis[lang]['control']['samples'])
+            
+            logger.info(f"{lang}の分析完了")
         
-        # 結果の出力（テキスト形式）
-        report_path = self.output_dir / "node_type_usage_report.txt"
+        # 2. 可視化
+        self._create_node_type_visualizations(node_type_analysis)
+        
+        # 3. レポート生成
+        self._generate_node_type_report(node_type_analysis)
+        
+        logger.info("ノードタイプ使用頻度の分析完了")
+        # 平均頻度の計算
+        average_frequencies = {
+            'poetry': defaultdict(dict),
+            'control': defaultdict(dict)
+        }
+        
+        for group in ['poetry', 'control']:
+            for lang in ['java', 'python', 'js']:
+                for node_type, freq_list in frequency_stats[group][lang].items():
+                    if freq_list:
+                        average_frequencies[group][lang][node_type] = {
+                            'mean': np.mean(freq_list),
+                            'std': np.std(freq_list),
+                            'n_samples': len(freq_list)
+                        }
+        
+        # レポート生成
+        self._generate_frequency_report(average_frequencies, frequency_stats)
+        
+        return average_frequencies
+
+    def _generate_frequency_report(self, average_frequencies, node_type_stats):
+        """ノードタイプ使用頻度レポートを生成"""
+        report_path = self.output_dir / "node_type_frequency_report.txt"
         with open(report_path, 'w', encoding='utf-8') as f:
             f.write("=== ノードタイプ使用頻度分析 ===\n\n")
             
             for lang in ['java', 'python', 'js']:
                 f.write(f"\n{lang.upper()}:\n")
-                f.write("\n詩的コード上位10ノードタイプ:\n")
-                sorted_poetry = sorted(
-                    usage_stats['poetry'][lang].items(),
-                    key=lambda x: x[1],
-                    reverse=True
-                )[:10]
-                for node_type, count in sorted_poetry:
-                    category = self._categorize_node_type(node_type, lang) or '未分類'
-                    f.write(f"  - {node_type} ({category}): {count}回\n")
-                
-                f.write("\n対照群上位10ノードタイプ:\n")
-                sorted_control = sorted(
-                    usage_stats['control'][lang].items(),
-                    key=lambda x: x[1],
-                    reverse=True
-                )[:10]
-                for node_type, count in sorted_control:
-                    category = self._categorize_node_type(node_type, lang) or '未分類'
-                    f.write(f"  - {node_type} ({category}): {count}回\n")
-                
-                # 特徴的な差異の分析
-                f.write("\n特徴的な差異（詩的コードと対照群の比率）:\n")
-                poetry_total = sum(usage_stats['poetry'][lang].values())
-                control_total = sum(usage_stats['control'][lang].values())
-                
-                ratios = []
-                for node_type in set(usage_stats['poetry'][lang]) | set(usage_stats['control'][lang]):
-                    poetry_ratio = usage_stats['poetry'][lang][node_type] / poetry_total if poetry_total > 0 else 0
-                    control_ratio = usage_stats['control'][lang][node_type] / control_total if control_total > 0 else 0
-                    
-                    if poetry_ratio > 0 and control_ratio > 0:
-                        ratio = poetry_ratio / control_ratio
-                        ratios.append((node_type, ratio))
-                
-                # 比率の大きい順にソート
-                sorted_ratios = sorted(ratios, key=lambda x: abs(x[1] - 1), reverse=True)[:5]
-                for node_type, ratio in sorted_ratios:
-                    category = self._categorize_node_type(node_type, lang) or '未分類'
-                    if ratio > 1:
-                        f.write(f"  - {node_type} ({category}): 詩的コードで{ratio:.2f}倍多い\n")
-                    else:
-                        f.write(f"  - {node_type} ({category}): 詩的コードで{1/ratio:.2f}倍少ない\n")
-                
-                f.write("\n" + "="*50 + "\n")
-        
-        # Frequency詳細の出力（CSV形式）
-        freq_path = self.output_dir / "node_type_frequencies.csv"
-        with open(freq_path, 'w', encoding='utf-8') as f:
-            f.write("Language,Group,Node Type,Category,Count,Frequency(%),Rank\n")
-            
-            # 言語ごとに処理
-            for lang in ['java', 'python', 'js']:
-                # Poetry と Control のデータを準備
-                poetry_total = sum(usage_stats['poetry'][lang].values())
-                control_total = sum(usage_stats['control'][lang].values())
-                
-                # データを整形
-                poetry_data = [
-                    {
-                        'Language': lang,
-                        'Group': 'poetry',
-                        'Node Type': node_type,
-                        'Category': self._categorize_node_type(node_type, lang) or 'Uncategorized',
-                        'Count': count,
-                        'Frequency': (count / poetry_total * 100) if poetry_total > 0 else 0
-                    }
-                    for node_type, count in usage_stats['poetry'][lang].items()
-                ]
-                
-                control_data = [
-                    {
-                        'Language': lang,
-                        'Group': 'control',
-                        'Node Type': node_type,
-                        'Category': self._categorize_node_type(node_type, lang) or 'Uncategorized',
-                        'Count': count,
-                        'Frequency': (count / control_total * 100) if control_total > 0 else 0
-                    }
-                    for node_type, count in usage_stats['control'][lang].items()
-                ]
-                
-                # Frequencyで降順ソート
-                poetry_data = sorted(poetry_data, key=lambda x: x['Frequency'], reverse=True)
-                control_data = sorted(control_data, key=lambda x: x['Frequency'], reverse=True)
-                
-                # ランク付け
-                for i, item in enumerate(poetry_data, 1):
-                    item['Rank'] = i
-                for i, item in enumerate(control_data, 1):
-                    item['Rank'] = i
-                
-                # データを書き出し
-                for item in poetry_data:
-                    f.write(f"{item['Language']},{item['Group']},{item['Node Type']},{item['Category']},"
-                           f"{item['Count']},{item['Frequency']:.2f},{item['Rank']}\n")
-                for item in control_data:
-                    f.write(f"{item['Language']},{item['Group']},{item['Node Type']},{item['Category']},"
-                           f"{item['Count']},{item['Frequency']:.2f},{item['Rank']}\n")
-                
-                # 言語間の区切りを追加
-                f.write("\n")
-        
-        # サマリーレポートの出力（テキスト形式）
-        summary_path = self.output_dir / "node_type_frequency_summary.txt"
-        with open(summary_path, 'w', encoding='utf-8') as f:
-            f.write("=== Node Type Frequency Summary ===\n\n")
-            
-            for lang in ['java', 'python', 'js']:
-                f.write(f"\n{lang.upper()}\n")
                 f.write("=" * 50 + "\n\n")
                 
-                # Poetry の上位10
-                f.write("Top 10 Node Types in Code Poetry:\n")
-                f.write("-" * 40 + "\n")
-                poetry_total = sum(usage_stats['poetry'][lang].values())
-                sorted_poetry = sorted(
-                    [(k, v / poetry_total * 100) for k, v in usage_stats['poetry'][lang].items()],
-                    key=lambda x: x[1],
-                    reverse=True
-                )[:10]
+                # 各ノードタイプについて統計分析
+                for node_type in average_frequencies[lang]:
+                    poetry_vals = node_type_stats[lang]['poetry'].get(node_type, [])
+                    control_vals = node_type_stats[lang]['control'].get(node_type, [])
+                    
+                    if len(poetry_vals) > 1 and len(control_vals) > 1:
+                        # t検定
+                        _, p_value = stats.ttest_ind(poetry_vals, control_vals)
+                        
+                        # 効果量（Cohen's d）
+                        d = (np.mean(poetry_vals) - np.mean(control_vals)) / \
+                            np.sqrt((np.var(poetry_vals) + np.var(control_vals)) / 2)
+                    
+                    f.write(f"{node_type}: d={d:.3f}, p={p_value:.4f}\n")
                 
-                for i, (node_type, freq) in enumerate(sorted_poetry, 1):
-                    category = self._categorize_node_type(node_type, lang) or 'Uncategorized'
-                    f.write(f"{i:2d}. {node_type:30} ({category:15}) : {freq:6.2f}%\n")
-                
-                # Control の上位10
-                f.write("\nTop 10 Node Types in Control Group:\n")
-                f.write("-" * 40 + "\n")
-                control_total = sum(usage_stats['control'][lang].values())
-                sorted_control = sorted(
-                    [(k, v / control_total * 100) for k, v in usage_stats['control'][lang].items()],
-                    key=lambda x: x[1],
-                    reverse=True
-                )[:10]
-                
-                for i, (node_type, freq) in enumerate(sorted_control, 1):
-                    category = self._categorize_node_type(node_type, lang) or 'Uncategorized'
-                    f.write(f"{i:2d}. {node_type:30} ({category:15}) : {freq:6.2f}%\n")
-                
-                f.write("\n" + "=" * 50 + "\n")
+                f.write("\n")
         
-        logger.info(f"ノードタイプ使用頻度レポートを生成: {report_path}")
-        logger.info(f"ノードタイプ頻度詳細を生成: {freq_path}")
-        logger.info(f"ノードタイプ頻度サマリーを生成: {summary_path}")
-        
-        # 可視化の作成
-        self.create_node_type_visualizations(usage_stats)
-        
-        return usage_stats
-    
+        logger.info(f"改善された頻度分析レポートを生成: {report_path}")
+
     def run_analysis(self):
         """完全な分析の実行"""
         logger.info("分析開始")
