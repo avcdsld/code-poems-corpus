@@ -923,7 +923,7 @@ class CodePoetryAnalyzer:
         # 6. 制約と注意事項
         report.append("\n【6. 制約と注意事項】")
         report.append("- サンプルサイズが限定的（詩的コード17作品）")
-        report.append("- 『code {poems}』アンソロジーの作品のみを対象")
+        report.append("- 'code {poems}'アンソロジーの作品のみを対象")
         report.append("- 結果の一般化には慎重を要する")
         report.append("- 効果量（Cohen's d）を主要な指標として使用")
         
@@ -963,6 +963,205 @@ class CodePoetryAnalyzer:
         
         return report_text
     
+    def create_node_type_visualizations(self, usage_stats: Dict[str, Dict[str, Dict[str, int]]]):
+        """ノードタイプ使用頻度の可視化"""
+        logger.info("ノードタイプ使用頻度の可視化開始")
+        
+        # 1. 言語別の上位ノードタイプ棒グラフ
+        for lang in ['java', 'python', 'js']:
+            plt.figure(figsize=(15, 8))
+            
+            # データ準備
+            poetry_data = usage_stats['poetry'][lang]
+            control_data = usage_stats['control'][lang]
+            
+            # 上位10個のノードタイプを取得
+            top_types = set()
+            for data in [poetry_data, control_data]:
+                sorted_types = sorted(data.items(), key=lambda x: x[1], reverse=True)[:10]
+                top_types.update(type_name for type_name, _ in sorted_types)
+            top_types = list(top_types)
+            
+            # データ正規化
+            poetry_total = sum(poetry_data.values())
+            control_total = sum(control_data.values())
+            
+            poetry_values = [poetry_data.get(t, 0) / poetry_total * 100 for t in top_types]
+            control_values = [control_data.get(t, 0) / control_total * 100 for t in top_types]
+            
+            # プロット作成
+            x = np.arange(len(top_types))
+            width = 0.35
+            
+            ax = plt.gca()
+            rects1 = ax.bar(x - width/2, poetry_values, width, label='Code Poetry', color='lightblue', alpha=0.7)
+            rects2 = ax.bar(x + width/2, control_values, width, label='Control Group', color='lightcoral', alpha=0.7)
+            
+            # グラフの装飾
+            plt.title(f'{lang.upper()} - Node Type Usage Frequency (%)')
+            plt.xlabel('Node Type')
+            plt.ylabel('Usage Frequency (%)')
+            plt.xticks(x, top_types, rotation=45, ha='right')
+            plt.legend()
+            plt.grid(True, alpha=0.3)
+            
+            # レイアウト調整
+            plt.tight_layout()
+            
+            # 保存
+            plt.savefig(self.output_dir / f"node_type_frequency_{lang}.png", dpi=300, bbox_inches='tight')
+            plt.close()
+        
+        # 2. 比率のヒートマップ
+        plt.figure(figsize=(12, 8))
+        
+        # データ準備
+        ratio_data = []
+        node_types = set()
+        languages = ['java', 'python', 'js']
+        
+        # 全言語の主要なノードタイプを収集
+        for lang in languages:
+            poetry_data = usage_stats['poetry'][lang]
+            control_data = usage_stats['control'][lang]
+            
+            # 上位10個のノードタイプを追加
+            for data in [poetry_data, control_data]:
+                sorted_types = sorted(data.items(), key=lambda x: x[1], reverse=True)[:10]
+                node_types.update(type_name for type_name, _ in sorted_types)
+        
+        node_types = list(node_types)
+        
+        # 比率行列の作成
+        ratio_matrix = np.zeros((len(languages), len(node_types)))
+        
+        for i, lang in enumerate(languages):
+            poetry_data = usage_stats['poetry'][lang]
+            control_data = usage_stats['control'][lang]
+            
+            poetry_total = sum(poetry_data.values())
+            control_total = sum(control_data.values())
+            
+            for j, node_type in enumerate(node_types):
+                poetry_ratio = poetry_data.get(node_type, 0) / poetry_total if poetry_total > 0 else 0
+                control_ratio = control_data.get(node_type, 0) / control_total if control_total > 0 else 0
+                
+                if control_ratio > 0:
+                    ratio = np.log2(poetry_ratio / control_ratio)  # 対数スケール
+                else:
+                    ratio = 0
+                ratio_matrix[i, j] = ratio
+        
+        # ヒートマップの作成
+        sns.heatmap(ratio_matrix,
+                   xticklabels=node_types,
+                   yticklabels=[l.upper() for l in languages],
+                   cmap='RdBu_r',
+                   center=0,
+                   annot=True,
+                   fmt='.2f',
+                   cbar_kws={'label': 'Code Poetry/Control Group Ratio (log2)'})
+        
+        plt.title('Node Type Usage Ratio by Language (Code Poetry vs Control Group)')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        
+        # 保存
+        plt.savefig(self.output_dir / "node_type_ratio_heatmap.png", dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        logger.info("ノードタイプ使用頻度の可視化を完了")
+
+    def analyze_node_type_usage(self) -> Dict[str, Dict[str, Dict[str, int]]]:
+        """各言語のノードタイプ使用頻度を分析"""
+        logger.info("ノードタイプ使用頻度の分析開始")
+        
+        usage_stats = {
+            'poetry': defaultdict(lambda: defaultdict(int)),
+            'control': defaultdict(lambda: defaultdict(int))
+        }
+        
+        def count_node_types(node: Dict, language: str, group: str):
+            """ノードタイプを再帰的にカウント"""
+            if not isinstance(node, dict):
+                return
+            
+            node_type = node.get('type', 'unknown')
+            if self._is_structural_node(node_type):
+                usage_stats[group][language][node_type] += 1
+            
+            for child in node.get('children', []):
+                count_node_types(child, language, group)
+        
+        # 詩的コードの分析
+        for lang in ['java', 'python', 'js']:
+            for sample in self.poetry_data[lang]:
+                count_node_types(sample['ast'], lang, 'poetry')
+        
+        # 対照群の分析（各言語から最初の20サンプルのみ）
+        for lang in ['java', 'python', 'js']:
+            for sample in self.control_data[lang][:20]:
+                count_node_types(sample['ast'], lang, 'control')
+        
+        # 結果の出力
+        report_path = self.output_dir / "node_type_usage_report.txt"
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write("=== ノードタイプ使用頻度分析 ===\n\n")
+            
+            for lang in ['java', 'python', 'js']:
+                f.write(f"\n{lang.upper()}:\n")
+                f.write("\n詩的コード上位10ノードタイプ:\n")
+                sorted_poetry = sorted(
+                    usage_stats['poetry'][lang].items(),
+                    key=lambda x: x[1],
+                    reverse=True
+                )[:10]
+                for node_type, count in sorted_poetry:
+                    category = self._categorize_node_type(node_type, lang) or '未分類'
+                    f.write(f"  - {node_type} ({category}): {count}回\n")
+                
+                f.write("\n対照群上位10ノードタイプ:\n")
+                sorted_control = sorted(
+                    usage_stats['control'][lang].items(),
+                    key=lambda x: x[1],
+                    reverse=True
+                )[:10]
+                for node_type, count in sorted_control:
+                    category = self._categorize_node_type(node_type, lang) or '未分類'
+                    f.write(f"  - {node_type} ({category}): {count}回\n")
+                
+                # 特徴的な差異の分析
+                f.write("\n特徴的な差異（詩的コードと対照群の比率）:\n")
+                poetry_total = sum(usage_stats['poetry'][lang].values())
+                control_total = sum(usage_stats['control'][lang].values())
+                
+                ratios = []
+                for node_type in set(usage_stats['poetry'][lang]) | set(usage_stats['control'][lang]):
+                    poetry_ratio = usage_stats['poetry'][lang][node_type] / poetry_total if poetry_total > 0 else 0
+                    control_ratio = usage_stats['control'][lang][node_type] / control_total if control_total > 0 else 0
+                    
+                    if poetry_ratio > 0 and control_ratio > 0:
+                        ratio = poetry_ratio / control_ratio
+                        ratios.append((node_type, ratio))
+                
+                # 比率の大きい順にソート
+                sorted_ratios = sorted(ratios, key=lambda x: abs(x[1] - 1), reverse=True)[:5]
+                for node_type, ratio in sorted_ratios:
+                    category = self._categorize_node_type(node_type, lang) or '未分類'
+                    if ratio > 1:
+                        f.write(f"  - {node_type} ({category}): 詩的コードで{ratio:.2f}倍多い\n")
+                    else:
+                        f.write(f"  - {node_type} ({category}): 詩的コードで{1/ratio:.2f}倍少ない\n")
+                
+                f.write("\n" + "="*50 + "\n")
+        
+        logger.info(f"ノードタイプ使用頻度レポートを生成: {report_path}")
+        
+        # 可視化の作成
+        self.create_node_type_visualizations(usage_stats)
+        
+        return usage_stats
+    
     def run_analysis(self):
         """完全な分析の実行"""
         logger.info("分析開始")
@@ -973,29 +1172,32 @@ class CodePoetryAnalyzer:
         # 2. ノードタイプの分析（デバッグ・確認用）
         self.analyze_node_types()
         
-        # 3. 言語別分析
-        # for lang in ['java', 'python', 'js', 'ruby']:
+        # 3. ノードタイプの使用頻度分析
+        self.analyze_node_type_usage()
+        
+        # 4. 言語別分析
         for lang in ['java', 'python', 'js']:
             result = self.analyze_language(lang)
             if result:
                 self.results['by_language'][lang] = result
         
-        # 4. プール分析
+        # 5. プール分析
         self.results['pooled'] = self.pooled_analysis()
         
-        # 5. メタ分析
+        # 6. メタ分析
         self.results['meta_analysis'] = self.meta_analysis(self.results['by_language'])
         
-        # 6. 可視化
+        # 7. 可視化
         self.create_visualizations()
         
-        # 7. レポート生成
+        # 8. レポート生成
         report = self.generate_report()
         
         logger.info("分析完了")
         print("\n" + report)
         print(f"\n結果は {self.output_dir} ディレクトリに保存されました")
         print("node_types_report.txt でノードタイプの確認ができます")
+        print("node_type_usage_report.txt でノードタイプの使用頻度を確認できます")
 
 def main():
     """メイン処理"""
