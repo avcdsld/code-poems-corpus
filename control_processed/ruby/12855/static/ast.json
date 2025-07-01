@@ -1,0 +1,2810 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 28,
+    "column": 7
+  },
+  "text": "def activate_stream(id: nil, **args)\n      connection_error(msg: 'Stream ID already exists') if @streams.key?(id)\n\n      stream = Stream.new({ connection: self, id: id }.merge(args))\n\n      # Streams that are in the \"open\" state, or either of the \"half closed\"\n      # states count toward the maximum number of streams that an endpoint is\n      # permitted to open.\n      stream.once(:active) { @active_stream_count += 1 }\n      stream.once(:close) do\n        @active_stream_count -= 1\n\n        # Store a reference to the closed stream, such that we can respond\n        # to any in-flight frames while close is registered on both sides.\n        # References to such streams will be purged whenever another stream\n        # is closed, with a minimum of 15s RTT time window.\n        @streams_recently_closed[id] = Time.now\n        to_delete = @streams_recently_closed.select { |_, v| (Time.now - v) > 15 }\n        to_delete.each do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end\n      end\n\n      stream.on(:promise, &method(:promise)) if self.is_a? Server\n      stream.on(:frame,   &method(:send))\n\n      @streams[id] = stream\n    end",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 28,
+        "column": 7
+      },
+      "text": "def activate_stream(id: nil, **args)\n      connection_error(msg: 'Stream ID already exists') if @streams.key?(id)\n\n      stream = Stream.new({ connection: self, id: id }.merge(args))\n\n      # Streams that are in the \"open\" state, or either of the \"half closed\"\n      # states count toward the maximum number of streams that an endpoint is\n      # permitted to open.\n      stream.once(:active) { @active_stream_count += 1 }\n      stream.once(:close) do\n        @active_stream_count -= 1\n\n        # Store a reference to the closed stream, such that we can respond\n        # to any in-flight frames while close is registered on both sides.\n        # References to such streams will be purged whenever another stream\n        # is closed, with a minimum of 15s RTT time window.\n        @streams_recently_closed[id] = Time.now\n        to_delete = @streams_recently_closed.select { |_, v| (Time.now - v) > 15 }\n        to_delete.each do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end\n      end\n\n      stream.on(:promise, &method(:promise)) if self.is_a? Server\n      stream.on(:frame,   &method(:send))\n\n      @streams[id] = stream\n    end",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 19
+          },
+          "text": "activate_stream"
+        },
+        {
+          "type": "method_parameters",
+          "start": {
+            "row": 0,
+            "column": 19
+          },
+          "end": {
+            "row": 0,
+            "column": 36
+          },
+          "text": "(id: nil, **args)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 19
+              },
+              "end": {
+                "row": 0,
+                "column": 20
+              },
+              "text": "("
+            },
+            {
+              "type": "keyword_parameter",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 27
+              },
+              "text": "id: nil",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 22
+                  },
+                  "text": "id"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 0,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 23
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "nil",
+                  "start": {
+                    "row": 0,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "text": "nil",
+                  "children": [
+                    {
+                      "type": "nil",
+                      "start": {
+                        "row": 0,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 27
+                      },
+                      "text": "nil"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 27
+              },
+              "end": {
+                "row": 0,
+                "column": 28
+              },
+              "text": ","
+            },
+            {
+              "type": "hash_splat_parameter",
+              "start": {
+                "row": 0,
+                "column": 29
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": "**args",
+              "children": [
+                {
+                  "type": "**",
+                  "start": {
+                    "row": 0,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 31
+                  },
+                  "text": "**"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 31
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 35
+                  },
+                  "text": "args"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 35
+              },
+              "end": {
+                "row": 0,
+                "column": 36
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 27,
+            "column": 27
+          },
+          "text": "connection_error(msg: 'Stream ID already exists') if @streams.key?(id)\n\n      stream = Stream.new({ connection: self, id: id }.merge(args))\n\n      # Streams that are in the \"open\" state, or either of the \"half closed\"\n      # states count toward the maximum number of streams that an endpoint is\n      # permitted to open.\n      stream.once(:active) { @active_stream_count += 1 }\n      stream.once(:close) do\n        @active_stream_count -= 1\n\n        # Store a reference to the closed stream, such that we can respond\n        # to any in-flight frames while close is registered on both sides.\n        # References to such streams will be purged whenever another stream\n        # is closed, with a minimum of 15s RTT time window.\n        @streams_recently_closed[id] = Time.now\n        to_delete = @streams_recently_closed.select { |_, v| (Time.now - v) > 15 }\n        to_delete.each do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end\n      end\n\n      stream.on(:promise, &method(:promise)) if self.is_a? Server\n      stream.on(:frame,   &method(:send))\n\n      @streams[id] = stream",
+          "children": [
+            {
+              "type": "if_modifier",
+              "start": {
+                "row": 1,
+                "column": 6
+              },
+              "end": {
+                "row": 1,
+                "column": 76
+              },
+              "text": "connection_error(msg: 'Stream ID already exists') if @streams.key?(id)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 1,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 55
+                  },
+                  "text": "connection_error(msg: 'Stream ID already exists')",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 22
+                      },
+                      "text": "connection_error"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 1,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 55
+                      },
+                      "text": "(msg: 'Stream ID already exists')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 1,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 1,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 54
+                          },
+                          "text": "msg: 'Stream ID already exists'",
+                          "children": [
+                            {
+                              "type": "hash_key_symbol",
+                              "start": {
+                                "row": 1,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 26
+                              },
+                              "text": "msg"
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 1,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 27
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 1,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 54
+                              },
+                              "text": "'Stream ID already exists'",
+                              "children": [
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 29
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 53
+                                  },
+                                  "text": "Stream ID already exists"
+                                },
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 54
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 1,
+                            "column": 54
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 55
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 1,
+                    "column": 56
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 58
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 1,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 76
+                  },
+                  "text": "@streams.key?(id)",
+                  "children": [
+                    {
+                      "type": "instance_variable",
+                      "start": {
+                        "row": 1,
+                        "column": 59
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 67
+                      },
+                      "text": "@streams"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 1,
+                        "column": 67
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 68
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 68
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 72
+                      },
+                      "text": "key?"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 1,
+                        "column": 72
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 76
+                      },
+                      "text": "(id)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 1,
+                            "column": 72
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 73
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 1,
+                            "column": 73
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 75
+                          },
+                          "text": "id"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 1,
+                            "column": 75
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 76
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 3,
+                "column": 6
+              },
+              "end": {
+                "row": 3,
+                "column": 67
+              },
+              "text": "stream = Stream.new({ connection: self, id: id }.merge(args))",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 12
+                  },
+                  "text": "stream"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 3,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 14
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 3,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 67
+                  },
+                  "text": "Stream.new({ connection: self, id: id }.merge(args))",
+                  "children": [
+                    {
+                      "type": "constant",
+                      "start": {
+                        "row": 3,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 21
+                      },
+                      "text": "Stream"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 3,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 22
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 3,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 25
+                      },
+                      "text": "new"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 3,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 67
+                      },
+                      "text": "({ connection: self, id: id }.merge(args))",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 3,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 26
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 3,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 66
+                          },
+                          "text": "{ connection: self, id: id }.merge(args)",
+                          "children": [
+                            {
+                              "type": "hash",
+                              "start": {
+                                "row": 3,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 54
+                              },
+                              "text": "{ connection: self, id: id }",
+                              "children": [
+                                {
+                                  "type": "{",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 27
+                                  },
+                                  "text": "{"
+                                },
+                                {
+                                  "type": "pair",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 44
+                                  },
+                                  "text": "connection: self",
+                                  "children": [
+                                    {
+                                      "type": "hash_key_symbol",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 38
+                                      },
+                                      "text": "connection"
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 39
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "self",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 44
+                                      },
+                                      "text": "self"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 45
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "pair",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 52
+                                  },
+                                  "text": "id: id",
+                                  "children": [
+                                    {
+                                      "type": "hash_key_symbol",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 48
+                                      },
+                                      "text": "id"
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 49
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 52
+                                      },
+                                      "text": "id"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 54
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 3,
+                                "column": 54
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 55
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 3,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 60
+                              },
+                              "text": "merge"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 3,
+                                "column": 60
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 66
+                              },
+                              "text": "(args)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 60
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 61
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 65
+                                  },
+                                  "text": "args"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 65
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 66
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 3,
+                            "column": 66
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 67
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 5,
+                "column": 6
+              },
+              "end": {
+                "row": 5,
+                "column": 76
+              },
+              "text": "# Streams that are in the \"open\" state, or either of the \"half closed\""
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 6,
+                "column": 6
+              },
+              "end": {
+                "row": 6,
+                "column": 77
+              },
+              "text": "# states count toward the maximum number of streams that an endpoint is"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 7,
+                "column": 6
+              },
+              "end": {
+                "row": 7,
+                "column": 26
+              },
+              "text": "# permitted to open."
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 8,
+                "column": 6
+              },
+              "end": {
+                "row": 8,
+                "column": 56
+              },
+              "text": "stream.once(:active) { @active_stream_count += 1 }",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 8,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 12
+                  },
+                  "text": "stream"
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 8,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 13
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 8,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 17
+                  },
+                  "text": "once"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 8,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 26
+                  },
+                  "text": "(:active)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 8,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 18
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "simple_symbol",
+                      "start": {
+                        "row": 8,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 25
+                      },
+                      "text": ":active"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 8,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 26
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 8,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 56
+                  },
+                  "text": "{ @active_stream_count += 1 }",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 8,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 28
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "block_body",
+                      "start": {
+                        "row": 8,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 54
+                      },
+                      "text": "@active_stream_count += 1",
+                      "children": [
+                        {
+                          "type": "operator_assignment",
+                          "start": {
+                            "row": 8,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 54
+                          },
+                          "text": "@active_stream_count += 1",
+                          "children": [
+                            {
+                              "type": "instance_variable",
+                              "start": {
+                                "row": 8,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 49
+                              },
+                              "text": "@active_stream_count"
+                            },
+                            {
+                              "type": "+=",
+                              "start": {
+                                "row": 8,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 52
+                              },
+                              "text": "+="
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 8,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 54
+                              },
+                              "text": "1"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 8,
+                        "column": 55
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 56
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 9,
+                "column": 6
+              },
+              "end": {
+                "row": 22,
+                "column": 9
+              },
+              "text": "stream.once(:close) do\n        @active_stream_count -= 1\n\n        # Store a reference to the closed stream, such that we can respond\n        # to any in-flight frames while close is registered on both sides.\n        # References to such streams will be purged whenever another stream\n        # is closed, with a minimum of 15s RTT time window.\n        @streams_recently_closed[id] = Time.now\n        to_delete = @streams_recently_closed.select { |_, v| (Time.now - v) > 15 }\n        to_delete.each do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end\n      end",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 9,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 12
+                  },
+                  "text": "stream"
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 9,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 13
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 9,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 17
+                  },
+                  "text": "once"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 9,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 25
+                  },
+                  "text": "(:close)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 9,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 18
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "simple_symbol",
+                      "start": {
+                        "row": 9,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 24
+                      },
+                      "text": ":close"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 9,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 25
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": "do_block",
+                  "start": {
+                    "row": 9,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 9
+                  },
+                  "text": "do\n        @active_stream_count -= 1\n\n        # Store a reference to the closed stream, such that we can respond\n        # to any in-flight frames while close is registered on both sides.\n        # References to such streams will be purged whenever another stream\n        # is closed, with a minimum of 15s RTT time window.\n        @streams_recently_closed[id] = Time.now\n        to_delete = @streams_recently_closed.select { |_, v| (Time.now - v) > 15 }\n        to_delete.each do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end\n      end",
+                  "children": [
+                    {
+                      "type": "do",
+                      "start": {
+                        "row": 9,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 28
+                      },
+                      "text": "do"
+                    },
+                    {
+                      "type": "body_statement",
+                      "start": {
+                        "row": 10,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 11
+                      },
+                      "text": "@active_stream_count -= 1\n\n        # Store a reference to the closed stream, such that we can respond\n        # to any in-flight frames while close is registered on both sides.\n        # References to such streams will be purged whenever another stream\n        # is closed, with a minimum of 15s RTT time window.\n        @streams_recently_closed[id] = Time.now\n        to_delete = @streams_recently_closed.select { |_, v| (Time.now - v) > 15 }\n        to_delete.each do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end",
+                      "children": [
+                        {
+                          "type": "operator_assignment",
+                          "start": {
+                            "row": 10,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 33
+                          },
+                          "text": "@active_stream_count -= 1",
+                          "children": [
+                            {
+                              "type": "instance_variable",
+                              "start": {
+                                "row": 10,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 28
+                              },
+                              "text": "@active_stream_count"
+                            },
+                            {
+                              "type": "-=",
+                              "start": {
+                                "row": 10,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 31
+                              },
+                              "text": "-="
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 10,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 33
+                              },
+                              "text": "1"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 12,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 74
+                          },
+                          "text": "# Store a reference to the closed stream, such that we can respond"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 13,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 74
+                          },
+                          "text": "# to any in-flight frames while close is registered on both sides."
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 14,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 75
+                          },
+                          "text": "# References to such streams will be purged whenever another stream"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 15,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 59
+                          },
+                          "text": "# is closed, with a minimum of 15s RTT time window."
+                        },
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 16,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 47
+                          },
+                          "text": "@streams_recently_closed[id] = Time.now",
+                          "children": [
+                            {
+                              "type": "element_reference",
+                              "start": {
+                                "row": 16,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 36
+                              },
+                              "text": "@streams_recently_closed[id]",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 32
+                                  },
+                                  "text": "@streams_recently_closed"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 33
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 35
+                                  },
+                                  "text": "id"
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 36
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 16,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 38
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 16,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 47
+                              },
+                              "text": "Time.now",
+                              "children": [
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 43
+                                  },
+                                  "text": "Time"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 44
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 47
+                                  },
+                                  "text": "now"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 17,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 82
+                          },
+                          "text": "to_delete = @streams_recently_closed.select { |_, v| (Time.now - v) > 15 }",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 17,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 17
+                              },
+                              "text": "to_delete"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 17,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 19
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 17,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 82
+                              },
+                              "text": "@streams_recently_closed.select { |_, v| (Time.now - v) > 15 }",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 44
+                                  },
+                                  "text": "@streams_recently_closed"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 45
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 45
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 51
+                                  },
+                                  "text": "select"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 82
+                                  },
+                                  "text": "{ |_, v| (Time.now - v) > 15 }",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 53
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "block_parameters",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 54
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 60
+                                      },
+                                      "text": "|_, v|",
+                                      "children": [
+                                        {
+                                          "type": "|",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 54
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 55
+                                          },
+                                          "text": "|"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 55
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 56
+                                          },
+                                          "text": "_"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 56
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 57
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 58
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 59
+                                          },
+                                          "text": "v"
+                                        },
+                                        {
+                                          "type": "|",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 60
+                                          },
+                                          "text": "|"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "block_body",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 80
+                                      },
+                                      "text": "(Time.now - v) > 15",
+                                      "children": [
+                                        {
+                                          "type": "binary",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 61
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 80
+                                          },
+                                          "text": "(Time.now - v) > 15",
+                                          "children": [
+                                            {
+                                              "type": "parenthesized_statements",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 61
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 75
+                                              },
+                                              "text": "(Time.now - v)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 61
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 62
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "binary",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 62
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 74
+                                                  },
+                                                  "text": "Time.now - v",
+                                                  "children": [
+                                                    {
+                                                      "type": "call",
+                                                      "start": {
+                                                        "row": 17,
+                                                        "column": 62
+                                                      },
+                                                      "end": {
+                                                        "row": 17,
+                                                        "column": 70
+                                                      },
+                                                      "text": "Time.now",
+                                                      "children": [
+                                                        {
+                                                          "type": "constant",
+                                                          "start": {
+                                                            "row": 17,
+                                                            "column": 62
+                                                          },
+                                                          "end": {
+                                                            "row": 17,
+                                                            "column": 66
+                                                          },
+                                                          "text": "Time"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 17,
+                                                            "column": 66
+                                                          },
+                                                          "end": {
+                                                            "row": 17,
+                                                            "column": 67
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 17,
+                                                            "column": 67
+                                                          },
+                                                          "end": {
+                                                            "row": 17,
+                                                            "column": 70
+                                                          },
+                                                          "text": "now"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "-",
+                                                      "start": {
+                                                        "row": 17,
+                                                        "column": 71
+                                                      },
+                                                      "end": {
+                                                        "row": 17,
+                                                        "column": 72
+                                                      },
+                                                      "text": "-"
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 17,
+                                                        "column": 73
+                                                      },
+                                                      "end": {
+                                                        "row": 17,
+                                                        "column": 74
+                                                      },
+                                                      "text": "v"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 74
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 75
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ">",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 76
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 77
+                                              },
+                                              "text": ">"
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 78
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 80
+                                              },
+                                              "text": "15"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 81
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 82
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 18,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 11
+                          },
+                          "text": "to_delete.each do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 18,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 17
+                              },
+                              "text": "to_delete"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 18,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 18
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 18,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 22
+                              },
+                              "text": "each"
+                            },
+                            {
+                              "type": "do_block",
+                              "start": {
+                                "row": 18,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 11
+                              },
+                              "text": "do |stream_id|\n          @streams.delete stream_id\n          @streams_recently_closed.delete stream_id\n        end",
+                              "children": [
+                                {
+                                  "type": "do",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 25
+                                  },
+                                  "text": "do"
+                                },
+                                {
+                                  "type": "block_parameters",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 37
+                                  },
+                                  "text": "|stream_id|",
+                                  "children": [
+                                    {
+                                      "type": "|",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 27
+                                      },
+                                      "text": "|"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 36
+                                      },
+                                      "text": "stream_id"
+                                    },
+                                    {
+                                      "type": "|",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 37
+                                      },
+                                      "text": "|"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "body_statement",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 51
+                                  },
+                                  "text": "@streams.delete stream_id\n          @streams_recently_closed.delete stream_id",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 35
+                                      },
+                                      "text": "@streams.delete stream_id",
+                                      "children": [
+                                        {
+                                          "type": "instance_variable",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 18
+                                          },
+                                          "text": "@streams"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 18
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 19
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 25
+                                          },
+                                          "text": "delete"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 35
+                                          },
+                                          "text": "stream_id",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 35
+                                              },
+                                              "text": "stream_id"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 51
+                                      },
+                                      "text": "@streams_recently_closed.delete stream_id",
+                                      "children": [
+                                        {
+                                          "type": "instance_variable",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 34
+                                          },
+                                          "text": "@streams_recently_closed"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 35
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 41
+                                          },
+                                          "text": "delete"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 51
+                                          },
+                                          "text": "stream_id",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 42
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 51
+                                              },
+                                              "text": "stream_id"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "end",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 11
+                                  },
+                                  "text": "end"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "end",
+                      "start": {
+                        "row": 22,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 9
+                      },
+                      "text": "end"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_modifier",
+              "start": {
+                "row": 24,
+                "column": 6
+              },
+              "end": {
+                "row": 24,
+                "column": 65
+              },
+              "text": "stream.on(:promise, &method(:promise)) if self.is_a? Server",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 24,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 44
+                  },
+                  "text": "stream.on(:promise, &method(:promise))",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 24,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 12
+                      },
+                      "text": "stream"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 24,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 13
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 24,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 15
+                      },
+                      "text": "on"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 24,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 44
+                      },
+                      "text": "(:promise, &method(:promise))",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 24,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 16
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 24,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 24
+                          },
+                          "text": ":promise"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 24,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 25
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "block_argument",
+                          "start": {
+                            "row": 24,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 43
+                          },
+                          "text": "&method(:promise)",
+                          "children": [
+                            {
+                              "type": "&",
+                              "start": {
+                                "row": 24,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 27
+                              },
+                              "text": "&"
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 24,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 43
+                              },
+                              "text": "method(:promise)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 33
+                                  },
+                                  "text": "method"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 43
+                                  },
+                                  "text": "(:promise)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 34
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "simple_symbol",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 42
+                                      },
+                                      "text": ":promise"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 43
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 24,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 44
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 24,
+                    "column": 45
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 47
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 24,
+                    "column": 48
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 65
+                  },
+                  "text": "self.is_a? Server",
+                  "children": [
+                    {
+                      "type": "self",
+                      "start": {
+                        "row": 24,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 52
+                      },
+                      "text": "self"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 24,
+                        "column": 52
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 53
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 24,
+                        "column": 53
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 58
+                      },
+                      "text": "is_a?"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 24,
+                        "column": 59
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 65
+                      },
+                      "text": "Server",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 24,
+                            "column": 59
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 65
+                          },
+                          "text": "Server"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 25,
+                "column": 6
+              },
+              "end": {
+                "row": 25,
+                "column": 41
+              },
+              "text": "stream.on(:frame,   &method(:send))",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 25,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 12
+                  },
+                  "text": "stream"
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 25,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 13
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 25,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 15
+                  },
+                  "text": "on"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 25,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 41
+                  },
+                  "text": "(:frame,   &method(:send))",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 25,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 16
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "simple_symbol",
+                      "start": {
+                        "row": 25,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 22
+                      },
+                      "text": ":frame"
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 25,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 23
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "block_argument",
+                      "start": {
+                        "row": 25,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 40
+                      },
+                      "text": "&method(:send)",
+                      "children": [
+                        {
+                          "type": "&",
+                          "start": {
+                            "row": 25,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 27
+                          },
+                          "text": "&"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 25,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 40
+                          },
+                          "text": "method(:send)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 25,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 33
+                              },
+                              "text": "method"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 25,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 40
+                              },
+                              "text": "(:send)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "simple_symbol",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 39
+                                  },
+                                  "text": ":send"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 40
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 25,
+                        "column": 40
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 41
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 27,
+                "column": 6
+              },
+              "end": {
+                "row": 27,
+                "column": 27
+              },
+              "text": "@streams[id] = stream",
+              "children": [
+                {
+                  "type": "element_reference",
+                  "start": {
+                    "row": 27,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 18
+                  },
+                  "text": "@streams[id]",
+                  "children": [
+                    {
+                      "type": "instance_variable",
+                      "start": {
+                        "row": 27,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 14
+                      },
+                      "text": "@streams"
+                    },
+                    {
+                      "type": "[",
+                      "start": {
+                        "row": 27,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 15
+                      },
+                      "text": "["
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 17
+                      },
+                      "text": "id"
+                    },
+                    {
+                      "type": "]",
+                      "start": {
+                        "row": 27,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 18
+                      },
+                      "text": "]"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 27,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 20
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 27,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 27
+                  },
+                  "text": "stream"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 28,
+            "column": 4
+          },
+          "end": {
+            "row": 28,
+            "column": 7
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

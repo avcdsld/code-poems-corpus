@@ -1,0 +1,6 @@
+public static boolean isPublic(Class<?> clazz) {
+		if (null == clazz) {
+			throw new NullPointerException("Class to provided is null.");
+		}
+		return Modifier.isPublic(clazz.getModifiers());
+	}

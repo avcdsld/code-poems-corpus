@@ -1,0 +1,3980 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 71,
+    "column": 45
+  },
+  "text": "def explain_instance_with_data(self,\n                                   neighborhood_data,\n                                   neighborhood_labels,\n                                   distances,\n                                   label,\n                                   num_features,\n                                   feature_selection='auto',\n                                   model_regressor=None):\n        \"\"\"Takes perturbed data, labels and distances, returns explanation.\n\n        Args:\n            neighborhood_data: perturbed data, 2d array. first element is\n                               assumed to be the original data point.\n            neighborhood_labels: corresponding perturbed labels. should have as\n                                 many columns as the number of possible labels.\n            distances: distances to original data point.\n            label: label for which we want an explanation\n            num_features: maximum number of features in explanation\n            feature_selection: how to select num_features. options are:\n                'forward_selection': iteratively add features to the model.\n                    This is costly when num_features is high\n                'highest_weights': selects the features that have the highest\n                    product of absolute weight * original data point when\n                    learning with all the features\n                'lasso_path': chooses features based on the lasso\n                    regularization path\n                'none': uses all features, ignores num_features\n                'auto': uses forward_selection if num_features <= 6, and\n                    'highest_weights' otherwise.\n            model_regressor: sklearn regressor to use in explanation.\n                Defaults to Ridge regression if None. Must have\n                model_regressor.coef_ and 'sample_weight' as a parameter\n                to model_regressor.fit()\n\n        Returns:\n            (intercept, exp, score, local_pred):\n            intercept is a float.\n            exp is a sorted list of tuples, where each tuple (x,y) corresponds\n            to the feature id (x) and the local weight (y). The list is sorted\n            by decreasing absolute value of y.\n            score is the R^2 value of the returned explanation\n            local_pred is the prediction of the explanation model on the original instance\n        \"\"\"\n\n        weights = self.kernel_fn(distances)\n        labels_column = neighborhood_labels[:, label]\n        used_features = self.feature_selection(neighborhood_data,\n                                               labels_column,\n                                               weights,\n                                               num_features,\n                                               feature_selection)\n\n        if model_regressor is None:\n            model_regressor = Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)\n        easy_model = model_regressor\n        easy_model.fit(neighborhood_data[:, used_features],\n                       labels_column, sample_weight=weights)\n        prediction_score = easy_model.score(\n            neighborhood_data[:, used_features],\n            labels_column, sample_weight=weights)\n\n        local_pred = easy_model.predict(neighborhood_data[0, used_features].reshape(1, -1))\n\n        if self.verbose:\n            print('Intercept', easy_model.intercept_)\n            print('Prediction_local', local_pred,)\n            print('Right:', neighborhood_labels[0, label])\n        return (easy_model.intercept_,\n                sorted(zip(used_features, easy_model.coef_),\n                       key=lambda x: np.abs(x[1]), reverse=True),\n                prediction_score, local_pred)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 71,
+        "column": 45
+      },
+      "text": "def explain_instance_with_data(self,\n                                   neighborhood_data,\n                                   neighborhood_labels,\n                                   distances,\n                                   label,\n                                   num_features,\n                                   feature_selection='auto',\n                                   model_regressor=None):\n        \"\"\"Takes perturbed data, labels and distances, returns explanation.\n\n        Args:\n            neighborhood_data: perturbed data, 2d array. first element is\n                               assumed to be the original data point.\n            neighborhood_labels: corresponding perturbed labels. should have as\n                                 many columns as the number of possible labels.\n            distances: distances to original data point.\n            label: label for which we want an explanation\n            num_features: maximum number of features in explanation\n            feature_selection: how to select num_features. options are:\n                'forward_selection': iteratively add features to the model.\n                    This is costly when num_features is high\n                'highest_weights': selects the features that have the highest\n                    product of absolute weight * original data point when\n                    learning with all the features\n                'lasso_path': chooses features based on the lasso\n                    regularization path\n                'none': uses all features, ignores num_features\n                'auto': uses forward_selection if num_features <= 6, and\n                    'highest_weights' otherwise.\n            model_regressor: sklearn regressor to use in explanation.\n                Defaults to Ridge regression if None. Must have\n                model_regressor.coef_ and 'sample_weight' as a parameter\n                to model_regressor.fit()\n\n        Returns:\n            (intercept, exp, score, local_pred):\n            intercept is a float.\n            exp is a sorted list of tuples, where each tuple (x,y) corresponds\n            to the feature id (x) and the local weight (y). The list is sorted\n            by decreasing absolute value of y.\n            score is the R^2 value of the returned explanation\n            local_pred is the prediction of the explanation model on the original instance\n        \"\"\"\n\n        weights = self.kernel_fn(distances)\n        labels_column = neighborhood_labels[:, label]\n        used_features = self.feature_selection(neighborhood_data,\n                                               labels_column,\n                                               weights,\n                                               num_features,\n                                               feature_selection)\n\n        if model_regressor is None:\n            model_regressor = Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)\n        easy_model = model_regressor\n        easy_model.fit(neighborhood_data[:, used_features],\n                       labels_column, sample_weight=weights)\n        prediction_score = easy_model.score(\n            neighborhood_data[:, used_features],\n            labels_column, sample_weight=weights)\n\n        local_pred = easy_model.predict(neighborhood_data[0, used_features].reshape(1, -1))\n\n        if self.verbose:\n            print('Intercept', easy_model.intercept_)\n            print('Prediction_local', local_pred,)\n            print('Right:', neighborhood_labels[0, label])\n        return (easy_model.intercept_,\n                sorted(zip(used_features, easy_model.coef_),\n                       key=lambda x: np.abs(x[1]), reverse=True),\n                prediction_score, local_pred)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 30
+          },
+          "text": "explain_instance_with_data"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 30
+          },
+          "end": {
+            "row": 7,
+            "column": 56
+          },
+          "text": "(self,\n                                   neighborhood_data,\n                                   neighborhood_labels,\n                                   distances,\n                                   label,\n                                   num_features,\n                                   feature_selection='auto',\n                                   model_regressor=None)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 30
+              },
+              "end": {
+                "row": 0,
+                "column": 31
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 31
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 35
+              },
+              "end": {
+                "row": 0,
+                "column": 36
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 1,
+                "column": 35
+              },
+              "end": {
+                "row": 1,
+                "column": 52
+              },
+              "text": "neighborhood_data"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 52
+              },
+              "end": {
+                "row": 1,
+                "column": 53
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 2,
+                "column": 35
+              },
+              "end": {
+                "row": 2,
+                "column": 54
+              },
+              "text": "neighborhood_labels"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 2,
+                "column": 54
+              },
+              "end": {
+                "row": 2,
+                "column": 55
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 3,
+                "column": 35
+              },
+              "end": {
+                "row": 3,
+                "column": 44
+              },
+              "text": "distances"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 3,
+                "column": 44
+              },
+              "end": {
+                "row": 3,
+                "column": 45
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 4,
+                "column": 35
+              },
+              "end": {
+                "row": 4,
+                "column": 40
+              },
+              "text": "label"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 4,
+                "column": 40
+              },
+              "end": {
+                "row": 4,
+                "column": 41
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 5,
+                "column": 35
+              },
+              "end": {
+                "row": 5,
+                "column": 47
+              },
+              "text": "num_features"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 5,
+                "column": 47
+              },
+              "end": {
+                "row": 5,
+                "column": 48
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 6,
+                "column": 35
+              },
+              "end": {
+                "row": 6,
+                "column": 59
+              },
+              "text": "feature_selection='auto'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 6,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 52
+                  },
+                  "text": "feature_selection"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 6,
+                    "column": 52
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 53
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 6,
+                    "column": 53
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 59
+                  },
+                  "text": "'auto'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 6,
+                        "column": 53
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 54
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 6,
+                        "column": 54
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 58
+                      },
+                      "text": "auto"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 6,
+                        "column": 58
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 59
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 6,
+                "column": 59
+              },
+              "end": {
+                "row": 6,
+                "column": 60
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 7,
+                "column": 35
+              },
+              "end": {
+                "row": 7,
+                "column": 55
+              },
+              "text": "model_regressor=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 7,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 50
+                  },
+                  "text": "model_regressor"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 7,
+                    "column": 50
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 51
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 7,
+                    "column": 51
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 55
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 7,
+                "column": 55
+              },
+              "end": {
+                "row": 7,
+                "column": 56
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 7,
+            "column": 56
+          },
+          "end": {
+            "row": 7,
+            "column": 57
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 8,
+            "column": 8
+          },
+          "end": {
+            "row": 71,
+            "column": 45
+          },
+          "text": "\"\"\"Takes perturbed data, labels and distances, returns explanation.\n\n        Args:\n            neighborhood_data: perturbed data, 2d array. first element is\n                               assumed to be the original data point.\n            neighborhood_labels: corresponding perturbed labels. should have as\n                                 many columns as the number of possible labels.\n            distances: distances to original data point.\n            label: label for which we want an explanation\n            num_features: maximum number of features in explanation\n            feature_selection: how to select num_features. options are:\n                'forward_selection': iteratively add features to the model.\n                    This is costly when num_features is high\n                'highest_weights': selects the features that have the highest\n                    product of absolute weight * original data point when\n                    learning with all the features\n                'lasso_path': chooses features based on the lasso\n                    regularization path\n                'none': uses all features, ignores num_features\n                'auto': uses forward_selection if num_features <= 6, and\n                    'highest_weights' otherwise.\n            model_regressor: sklearn regressor to use in explanation.\n                Defaults to Ridge regression if None. Must have\n                model_regressor.coef_ and 'sample_weight' as a parameter\n                to model_regressor.fit()\n\n        Returns:\n            (intercept, exp, score, local_pred):\n            intercept is a float.\n            exp is a sorted list of tuples, where each tuple (x,y) corresponds\n            to the feature id (x) and the local weight (y). The list is sorted\n            by decreasing absolute value of y.\n            score is the R^2 value of the returned explanation\n            local_pred is the prediction of the explanation model on the original instance\n        \"\"\"\n\n        weights = self.kernel_fn(distances)\n        labels_column = neighborhood_labels[:, label]\n        used_features = self.feature_selection(neighborhood_data,\n                                               labels_column,\n                                               weights,\n                                               num_features,\n                                               feature_selection)\n\n        if model_regressor is None:\n            model_regressor = Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)\n        easy_model = model_regressor\n        easy_model.fit(neighborhood_data[:, used_features],\n                       labels_column, sample_weight=weights)\n        prediction_score = easy_model.score(\n            neighborhood_data[:, used_features],\n            labels_column, sample_weight=weights)\n\n        local_pred = easy_model.predict(neighborhood_data[0, used_features].reshape(1, -1))\n\n        if self.verbose:\n            print('Intercept', easy_model.intercept_)\n            print('Prediction_local', local_pred,)\n            print('Right:', neighborhood_labels[0, label])\n        return (easy_model.intercept_,\n                sorted(zip(used_features, easy_model.coef_),\n                       key=lambda x: np.abs(x[1]), reverse=True),\n                prediction_score, local_pred)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 8,
+                "column": 8
+              },
+              "end": {
+                "row": 42,
+                "column": 11
+              },
+              "text": "\"\"\"Takes perturbed data, labels and distances, returns explanation.\n\n        Args:\n            neighborhood_data: perturbed data, 2d array. first element is\n                               assumed to be the original data point.\n            neighborhood_labels: corresponding perturbed labels. should have as\n                                 many columns as the number of possible labels.\n            distances: distances to original data point.\n            label: label for which we want an explanation\n            num_features: maximum number of features in explanation\n            feature_selection: how to select num_features. options are:\n                'forward_selection': iteratively add features to the model.\n                    This is costly when num_features is high\n                'highest_weights': selects the features that have the highest\n                    product of absolute weight * original data point when\n                    learning with all the features\n                'lasso_path': chooses features based on the lasso\n                    regularization path\n                'none': uses all features, ignores num_features\n                'auto': uses forward_selection if num_features <= 6, and\n                    'highest_weights' otherwise.\n            model_regressor: sklearn regressor to use in explanation.\n                Defaults to Ridge regression if None. Must have\n                model_regressor.coef_ and 'sample_weight' as a parameter\n                to model_regressor.fit()\n\n        Returns:\n            (intercept, exp, score, local_pred):\n            intercept is a float.\n            exp is a sorted list of tuples, where each tuple (x,y) corresponds\n            to the feature id (x) and the local weight (y). The list is sorted\n            by decreasing absolute value of y.\n            score is the R^2 value of the returned explanation\n            local_pred is the prediction of the explanation model on the original instance\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 8,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 11
+                  },
+                  "text": "\"\"\"Takes perturbed data, labels and distances, returns explanation.\n\n        Args:\n            neighborhood_data: perturbed data, 2d array. first element is\n                               assumed to be the original data point.\n            neighborhood_labels: corresponding perturbed labels. should have as\n                                 many columns as the number of possible labels.\n            distances: distances to original data point.\n            label: label for which we want an explanation\n            num_features: maximum number of features in explanation\n            feature_selection: how to select num_features. options are:\n                'forward_selection': iteratively add features to the model.\n                    This is costly when num_features is high\n                'highest_weights': selects the features that have the highest\n                    product of absolute weight * original data point when\n                    learning with all the features\n                'lasso_path': chooses features based on the lasso\n                    regularization path\n                'none': uses all features, ignores num_features\n                'auto': uses forward_selection if num_features <= 6, and\n                    'highest_weights' otherwise.\n            model_regressor: sklearn regressor to use in explanation.\n                Defaults to Ridge regression if None. Must have\n                model_regressor.coef_ and 'sample_weight' as a parameter\n                to model_regressor.fit()\n\n        Returns:\n            (intercept, exp, score, local_pred):\n            intercept is a float.\n            exp is a sorted list of tuples, where each tuple (x,y) corresponds\n            to the feature id (x) and the local weight (y). The list is sorted\n            by decreasing absolute value of y.\n            score is the R^2 value of the returned explanation\n            local_pred is the prediction of the explanation model on the original instance\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 8,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 8
+                      },
+                      "text": "Takes perturbed data, labels and distances, returns explanation.\n\n        Args:\n            neighborhood_data: perturbed data, 2d array. first element is\n                               assumed to be the original data point.\n            neighborhood_labels: corresponding perturbed labels. should have as\n                                 many columns as the number of possible labels.\n            distances: distances to original data point.\n            label: label for which we want an explanation\n            num_features: maximum number of features in explanation\n            feature_selection: how to select num_features. options are:\n                'forward_selection': iteratively add features to the model.\n                    This is costly when num_features is high\n                'highest_weights': selects the features that have the highest\n                    product of absolute weight * original data point when\n                    learning with all the features\n                'lasso_path': chooses features based on the lasso\n                    regularization path\n                'none': uses all features, ignores num_features\n                'auto': uses forward_selection if num_features <= 6, and\n                    'highest_weights' otherwise.\n            model_regressor: sklearn regressor to use in explanation.\n                Defaults to Ridge regression if None. Must have\n                model_regressor.coef_ and 'sample_weight' as a parameter\n                to model_regressor.fit()\n\n        Returns:\n            (intercept, exp, score, local_pred):\n            intercept is a float.\n            exp is a sorted list of tuples, where each tuple (x,y) corresponds\n            to the feature id (x) and the local weight (y). The list is sorted\n            by decreasing absolute value of y.\n            score is the R^2 value of the returned explanation\n            local_pred is the prediction of the explanation model on the original instance\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 42,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 44,
+                "column": 8
+              },
+              "end": {
+                "row": 44,
+                "column": 43
+              },
+              "text": "weights = self.kernel_fn(distances)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 44,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 43
+                  },
+                  "text": "weights = self.kernel_fn(distances)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 44,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 15
+                      },
+                      "text": "weights"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 44,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 17
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 44,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 43
+                      },
+                      "text": "self.kernel_fn(distances)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 44,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 32
+                          },
+                          "text": "self.kernel_fn",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 22
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 44,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 23
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 32
+                              },
+                              "text": "kernel_fn"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 44,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 43
+                          },
+                          "text": "(distances)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 44,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 33
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 42
+                              },
+                              "text": "distances"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 44,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 43
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 45,
+                "column": 8
+              },
+              "end": {
+                "row": 45,
+                "column": 53
+              },
+              "text": "labels_column = neighborhood_labels[:, label]",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 45,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 45,
+                    "column": 53
+                  },
+                  "text": "labels_column = neighborhood_labels[:, label]",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 45,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 21
+                      },
+                      "text": "labels_column"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 45,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 23
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "subscript",
+                      "start": {
+                        "row": 45,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 53
+                      },
+                      "text": "neighborhood_labels[:, label]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 45,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 43
+                          },
+                          "text": "neighborhood_labels"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 45,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 44
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "slice",
+                          "start": {
+                            "row": 45,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 45
+                          },
+                          "text": ":",
+                          "children": [
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 45,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 45
+                              },
+                              "text": ":"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 45,
+                            "column": 45
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 46
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 45,
+                            "column": 47
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 52
+                          },
+                          "text": "label"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 45,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 53
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 46,
+                "column": 8
+              },
+              "end": {
+                "row": 50,
+                "column": 65
+              },
+              "text": "used_features = self.feature_selection(neighborhood_data,\n                                               labels_column,\n                                               weights,\n                                               num_features,\n                                               feature_selection)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 46,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 65
+                  },
+                  "text": "used_features = self.feature_selection(neighborhood_data,\n                                               labels_column,\n                                               weights,\n                                               num_features,\n                                               feature_selection)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 46,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 21
+                      },
+                      "text": "used_features"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 46,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 23
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 46,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 65
+                      },
+                      "text": "self.feature_selection(neighborhood_data,\n                                               labels_column,\n                                               weights,\n                                               num_features,\n                                               feature_selection)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 46,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 46
+                          },
+                          "text": "self.feature_selection",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 28
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 46,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 29
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 46
+                              },
+                              "text": "feature_selection"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 46,
+                            "column": 46
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 65
+                          },
+                          "text": "(neighborhood_data,\n                                               labels_column,\n                                               weights,\n                                               num_features,\n                                               feature_selection)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 46,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 47
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 64
+                              },
+                              "text": "neighborhood_data"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 46,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 65
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 47,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 60
+                              },
+                              "text": "labels_column"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 47,
+                                "column": 60
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 61
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 48,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 54
+                              },
+                              "text": "weights"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 48,
+                                "column": 54
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 55
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 49,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 49,
+                                "column": 59
+                              },
+                              "text": "num_features"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 49,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 49,
+                                "column": 60
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 50,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 64
+                              },
+                              "text": "feature_selection"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 50,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 65
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 52,
+                "column": 8
+              },
+              "end": {
+                "row": 54,
+                "column": 67
+              },
+              "text": "if model_regressor is None:\n            model_regressor = Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 52,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 52,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 52,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 52,
+                    "column": 34
+                  },
+                  "text": "model_regressor is None",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 52,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 26
+                      },
+                      "text": "model_regressor"
+                    },
+                    {
+                      "type": "is",
+                      "start": {
+                        "row": 52,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 29
+                      },
+                      "text": "is"
+                    },
+                    {
+                      "type": "none",
+                      "start": {
+                        "row": 52,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 34
+                      },
+                      "text": "None"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 52,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 52,
+                    "column": 35
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 53,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 54,
+                    "column": 67
+                  },
+                  "text": "model_regressor = Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 53,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 54,
+                        "column": 67
+                      },
+                      "text": "model_regressor = Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 53,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 54,
+                            "column": 67
+                          },
+                          "text": "model_regressor = Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 53,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 27
+                              },
+                              "text": "model_regressor"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 53,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 29
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 53,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 54,
+                                "column": 67
+                              },
+                              "text": "Ridge(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 35
+                                  },
+                                  "text": "Ridge"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 67
+                                  },
+                                  "text": "(alpha=1, fit_intercept=True,\n                                    random_state=self.random_state)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 36
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "keyword_argument",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 43
+                                      },
+                                      "text": "alpha=1",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 41
+                                          },
+                                          "text": "alpha"
+                                        },
+                                        {
+                                          "type": "=",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 42
+                                          },
+                                          "text": "="
+                                        },
+                                        {
+                                          "type": "integer",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 43
+                                          },
+                                          "text": "1"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 44
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "keyword_argument",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 63
+                                      },
+                                      "text": "fit_intercept=True",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 58
+                                          },
+                                          "text": "fit_intercept"
+                                        },
+                                        {
+                                          "type": "=",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 58
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 59
+                                          },
+                                          "text": "="
+                                        },
+                                        {
+                                          "type": "true",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 63
+                                          },
+                                          "text": "True"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 63
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 64
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "keyword_argument",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 66
+                                      },
+                                      "text": "random_state=self.random_state",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 54,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 54,
+                                            "column": 48
+                                          },
+                                          "text": "random_state"
+                                        },
+                                        {
+                                          "type": "=",
+                                          "start": {
+                                            "row": 54,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 54,
+                                            "column": 49
+                                          },
+                                          "text": "="
+                                        },
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 54,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 54,
+                                            "column": 66
+                                          },
+                                          "text": "self.random_state",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 54,
+                                                "column": 49
+                                              },
+                                              "end": {
+                                                "row": 54,
+                                                "column": 53
+                                              },
+                                              "text": "self"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 54,
+                                                "column": 53
+                                              },
+                                              "end": {
+                                                "row": 54,
+                                                "column": 54
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 54,
+                                                "column": 54
+                                              },
+                                              "end": {
+                                                "row": 54,
+                                                "column": 66
+                                              },
+                                              "text": "random_state"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 66
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 67
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 55,
+                "column": 8
+              },
+              "end": {
+                "row": 55,
+                "column": 36
+              },
+              "text": "easy_model = model_regressor",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 55,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 55,
+                    "column": 36
+                  },
+                  "text": "easy_model = model_regressor",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 55,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 55,
+                        "column": 18
+                      },
+                      "text": "easy_model"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 55,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 55,
+                        "column": 20
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 55,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 55,
+                        "column": 36
+                      },
+                      "text": "model_regressor"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 56,
+                "column": 8
+              },
+              "end": {
+                "row": 57,
+                "column": 60
+              },
+              "text": "easy_model.fit(neighborhood_data[:, used_features],\n                       labels_column, sample_weight=weights)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 56,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 57,
+                    "column": 60
+                  },
+                  "text": "easy_model.fit(neighborhood_data[:, used_features],\n                       labels_column, sample_weight=weights)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 56,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 56,
+                        "column": 22
+                      },
+                      "text": "easy_model.fit",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 56,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 18
+                          },
+                          "text": "easy_model"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 56,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 19
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 56,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 22
+                          },
+                          "text": "fit"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 56,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 57,
+                        "column": 60
+                      },
+                      "text": "(neighborhood_data[:, used_features],\n                       labels_column, sample_weight=weights)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 56,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "subscript",
+                          "start": {
+                            "row": 56,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 58
+                          },
+                          "text": "neighborhood_data[:, used_features]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 56,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 40
+                              },
+                              "text": "neighborhood_data"
+                            },
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 56,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 41
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "slice",
+                              "start": {
+                                "row": 56,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 42
+                              },
+                              "text": ":",
+                              "children": [
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 56,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 56,
+                                    "column": 42
+                                  },
+                                  "text": ":"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 56,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 43
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 56,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 57
+                              },
+                              "text": "used_features"
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 56,
+                                "column": 57
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 58
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 56,
+                            "column": 58
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 59
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 57,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 57,
+                            "column": 36
+                          },
+                          "text": "labels_column"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 57,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 57,
+                            "column": 37
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 57,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 57,
+                            "column": 59
+                          },
+                          "text": "sample_weight=weights",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 57,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 51
+                              },
+                              "text": "sample_weight"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 57,
+                                "column": 51
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 52
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 57,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 59
+                              },
+                              "text": "weights"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 57,
+                            "column": 59
+                          },
+                          "end": {
+                            "row": 57,
+                            "column": 60
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 58,
+                "column": 8
+              },
+              "end": {
+                "row": 60,
+                "column": 49
+              },
+              "text": "prediction_score = easy_model.score(\n            neighborhood_data[:, used_features],\n            labels_column, sample_weight=weights)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 58,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 60,
+                    "column": 49
+                  },
+                  "text": "prediction_score = easy_model.score(\n            neighborhood_data[:, used_features],\n            labels_column, sample_weight=weights)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 58,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 24
+                      },
+                      "text": "prediction_score"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 58,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 26
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 58,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 60,
+                        "column": 49
+                      },
+                      "text": "easy_model.score(\n            neighborhood_data[:, used_features],\n            labels_column, sample_weight=weights)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 58,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 58,
+                            "column": 43
+                          },
+                          "text": "easy_model.score",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 58,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 37
+                              },
+                              "text": "easy_model"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 58,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 38
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 58,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 43
+                              },
+                              "text": "score"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 58,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 60,
+                            "column": 49
+                          },
+                          "text": "(\n            neighborhood_data[:, used_features],\n            labels_column, sample_weight=weights)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 58,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 44
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 59,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 59,
+                                "column": 47
+                              },
+                              "text": "neighborhood_data[:, used_features]",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 29
+                                  },
+                                  "text": "neighborhood_data"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 30
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "slice",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 31
+                                  },
+                                  "text": ":",
+                                  "children": [
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 31
+                                      },
+                                      "text": ":"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 32
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 46
+                                  },
+                                  "text": "used_features"
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 47
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 59,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 59,
+                                "column": 48
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 60,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 60,
+                                "column": 25
+                              },
+                              "text": "labels_column"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 60,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 60,
+                                "column": 26
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 60,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 60,
+                                "column": 48
+                              },
+                              "text": "sample_weight=weights",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 60,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 60,
+                                    "column": 40
+                                  },
+                                  "text": "sample_weight"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 60,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 60,
+                                    "column": 41
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 60,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 60,
+                                    "column": 48
+                                  },
+                                  "text": "weights"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 60,
+                                "column": 48
+                              },
+                              "end": {
+                                "row": 60,
+                                "column": 49
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 62,
+                "column": 8
+              },
+              "end": {
+                "row": 62,
+                "column": 91
+              },
+              "text": "local_pred = easy_model.predict(neighborhood_data[0, used_features].reshape(1, -1))",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 62,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 62,
+                    "column": 91
+                  },
+                  "text": "local_pred = easy_model.predict(neighborhood_data[0, used_features].reshape(1, -1))",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 62,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 62,
+                        "column": 18
+                      },
+                      "text": "local_pred"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 62,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 62,
+                        "column": 20
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 62,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 62,
+                        "column": 91
+                      },
+                      "text": "easy_model.predict(neighborhood_data[0, used_features].reshape(1, -1))",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 62,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 62,
+                            "column": 39
+                          },
+                          "text": "easy_model.predict",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 62,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 62,
+                                "column": 31
+                              },
+                              "text": "easy_model"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 62,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 62,
+                                "column": 32
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 62,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 62,
+                                "column": 39
+                              },
+                              "text": "predict"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 62,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 62,
+                            "column": 91
+                          },
+                          "text": "(neighborhood_data[0, used_features].reshape(1, -1))",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 62,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 62,
+                                "column": 40
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 62,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 62,
+                                "column": 90
+                              },
+                              "text": "neighborhood_data[0, used_features].reshape(1, -1)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 62,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 62,
+                                    "column": 83
+                                  },
+                                  "text": "neighborhood_data[0, used_features].reshape",
+                                  "children": [
+                                    {
+                                      "type": "subscript",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 75
+                                      },
+                                      "text": "neighborhood_data[0, used_features]",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 57
+                                          },
+                                          "text": "neighborhood_data"
+                                        },
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 57
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 58
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "integer",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 58
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 59
+                                          },
+                                          "text": "0"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 60
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 61
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 74
+                                          },
+                                          "text": "used_features"
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 74
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 75
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 75
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 76
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 76
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 83
+                                      },
+                                      "text": "reshape"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 62,
+                                    "column": 83
+                                  },
+                                  "end": {
+                                    "row": 62,
+                                    "column": 90
+                                  },
+                                  "text": "(1, -1)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 83
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 84
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 84
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 85
+                                      },
+                                      "text": "1"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 85
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 86
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "unary_operator",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 87
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 89
+                                      },
+                                      "text": "-1",
+                                      "children": [
+                                        {
+                                          "type": "-",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 87
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 88
+                                          },
+                                          "text": "-"
+                                        },
+                                        {
+                                          "type": "integer",
+                                          "start": {
+                                            "row": 62,
+                                            "column": 88
+                                          },
+                                          "end": {
+                                            "row": 62,
+                                            "column": 89
+                                          },
+                                          "text": "1"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 89
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 90
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 62,
+                                "column": 90
+                              },
+                              "end": {
+                                "row": 62,
+                                "column": 91
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 64,
+                "column": 8
+              },
+              "end": {
+                "row": 67,
+                "column": 58
+              },
+              "text": "if self.verbose:\n            print('Intercept', easy_model.intercept_)\n            print('Prediction_local', local_pred,)\n            print('Right:', neighborhood_labels[0, label])",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 64,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 64,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "attribute",
+                  "start": {
+                    "row": 64,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 64,
+                    "column": 23
+                  },
+                  "text": "self.verbose",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 64,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 64,
+                        "column": 15
+                      },
+                      "text": "self"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 64,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 64,
+                        "column": 16
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 64,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 64,
+                        "column": 23
+                      },
+                      "text": "verbose"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 64,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 64,
+                    "column": 24
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 65,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 67,
+                    "column": 58
+                  },
+                  "text": "print('Intercept', easy_model.intercept_)\n            print('Prediction_local', local_pred,)\n            print('Right:', neighborhood_labels[0, label])",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 65,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 65,
+                        "column": 53
+                      },
+                      "text": "print('Intercept', easy_model.intercept_)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 65,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 53
+                          },
+                          "text": "print('Intercept', easy_model.intercept_)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 65,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 65,
+                                "column": 17
+                              },
+                              "text": "print"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 65,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 65,
+                                "column": 53
+                              },
+                              "text": "('Intercept', easy_model.intercept_)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 18
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 29
+                                  },
+                                  "text": "'Intercept'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 19
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 28
+                                      },
+                                      "text": "Intercept"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 29
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 30
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 52
+                                  },
+                                  "text": "easy_model.intercept_",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 41
+                                      },
+                                      "text": "easy_model"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 41
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 42
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 52
+                                      },
+                                      "text": "intercept_"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 53
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 66,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 66,
+                        "column": 50
+                      },
+                      "text": "print('Prediction_local', local_pred,)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 66,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 66,
+                            "column": 50
+                          },
+                          "text": "print('Prediction_local', local_pred,)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 66,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 17
+                              },
+                              "text": "print"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 66,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 50
+                              },
+                              "text": "('Prediction_local', local_pred,)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 66,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 66,
+                                    "column": 18
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 66,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 66,
+                                    "column": 36
+                                  },
+                                  "text": "'Prediction_local'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 66,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 66,
+                                        "column": 19
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 66,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 66,
+                                        "column": 35
+                                      },
+                                      "text": "Prediction_local"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 66,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 66,
+                                        "column": 36
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 66,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 66,
+                                    "column": 37
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 66,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 66,
+                                    "column": 48
+                                  },
+                                  "text": "local_pred"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 66,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 66,
+                                    "column": 49
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 66,
+                                    "column": 49
+                                  },
+                                  "end": {
+                                    "row": 66,
+                                    "column": 50
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 67,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 67,
+                        "column": 58
+                      },
+                      "text": "print('Right:', neighborhood_labels[0, label])",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 67,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 58
+                          },
+                          "text": "print('Right:', neighborhood_labels[0, label])",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 67,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 17
+                              },
+                              "text": "print"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 67,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 58
+                              },
+                              "text": "('Right:', neighborhood_labels[0, label])",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 67,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 67,
+                                    "column": 18
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 67,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 67,
+                                    "column": 26
+                                  },
+                                  "text": "'Right:'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 19
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 25
+                                      },
+                                      "text": "Right:"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 26
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 67,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 67,
+                                    "column": 27
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "subscript",
+                                  "start": {
+                                    "row": 67,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 67,
+                                    "column": 57
+                                  },
+                                  "text": "neighborhood_labels[0, label]",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 47
+                                      },
+                                      "text": "neighborhood_labels"
+                                    },
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 48
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 49
+                                      },
+                                      "text": "0"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 50
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 56
+                                      },
+                                      "text": "label"
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 67,
+                                        "column": 56
+                                      },
+                                      "end": {
+                                        "row": 67,
+                                        "column": 57
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 67,
+                                    "column": 57
+                                  },
+                                  "end": {
+                                    "row": 67,
+                                    "column": 58
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 68,
+                "column": 8
+              },
+              "end": {
+                "row": 71,
+                "column": 45
+              },
+              "text": "return (easy_model.intercept_,\n                sorted(zip(used_features, easy_model.coef_),\n                       key=lambda x: np.abs(x[1]), reverse=True),\n                prediction_score, local_pred)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 68,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 68,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "tuple",
+                  "start": {
+                    "row": 68,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 71,
+                    "column": 45
+                  },
+                  "text": "(easy_model.intercept_,\n                sorted(zip(used_features, easy_model.coef_),\n                       key=lambda x: np.abs(x[1]), reverse=True),\n                prediction_score, local_pred)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 68,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 68,
+                        "column": 16
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 68,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 68,
+                        "column": 37
+                      },
+                      "text": "easy_model.intercept_",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 68,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 68,
+                            "column": 26
+                          },
+                          "text": "easy_model"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 68,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 68,
+                            "column": 27
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 68,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 68,
+                            "column": 37
+                          },
+                          "text": "intercept_"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 68,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 68,
+                        "column": 38
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 69,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 70,
+                        "column": 64
+                      },
+                      "text": "sorted(zip(used_features, easy_model.coef_),\n                       key=lambda x: np.abs(x[1]), reverse=True)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 69,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 69,
+                            "column": 22
+                          },
+                          "text": "sorted"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 69,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 70,
+                            "column": 64
+                          },
+                          "text": "(zip(used_features, easy_model.coef_),\n                       key=lambda x: np.abs(x[1]), reverse=True)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 69,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 23
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 69,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 59
+                              },
+                              "text": "zip(used_features, easy_model.coef_)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 69,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 69,
+                                    "column": 26
+                                  },
+                                  "text": "zip"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 69,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 69,
+                                    "column": 59
+                                  },
+                                  "text": "(used_features, easy_model.coef_)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 69,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 69,
+                                        "column": 27
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 69,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 69,
+                                        "column": 40
+                                      },
+                                      "text": "used_features"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 69,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 69,
+                                        "column": 41
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 69,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 69,
+                                        "column": 58
+                                      },
+                                      "text": "easy_model.coef_",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 69,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 69,
+                                            "column": 52
+                                          },
+                                          "text": "easy_model"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 69,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 69,
+                                            "column": 53
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 69,
+                                            "column": 53
+                                          },
+                                          "end": {
+                                            "row": 69,
+                                            "column": 58
+                                          },
+                                          "text": "coef_"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 69,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 69,
+                                        "column": 59
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 69,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 60
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 70,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 49
+                              },
+                              "text": "key=lambda x: np.abs(x[1])",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 70,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 70,
+                                    "column": 26
+                                  },
+                                  "text": "key"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 70,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 70,
+                                    "column": 27
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "lambda",
+                                  "start": {
+                                    "row": 70,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 70,
+                                    "column": 49
+                                  },
+                                  "text": "lambda x: np.abs(x[1])",
+                                  "children": [
+                                    {
+                                      "type": "lambda",
+                                      "start": {
+                                        "row": 70,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 70,
+                                        "column": 33
+                                      },
+                                      "text": "lambda"
+                                    },
+                                    {
+                                      "type": "lambda_parameters",
+                                      "start": {
+                                        "row": 70,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 70,
+                                        "column": 35
+                                      },
+                                      "text": "x",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 70,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 70,
+                                            "column": 35
+                                          },
+                                          "text": "x"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 70,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 70,
+                                        "column": 36
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 70,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 70,
+                                        "column": 49
+                                      },
+                                      "text": "np.abs(x[1])",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 70,
+                                            "column": 37
+                                          },
+                                          "end": {
+                                            "row": 70,
+                                            "column": 43
+                                          },
+                                          "text": "np.abs",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 70,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 70,
+                                                "column": 39
+                                              },
+                                              "text": "np"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 70,
+                                                "column": 39
+                                              },
+                                              "end": {
+                                                "row": 70,
+                                                "column": 40
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 70,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 70,
+                                                "column": 43
+                                              },
+                                              "text": "abs"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 70,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 70,
+                                            "column": 49
+                                          },
+                                          "text": "(x[1])",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 70,
+                                                "column": 43
+                                              },
+                                              "end": {
+                                                "row": 70,
+                                                "column": 44
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "subscript",
+                                              "start": {
+                                                "row": 70,
+                                                "column": 44
+                                              },
+                                              "end": {
+                                                "row": 70,
+                                                "column": 48
+                                              },
+                                              "text": "x[1]",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 70,
+                                                    "column": 44
+                                                  },
+                                                  "end": {
+                                                    "row": 70,
+                                                    "column": 45
+                                                  },
+                                                  "text": "x"
+                                                },
+                                                {
+                                                  "type": "[",
+                                                  "start": {
+                                                    "row": 70,
+                                                    "column": 45
+                                                  },
+                                                  "end": {
+                                                    "row": 70,
+                                                    "column": 46
+                                                  },
+                                                  "text": "["
+                                                },
+                                                {
+                                                  "type": "integer",
+                                                  "start": {
+                                                    "row": 70,
+                                                    "column": 46
+                                                  },
+                                                  "end": {
+                                                    "row": 70,
+                                                    "column": 47
+                                                  },
+                                                  "text": "1"
+                                                },
+                                                {
+                                                  "type": "]",
+                                                  "start": {
+                                                    "row": 70,
+                                                    "column": 47
+                                                  },
+                                                  "end": {
+                                                    "row": 70,
+                                                    "column": 48
+                                                  },
+                                                  "text": "]"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 70,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 70,
+                                                "column": 49
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 70,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 50
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 70,
+                                "column": 51
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 63
+                              },
+                              "text": "reverse=True",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 70,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 70,
+                                    "column": 58
+                                  },
+                                  "text": "reverse"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 70,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 70,
+                                    "column": 59
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "true",
+                                  "start": {
+                                    "row": 70,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 70,
+                                    "column": 63
+                                  },
+                                  "text": "True"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 70,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 64
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 70,
+                        "column": 64
+                      },
+                      "end": {
+                        "row": 70,
+                        "column": 65
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 71,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 71,
+                        "column": 32
+                      },
+                      "text": "prediction_score"
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 71,
+                        "column": 32
+                      },
+                      "end": {
+                        "row": 71,
+                        "column": 33
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 71,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 71,
+                        "column": 44
+                      },
+                      "text": "local_pred"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 71,
+                        "column": 44
+                      },
+                      "end": {
+                        "row": 71,
+                        "column": 45
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

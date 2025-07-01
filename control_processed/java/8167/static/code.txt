@@ -1,0 +1,10 @@
+private void urlWithParamIfGet() {
+		if (Method.GET.equals(method) && false == this.isRest) {
+			// 优先使用body形式的参数，不存在使用form
+			if (ArrayUtil.isNotEmpty(this.bodyBytes)) {
+				this.url = HttpUtil.urlWithForm(this.url, StrUtil.str(this.bodyBytes, this.charset), this.charset, false);
+			} else {
+				this.url = HttpUtil.urlWithForm(this.url, this.form, this.charset, false);
+			}
+		}
+	}

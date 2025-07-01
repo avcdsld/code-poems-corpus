@@ -1,0 +1,3 @@
+public static void sendHtml(Collection<String> tos, String subject, String content, File... files) {
+		send(tos, subject, content, true, files);
+	}

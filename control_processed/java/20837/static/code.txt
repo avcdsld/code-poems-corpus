@@ -1,0 +1,32 @@
+private void followRedirections(HttpMessage message, HttpRequestConfig requestConfig) throws IOException {
+        HttpRedirectionValidator validator = requestConfig.getRedirectionValidator();
+        validator.notifyMessageReceived(message);
+
+        User requestingUser = getUser(message);
+        HttpMessage redirectMessage = message;
+        int maxRedirections = client.getParams().getIntParameter(HttpClientParams.MAX_REDIRECTS, 100);
+        for (int i = 0; i < maxRedirections && isRedirectionNeeded(redirectMessage.getResponseHeader().getStatusCode()); i++) {
+            URI newLocation = extractRedirectLocation(redirectMessage);
+            if (newLocation == null || !validator.isValid(newLocation)) {
+                return;
+            }
+
+            redirectMessage = redirectMessage.cloneAll();
+            redirectMessage.setRequestingUser(requestingUser);
+            redirectMessage.getRequestHeader().setURI(newLocation);
+
+            if (isRequestRewriteNeeded(redirectMessage)) {
+                redirectMessage.getRequestHeader().setMethod(HttpRequestHeader.GET);
+                redirectMessage.getRequestHeader().setHeader(HttpHeader.CONTENT_TYPE, null);
+                redirectMessage.getRequestHeader().setHeader(HttpHeader.CONTENT_LENGTH, null);
+                redirectMessage.setRequestBody("");
+            }
+
+            sendAndReceiveImpl(redirectMessage, requestConfig);
+            validator.notifyMessageReceived(redirectMessage);
+
+            // Update the response of the (original) message
+            message.setResponseHeader(redirectMessage.getResponseHeader());
+            message.setResponseBody(redirectMessage.getResponseBody());
+        }
+    }

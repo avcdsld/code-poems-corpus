@@ -1,0 +1,7 @@
+public static <T> T isInstanceOf(Class<?> type, T obj, String errorMsgTemplate, Object... params) throws IllegalArgumentException {
+		notNull(type, "Type to check against must not be null");
+		if (false == type.isInstance(obj)) {
+			throw new IllegalArgumentException(StrUtil.format(errorMsgTemplate, params));
+		}
+		return obj;
+	}

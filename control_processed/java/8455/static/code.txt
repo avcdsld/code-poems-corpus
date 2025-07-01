@@ -1,0 +1,11 @@
+public static PublicKey generatePublicKey(String algorithm, KeySpec keySpec) {
+		if (null == keySpec) {
+			return null;
+		}
+		algorithm = getAlgorithmAfterWith(algorithm);
+		try {
+			return getKeyFactory(algorithm).generatePublic(keySpec);
+		} catch (Exception e) {
+			throw new CryptoException(e);
+		}
+	}

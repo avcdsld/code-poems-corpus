@@ -1,0 +1,10 @@
+function Tick(pos, minor) {
+			var tick = this;
+			tick.pos = pos;
+			tick.minor = minor;
+			tick.isNew = true;
+
+			if (!minor) {
+				tick.addLabel();
+			}
+		}

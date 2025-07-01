@@ -1,0 +1,6 @@
+public static boolean isJsonArray(String str) {
+		if (StrUtil.isBlank(str)) {
+			return false;
+		}
+		return StrUtil.isWrap(str.trim(), '[', ']');
+	}

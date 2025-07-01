@@ -1,0 +1,18 @@
+def check_conflicts(self):
+        """Check shortcuts for conflicts."""
+        conflicts = []
+        if len(self._qsequences) == 0:
+            return conflicts
+
+        new_qsequence = self.new_qsequence
+        for shortcut in self.shortcuts:
+            shortcut_qsequence = QKeySequence.fromString(str(shortcut.key))
+            if shortcut_qsequence.isEmpty():
+                continue
+            if (shortcut.context, shortcut.name) == (self.context, self.name):
+                continue
+            if shortcut.context in [self.context, '_'] or self.context == '_':
+                if (shortcut_qsequence.matches(new_qsequence) or
+                        new_qsequence.matches(shortcut_qsequence)):
+                    conflicts.append(shortcut)
+        return conflicts

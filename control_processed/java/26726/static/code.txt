@@ -1,0 +1,16 @@
+private PipelineResponseCommit applyStageTimestamps(PipelineResponseCommit commit, Dashboard dashboard, Pipeline pipeline,List<PipelineStage> pipelineStageList){
+        PipelineResponseCommit returnCommit = new PipelineResponseCommit(commit);
+
+        for(PipelineStage systemStage : pipelineStageList) {
+            //get commits for a given stage
+            Map<String, PipelineCommit> commitMap = findCommitsForStage(dashboard, pipeline, systemStage);
+
+            //if this commit doesnt have a processed timestamp for this stage, add one
+            PipelineCommit pipelineCommit = commitMap.get(commit.getScmRevisionNumber());
+            if(pipelineCommit != null && !returnCommit.getProcessedTimestamps().containsKey(systemStage.getName())){
+                Long timestamp = pipelineCommit.getTimestamp();
+                returnCommit.addNewPipelineProcessedTimestamp(systemStage, timestamp);
+            }
+        }
+        return returnCommit;
+    }

@@ -1,0 +1,12 @@
+def get_batters(home_or_away)
+      if self.gid
+        bs = get_boxscore
+        if home_or_away == 'away'
+        	bs.batters[0]
+        else
+          bs.batters[1]
+        end
+      else
+        puts "No data for input specified"
+      end
+    end

@@ -1,0 +1,940 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 145,
+    "column": 49
+  },
+  "text": "def update(self, field_updates, option=None):\n        \"\"\"Update an existing document in the Firestore database.\n\n        By default, this method verifies that the document exists on the\n        server before making updates. A write ``option`` can be specified to\n        override these preconditions.\n\n        Each key in ``field_updates`` can either be a field name or a\n        **field path** (For more information on **field paths**, see\n        :meth:`~.firestore_v1beta1.client.Client.field_path`.) To\n        illustrate this, consider a document with\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n               'other': True,\n           }\n\n        stored on the server. If the field name is used in the update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo': {\n           ...         'quux': 800,\n           ...     },\n           ... }\n           >>> document.update(field_updates)\n\n        then all of ``foo`` will be overwritten on the server and the new\n        value will be\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        On the other hand, if a ``.``-delimited **field path** is used in the\n        update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.quux': 800,\n           ... }\n           >>> document.update(field_updates)\n\n        then only ``foo.quux`` will be updated on the server and the\n        field ``foo.bar`` will remain intact:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        .. warning::\n\n           A **field path** can only be used as a top-level key in\n           ``field_updates``.\n\n        To delete / remove a field from an existing document, use the\n        :attr:`~.firestore_v1beta1.transforms.DELETE_FIELD` sentinel. So\n        with the example above, sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'other': firestore.DELETE_FIELD,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n           }\n\n        To set a field to the current time on the server when the\n        update is received, use the\n        :attr:`~.firestore_v1beta1.transforms.SERVER_TIMESTAMP` sentinel.\n        Sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.now': firestore.SERVER_TIMESTAMP,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'now': datetime.datetime(2012, ...),\n               },\n               'other': True,\n           }\n\n        Args:\n            field_updates (dict): Field names or paths to update and values\n                to update with.\n            option (Optional[~.firestore_v1beta1.client.WriteOption]): A\n               write option to make assertions / preconditions on the server\n               state of the document before applying changes.\n\n        Returns:\n            google.cloud.firestore_v1beta1.types.WriteResult: The\n            write result corresponding to the updated document. A write\n            result contains an ``update_time`` field.\n\n        Raises:\n            ~google.cloud.exceptions.NotFound: If the document does not exist.\n        \"\"\"\n        batch = self._client.batch()\n        batch.update(self, field_updates, option=option)\n        write_results = batch.commit()\n        return _first_write_result(write_results)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 145,
+        "column": 49
+      },
+      "text": "def update(self, field_updates, option=None):\n        \"\"\"Update an existing document in the Firestore database.\n\n        By default, this method verifies that the document exists on the\n        server before making updates. A write ``option`` can be specified to\n        override these preconditions.\n\n        Each key in ``field_updates`` can either be a field name or a\n        **field path** (For more information on **field paths**, see\n        :meth:`~.firestore_v1beta1.client.Client.field_path`.) To\n        illustrate this, consider a document with\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n               'other': True,\n           }\n\n        stored on the server. If the field name is used in the update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo': {\n           ...         'quux': 800,\n           ...     },\n           ... }\n           >>> document.update(field_updates)\n\n        then all of ``foo`` will be overwritten on the server and the new\n        value will be\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        On the other hand, if a ``.``-delimited **field path** is used in the\n        update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.quux': 800,\n           ... }\n           >>> document.update(field_updates)\n\n        then only ``foo.quux`` will be updated on the server and the\n        field ``foo.bar`` will remain intact:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        .. warning::\n\n           A **field path** can only be used as a top-level key in\n           ``field_updates``.\n\n        To delete / remove a field from an existing document, use the\n        :attr:`~.firestore_v1beta1.transforms.DELETE_FIELD` sentinel. So\n        with the example above, sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'other': firestore.DELETE_FIELD,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n           }\n\n        To set a field to the current time on the server when the\n        update is received, use the\n        :attr:`~.firestore_v1beta1.transforms.SERVER_TIMESTAMP` sentinel.\n        Sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.now': firestore.SERVER_TIMESTAMP,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'now': datetime.datetime(2012, ...),\n               },\n               'other': True,\n           }\n\n        Args:\n            field_updates (dict): Field names or paths to update and values\n                to update with.\n            option (Optional[~.firestore_v1beta1.client.WriteOption]): A\n               write option to make assertions / preconditions on the server\n               state of the document before applying changes.\n\n        Returns:\n            google.cloud.firestore_v1beta1.types.WriteResult: The\n            write result corresponding to the updated document. A write\n            result contains an ``update_time`` field.\n\n        Raises:\n            ~google.cloud.exceptions.NotFound: If the document does not exist.\n        \"\"\"\n        batch = self._client.batch()\n        batch.update(self, field_updates, option=option)\n        write_results = batch.commit()\n        return _first_write_result(write_results)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 10
+          },
+          "text": "update"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 10
+          },
+          "end": {
+            "row": 0,
+            "column": 44
+          },
+          "text": "(self, field_updates, option=None)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 10
+              },
+              "end": {
+                "row": 0,
+                "column": 11
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 11
+              },
+              "end": {
+                "row": 0,
+                "column": 15
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 15
+              },
+              "end": {
+                "row": 0,
+                "column": 16
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 17
+              },
+              "end": {
+                "row": 0,
+                "column": 30
+              },
+              "text": "field_updates"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 30
+              },
+              "end": {
+                "row": 0,
+                "column": 31
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 32
+              },
+              "end": {
+                "row": 0,
+                "column": 43
+              },
+              "text": "option=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 32
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "text": "option"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 39
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 39
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 43
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 43
+              },
+              "end": {
+                "row": 0,
+                "column": 44
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 44
+          },
+          "end": {
+            "row": 0,
+            "column": 45
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 8
+          },
+          "end": {
+            "row": 145,
+            "column": 49
+          },
+          "text": "\"\"\"Update an existing document in the Firestore database.\n\n        By default, this method verifies that the document exists on the\n        server before making updates. A write ``option`` can be specified to\n        override these preconditions.\n\n        Each key in ``field_updates`` can either be a field name or a\n        **field path** (For more information on **field paths**, see\n        :meth:`~.firestore_v1beta1.client.Client.field_path`.) To\n        illustrate this, consider a document with\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n               'other': True,\n           }\n\n        stored on the server. If the field name is used in the update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo': {\n           ...         'quux': 800,\n           ...     },\n           ... }\n           >>> document.update(field_updates)\n\n        then all of ``foo`` will be overwritten on the server and the new\n        value will be\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        On the other hand, if a ``.``-delimited **field path** is used in the\n        update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.quux': 800,\n           ... }\n           >>> document.update(field_updates)\n\n        then only ``foo.quux`` will be updated on the server and the\n        field ``foo.bar`` will remain intact:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        .. warning::\n\n           A **field path** can only be used as a top-level key in\n           ``field_updates``.\n\n        To delete / remove a field from an existing document, use the\n        :attr:`~.firestore_v1beta1.transforms.DELETE_FIELD` sentinel. So\n        with the example above, sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'other': firestore.DELETE_FIELD,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n           }\n\n        To set a field to the current time on the server when the\n        update is received, use the\n        :attr:`~.firestore_v1beta1.transforms.SERVER_TIMESTAMP` sentinel.\n        Sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.now': firestore.SERVER_TIMESTAMP,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'now': datetime.datetime(2012, ...),\n               },\n               'other': True,\n           }\n\n        Args:\n            field_updates (dict): Field names or paths to update and values\n                to update with.\n            option (Optional[~.firestore_v1beta1.client.WriteOption]): A\n               write option to make assertions / preconditions on the server\n               state of the document before applying changes.\n\n        Returns:\n            google.cloud.firestore_v1beta1.types.WriteResult: The\n            write result corresponding to the updated document. A write\n            result contains an ``update_time`` field.\n\n        Raises:\n            ~google.cloud.exceptions.NotFound: If the document does not exist.\n        \"\"\"\n        batch = self._client.batch()\n        batch.update(self, field_updates, option=option)\n        write_results = batch.commit()\n        return _first_write_result(write_results)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 141,
+                "column": 11
+              },
+              "text": "\"\"\"Update an existing document in the Firestore database.\n\n        By default, this method verifies that the document exists on the\n        server before making updates. A write ``option`` can be specified to\n        override these preconditions.\n\n        Each key in ``field_updates`` can either be a field name or a\n        **field path** (For more information on **field paths**, see\n        :meth:`~.firestore_v1beta1.client.Client.field_path`.) To\n        illustrate this, consider a document with\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n               'other': True,\n           }\n\n        stored on the server. If the field name is used in the update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo': {\n           ...         'quux': 800,\n           ...     },\n           ... }\n           >>> document.update(field_updates)\n\n        then all of ``foo`` will be overwritten on the server and the new\n        value will be\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        On the other hand, if a ``.``-delimited **field path** is used in the\n        update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.quux': 800,\n           ... }\n           >>> document.update(field_updates)\n\n        then only ``foo.quux`` will be updated on the server and the\n        field ``foo.bar`` will remain intact:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        .. warning::\n\n           A **field path** can only be used as a top-level key in\n           ``field_updates``.\n\n        To delete / remove a field from an existing document, use the\n        :attr:`~.firestore_v1beta1.transforms.DELETE_FIELD` sentinel. So\n        with the example above, sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'other': firestore.DELETE_FIELD,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n           }\n\n        To set a field to the current time on the server when the\n        update is received, use the\n        :attr:`~.firestore_v1beta1.transforms.SERVER_TIMESTAMP` sentinel.\n        Sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.now': firestore.SERVER_TIMESTAMP,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'now': datetime.datetime(2012, ...),\n               },\n               'other': True,\n           }\n\n        Args:\n            field_updates (dict): Field names or paths to update and values\n                to update with.\n            option (Optional[~.firestore_v1beta1.client.WriteOption]): A\n               write option to make assertions / preconditions on the server\n               state of the document before applying changes.\n\n        Returns:\n            google.cloud.firestore_v1beta1.types.WriteResult: The\n            write result corresponding to the updated document. A write\n            result contains an ``update_time`` field.\n\n        Raises:\n            ~google.cloud.exceptions.NotFound: If the document does not exist.\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 141,
+                    "column": 11
+                  },
+                  "text": "\"\"\"Update an existing document in the Firestore database.\n\n        By default, this method verifies that the document exists on the\n        server before making updates. A write ``option`` can be specified to\n        override these preconditions.\n\n        Each key in ``field_updates`` can either be a field name or a\n        **field path** (For more information on **field paths**, see\n        :meth:`~.firestore_v1beta1.client.Client.field_path`.) To\n        illustrate this, consider a document with\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n               'other': True,\n           }\n\n        stored on the server. If the field name is used in the update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo': {\n           ...         'quux': 800,\n           ...     },\n           ... }\n           >>> document.update(field_updates)\n\n        then all of ``foo`` will be overwritten on the server and the new\n        value will be\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        On the other hand, if a ``.``-delimited **field path** is used in the\n        update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.quux': 800,\n           ... }\n           >>> document.update(field_updates)\n\n        then only ``foo.quux`` will be updated on the server and the\n        field ``foo.bar`` will remain intact:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        .. warning::\n\n           A **field path** can only be used as a top-level key in\n           ``field_updates``.\n\n        To delete / remove a field from an existing document, use the\n        :attr:`~.firestore_v1beta1.transforms.DELETE_FIELD` sentinel. So\n        with the example above, sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'other': firestore.DELETE_FIELD,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n           }\n\n        To set a field to the current time on the server when the\n        update is received, use the\n        :attr:`~.firestore_v1beta1.transforms.SERVER_TIMESTAMP` sentinel.\n        Sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.now': firestore.SERVER_TIMESTAMP,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'now': datetime.datetime(2012, ...),\n               },\n               'other': True,\n           }\n\n        Args:\n            field_updates (dict): Field names or paths to update and values\n                to update with.\n            option (Optional[~.firestore_v1beta1.client.WriteOption]): A\n               write option to make assertions / preconditions on the server\n               state of the document before applying changes.\n\n        Returns:\n            google.cloud.firestore_v1beta1.types.WriteResult: The\n            write result corresponding to the updated document. A write\n            result contains an ``update_time`` field.\n\n        Raises:\n            ~google.cloud.exceptions.NotFound: If the document does not exist.\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 141,
+                        "column": 8
+                      },
+                      "text": "Update an existing document in the Firestore database.\n\n        By default, this method verifies that the document exists on the\n        server before making updates. A write ``option`` can be specified to\n        override these preconditions.\n\n        Each key in ``field_updates`` can either be a field name or a\n        **field path** (For more information on **field paths**, see\n        :meth:`~.firestore_v1beta1.client.Client.field_path`.) To\n        illustrate this, consider a document with\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n               'other': True,\n           }\n\n        stored on the server. If the field name is used in the update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo': {\n           ...         'quux': 800,\n           ...     },\n           ... }\n           >>> document.update(field_updates)\n\n        then all of ``foo`` will be overwritten on the server and the new\n        value will be\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        On the other hand, if a ``.``-delimited **field path** is used in the\n        update:\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.quux': 800,\n           ... }\n           >>> document.update(field_updates)\n\n        then only ``foo.quux`` will be updated on the server and the\n        field ``foo.bar`` will remain intact:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'quux': 800,\n               },\n               'other': True,\n           }\n\n        .. warning::\n\n           A **field path** can only be used as a top-level key in\n           ``field_updates``.\n\n        To delete / remove a field from an existing document, use the\n        :attr:`~.firestore_v1beta1.transforms.DELETE_FIELD` sentinel. So\n        with the example above, sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'other': firestore.DELETE_FIELD,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n               },\n           }\n\n        To set a field to the current time on the server when the\n        update is received, use the\n        :attr:`~.firestore_v1beta1.transforms.SERVER_TIMESTAMP` sentinel.\n        Sending\n\n        .. code-block:: python\n\n           >>> field_updates = {\n           ...     'foo.now': firestore.SERVER_TIMESTAMP,\n           ... }\n           >>> document.update(field_updates)\n\n        would update the value on the server to:\n\n        .. code-block:: python\n\n           >>> snapshot = document.get()\n           >>> snapshot.to_dict()\n           {\n               'foo': {\n                   'bar': 'baz',\n                   'now': datetime.datetime(2012, ...),\n               },\n               'other': True,\n           }\n\n        Args:\n            field_updates (dict): Field names or paths to update and values\n                to update with.\n            option (Optional[~.firestore_v1beta1.client.WriteOption]): A\n               write option to make assertions / preconditions on the server\n               state of the document before applying changes.\n\n        Returns:\n            google.cloud.firestore_v1beta1.types.WriteResult: The\n            write result corresponding to the updated document. A write\n            result contains an ``update_time`` field.\n\n        Raises:\n            ~google.cloud.exceptions.NotFound: If the document does not exist.\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 141,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 141,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 142,
+                "column": 8
+              },
+              "end": {
+                "row": 142,
+                "column": 36
+              },
+              "text": "batch = self._client.batch()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 142,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 142,
+                    "column": 36
+                  },
+                  "text": "batch = self._client.batch()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 142,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 142,
+                        "column": 13
+                      },
+                      "text": "batch"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 142,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 142,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 142,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 142,
+                        "column": 36
+                      },
+                      "text": "self._client.batch()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 142,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 142,
+                            "column": 34
+                          },
+                          "text": "self._client.batch",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 142,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 142,
+                                "column": 28
+                              },
+                              "text": "self._client",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 142,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 142,
+                                    "column": 20
+                                  },
+                                  "text": "self"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 142,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 142,
+                                    "column": 21
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 142,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 142,
+                                    "column": 28
+                                  },
+                                  "text": "_client"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 142,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 142,
+                                "column": 29
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 142,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 142,
+                                "column": 34
+                              },
+                              "text": "batch"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 142,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 142,
+                            "column": 36
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 142,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 142,
+                                "column": 35
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 142,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 142,
+                                "column": 36
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 143,
+                "column": 8
+              },
+              "end": {
+                "row": 143,
+                "column": 56
+              },
+              "text": "batch.update(self, field_updates, option=option)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 143,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 143,
+                    "column": 56
+                  },
+                  "text": "batch.update(self, field_updates, option=option)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 143,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 143,
+                        "column": 20
+                      },
+                      "text": "batch.update",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 143,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 13
+                          },
+                          "text": "batch"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 143,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 14
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 143,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 20
+                          },
+                          "text": "update"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 143,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 143,
+                        "column": 56
+                      },
+                      "text": "(self, field_updates, option=option)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 143,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 21
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 143,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 25
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 143,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 26
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 143,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 40
+                          },
+                          "text": "field_updates"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 143,
+                            "column": 40
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 41
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 143,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 55
+                          },
+                          "text": "option=option",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 143,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 143,
+                                "column": 48
+                              },
+                              "text": "option"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 143,
+                                "column": 48
+                              },
+                              "end": {
+                                "row": 143,
+                                "column": 49
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 143,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 143,
+                                "column": 55
+                              },
+                              "text": "option"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 143,
+                            "column": 55
+                          },
+                          "end": {
+                            "row": 143,
+                            "column": 56
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 144,
+                "column": 8
+              },
+              "end": {
+                "row": 144,
+                "column": 38
+              },
+              "text": "write_results = batch.commit()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 144,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 144,
+                    "column": 38
+                  },
+                  "text": "write_results = batch.commit()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 144,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 144,
+                        "column": 21
+                      },
+                      "text": "write_results"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 144,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 144,
+                        "column": 23
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 144,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 144,
+                        "column": 38
+                      },
+                      "text": "batch.commit()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 144,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 144,
+                            "column": 36
+                          },
+                          "text": "batch.commit",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 144,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 144,
+                                "column": 29
+                              },
+                              "text": "batch"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 144,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 144,
+                                "column": 30
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 144,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 144,
+                                "column": 36
+                              },
+                              "text": "commit"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 144,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 144,
+                            "column": 38
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 144,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 144,
+                                "column": 37
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 144,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 144,
+                                "column": 38
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 145,
+                "column": 8
+              },
+              "end": {
+                "row": 145,
+                "column": 49
+              },
+              "text": "return _first_write_result(write_results)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 145,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 145,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 145,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 145,
+                    "column": 49
+                  },
+                  "text": "_first_write_result(write_results)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 145,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 145,
+                        "column": 34
+                      },
+                      "text": "_first_write_result"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 145,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 145,
+                        "column": 49
+                      },
+                      "text": "(write_results)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 145,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 145,
+                            "column": 35
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 145,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 145,
+                            "column": 48
+                          },
+                          "text": "write_results"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 145,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 145,
+                            "column": 49
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

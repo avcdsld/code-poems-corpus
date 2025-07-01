@@ -1,0 +1,3602 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 188,
+    "column": 50
+  },
+  "text": "def create(dataset, target,\n           features=None, max_iterations=10,\n           validation_set='auto',\n           class_weights = None,\n           max_depth=6, step_size=0.3,\n           min_loss_reduction=0.0, min_child_weight=0.1,\n           row_subsample=1.0, column_subsample=1.0,\n           verbose=True,\n           random_seed = None,\n           metric='auto',\n           **kwargs):\n    \"\"\"\n    Create a (binary or multi-class) classifier model of type\n    :class:`~turicreate.boosted_trees_classifier.BoostedTreesClassifier` using\n    gradient boosted trees (sometimes known as GBMs).\n\n    Parameters\n    ----------\n    dataset : SFrame\n        A training dataset containing feature columns and a target column.\n\n    target : str\n        Name of the column containing the target variable. The values in this\n        column must be of string or integer type.  String target variables are\n        automatically mapped to integers in alphabetical order of the variable values.\n        For example, a target variable with 'cat', 'dog', and 'foosa' as possible\n        values is mapped to 0, 1, and, 2 respectively.\n\n    features : list[str], optional\n        A list of columns names of features used for training the model.\n        Defaults to None, which uses all columns in the SFrame ``dataset``\n        excepting the target column..\n\n    max_iterations : int, optional\n        The maximum number of iterations for boosting. Each iteration results\n        in the creation of an extra tree.\n\n    validation_set : SFrame, optional\n        A dataset for monitoring the model's generalization performance.\n        For each row of the progress table, the chosen metrics are computed\n        for both the provided training dataset and the validation_set. The\n        format of this SFrame must be the same as the training set.\n        By default this argument is set to 'auto' and a validation set is\n        automatically sampled and used for progress printing. If\n        validation_set is set to None, then no additional metrics\n        are computed. This is computed once per full iteration. Large\n        differences in model accuracy between the training data and validation\n        data is indicative of overfitting. The default value is 'auto'.\n\n    class_weights : {dict, `auto`}, optional\n\n        Weights the examples in the training data according to the given class\n        weights. If provided, the dictionary must contain a key for each class\n        label. The value can be any positive number greater than 1e-20. Weights\n        are interpreted as relative to each other. So setting the weights to be\n        2.0 for the positive class and 1.0 for the negative class has the same\n        effect as setting them to be 20.0 and 10.0, respectively. If set to\n        `None`, all classes are taken to have weight 1.0. The `auto` mode sets\n        the class weight to be inversely proportional to the number of examples\n        in the training data with the given class.\n\n    max_depth : float, optional\n        Maximum depth of a tree. Must be at least 1.\n\n    step_size : float, [0,1], optional\n        Step size (shrinkage) used in update to prevents overfitting.  It\n        shrinks the prediction of each weak learner to make the boosting\n        process more conservative.  The smaller the step size, the more conservative\n        the algorithm will be. Smaller step_size work well when\n        `max_iterations` is large.\n\n    min_loss_reduction : float, optional (non-negative)\n        Minimum loss reduction required to make a further partition/split a\n        node during the tree learning phase. Larger (more positive) values\n        can help prevent overfitting by avoiding splits that do not\n        sufficiently reduce the loss function.\n\n    min_child_weight : float, optional (non-negative)\n        Controls the minimum weight of each leaf node. Larger values result in\n        more conservative tree learning and help prevent overfitting.\n        Formally, this is minimum sum of instance weights (hessians) in each\n        node. If the tree learning algorithm results in a leaf node with the\n        sum of instance weights less than `min_child_weight`, tree building\n        will terminate.\n\n    row_subsample : float, [0,1], optional\n        Subsample the ratio of the training set in each iteration of tree\n        construction.  This is called the bagging trick and can usually help\n        prevent overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the examples (rows) to grow each tree.\n\n    column_subsample : float, [0,1], optional\n        Subsample ratio of the columns in each iteration of tree\n        construction.  Like row_subsample, this can also help prevent\n        model overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the columns to grow each tree.\n\n    verbose : boolean, optional\n        Print progress information during training (if set to true).\n\n    random_seed : int, optional\n        Seeds random opertations such as column and row subsampling, such that\n        results are reproducable.\n\n    metric : str or list[str], optional\n        Performance metric(s) that are tracked during training. When specified,\n        the progress table will display the tracked metric(s) on training and\n        validation set.\n        Supported metrics are: {'accuracy', 'auc', 'log_loss'}\n\n    kwargs : dict, optional\n        Additional arguments for training the model.\n\n        - ``early_stopping_rounds`` : int, default None\n            If the validation metric does not improve after <early_stopping_rounds>,\n            stop training and return the best model.\n            If multiple metrics are being tracked, the last one is used.\n\n        - ``model_checkpoint_path`` : str, default None\n            If specified, checkpoint the model training to the given path every n iterations,\n            where n is specified by ``model_checkpoint_interval``.\n            For instance, if `model_checkpoint_interval` is 5, and `model_checkpoint_path` is\n            set to ``/tmp/model_tmp``, the checkpoints will be saved into\n            ``/tmp/model_tmp/model_checkpoint_5``, ``/tmp/model_tmp/model_checkpoint_10``, ... etc.\n            Training can be resumed by setting ``resume_from_checkpoint`` to one of these checkpoints.\n\n        - ``model_checkpoint_interval`` : int, default 5\n            If model_check_point_path is specified,\n            save the model to the given path every n iterations.\n\n        - ``resume_from_checkpoint`` : str, default None\n            Continues training from a model checkpoint. The model must take\n            exact the same training data as the checkpointed model.\n\n    Returns\n    -------\n      out : BoostedTreesClassifier\n          A trained gradient boosted trees model for classifications tasks.\n\n    References\n    ----------\n\n    - `Wikipedia - Gradient tree boosting\n      <http://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_\n    - `Trevor Hastie's slides on Boosted Trees and Random Forest\n      <http://jessica2.msri.org/attachments/10778/10778-boost.pdf>`_\n\n    See Also\n    --------\n    BoostedTreesClassifier, turicreate.logistic_classifier.LogisticClassifier, turicreate.svm_classifier.SVMClassifier\n\n    Examples\n    --------\n\n    .. sourcecode:: python\n\n      >>> url = 'https://static.turi.com/datasets/xgboost/mushroom.csv'\n      >>> data = turicreate.SFrame.read_csv(url)\n\n      >>> train, test = data.random_split(0.8)\n      >>> model = turicreate.boosted_trees_classifier.create(train, target='label')\n\n      >>> predictions = model.classify(test)\n      >>> results = model.evaluate(test)\n    \"\"\"\n    if random_seed is not None:\n        kwargs['random_seed'] = random_seed\n    if 'model_checkpoint_path' in kwargs:\n        kwargs['model_checkpoint_path'] = _make_internal_url(kwargs['model_checkpoint_path'])\n    if 'resume_from_checkpoint' in kwargs:\n        kwargs['resume_from_checkpoint'] = _make_internal_url(kwargs['resume_from_checkpoint'])\n\n    model = _sl.create(dataset = dataset,\n                        target = target,\n                        features = features,\n                        model_name = 'boosted_trees_classifier',\n                        max_iterations = max_iterations,\n                        validation_set = validation_set,\n                        class_weights = class_weights,\n                        max_depth = max_depth,\n                        step_size = step_size,\n                        min_loss_reduction = min_loss_reduction,\n                        min_child_weight = min_child_weight,\n                        row_subsample = row_subsample,\n                        column_subsample = column_subsample,\n                        verbose = verbose,\n                        metric = metric,\n                        **kwargs)\n    return BoostedTreesClassifier(model.__proxy__)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 188,
+        "column": 50
+      },
+      "text": "def create(dataset, target,\n           features=None, max_iterations=10,\n           validation_set='auto',\n           class_weights = None,\n           max_depth=6, step_size=0.3,\n           min_loss_reduction=0.0, min_child_weight=0.1,\n           row_subsample=1.0, column_subsample=1.0,\n           verbose=True,\n           random_seed = None,\n           metric='auto',\n           **kwargs):\n    \"\"\"\n    Create a (binary or multi-class) classifier model of type\n    :class:`~turicreate.boosted_trees_classifier.BoostedTreesClassifier` using\n    gradient boosted trees (sometimes known as GBMs).\n\n    Parameters\n    ----------\n    dataset : SFrame\n        A training dataset containing feature columns and a target column.\n\n    target : str\n        Name of the column containing the target variable. The values in this\n        column must be of string or integer type.  String target variables are\n        automatically mapped to integers in alphabetical order of the variable values.\n        For example, a target variable with 'cat', 'dog', and 'foosa' as possible\n        values is mapped to 0, 1, and, 2 respectively.\n\n    features : list[str], optional\n        A list of columns names of features used for training the model.\n        Defaults to None, which uses all columns in the SFrame ``dataset``\n        excepting the target column..\n\n    max_iterations : int, optional\n        The maximum number of iterations for boosting. Each iteration results\n        in the creation of an extra tree.\n\n    validation_set : SFrame, optional\n        A dataset for monitoring the model's generalization performance.\n        For each row of the progress table, the chosen metrics are computed\n        for both the provided training dataset and the validation_set. The\n        format of this SFrame must be the same as the training set.\n        By default this argument is set to 'auto' and a validation set is\n        automatically sampled and used for progress printing. If\n        validation_set is set to None, then no additional metrics\n        are computed. This is computed once per full iteration. Large\n        differences in model accuracy between the training data and validation\n        data is indicative of overfitting. The default value is 'auto'.\n\n    class_weights : {dict, `auto`}, optional\n\n        Weights the examples in the training data according to the given class\n        weights. If provided, the dictionary must contain a key for each class\n        label. The value can be any positive number greater than 1e-20. Weights\n        are interpreted as relative to each other. So setting the weights to be\n        2.0 for the positive class and 1.0 for the negative class has the same\n        effect as setting them to be 20.0 and 10.0, respectively. If set to\n        `None`, all classes are taken to have weight 1.0. The `auto` mode sets\n        the class weight to be inversely proportional to the number of examples\n        in the training data with the given class.\n\n    max_depth : float, optional\n        Maximum depth of a tree. Must be at least 1.\n\n    step_size : float, [0,1], optional\n        Step size (shrinkage) used in update to prevents overfitting.  It\n        shrinks the prediction of each weak learner to make the boosting\n        process more conservative.  The smaller the step size, the more conservative\n        the algorithm will be. Smaller step_size work well when\n        `max_iterations` is large.\n\n    min_loss_reduction : float, optional (non-negative)\n        Minimum loss reduction required to make a further partition/split a\n        node during the tree learning phase. Larger (more positive) values\n        can help prevent overfitting by avoiding splits that do not\n        sufficiently reduce the loss function.\n\n    min_child_weight : float, optional (non-negative)\n        Controls the minimum weight of each leaf node. Larger values result in\n        more conservative tree learning and help prevent overfitting.\n        Formally, this is minimum sum of instance weights (hessians) in each\n        node. If the tree learning algorithm results in a leaf node with the\n        sum of instance weights less than `min_child_weight`, tree building\n        will terminate.\n\n    row_subsample : float, [0,1], optional\n        Subsample the ratio of the training set in each iteration of tree\n        construction.  This is called the bagging trick and can usually help\n        prevent overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the examples (rows) to grow each tree.\n\n    column_subsample : float, [0,1], optional\n        Subsample ratio of the columns in each iteration of tree\n        construction.  Like row_subsample, this can also help prevent\n        model overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the columns to grow each tree.\n\n    verbose : boolean, optional\n        Print progress information during training (if set to true).\n\n    random_seed : int, optional\n        Seeds random opertations such as column and row subsampling, such that\n        results are reproducable.\n\n    metric : str or list[str], optional\n        Performance metric(s) that are tracked during training. When specified,\n        the progress table will display the tracked metric(s) on training and\n        validation set.\n        Supported metrics are: {'accuracy', 'auc', 'log_loss'}\n\n    kwargs : dict, optional\n        Additional arguments for training the model.\n\n        - ``early_stopping_rounds`` : int, default None\n            If the validation metric does not improve after <early_stopping_rounds>,\n            stop training and return the best model.\n            If multiple metrics are being tracked, the last one is used.\n\n        - ``model_checkpoint_path`` : str, default None\n            If specified, checkpoint the model training to the given path every n iterations,\n            where n is specified by ``model_checkpoint_interval``.\n            For instance, if `model_checkpoint_interval` is 5, and `model_checkpoint_path` is\n            set to ``/tmp/model_tmp``, the checkpoints will be saved into\n            ``/tmp/model_tmp/model_checkpoint_5``, ``/tmp/model_tmp/model_checkpoint_10``, ... etc.\n            Training can be resumed by setting ``resume_from_checkpoint`` to one of these checkpoints.\n\n        - ``model_checkpoint_interval`` : int, default 5\n            If model_check_point_path is specified,\n            save the model to the given path every n iterations.\n\n        - ``resume_from_checkpoint`` : str, default None\n            Continues training from a model checkpoint. The model must take\n            exact the same training data as the checkpointed model.\n\n    Returns\n    -------\n      out : BoostedTreesClassifier\n          A trained gradient boosted trees model for classifications tasks.\n\n    References\n    ----------\n\n    - `Wikipedia - Gradient tree boosting\n      <http://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_\n    - `Trevor Hastie's slides on Boosted Trees and Random Forest\n      <http://jessica2.msri.org/attachments/10778/10778-boost.pdf>`_\n\n    See Also\n    --------\n    BoostedTreesClassifier, turicreate.logistic_classifier.LogisticClassifier, turicreate.svm_classifier.SVMClassifier\n\n    Examples\n    --------\n\n    .. sourcecode:: python\n\n      >>> url = 'https://static.turi.com/datasets/xgboost/mushroom.csv'\n      >>> data = turicreate.SFrame.read_csv(url)\n\n      >>> train, test = data.random_split(0.8)\n      >>> model = turicreate.boosted_trees_classifier.create(train, target='label')\n\n      >>> predictions = model.classify(test)\n      >>> results = model.evaluate(test)\n    \"\"\"\n    if random_seed is not None:\n        kwargs['random_seed'] = random_seed\n    if 'model_checkpoint_path' in kwargs:\n        kwargs['model_checkpoint_path'] = _make_internal_url(kwargs['model_checkpoint_path'])\n    if 'resume_from_checkpoint' in kwargs:\n        kwargs['resume_from_checkpoint'] = _make_internal_url(kwargs['resume_from_checkpoint'])\n\n    model = _sl.create(dataset = dataset,\n                        target = target,\n                        features = features,\n                        model_name = 'boosted_trees_classifier',\n                        max_iterations = max_iterations,\n                        validation_set = validation_set,\n                        class_weights = class_weights,\n                        max_depth = max_depth,\n                        step_size = step_size,\n                        min_loss_reduction = min_loss_reduction,\n                        min_child_weight = min_child_weight,\n                        row_subsample = row_subsample,\n                        column_subsample = column_subsample,\n                        verbose = verbose,\n                        metric = metric,\n                        **kwargs)\n    return BoostedTreesClassifier(model.__proxy__)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 10
+          },
+          "text": "create"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 10
+          },
+          "end": {
+            "row": 10,
+            "column": 20
+          },
+          "text": "(dataset, target,\n           features=None, max_iterations=10,\n           validation_set='auto',\n           class_weights = None,\n           max_depth=6, step_size=0.3,\n           min_loss_reduction=0.0, min_child_weight=0.1,\n           row_subsample=1.0, column_subsample=1.0,\n           verbose=True,\n           random_seed = None,\n           metric='auto',\n           **kwargs)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 10
+              },
+              "end": {
+                "row": 0,
+                "column": 11
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 11
+              },
+              "end": {
+                "row": 0,
+                "column": 18
+              },
+              "text": "dataset"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 18
+              },
+              "end": {
+                "row": 0,
+                "column": 19
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 26
+              },
+              "text": "target"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 26
+              },
+              "end": {
+                "row": 0,
+                "column": 27
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 1,
+                "column": 11
+              },
+              "end": {
+                "row": 1,
+                "column": 24
+              },
+              "text": "features=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 19
+                  },
+                  "text": "features"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 1,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 20
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 1,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 24
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 24
+              },
+              "end": {
+                "row": 1,
+                "column": 25
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 1,
+                "column": 26
+              },
+              "end": {
+                "row": 1,
+                "column": 43
+              },
+              "text": "max_iterations=10",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 40
+                  },
+                  "text": "max_iterations"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 1,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 41
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "integer",
+                  "start": {
+                    "row": 1,
+                    "column": 41
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 43
+                  },
+                  "text": "10"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 43
+              },
+              "end": {
+                "row": 1,
+                "column": 44
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 2,
+                "column": 11
+              },
+              "end": {
+                "row": 2,
+                "column": 32
+              },
+              "text": "validation_set='auto'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 2,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 25
+                  },
+                  "text": "validation_set"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 2,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 26
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 2,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 32
+                  },
+                  "text": "'auto'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 2,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 27
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 2,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 31
+                      },
+                      "text": "auto"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 2,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 32
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 2,
+                "column": 32
+              },
+              "end": {
+                "row": 2,
+                "column": 33
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 3,
+                "column": 11
+              },
+              "end": {
+                "row": 3,
+                "column": 31
+              },
+              "text": "class_weights = None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 24
+                  },
+                  "text": "class_weights"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 3,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 26
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 3,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 31
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 3,
+                "column": 31
+              },
+              "end": {
+                "row": 3,
+                "column": 32
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 4,
+                "column": 11
+              },
+              "end": {
+                "row": 4,
+                "column": 22
+              },
+              "text": "max_depth=6",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 20
+                  },
+                  "text": "max_depth"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 4,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 21
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "integer",
+                  "start": {
+                    "row": 4,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 22
+                  },
+                  "text": "6"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 4,
+                "column": 22
+              },
+              "end": {
+                "row": 4,
+                "column": 23
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 4,
+                "column": 24
+              },
+              "end": {
+                "row": 4,
+                "column": 37
+              },
+              "text": "step_size=0.3",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 33
+                  },
+                  "text": "step_size"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 4,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 34
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "float",
+                  "start": {
+                    "row": 4,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 37
+                  },
+                  "text": "0.3"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 4,
+                "column": 37
+              },
+              "end": {
+                "row": 4,
+                "column": 38
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 5,
+                "column": 11
+              },
+              "end": {
+                "row": 5,
+                "column": 33
+              },
+              "text": "min_loss_reduction=0.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 5,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 29
+                  },
+                  "text": "min_loss_reduction"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 5,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 30
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "float",
+                  "start": {
+                    "row": 5,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 33
+                  },
+                  "text": "0.0"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 5,
+                "column": 33
+              },
+              "end": {
+                "row": 5,
+                "column": 34
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 5,
+                "column": 35
+              },
+              "end": {
+                "row": 5,
+                "column": 55
+              },
+              "text": "min_child_weight=0.1",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 5,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 51
+                  },
+                  "text": "min_child_weight"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 5,
+                    "column": 51
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 52
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "float",
+                  "start": {
+                    "row": 5,
+                    "column": 52
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 55
+                  },
+                  "text": "0.1"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 5,
+                "column": 55
+              },
+              "end": {
+                "row": 5,
+                "column": 56
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 6,
+                "column": 11
+              },
+              "end": {
+                "row": 6,
+                "column": 28
+              },
+              "text": "row_subsample=1.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 6,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 24
+                  },
+                  "text": "row_subsample"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 6,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 25
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "float",
+                  "start": {
+                    "row": 6,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 28
+                  },
+                  "text": "1.0"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 6,
+                "column": 28
+              },
+              "end": {
+                "row": 6,
+                "column": 29
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 6,
+                "column": 30
+              },
+              "end": {
+                "row": 6,
+                "column": 50
+              },
+              "text": "column_subsample=1.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 6,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 46
+                  },
+                  "text": "column_subsample"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 6,
+                    "column": 46
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 47
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "float",
+                  "start": {
+                    "row": 6,
+                    "column": 47
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 50
+                  },
+                  "text": "1.0"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 6,
+                "column": 50
+              },
+              "end": {
+                "row": 6,
+                "column": 51
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 7,
+                "column": 11
+              },
+              "end": {
+                "row": 7,
+                "column": 23
+              },
+              "text": "verbose=True",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 7,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 18
+                  },
+                  "text": "verbose"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 7,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 19
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "true",
+                  "start": {
+                    "row": 7,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 23
+                  },
+                  "text": "True"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 7,
+                "column": 23
+              },
+              "end": {
+                "row": 7,
+                "column": 24
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 8,
+                "column": 11
+              },
+              "end": {
+                "row": 8,
+                "column": 29
+              },
+              "text": "random_seed = None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 8,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 22
+                  },
+                  "text": "random_seed"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 8,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 24
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 8,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 29
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 8,
+                "column": 29
+              },
+              "end": {
+                "row": 8,
+                "column": 30
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 9,
+                "column": 11
+              },
+              "end": {
+                "row": 9,
+                "column": 24
+              },
+              "text": "metric='auto'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 9,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 17
+                  },
+                  "text": "metric"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 9,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 18
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 9,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 24
+                  },
+                  "text": "'auto'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 9,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 19
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 9,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 23
+                      },
+                      "text": "auto"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 9,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 24
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 9,
+                "column": 24
+              },
+              "end": {
+                "row": 9,
+                "column": 25
+              },
+              "text": ","
+            },
+            {
+              "type": "dictionary_splat_pattern",
+              "start": {
+                "row": 10,
+                "column": 11
+              },
+              "end": {
+                "row": 10,
+                "column": 19
+              },
+              "text": "**kwargs",
+              "children": [
+                {
+                  "type": "**",
+                  "start": {
+                    "row": 10,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 13
+                  },
+                  "text": "**"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 10,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 19
+                  },
+                  "text": "kwargs"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 10,
+                "column": 19
+              },
+              "end": {
+                "row": 10,
+                "column": 20
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 10,
+            "column": 20
+          },
+          "end": {
+            "row": 10,
+            "column": 21
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 11,
+            "column": 4
+          },
+          "end": {
+            "row": 188,
+            "column": 50
+          },
+          "text": "\"\"\"\n    Create a (binary or multi-class) classifier model of type\n    :class:`~turicreate.boosted_trees_classifier.BoostedTreesClassifier` using\n    gradient boosted trees (sometimes known as GBMs).\n\n    Parameters\n    ----------\n    dataset : SFrame\n        A training dataset containing feature columns and a target column.\n\n    target : str\n        Name of the column containing the target variable. The values in this\n        column must be of string or integer type.  String target variables are\n        automatically mapped to integers in alphabetical order of the variable values.\n        For example, a target variable with 'cat', 'dog', and 'foosa' as possible\n        values is mapped to 0, 1, and, 2 respectively.\n\n    features : list[str], optional\n        A list of columns names of features used for training the model.\n        Defaults to None, which uses all columns in the SFrame ``dataset``\n        excepting the target column..\n\n    max_iterations : int, optional\n        The maximum number of iterations for boosting. Each iteration results\n        in the creation of an extra tree.\n\n    validation_set : SFrame, optional\n        A dataset for monitoring the model's generalization performance.\n        For each row of the progress table, the chosen metrics are computed\n        for both the provided training dataset and the validation_set. The\n        format of this SFrame must be the same as the training set.\n        By default this argument is set to 'auto' and a validation set is\n        automatically sampled and used for progress printing. If\n        validation_set is set to None, then no additional metrics\n        are computed. This is computed once per full iteration. Large\n        differences in model accuracy between the training data and validation\n        data is indicative of overfitting. The default value is 'auto'.\n\n    class_weights : {dict, `auto`}, optional\n\n        Weights the examples in the training data according to the given class\n        weights. If provided, the dictionary must contain a key for each class\n        label. The value can be any positive number greater than 1e-20. Weights\n        are interpreted as relative to each other. So setting the weights to be\n        2.0 for the positive class and 1.0 for the negative class has the same\n        effect as setting them to be 20.0 and 10.0, respectively. If set to\n        `None`, all classes are taken to have weight 1.0. The `auto` mode sets\n        the class weight to be inversely proportional to the number of examples\n        in the training data with the given class.\n\n    max_depth : float, optional\n        Maximum depth of a tree. Must be at least 1.\n\n    step_size : float, [0,1], optional\n        Step size (shrinkage) used in update to prevents overfitting.  It\n        shrinks the prediction of each weak learner to make the boosting\n        process more conservative.  The smaller the step size, the more conservative\n        the algorithm will be. Smaller step_size work well when\n        `max_iterations` is large.\n\n    min_loss_reduction : float, optional (non-negative)\n        Minimum loss reduction required to make a further partition/split a\n        node during the tree learning phase. Larger (more positive) values\n        can help prevent overfitting by avoiding splits that do not\n        sufficiently reduce the loss function.\n\n    min_child_weight : float, optional (non-negative)\n        Controls the minimum weight of each leaf node. Larger values result in\n        more conservative tree learning and help prevent overfitting.\n        Formally, this is minimum sum of instance weights (hessians) in each\n        node. If the tree learning algorithm results in a leaf node with the\n        sum of instance weights less than `min_child_weight`, tree building\n        will terminate.\n\n    row_subsample : float, [0,1], optional\n        Subsample the ratio of the training set in each iteration of tree\n        construction.  This is called the bagging trick and can usually help\n        prevent overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the examples (rows) to grow each tree.\n\n    column_subsample : float, [0,1], optional\n        Subsample ratio of the columns in each iteration of tree\n        construction.  Like row_subsample, this can also help prevent\n        model overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the columns to grow each tree.\n\n    verbose : boolean, optional\n        Print progress information during training (if set to true).\n\n    random_seed : int, optional\n        Seeds random opertations such as column and row subsampling, such that\n        results are reproducable.\n\n    metric : str or list[str], optional\n        Performance metric(s) that are tracked during training. When specified,\n        the progress table will display the tracked metric(s) on training and\n        validation set.\n        Supported metrics are: {'accuracy', 'auc', 'log_loss'}\n\n    kwargs : dict, optional\n        Additional arguments for training the model.\n\n        - ``early_stopping_rounds`` : int, default None\n            If the validation metric does not improve after <early_stopping_rounds>,\n            stop training and return the best model.\n            If multiple metrics are being tracked, the last one is used.\n\n        - ``model_checkpoint_path`` : str, default None\n            If specified, checkpoint the model training to the given path every n iterations,\n            where n is specified by ``model_checkpoint_interval``.\n            For instance, if `model_checkpoint_interval` is 5, and `model_checkpoint_path` is\n            set to ``/tmp/model_tmp``, the checkpoints will be saved into\n            ``/tmp/model_tmp/model_checkpoint_5``, ``/tmp/model_tmp/model_checkpoint_10``, ... etc.\n            Training can be resumed by setting ``resume_from_checkpoint`` to one of these checkpoints.\n\n        - ``model_checkpoint_interval`` : int, default 5\n            If model_check_point_path is specified,\n            save the model to the given path every n iterations.\n\n        - ``resume_from_checkpoint`` : str, default None\n            Continues training from a model checkpoint. The model must take\n            exact the same training data as the checkpointed model.\n\n    Returns\n    -------\n      out : BoostedTreesClassifier\n          A trained gradient boosted trees model for classifications tasks.\n\n    References\n    ----------\n\n    - `Wikipedia - Gradient tree boosting\n      <http://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_\n    - `Trevor Hastie's slides on Boosted Trees and Random Forest\n      <http://jessica2.msri.org/attachments/10778/10778-boost.pdf>`_\n\n    See Also\n    --------\n    BoostedTreesClassifier, turicreate.logistic_classifier.LogisticClassifier, turicreate.svm_classifier.SVMClassifier\n\n    Examples\n    --------\n\n    .. sourcecode:: python\n\n      >>> url = 'https://static.turi.com/datasets/xgboost/mushroom.csv'\n      >>> data = turicreate.SFrame.read_csv(url)\n\n      >>> train, test = data.random_split(0.8)\n      >>> model = turicreate.boosted_trees_classifier.create(train, target='label')\n\n      >>> predictions = model.classify(test)\n      >>> results = model.evaluate(test)\n    \"\"\"\n    if random_seed is not None:\n        kwargs['random_seed'] = random_seed\n    if 'model_checkpoint_path' in kwargs:\n        kwargs['model_checkpoint_path'] = _make_internal_url(kwargs['model_checkpoint_path'])\n    if 'resume_from_checkpoint' in kwargs:\n        kwargs['resume_from_checkpoint'] = _make_internal_url(kwargs['resume_from_checkpoint'])\n\n    model = _sl.create(dataset = dataset,\n                        target = target,\n                        features = features,\n                        model_name = 'boosted_trees_classifier',\n                        max_iterations = max_iterations,\n                        validation_set = validation_set,\n                        class_weights = class_weights,\n                        max_depth = max_depth,\n                        step_size = step_size,\n                        min_loss_reduction = min_loss_reduction,\n                        min_child_weight = min_child_weight,\n                        row_subsample = row_subsample,\n                        column_subsample = column_subsample,\n                        verbose = verbose,\n                        metric = metric,\n                        **kwargs)\n    return BoostedTreesClassifier(model.__proxy__)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 11,
+                "column": 4
+              },
+              "end": {
+                "row": 164,
+                "column": 7
+              },
+              "text": "\"\"\"\n    Create a (binary or multi-class) classifier model of type\n    :class:`~turicreate.boosted_trees_classifier.BoostedTreesClassifier` using\n    gradient boosted trees (sometimes known as GBMs).\n\n    Parameters\n    ----------\n    dataset : SFrame\n        A training dataset containing feature columns and a target column.\n\n    target : str\n        Name of the column containing the target variable. The values in this\n        column must be of string or integer type.  String target variables are\n        automatically mapped to integers in alphabetical order of the variable values.\n        For example, a target variable with 'cat', 'dog', and 'foosa' as possible\n        values is mapped to 0, 1, and, 2 respectively.\n\n    features : list[str], optional\n        A list of columns names of features used for training the model.\n        Defaults to None, which uses all columns in the SFrame ``dataset``\n        excepting the target column..\n\n    max_iterations : int, optional\n        The maximum number of iterations for boosting. Each iteration results\n        in the creation of an extra tree.\n\n    validation_set : SFrame, optional\n        A dataset for monitoring the model's generalization performance.\n        For each row of the progress table, the chosen metrics are computed\n        for both the provided training dataset and the validation_set. The\n        format of this SFrame must be the same as the training set.\n        By default this argument is set to 'auto' and a validation set is\n        automatically sampled and used for progress printing. If\n        validation_set is set to None, then no additional metrics\n        are computed. This is computed once per full iteration. Large\n        differences in model accuracy between the training data and validation\n        data is indicative of overfitting. The default value is 'auto'.\n\n    class_weights : {dict, `auto`}, optional\n\n        Weights the examples in the training data according to the given class\n        weights. If provided, the dictionary must contain a key for each class\n        label. The value can be any positive number greater than 1e-20. Weights\n        are interpreted as relative to each other. So setting the weights to be\n        2.0 for the positive class and 1.0 for the negative class has the same\n        effect as setting them to be 20.0 and 10.0, respectively. If set to\n        `None`, all classes are taken to have weight 1.0. The `auto` mode sets\n        the class weight to be inversely proportional to the number of examples\n        in the training data with the given class.\n\n    max_depth : float, optional\n        Maximum depth of a tree. Must be at least 1.\n\n    step_size : float, [0,1], optional\n        Step size (shrinkage) used in update to prevents overfitting.  It\n        shrinks the prediction of each weak learner to make the boosting\n        process more conservative.  The smaller the step size, the more conservative\n        the algorithm will be. Smaller step_size work well when\n        `max_iterations` is large.\n\n    min_loss_reduction : float, optional (non-negative)\n        Minimum loss reduction required to make a further partition/split a\n        node during the tree learning phase. Larger (more positive) values\n        can help prevent overfitting by avoiding splits that do not\n        sufficiently reduce the loss function.\n\n    min_child_weight : float, optional (non-negative)\n        Controls the minimum weight of each leaf node. Larger values result in\n        more conservative tree learning and help prevent overfitting.\n        Formally, this is minimum sum of instance weights (hessians) in each\n        node. If the tree learning algorithm results in a leaf node with the\n        sum of instance weights less than `min_child_weight`, tree building\n        will terminate.\n\n    row_subsample : float, [0,1], optional\n        Subsample the ratio of the training set in each iteration of tree\n        construction.  This is called the bagging trick and can usually help\n        prevent overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the examples (rows) to grow each tree.\n\n    column_subsample : float, [0,1], optional\n        Subsample ratio of the columns in each iteration of tree\n        construction.  Like row_subsample, this can also help prevent\n        model overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the columns to grow each tree.\n\n    verbose : boolean, optional\n        Print progress information during training (if set to true).\n\n    random_seed : int, optional\n        Seeds random opertations such as column and row subsampling, such that\n        results are reproducable.\n\n    metric : str or list[str], optional\n        Performance metric(s) that are tracked during training. When specified,\n        the progress table will display the tracked metric(s) on training and\n        validation set.\n        Supported metrics are: {'accuracy', 'auc', 'log_loss'}\n\n    kwargs : dict, optional\n        Additional arguments for training the model.\n\n        - ``early_stopping_rounds`` : int, default None\n            If the validation metric does not improve after <early_stopping_rounds>,\n            stop training and return the best model.\n            If multiple metrics are being tracked, the last one is used.\n\n        - ``model_checkpoint_path`` : str, default None\n            If specified, checkpoint the model training to the given path every n iterations,\n            where n is specified by ``model_checkpoint_interval``.\n            For instance, if `model_checkpoint_interval` is 5, and `model_checkpoint_path` is\n            set to ``/tmp/model_tmp``, the checkpoints will be saved into\n            ``/tmp/model_tmp/model_checkpoint_5``, ``/tmp/model_tmp/model_checkpoint_10``, ... etc.\n            Training can be resumed by setting ``resume_from_checkpoint`` to one of these checkpoints.\n\n        - ``model_checkpoint_interval`` : int, default 5\n            If model_check_point_path is specified,\n            save the model to the given path every n iterations.\n\n        - ``resume_from_checkpoint`` : str, default None\n            Continues training from a model checkpoint. The model must take\n            exact the same training data as the checkpointed model.\n\n    Returns\n    -------\n      out : BoostedTreesClassifier\n          A trained gradient boosted trees model for classifications tasks.\n\n    References\n    ----------\n\n    - `Wikipedia - Gradient tree boosting\n      <http://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_\n    - `Trevor Hastie's slides on Boosted Trees and Random Forest\n      <http://jessica2.msri.org/attachments/10778/10778-boost.pdf>`_\n\n    See Also\n    --------\n    BoostedTreesClassifier, turicreate.logistic_classifier.LogisticClassifier, turicreate.svm_classifier.SVMClassifier\n\n    Examples\n    --------\n\n    .. sourcecode:: python\n\n      >>> url = 'https://static.turi.com/datasets/xgboost/mushroom.csv'\n      >>> data = turicreate.SFrame.read_csv(url)\n\n      >>> train, test = data.random_split(0.8)\n      >>> model = turicreate.boosted_trees_classifier.create(train, target='label')\n\n      >>> predictions = model.classify(test)\n      >>> results = model.evaluate(test)\n    \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 11,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 164,
+                    "column": 7
+                  },
+                  "text": "\"\"\"\n    Create a (binary or multi-class) classifier model of type\n    :class:`~turicreate.boosted_trees_classifier.BoostedTreesClassifier` using\n    gradient boosted trees (sometimes known as GBMs).\n\n    Parameters\n    ----------\n    dataset : SFrame\n        A training dataset containing feature columns and a target column.\n\n    target : str\n        Name of the column containing the target variable. The values in this\n        column must be of string or integer type.  String target variables are\n        automatically mapped to integers in alphabetical order of the variable values.\n        For example, a target variable with 'cat', 'dog', and 'foosa' as possible\n        values is mapped to 0, 1, and, 2 respectively.\n\n    features : list[str], optional\n        A list of columns names of features used for training the model.\n        Defaults to None, which uses all columns in the SFrame ``dataset``\n        excepting the target column..\n\n    max_iterations : int, optional\n        The maximum number of iterations for boosting. Each iteration results\n        in the creation of an extra tree.\n\n    validation_set : SFrame, optional\n        A dataset for monitoring the model's generalization performance.\n        For each row of the progress table, the chosen metrics are computed\n        for both the provided training dataset and the validation_set. The\n        format of this SFrame must be the same as the training set.\n        By default this argument is set to 'auto' and a validation set is\n        automatically sampled and used for progress printing. If\n        validation_set is set to None, then no additional metrics\n        are computed. This is computed once per full iteration. Large\n        differences in model accuracy between the training data and validation\n        data is indicative of overfitting. The default value is 'auto'.\n\n    class_weights : {dict, `auto`}, optional\n\n        Weights the examples in the training data according to the given class\n        weights. If provided, the dictionary must contain a key for each class\n        label. The value can be any positive number greater than 1e-20. Weights\n        are interpreted as relative to each other. So setting the weights to be\n        2.0 for the positive class and 1.0 for the negative class has the same\n        effect as setting them to be 20.0 and 10.0, respectively. If set to\n        `None`, all classes are taken to have weight 1.0. The `auto` mode sets\n        the class weight to be inversely proportional to the number of examples\n        in the training data with the given class.\n\n    max_depth : float, optional\n        Maximum depth of a tree. Must be at least 1.\n\n    step_size : float, [0,1], optional\n        Step size (shrinkage) used in update to prevents overfitting.  It\n        shrinks the prediction of each weak learner to make the boosting\n        process more conservative.  The smaller the step size, the more conservative\n        the algorithm will be. Smaller step_size work well when\n        `max_iterations` is large.\n\n    min_loss_reduction : float, optional (non-negative)\n        Minimum loss reduction required to make a further partition/split a\n        node during the tree learning phase. Larger (more positive) values\n        can help prevent overfitting by avoiding splits that do not\n        sufficiently reduce the loss function.\n\n    min_child_weight : float, optional (non-negative)\n        Controls the minimum weight of each leaf node. Larger values result in\n        more conservative tree learning and help prevent overfitting.\n        Formally, this is minimum sum of instance weights (hessians) in each\n        node. If the tree learning algorithm results in a leaf node with the\n        sum of instance weights less than `min_child_weight`, tree building\n        will terminate.\n\n    row_subsample : float, [0,1], optional\n        Subsample the ratio of the training set in each iteration of tree\n        construction.  This is called the bagging trick and can usually help\n        prevent overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the examples (rows) to grow each tree.\n\n    column_subsample : float, [0,1], optional\n        Subsample ratio of the columns in each iteration of tree\n        construction.  Like row_subsample, this can also help prevent\n        model overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the columns to grow each tree.\n\n    verbose : boolean, optional\n        Print progress information during training (if set to true).\n\n    random_seed : int, optional\n        Seeds random opertations such as column and row subsampling, such that\n        results are reproducable.\n\n    metric : str or list[str], optional\n        Performance metric(s) that are tracked during training. When specified,\n        the progress table will display the tracked metric(s) on training and\n        validation set.\n        Supported metrics are: {'accuracy', 'auc', 'log_loss'}\n\n    kwargs : dict, optional\n        Additional arguments for training the model.\n\n        - ``early_stopping_rounds`` : int, default None\n            If the validation metric does not improve after <early_stopping_rounds>,\n            stop training and return the best model.\n            If multiple metrics are being tracked, the last one is used.\n\n        - ``model_checkpoint_path`` : str, default None\n            If specified, checkpoint the model training to the given path every n iterations,\n            where n is specified by ``model_checkpoint_interval``.\n            For instance, if `model_checkpoint_interval` is 5, and `model_checkpoint_path` is\n            set to ``/tmp/model_tmp``, the checkpoints will be saved into\n            ``/tmp/model_tmp/model_checkpoint_5``, ``/tmp/model_tmp/model_checkpoint_10``, ... etc.\n            Training can be resumed by setting ``resume_from_checkpoint`` to one of these checkpoints.\n\n        - ``model_checkpoint_interval`` : int, default 5\n            If model_check_point_path is specified,\n            save the model to the given path every n iterations.\n\n        - ``resume_from_checkpoint`` : str, default None\n            Continues training from a model checkpoint. The model must take\n            exact the same training data as the checkpointed model.\n\n    Returns\n    -------\n      out : BoostedTreesClassifier\n          A trained gradient boosted trees model for classifications tasks.\n\n    References\n    ----------\n\n    - `Wikipedia - Gradient tree boosting\n      <http://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_\n    - `Trevor Hastie's slides on Boosted Trees and Random Forest\n      <http://jessica2.msri.org/attachments/10778/10778-boost.pdf>`_\n\n    See Also\n    --------\n    BoostedTreesClassifier, turicreate.logistic_classifier.LogisticClassifier, turicreate.svm_classifier.SVMClassifier\n\n    Examples\n    --------\n\n    .. sourcecode:: python\n\n      >>> url = 'https://static.turi.com/datasets/xgboost/mushroom.csv'\n      >>> data = turicreate.SFrame.read_csv(url)\n\n      >>> train, test = data.random_split(0.8)\n      >>> model = turicreate.boosted_trees_classifier.create(train, target='label')\n\n      >>> predictions = model.classify(test)\n      >>> results = model.evaluate(test)\n    \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 11,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 11,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 164,
+                        "column": 4
+                      },
+                      "text": "\n    Create a (binary or multi-class) classifier model of type\n    :class:`~turicreate.boosted_trees_classifier.BoostedTreesClassifier` using\n    gradient boosted trees (sometimes known as GBMs).\n\n    Parameters\n    ----------\n    dataset : SFrame\n        A training dataset containing feature columns and a target column.\n\n    target : str\n        Name of the column containing the target variable. The values in this\n        column must be of string or integer type.  String target variables are\n        automatically mapped to integers in alphabetical order of the variable values.\n        For example, a target variable with 'cat', 'dog', and 'foosa' as possible\n        values is mapped to 0, 1, and, 2 respectively.\n\n    features : list[str], optional\n        A list of columns names of features used for training the model.\n        Defaults to None, which uses all columns in the SFrame ``dataset``\n        excepting the target column..\n\n    max_iterations : int, optional\n        The maximum number of iterations for boosting. Each iteration results\n        in the creation of an extra tree.\n\n    validation_set : SFrame, optional\n        A dataset for monitoring the model's generalization performance.\n        For each row of the progress table, the chosen metrics are computed\n        for both the provided training dataset and the validation_set. The\n        format of this SFrame must be the same as the training set.\n        By default this argument is set to 'auto' and a validation set is\n        automatically sampled and used for progress printing. If\n        validation_set is set to None, then no additional metrics\n        are computed. This is computed once per full iteration. Large\n        differences in model accuracy between the training data and validation\n        data is indicative of overfitting. The default value is 'auto'.\n\n    class_weights : {dict, `auto`}, optional\n\n        Weights the examples in the training data according to the given class\n        weights. If provided, the dictionary must contain a key for each class\n        label. The value can be any positive number greater than 1e-20. Weights\n        are interpreted as relative to each other. So setting the weights to be\n        2.0 for the positive class and 1.0 for the negative class has the same\n        effect as setting them to be 20.0 and 10.0, respectively. If set to\n        `None`, all classes are taken to have weight 1.0. The `auto` mode sets\n        the class weight to be inversely proportional to the number of examples\n        in the training data with the given class.\n\n    max_depth : float, optional\n        Maximum depth of a tree. Must be at least 1.\n\n    step_size : float, [0,1], optional\n        Step size (shrinkage) used in update to prevents overfitting.  It\n        shrinks the prediction of each weak learner to make the boosting\n        process more conservative.  The smaller the step size, the more conservative\n        the algorithm will be. Smaller step_size work well when\n        `max_iterations` is large.\n\n    min_loss_reduction : float, optional (non-negative)\n        Minimum loss reduction required to make a further partition/split a\n        node during the tree learning phase. Larger (more positive) values\n        can help prevent overfitting by avoiding splits that do not\n        sufficiently reduce the loss function.\n\n    min_child_weight : float, optional (non-negative)\n        Controls the minimum weight of each leaf node. Larger values result in\n        more conservative tree learning and help prevent overfitting.\n        Formally, this is minimum sum of instance weights (hessians) in each\n        node. If the tree learning algorithm results in a leaf node with the\n        sum of instance weights less than `min_child_weight`, tree building\n        will terminate.\n\n    row_subsample : float, [0,1], optional\n        Subsample the ratio of the training set in each iteration of tree\n        construction.  This is called the bagging trick and can usually help\n        prevent overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the examples (rows) to grow each tree.\n\n    column_subsample : float, [0,1], optional\n        Subsample ratio of the columns in each iteration of tree\n        construction.  Like row_subsample, this can also help prevent\n        model overfitting.  Setting this to a value of 0.5 results in the\n        model randomly sampling half of the columns to grow each tree.\n\n    verbose : boolean, optional\n        Print progress information during training (if set to true).\n\n    random_seed : int, optional\n        Seeds random opertations such as column and row subsampling, such that\n        results are reproducable.\n\n    metric : str or list[str], optional\n        Performance metric(s) that are tracked during training. When specified,\n        the progress table will display the tracked metric(s) on training and\n        validation set.\n        Supported metrics are: {'accuracy', 'auc', 'log_loss'}\n\n    kwargs : dict, optional\n        Additional arguments for training the model.\n\n        - ``early_stopping_rounds`` : int, default None\n            If the validation metric does not improve after <early_stopping_rounds>,\n            stop training and return the best model.\n            If multiple metrics are being tracked, the last one is used.\n\n        - ``model_checkpoint_path`` : str, default None\n            If specified, checkpoint the model training to the given path every n iterations,\n            where n is specified by ``model_checkpoint_interval``.\n            For instance, if `model_checkpoint_interval` is 5, and `model_checkpoint_path` is\n            set to ``/tmp/model_tmp``, the checkpoints will be saved into\n            ``/tmp/model_tmp/model_checkpoint_5``, ``/tmp/model_tmp/model_checkpoint_10``, ... etc.\n            Training can be resumed by setting ``resume_from_checkpoint`` to one of these checkpoints.\n\n        - ``model_checkpoint_interval`` : int, default 5\n            If model_check_point_path is specified,\n            save the model to the given path every n iterations.\n\n        - ``resume_from_checkpoint`` : str, default None\n            Continues training from a model checkpoint. The model must take\n            exact the same training data as the checkpointed model.\n\n    Returns\n    -------\n      out : BoostedTreesClassifier\n          A trained gradient boosted trees model for classifications tasks.\n\n    References\n    ----------\n\n    - `Wikipedia - Gradient tree boosting\n      <http://en.wikipedia.org/wiki/Gradient_boosting#Gradient_tree_boosting>`_\n    - `Trevor Hastie's slides on Boosted Trees and Random Forest\n      <http://jessica2.msri.org/attachments/10778/10778-boost.pdf>`_\n\n    See Also\n    --------\n    BoostedTreesClassifier, turicreate.logistic_classifier.LogisticClassifier, turicreate.svm_classifier.SVMClassifier\n\n    Examples\n    --------\n\n    .. sourcecode:: python\n\n      >>> url = 'https://static.turi.com/datasets/xgboost/mushroom.csv'\n      >>> data = turicreate.SFrame.read_csv(url)\n\n      >>> train, test = data.random_split(0.8)\n      >>> model = turicreate.boosted_trees_classifier.create(train, target='label')\n\n      >>> predictions = model.classify(test)\n      >>> results = model.evaluate(test)\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 164,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 164,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 165,
+                "column": 4
+              },
+              "end": {
+                "row": 166,
+                "column": 43
+              },
+              "text": "if random_seed is not None:\n        kwargs['random_seed'] = random_seed",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 165,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 165,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 165,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 165,
+                    "column": 30
+                  },
+                  "text": "random_seed is not None",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 165,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 165,
+                        "column": 18
+                      },
+                      "text": "random_seed"
+                    },
+                    {
+                      "type": "is not",
+                      "start": {
+                        "row": 165,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 165,
+                        "column": 21
+                      },
+                      "text": "is"
+                    },
+                    {
+                      "type": "is not",
+                      "start": {
+                        "row": 165,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 165,
+                        "column": 25
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "none",
+                      "start": {
+                        "row": 165,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 165,
+                        "column": 30
+                      },
+                      "text": "None"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 165,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 165,
+                    "column": 31
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 166,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 166,
+                    "column": 43
+                  },
+                  "text": "kwargs['random_seed'] = random_seed",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 166,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 166,
+                        "column": 43
+                      },
+                      "text": "kwargs['random_seed'] = random_seed",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 166,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 166,
+                            "column": 43
+                          },
+                          "text": "kwargs['random_seed'] = random_seed",
+                          "children": [
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 166,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 166,
+                                "column": 29
+                              },
+                              "text": "kwargs['random_seed']",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 166,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 166,
+                                    "column": 14
+                                  },
+                                  "text": "kwargs"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 166,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 166,
+                                    "column": 15
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 166,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 166,
+                                    "column": 28
+                                  },
+                                  "text": "'random_seed'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 166,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 166,
+                                        "column": 16
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 166,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 166,
+                                        "column": 27
+                                      },
+                                      "text": "random_seed"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 166,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 166,
+                                        "column": 28
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 166,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 166,
+                                    "column": 29
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 166,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 166,
+                                "column": 31
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 166,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 166,
+                                "column": 43
+                              },
+                              "text": "random_seed"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 167,
+                "column": 4
+              },
+              "end": {
+                "row": 168,
+                "column": 93
+              },
+              "text": "if 'model_checkpoint_path' in kwargs:\n        kwargs['model_checkpoint_path'] = _make_internal_url(kwargs['model_checkpoint_path'])",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 167,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 167,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 167,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 167,
+                    "column": 40
+                  },
+                  "text": "'model_checkpoint_path' in kwargs",
+                  "children": [
+                    {
+                      "type": "string",
+                      "start": {
+                        "row": 167,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 167,
+                        "column": 30
+                      },
+                      "text": "'model_checkpoint_path'",
+                      "children": [
+                        {
+                          "type": "string_start",
+                          "start": {
+                            "row": 167,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 167,
+                            "column": 8
+                          },
+                          "text": "'"
+                        },
+                        {
+                          "type": "string_content",
+                          "start": {
+                            "row": 167,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 167,
+                            "column": 29
+                          },
+                          "text": "model_checkpoint_path"
+                        },
+                        {
+                          "type": "string_end",
+                          "start": {
+                            "row": 167,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 167,
+                            "column": 30
+                          },
+                          "text": "'"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "in",
+                      "start": {
+                        "row": 167,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 167,
+                        "column": 33
+                      },
+                      "text": "in"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 167,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 167,
+                        "column": 40
+                      },
+                      "text": "kwargs"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 167,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 167,
+                    "column": 41
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 168,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 168,
+                    "column": 93
+                  },
+                  "text": "kwargs['model_checkpoint_path'] = _make_internal_url(kwargs['model_checkpoint_path'])",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 168,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 168,
+                        "column": 93
+                      },
+                      "text": "kwargs['model_checkpoint_path'] = _make_internal_url(kwargs['model_checkpoint_path'])",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 168,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 168,
+                            "column": 93
+                          },
+                          "text": "kwargs['model_checkpoint_path'] = _make_internal_url(kwargs['model_checkpoint_path'])",
+                          "children": [
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 168,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 168,
+                                "column": 39
+                              },
+                              "text": "kwargs['model_checkpoint_path']",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 168,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 168,
+                                    "column": 14
+                                  },
+                                  "text": "kwargs"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 168,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 168,
+                                    "column": 15
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 168,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 168,
+                                    "column": 38
+                                  },
+                                  "text": "'model_checkpoint_path'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 168,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 168,
+                                        "column": 16
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 168,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 168,
+                                        "column": 37
+                                      },
+                                      "text": "model_checkpoint_path"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 168,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 168,
+                                        "column": 38
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 168,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 168,
+                                    "column": 39
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 168,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 168,
+                                "column": 41
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 168,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 168,
+                                "column": 93
+                              },
+                              "text": "_make_internal_url(kwargs['model_checkpoint_path'])",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 168,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 168,
+                                    "column": 60
+                                  },
+                                  "text": "_make_internal_url"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 168,
+                                    "column": 60
+                                  },
+                                  "end": {
+                                    "row": 168,
+                                    "column": 93
+                                  },
+                                  "text": "(kwargs['model_checkpoint_path'])",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 168,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 168,
+                                        "column": 61
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "subscript",
+                                      "start": {
+                                        "row": 168,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 168,
+                                        "column": 92
+                                      },
+                                      "text": "kwargs['model_checkpoint_path']",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 168,
+                                            "column": 61
+                                          },
+                                          "end": {
+                                            "row": 168,
+                                            "column": 67
+                                          },
+                                          "text": "kwargs"
+                                        },
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 168,
+                                            "column": 67
+                                          },
+                                          "end": {
+                                            "row": 168,
+                                            "column": 68
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 168,
+                                            "column": 68
+                                          },
+                                          "end": {
+                                            "row": 168,
+                                            "column": 91
+                                          },
+                                          "text": "'model_checkpoint_path'",
+                                          "children": [
+                                            {
+                                              "type": "string_start",
+                                              "start": {
+                                                "row": 168,
+                                                "column": 68
+                                              },
+                                              "end": {
+                                                "row": 168,
+                                                "column": 69
+                                              },
+                                              "text": "'"
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 168,
+                                                "column": 69
+                                              },
+                                              "end": {
+                                                "row": 168,
+                                                "column": 90
+                                              },
+                                              "text": "model_checkpoint_path"
+                                            },
+                                            {
+                                              "type": "string_end",
+                                              "start": {
+                                                "row": 168,
+                                                "column": 90
+                                              },
+                                              "end": {
+                                                "row": 168,
+                                                "column": 91
+                                              },
+                                              "text": "'"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 168,
+                                            "column": 91
+                                          },
+                                          "end": {
+                                            "row": 168,
+                                            "column": 92
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 168,
+                                        "column": 92
+                                      },
+                                      "end": {
+                                        "row": 168,
+                                        "column": 93
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 169,
+                "column": 4
+              },
+              "end": {
+                "row": 170,
+                "column": 95
+              },
+              "text": "if 'resume_from_checkpoint' in kwargs:\n        kwargs['resume_from_checkpoint'] = _make_internal_url(kwargs['resume_from_checkpoint'])",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 169,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 169,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 169,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 169,
+                    "column": 41
+                  },
+                  "text": "'resume_from_checkpoint' in kwargs",
+                  "children": [
+                    {
+                      "type": "string",
+                      "start": {
+                        "row": 169,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 169,
+                        "column": 31
+                      },
+                      "text": "'resume_from_checkpoint'",
+                      "children": [
+                        {
+                          "type": "string_start",
+                          "start": {
+                            "row": 169,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 169,
+                            "column": 8
+                          },
+                          "text": "'"
+                        },
+                        {
+                          "type": "string_content",
+                          "start": {
+                            "row": 169,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 169,
+                            "column": 30
+                          },
+                          "text": "resume_from_checkpoint"
+                        },
+                        {
+                          "type": "string_end",
+                          "start": {
+                            "row": 169,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 169,
+                            "column": 31
+                          },
+                          "text": "'"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "in",
+                      "start": {
+                        "row": 169,
+                        "column": 32
+                      },
+                      "end": {
+                        "row": 169,
+                        "column": 34
+                      },
+                      "text": "in"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 169,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 169,
+                        "column": 41
+                      },
+                      "text": "kwargs"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 169,
+                    "column": 41
+                  },
+                  "end": {
+                    "row": 169,
+                    "column": 42
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 170,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 170,
+                    "column": 95
+                  },
+                  "text": "kwargs['resume_from_checkpoint'] = _make_internal_url(kwargs['resume_from_checkpoint'])",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 170,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 170,
+                        "column": 95
+                      },
+                      "text": "kwargs['resume_from_checkpoint'] = _make_internal_url(kwargs['resume_from_checkpoint'])",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 170,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 170,
+                            "column": 95
+                          },
+                          "text": "kwargs['resume_from_checkpoint'] = _make_internal_url(kwargs['resume_from_checkpoint'])",
+                          "children": [
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 170,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 170,
+                                "column": 40
+                              },
+                              "text": "kwargs['resume_from_checkpoint']",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 170,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 170,
+                                    "column": 14
+                                  },
+                                  "text": "kwargs"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 170,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 170,
+                                    "column": 15
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 170,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 170,
+                                    "column": 39
+                                  },
+                                  "text": "'resume_from_checkpoint'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 170,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 170,
+                                        "column": 16
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 170,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 170,
+                                        "column": 38
+                                      },
+                                      "text": "resume_from_checkpoint"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 170,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 170,
+                                        "column": 39
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 170,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 170,
+                                    "column": 40
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 170,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 170,
+                                "column": 42
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 170,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 170,
+                                "column": 95
+                              },
+                              "text": "_make_internal_url(kwargs['resume_from_checkpoint'])",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 170,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 170,
+                                    "column": 61
+                                  },
+                                  "text": "_make_internal_url"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 170,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 170,
+                                    "column": 95
+                                  },
+                                  "text": "(kwargs['resume_from_checkpoint'])",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 170,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 170,
+                                        "column": 62
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "subscript",
+                                      "start": {
+                                        "row": 170,
+                                        "column": 62
+                                      },
+                                      "end": {
+                                        "row": 170,
+                                        "column": 94
+                                      },
+                                      "text": "kwargs['resume_from_checkpoint']",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 170,
+                                            "column": 62
+                                          },
+                                          "end": {
+                                            "row": 170,
+                                            "column": 68
+                                          },
+                                          "text": "kwargs"
+                                        },
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 170,
+                                            "column": 68
+                                          },
+                                          "end": {
+                                            "row": 170,
+                                            "column": 69
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 170,
+                                            "column": 69
+                                          },
+                                          "end": {
+                                            "row": 170,
+                                            "column": 93
+                                          },
+                                          "text": "'resume_from_checkpoint'",
+                                          "children": [
+                                            {
+                                              "type": "string_start",
+                                              "start": {
+                                                "row": 170,
+                                                "column": 69
+                                              },
+                                              "end": {
+                                                "row": 170,
+                                                "column": 70
+                                              },
+                                              "text": "'"
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 170,
+                                                "column": 70
+                                              },
+                                              "end": {
+                                                "row": 170,
+                                                "column": 92
+                                              },
+                                              "text": "resume_from_checkpoint"
+                                            },
+                                            {
+                                              "type": "string_end",
+                                              "start": {
+                                                "row": 170,
+                                                "column": 92
+                                              },
+                                              "end": {
+                                                "row": 170,
+                                                "column": 93
+                                              },
+                                              "text": "'"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 170,
+                                            "column": 93
+                                          },
+                                          "end": {
+                                            "row": 170,
+                                            "column": 94
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 170,
+                                        "column": 94
+                                      },
+                                      "end": {
+                                        "row": 170,
+                                        "column": 95
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 172,
+                "column": 4
+              },
+              "end": {
+                "row": 187,
+                "column": 33
+              },
+              "text": "model = _sl.create(dataset = dataset,\n                        target = target,\n                        features = features,\n                        model_name = 'boosted_trees_classifier',\n                        max_iterations = max_iterations,\n                        validation_set = validation_set,\n                        class_weights = class_weights,\n                        max_depth = max_depth,\n                        step_size = step_size,\n                        min_loss_reduction = min_loss_reduction,\n                        min_child_weight = min_child_weight,\n                        row_subsample = row_subsample,\n                        column_subsample = column_subsample,\n                        verbose = verbose,\n                        metric = metric,\n                        **kwargs)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 172,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 187,
+                    "column": 33
+                  },
+                  "text": "model = _sl.create(dataset = dataset,\n                        target = target,\n                        features = features,\n                        model_name = 'boosted_trees_classifier',\n                        max_iterations = max_iterations,\n                        validation_set = validation_set,\n                        class_weights = class_weights,\n                        max_depth = max_depth,\n                        step_size = step_size,\n                        min_loss_reduction = min_loss_reduction,\n                        min_child_weight = min_child_weight,\n                        row_subsample = row_subsample,\n                        column_subsample = column_subsample,\n                        verbose = verbose,\n                        metric = metric,\n                        **kwargs)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 172,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 172,
+                        "column": 9
+                      },
+                      "text": "model"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 172,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 172,
+                        "column": 11
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 172,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 187,
+                        "column": 33
+                      },
+                      "text": "_sl.create(dataset = dataset,\n                        target = target,\n                        features = features,\n                        model_name = 'boosted_trees_classifier',\n                        max_iterations = max_iterations,\n                        validation_set = validation_set,\n                        class_weights = class_weights,\n                        max_depth = max_depth,\n                        step_size = step_size,\n                        min_loss_reduction = min_loss_reduction,\n                        min_child_weight = min_child_weight,\n                        row_subsample = row_subsample,\n                        column_subsample = column_subsample,\n                        verbose = verbose,\n                        metric = metric,\n                        **kwargs)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 172,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 172,
+                            "column": 22
+                          },
+                          "text": "_sl.create",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 172,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 172,
+                                "column": 15
+                              },
+                              "text": "_sl"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 172,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 172,
+                                "column": 16
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 172,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 172,
+                                "column": 22
+                              },
+                              "text": "create"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 172,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 187,
+                            "column": 33
+                          },
+                          "text": "(dataset = dataset,\n                        target = target,\n                        features = features,\n                        model_name = 'boosted_trees_classifier',\n                        max_iterations = max_iterations,\n                        validation_set = validation_set,\n                        class_weights = class_weights,\n                        max_depth = max_depth,\n                        step_size = step_size,\n                        min_loss_reduction = min_loss_reduction,\n                        min_child_weight = min_child_weight,\n                        row_subsample = row_subsample,\n                        column_subsample = column_subsample,\n                        verbose = verbose,\n                        metric = metric,\n                        **kwargs)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 172,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 172,
+                                "column": 23
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 172,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 172,
+                                "column": 40
+                              },
+                              "text": "dataset = dataset",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 172,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 172,
+                                    "column": 30
+                                  },
+                                  "text": "dataset"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 172,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 172,
+                                    "column": 32
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 172,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 172,
+                                    "column": 40
+                                  },
+                                  "text": "dataset"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 172,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 172,
+                                "column": 41
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 173,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 173,
+                                "column": 39
+                              },
+                              "text": "target = target",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 173,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 173,
+                                    "column": 30
+                                  },
+                                  "text": "target"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 173,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 173,
+                                    "column": 32
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 173,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 173,
+                                    "column": 39
+                                  },
+                                  "text": "target"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 173,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 173,
+                                "column": 40
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 174,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 174,
+                                "column": 43
+                              },
+                              "text": "features = features",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 174,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 174,
+                                    "column": 32
+                                  },
+                                  "text": "features"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 174,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 174,
+                                    "column": 34
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 174,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 174,
+                                    "column": 43
+                                  },
+                                  "text": "features"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 174,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 174,
+                                "column": 44
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 175,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 175,
+                                "column": 63
+                              },
+                              "text": "model_name = 'boosted_trees_classifier'",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 175,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 175,
+                                    "column": 34
+                                  },
+                                  "text": "model_name"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 175,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 175,
+                                    "column": 36
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 175,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 175,
+                                    "column": 63
+                                  },
+                                  "text": "'boosted_trees_classifier'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 175,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 175,
+                                        "column": 38
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 175,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 175,
+                                        "column": 62
+                                      },
+                                      "text": "boosted_trees_classifier"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 175,
+                                        "column": 62
+                                      },
+                                      "end": {
+                                        "row": 175,
+                                        "column": 63
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 175,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 175,
+                                "column": 64
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 176,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 176,
+                                "column": 55
+                              },
+                              "text": "max_iterations = max_iterations",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 176,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 176,
+                                    "column": 38
+                                  },
+                                  "text": "max_iterations"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 176,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 176,
+                                    "column": 40
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 176,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 176,
+                                    "column": 55
+                                  },
+                                  "text": "max_iterations"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 176,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 176,
+                                "column": 56
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 177,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 177,
+                                "column": 55
+                              },
+                              "text": "validation_set = validation_set",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 177,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 177,
+                                    "column": 38
+                                  },
+                                  "text": "validation_set"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 177,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 177,
+                                    "column": 40
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 177,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 177,
+                                    "column": 55
+                                  },
+                                  "text": "validation_set"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 177,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 177,
+                                "column": 56
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 178,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 178,
+                                "column": 53
+                              },
+                              "text": "class_weights = class_weights",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 178,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 178,
+                                    "column": 37
+                                  },
+                                  "text": "class_weights"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 178,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 178,
+                                    "column": 39
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 178,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 178,
+                                    "column": 53
+                                  },
+                                  "text": "class_weights"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 178,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 178,
+                                "column": 54
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 179,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 179,
+                                "column": 45
+                              },
+                              "text": "max_depth = max_depth",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 179,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 179,
+                                    "column": 33
+                                  },
+                                  "text": "max_depth"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 179,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 179,
+                                    "column": 35
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 179,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 179,
+                                    "column": 45
+                                  },
+                                  "text": "max_depth"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 179,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 179,
+                                "column": 46
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 180,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 180,
+                                "column": 45
+                              },
+                              "text": "step_size = step_size",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 180,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 180,
+                                    "column": 33
+                                  },
+                                  "text": "step_size"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 180,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 180,
+                                    "column": 35
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 180,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 180,
+                                    "column": 45
+                                  },
+                                  "text": "step_size"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 180,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 180,
+                                "column": 46
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 181,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 181,
+                                "column": 63
+                              },
+                              "text": "min_loss_reduction = min_loss_reduction",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 181,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 181,
+                                    "column": 42
+                                  },
+                                  "text": "min_loss_reduction"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 181,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 181,
+                                    "column": 44
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 181,
+                                    "column": 45
+                                  },
+                                  "end": {
+                                    "row": 181,
+                                    "column": 63
+                                  },
+                                  "text": "min_loss_reduction"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 181,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 181,
+                                "column": 64
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 182,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 182,
+                                "column": 59
+                              },
+                              "text": "min_child_weight = min_child_weight",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 182,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 182,
+                                    "column": 40
+                                  },
+                                  "text": "min_child_weight"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 182,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 182,
+                                    "column": 42
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 182,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 182,
+                                    "column": 59
+                                  },
+                                  "text": "min_child_weight"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 182,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 182,
+                                "column": 60
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 183,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 183,
+                                "column": 53
+                              },
+                              "text": "row_subsample = row_subsample",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 183,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 183,
+                                    "column": 37
+                                  },
+                                  "text": "row_subsample"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 183,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 183,
+                                    "column": 39
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 183,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 183,
+                                    "column": 53
+                                  },
+                                  "text": "row_subsample"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 183,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 183,
+                                "column": 54
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 184,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 184,
+                                "column": 59
+                              },
+                              "text": "column_subsample = column_subsample",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 184,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 184,
+                                    "column": 40
+                                  },
+                                  "text": "column_subsample"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 184,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 184,
+                                    "column": 42
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 184,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 184,
+                                    "column": 59
+                                  },
+                                  "text": "column_subsample"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 184,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 184,
+                                "column": 60
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 185,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 185,
+                                "column": 41
+                              },
+                              "text": "verbose = verbose",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 185,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 185,
+                                    "column": 31
+                                  },
+                                  "text": "verbose"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 185,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 185,
+                                    "column": 33
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 185,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 185,
+                                    "column": 41
+                                  },
+                                  "text": "verbose"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 185,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 185,
+                                "column": 42
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 186,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 186,
+                                "column": 39
+                              },
+                              "text": "metric = metric",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 186,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 186,
+                                    "column": 30
+                                  },
+                                  "text": "metric"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 186,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 186,
+                                    "column": 32
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 186,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 186,
+                                    "column": 39
+                                  },
+                                  "text": "metric"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 186,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 186,
+                                "column": 40
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "dictionary_splat",
+                              "start": {
+                                "row": 187,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 187,
+                                "column": 32
+                              },
+                              "text": "**kwargs",
+                              "children": [
+                                {
+                                  "type": "**",
+                                  "start": {
+                                    "row": 187,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 187,
+                                    "column": 26
+                                  },
+                                  "text": "**"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 187,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 187,
+                                    "column": 32
+                                  },
+                                  "text": "kwargs"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 187,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 187,
+                                "column": 33
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 188,
+                "column": 4
+              },
+              "end": {
+                "row": 188,
+                "column": 50
+              },
+              "text": "return BoostedTreesClassifier(model.__proxy__)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 188,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 188,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 188,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 188,
+                    "column": 50
+                  },
+                  "text": "BoostedTreesClassifier(model.__proxy__)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 188,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 188,
+                        "column": 33
+                      },
+                      "text": "BoostedTreesClassifier"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 188,
+                        "column": 33
+                      },
+                      "end": {
+                        "row": 188,
+                        "column": 50
+                      },
+                      "text": "(model.__proxy__)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 188,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 188,
+                            "column": 34
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 188,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 188,
+                            "column": 49
+                          },
+                          "text": "model.__proxy__",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 188,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 188,
+                                "column": 39
+                              },
+                              "text": "model"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 188,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 188,
+                                "column": 40
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 188,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 188,
+                                "column": 49
+                              },
+                              "text": "__proxy__"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 188,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 188,
+                            "column": 50
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

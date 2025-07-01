@@ -1,0 +1,6 @@
+public static void toWriter(String templateFileName, VelocityContext context, Writer writer) {
+		assertInit();
+
+		final Template template = Velocity.getTemplate(templateFileName);
+		merge(template, context, writer);
+	}

@@ -1,0 +1,7 @@
+public static String convertCharset(String str, String sourceCharset, String destCharset) {
+		if (StrUtil.hasBlank(str, sourceCharset, destCharset)) {
+			return str;
+		}
+
+		return CharsetUtil.convert(str, sourceCharset, destCharset);
+	}

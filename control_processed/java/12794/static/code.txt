@@ -1,0 +1,7 @@
+public JSONObject getJSONObject(String key) throws JSONException {
+    Object o = get(key);
+    if (o instanceof JSONObject) {
+      return (JSONObject) o;
+    }
+    throw new JSONException("JSONObject[" + quote(key) + "] is not a JSONObject.");
+  }

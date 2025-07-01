@@ -1,0 +1,7 @@
+public static Workbook createBook(File excelFile, String password) {
+		try {
+			return WorkbookFactory.create(excelFile, password);
+		} catch (Exception e) {
+			throw new POIException(e);
+		}
+	}

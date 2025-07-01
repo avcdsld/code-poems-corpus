@@ -1,0 +1,6 @@
+def bookmarks_changed(self):
+        """Bookmarks list has changed."""
+        bookmarks = self.editor.get_bookmarks()
+        if self.editor.bookmarks != bookmarks:
+            self.editor.bookmarks = bookmarks
+            self.sig_save_bookmarks.emit(self.filename, repr(bookmarks))

@@ -1,0 +1,23 @@
+private static String unwrapQuote(String value) {
+		if (null == value) {
+			return null;
+		}
+		value = value.trim();
+
+		int from = 0;
+		int to = value.length();
+		char startChar = value.charAt(0);
+		char endChar = value.charAt(to - 1);
+		if (startChar == endChar) {
+			if ('\'' == startChar || '"' == startChar) {
+				from = 1;
+				to = to - 1;
+			}
+		}
+
+		if (from == 0 && to == value.length()) {
+			// 并不包含，返回原值
+			return value;
+		}
+		return value.substring(from, to);
+	}

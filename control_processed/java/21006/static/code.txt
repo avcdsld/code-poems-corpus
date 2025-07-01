@@ -1,0 +1,10 @@
+public void print() {
+		System.out.println("TechSet: " + this.hashCode());
+		for (Tech tech : includeTech) {
+			System.out.println("\tInclude: " + tech);
+		}
+		for (Tech tech : excludeTech) {
+			System.out.println("\tExclude: " + tech);
+		}
+		
+	}

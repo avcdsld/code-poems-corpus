@@ -1,0 +1,15 @@
+def rmod(self, other, axis="columns", level=None, fill_value=None):
+        """Mod this DataFrame against another DataFrame/Series/scalar.
+
+        Args:
+            other: The object to use to apply the div against this.
+            axis: The axis to div over.
+            level: The Multilevel index level to apply div over.
+            fill_value: The value to fill NaNs with.
+
+        Returns:
+            A new DataFrame with the rdiv applied.
+        """
+        return self._binary_op(
+            "rmod", other, axis=axis, level=level, fill_value=fill_value
+        )

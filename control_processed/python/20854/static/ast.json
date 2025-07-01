@@ -1,0 +1,3902 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 39,
+    "column": 15
+  },
+  "text": "def on_value_event(self, event):\n    \"\"\"Records the summary values based on an updated message from the debugger.\n\n    Logs an error message if writing the event to disk fails.\n\n    Args:\n      event: The Event proto to be processed.\n    \"\"\"\n    if not event.summary.value:\n      logger.info('The summary of the event lacks a value.')\n      return None\n\n    # The node name property in the event proto is actually a watch key, which\n    # is a concatenation of several pieces of data.\n    watch_key = event.summary.value[0].node_name\n    tensor_value = debug_data.load_tensor_from_event(event)\n    device_name = _extract_device_name_from_event(event)\n    node_name, output_slot, debug_op = (\n        event.summary.value[0].node_name.split(':'))\n    maybe_base_expanded_node_name = (\n        self._run_states.get_maybe_base_expanded_node_name(node_name,\n                                                           self._run_key,\n                                                           device_name))\n    self._tensor_store.add(watch_key, tensor_value)\n    self._outgoing_channel.put(_comm_tensor_data(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time))\n\n    logger.info('on_value_event(): waiting for client ack (tensors)...')\n    self._incoming_channel.get()\n    logger.info('on_value_event(): client ack received (tensor).')\n\n    # Determine if the particular debug watch key is in the current list of\n    # breakpoints. If it is, send an EventReply() to unblock the debug op.\n    if self._is_debug_node_in_breakpoints(event.summary.value[0].node_name):\n      logger.info('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)\n      # TODO(cais): Support receiving and sending tensor value from front-end.\n      return debug_service_pb2.EventReply()\n    return None",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 39,
+        "column": 15
+      },
+      "text": "def on_value_event(self, event):\n    \"\"\"Records the summary values based on an updated message from the debugger.\n\n    Logs an error message if writing the event to disk fails.\n\n    Args:\n      event: The Event proto to be processed.\n    \"\"\"\n    if not event.summary.value:\n      logger.info('The summary of the event lacks a value.')\n      return None\n\n    # The node name property in the event proto is actually a watch key, which\n    # is a concatenation of several pieces of data.\n    watch_key = event.summary.value[0].node_name\n    tensor_value = debug_data.load_tensor_from_event(event)\n    device_name = _extract_device_name_from_event(event)\n    node_name, output_slot, debug_op = (\n        event.summary.value[0].node_name.split(':'))\n    maybe_base_expanded_node_name = (\n        self._run_states.get_maybe_base_expanded_node_name(node_name,\n                                                           self._run_key,\n                                                           device_name))\n    self._tensor_store.add(watch_key, tensor_value)\n    self._outgoing_channel.put(_comm_tensor_data(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time))\n\n    logger.info('on_value_event(): waiting for client ack (tensors)...')\n    self._incoming_channel.get()\n    logger.info('on_value_event(): client ack received (tensor).')\n\n    # Determine if the particular debug watch key is in the current list of\n    # breakpoints. If it is, send an EventReply() to unblock the debug op.\n    if self._is_debug_node_in_breakpoints(event.summary.value[0].node_name):\n      logger.info('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)\n      # TODO(cais): Support receiving and sending tensor value from front-end.\n      return debug_service_pb2.EventReply()\n    return None",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 18
+          },
+          "text": "on_value_event"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 18
+          },
+          "end": {
+            "row": 0,
+            "column": 31
+          },
+          "text": "(self, event)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 18
+              },
+              "end": {
+                "row": 0,
+                "column": 19
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 19
+              },
+              "end": {
+                "row": 0,
+                "column": 23
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 23
+              },
+              "end": {
+                "row": 0,
+                "column": 24
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 25
+              },
+              "end": {
+                "row": 0,
+                "column": 30
+              },
+              "text": "event"
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 30
+              },
+              "end": {
+                "row": 0,
+                "column": 31
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 31
+          },
+          "end": {
+            "row": 0,
+            "column": 32
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 4
+          },
+          "end": {
+            "row": 39,
+            "column": 15
+          },
+          "text": "\"\"\"Records the summary values based on an updated message from the debugger.\n\n    Logs an error message if writing the event to disk fails.\n\n    Args:\n      event: The Event proto to be processed.\n    \"\"\"\n    if not event.summary.value:\n      logger.info('The summary of the event lacks a value.')\n      return None\n\n    # The node name property in the event proto is actually a watch key, which\n    # is a concatenation of several pieces of data.\n    watch_key = event.summary.value[0].node_name\n    tensor_value = debug_data.load_tensor_from_event(event)\n    device_name = _extract_device_name_from_event(event)\n    node_name, output_slot, debug_op = (\n        event.summary.value[0].node_name.split(':'))\n    maybe_base_expanded_node_name = (\n        self._run_states.get_maybe_base_expanded_node_name(node_name,\n                                                           self._run_key,\n                                                           device_name))\n    self._tensor_store.add(watch_key, tensor_value)\n    self._outgoing_channel.put(_comm_tensor_data(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time))\n\n    logger.info('on_value_event(): waiting for client ack (tensors)...')\n    self._incoming_channel.get()\n    logger.info('on_value_event(): client ack received (tensor).')\n\n    # Determine if the particular debug watch key is in the current list of\n    # breakpoints. If it is, send an EventReply() to unblock the debug op.\n    if self._is_debug_node_in_breakpoints(event.summary.value[0].node_name):\n      logger.info('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)\n      # TODO(cais): Support receiving and sending tensor value from front-end.\n      return debug_service_pb2.EventReply()\n    return None",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 4
+              },
+              "end": {
+                "row": 7,
+                "column": 7
+              },
+              "text": "\"\"\"Records the summary values based on an updated message from the debugger.\n\n    Logs an error message if writing the event to disk fails.\n\n    Args:\n      event: The Event proto to be processed.\n    \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 7
+                  },
+                  "text": "\"\"\"Records the summary values based on an updated message from the debugger.\n\n    Logs an error message if writing the event to disk fails.\n\n    Args:\n      event: The Event proto to be processed.\n    \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 4
+                      },
+                      "text": "Records the summary values based on an updated message from the debugger.\n\n    Logs an error message if writing the event to disk fails.\n\n    Args:\n      event: The Event proto to be processed.\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 7,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 8,
+                "column": 4
+              },
+              "end": {
+                "row": 10,
+                "column": 17
+              },
+              "text": "if not event.summary.value:\n      logger.info('The summary of the event lacks a value.')\n      return None",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 8,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "not_operator",
+                  "start": {
+                    "row": 8,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 30
+                  },
+                  "text": "not event.summary.value",
+                  "children": [
+                    {
+                      "type": "not",
+                      "start": {
+                        "row": 8,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 10
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 8,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 30
+                      },
+                      "text": "event.summary.value",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 8,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 24
+                          },
+                          "text": "event.summary",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 16
+                              },
+                              "text": "event"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 8,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 17
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 24
+                              },
+                              "text": "summary"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 8,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 25
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 8,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 30
+                          },
+                          "text": "value"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 8,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 31
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 9,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 17
+                  },
+                  "text": "logger.info('The summary of the event lacks a value.')\n      return None",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 9,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 60
+                      },
+                      "text": "logger.info('The summary of the event lacks a value.')",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 9,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 60
+                          },
+                          "text": "logger.info('The summary of the event lacks a value.')",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 9,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 17
+                              },
+                              "text": "logger.info",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 12
+                                  },
+                                  "text": "logger"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 13
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 17
+                                  },
+                                  "text": "info"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 9,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 60
+                              },
+                              "text": "('The summary of the event lacks a value.')",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 18
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 59
+                                  },
+                                  "text": "'The summary of the event lacks a value.'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 19
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 58
+                                      },
+                                      "text": "The summary of the event lacks a value."
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 59
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 60
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 10,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 17
+                      },
+                      "text": "return None",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 10,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 12
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "none",
+                          "start": {
+                            "row": 10,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 17
+                          },
+                          "text": "None"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 12,
+                "column": 4
+              },
+              "end": {
+                "row": 12,
+                "column": 78
+              },
+              "text": "# The node name property in the event proto is actually a watch key, which"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 13,
+                "column": 4
+              },
+              "end": {
+                "row": 13,
+                "column": 51
+              },
+              "text": "# is a concatenation of several pieces of data."
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 14,
+                "column": 4
+              },
+              "end": {
+                "row": 14,
+                "column": 48
+              },
+              "text": "watch_key = event.summary.value[0].node_name",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 14,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 48
+                  },
+                  "text": "watch_key = event.summary.value[0].node_name",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 14,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 13
+                      },
+                      "text": "watch_key"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 14,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 14,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 48
+                      },
+                      "text": "event.summary.value[0].node_name",
+                      "children": [
+                        {
+                          "type": "subscript",
+                          "start": {
+                            "row": 14,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 38
+                          },
+                          "text": "event.summary.value[0]",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 14,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 35
+                              },
+                              "text": "event.summary.value",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 29
+                                  },
+                                  "text": "event.summary",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 21
+                                      },
+                                      "text": "event"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 22
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 29
+                                      },
+                                      "text": "summary"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 30
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 35
+                                  },
+                                  "text": "value"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 14,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 36
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 14,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 37
+                              },
+                              "text": "0"
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 14,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 38
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 14,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 39
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 48
+                          },
+                          "text": "node_name"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 15,
+                "column": 4
+              },
+              "end": {
+                "row": 15,
+                "column": 59
+              },
+              "text": "tensor_value = debug_data.load_tensor_from_event(event)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 15,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 59
+                  },
+                  "text": "tensor_value = debug_data.load_tensor_from_event(event)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 15,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 16
+                      },
+                      "text": "tensor_value"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 15,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 18
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 15,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 59
+                      },
+                      "text": "debug_data.load_tensor_from_event(event)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 15,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 52
+                          },
+                          "text": "debug_data.load_tensor_from_event",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 29
+                              },
+                              "text": "debug_data"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 15,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 30
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 52
+                              },
+                              "text": "load_tensor_from_event"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 15,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 59
+                          },
+                          "text": "(event)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 15,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 53
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 58
+                              },
+                              "text": "event"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 15,
+                                "column": 58
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 59
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 16,
+                "column": 4
+              },
+              "end": {
+                "row": 16,
+                "column": 56
+              },
+              "text": "device_name = _extract_device_name_from_event(event)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 16,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 56
+                  },
+                  "text": "device_name = _extract_device_name_from_event(event)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 16,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 15
+                      },
+                      "text": "device_name"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 16,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 17
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 16,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 56
+                      },
+                      "text": "_extract_device_name_from_event(event)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 16,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 49
+                          },
+                          "text": "_extract_device_name_from_event"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 16,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 56
+                          },
+                          "text": "(event)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 16,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 50
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 16,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 55
+                              },
+                              "text": "event"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 16,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 56
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 17,
+                "column": 4
+              },
+              "end": {
+                "row": 18,
+                "column": 52
+              },
+              "text": "node_name, output_slot, debug_op = (\n        event.summary.value[0].node_name.split(':'))",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 17,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 52
+                  },
+                  "text": "node_name, output_slot, debug_op = (\n        event.summary.value[0].node_name.split(':'))",
+                  "children": [
+                    {
+                      "type": "pattern_list",
+                      "start": {
+                        "row": 17,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 36
+                      },
+                      "text": "node_name, output_slot, debug_op",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 13
+                          },
+                          "text": "node_name"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 17,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 14
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 26
+                          },
+                          "text": "output_slot"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 17,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 27
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 36
+                          },
+                          "text": "debug_op"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 17,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 38
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "parenthesized_expression",
+                      "start": {
+                        "row": 17,
+                        "column": 39
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 52
+                      },
+                      "text": "(\n        event.summary.value[0].node_name.split(':'))",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 17,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 40
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 18,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 51
+                          },
+                          "text": "event.summary.value[0].node_name.split(':')",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 18,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 46
+                              },
+                              "text": "event.summary.value[0].node_name.split",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 40
+                                  },
+                                  "text": "event.summary.value[0].node_name",
+                                  "children": [
+                                    {
+                                      "type": "subscript",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 30
+                                      },
+                                      "text": "event.summary.value[0]",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 27
+                                          },
+                                          "text": "event.summary.value",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 21
+                                              },
+                                              "text": "event.summary",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 8
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 13
+                                                  },
+                                                  "text": "event"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 13
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 14
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 21
+                                                  },
+                                                  "text": "summary"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 22
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 22
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 27
+                                              },
+                                              "text": "value"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 28
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "integer",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 29
+                                          },
+                                          "text": "0"
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 30
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 31
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 40
+                                      },
+                                      "text": "node_name"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 41
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 46
+                                  },
+                                  "text": "split"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 18,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 51
+                              },
+                              "text": "(':')",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 47
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 50
+                                  },
+                                  "text": "':'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 48
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 49
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 50
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 51
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 18,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 52
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 19,
+                "column": 4
+              },
+              "end": {
+                "row": 22,
+                "column": 72
+              },
+              "text": "maybe_base_expanded_node_name = (\n        self._run_states.get_maybe_base_expanded_node_name(node_name,\n                                                           self._run_key,\n                                                           device_name))",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 19,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 72
+                  },
+                  "text": "maybe_base_expanded_node_name = (\n        self._run_states.get_maybe_base_expanded_node_name(node_name,\n                                                           self._run_key,\n                                                           device_name))",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 19,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 33
+                      },
+                      "text": "maybe_base_expanded_node_name"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 19,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 35
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "parenthesized_expression",
+                      "start": {
+                        "row": 19,
+                        "column": 36
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 72
+                      },
+                      "text": "(\n        self._run_states.get_maybe_base_expanded_node_name(node_name,\n                                                           self._run_key,\n                                                           device_name))",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 19,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 37
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 20,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 71
+                          },
+                          "text": "self._run_states.get_maybe_base_expanded_node_name(node_name,\n                                                           self._run_key,\n                                                           device_name)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 20,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 58
+                              },
+                              "text": "self._run_states.get_maybe_base_expanded_node_name",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 24
+                                  },
+                                  "text": "self._run_states",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 12
+                                      },
+                                      "text": "self"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 13
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 24
+                                      },
+                                      "text": "_run_states"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 25
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 58
+                                  },
+                                  "text": "get_maybe_base_expanded_node_name"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 20,
+                                "column": 58
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 71
+                              },
+                              "text": "(node_name,\n                                                           self._run_key,\n                                                           device_name)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 59
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 68
+                                  },
+                                  "text": "node_name"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 68
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 69
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 72
+                                  },
+                                  "text": "self._run_key",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 59
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 63
+                                      },
+                                      "text": "self"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 63
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 64
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 64
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 72
+                                      },
+                                      "text": "_run_key"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 72
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 73
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 70
+                                  },
+                                  "text": "device_name"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 70
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 71
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 22,
+                            "column": 71
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 72
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 23,
+                "column": 4
+              },
+              "end": {
+                "row": 23,
+                "column": 51
+              },
+              "text": "self._tensor_store.add(watch_key, tensor_value)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 23,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 51
+                  },
+                  "text": "self._tensor_store.add(watch_key, tensor_value)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 23,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 26
+                      },
+                      "text": "self._tensor_store.add",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 23,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 22
+                          },
+                          "text": "self._tensor_store",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 8
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 23,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 9
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 22
+                              },
+                              "text": "_tensor_store"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 23,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 23
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 23,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 26
+                          },
+                          "text": "add"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 23,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 51
+                      },
+                      "text": "(watch_key, tensor_value)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 23,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 27
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 23,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 36
+                          },
+                          "text": "watch_key"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 23,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 37
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 23,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 50
+                          },
+                          "text": "tensor_value"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 23,
+                            "column": 50
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 51
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 24,
+                "column": 4
+              },
+              "end": {
+                "row": 26,
+                "column": 49
+              },
+              "text": "self._outgoing_channel.put(_comm_tensor_data(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time))",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 24,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 49
+                  },
+                  "text": "self._outgoing_channel.put(_comm_tensor_data(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time))",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 24,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 30
+                      },
+                      "text": "self._outgoing_channel.put",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 24,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 26
+                          },
+                          "text": "self._outgoing_channel",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 8
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 24,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 9
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 26
+                              },
+                              "text": "_outgoing_channel"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 24,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 27
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 24,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 30
+                          },
+                          "text": "put"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 24,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 49
+                      },
+                      "text": "(_comm_tensor_data(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time))",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 24,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 31
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 24,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 48
+                          },
+                          "text": "_comm_tensor_data(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 48
+                              },
+                              "text": "_comm_tensor_data"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 24,
+                                "column": 48
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 48
+                              },
+                              "text": "(\n        device_name, node_name, maybe_base_expanded_node_name, output_slot,\n        debug_op, tensor_value, event.wall_time)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 49
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 19
+                                  },
+                                  "text": "device_name"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 20
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 30
+                                  },
+                                  "text": "node_name"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 31
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 61
+                                  },
+                                  "text": "maybe_base_expanded_node_name"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 62
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 63
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 74
+                                  },
+                                  "text": "output_slot"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 74
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 75
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 16
+                                  },
+                                  "text": "debug_op"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 17
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 30
+                                  },
+                                  "text": "tensor_value"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 31
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 47
+                                  },
+                                  "text": "event.wall_time",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 37
+                                      },
+                                      "text": "event"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 38
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 47
+                                      },
+                                      "text": "wall_time"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 48
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 26,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 49
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 28,
+                "column": 4
+              },
+              "end": {
+                "row": 28,
+                "column": 72
+              },
+              "text": "logger.info('on_value_event(): waiting for client ack (tensors)...')",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 28,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 72
+                  },
+                  "text": "logger.info('on_value_event(): waiting for client ack (tensors)...')",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 28,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 15
+                      },
+                      "text": "logger.info",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 28,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 10
+                          },
+                          "text": "logger"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 28,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 11
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 28,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 15
+                          },
+                          "text": "info"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 28,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 72
+                      },
+                      "text": "('on_value_event(): waiting for client ack (tensors)...')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 28,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 16
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 28,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 71
+                          },
+                          "text": "'on_value_event(): waiting for client ack (tensors)...'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 28,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 17
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 28,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 70
+                              },
+                              "text": "on_value_event(): waiting for client ack (tensors)..."
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 28,
+                                "column": 70
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 71
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 28,
+                            "column": 71
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 72
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 29,
+                "column": 4
+              },
+              "end": {
+                "row": 29,
+                "column": 32
+              },
+              "text": "self._incoming_channel.get()",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 29,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 32
+                  },
+                  "text": "self._incoming_channel.get()",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 29,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 30
+                      },
+                      "text": "self._incoming_channel.get",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 29,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 26
+                          },
+                          "text": "self._incoming_channel",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 29,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 8
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 29,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 9
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 29,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 26
+                              },
+                              "text": "_incoming_channel"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 29,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 27
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 29,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 30
+                          },
+                          "text": "get"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 29,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 32
+                      },
+                      "text": "()",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 29,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 31
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 29,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 32
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 30,
+                "column": 4
+              },
+              "end": {
+                "row": 30,
+                "column": 66
+              },
+              "text": "logger.info('on_value_event(): client ack received (tensor).')",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 30,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 66
+                  },
+                  "text": "logger.info('on_value_event(): client ack received (tensor).')",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 30,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 15
+                      },
+                      "text": "logger.info",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 30,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 10
+                          },
+                          "text": "logger"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 30,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 11
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 30,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 15
+                          },
+                          "text": "info"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 30,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 66
+                      },
+                      "text": "('on_value_event(): client ack received (tensor).')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 30,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 16
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 30,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 65
+                          },
+                          "text": "'on_value_event(): client ack received (tensor).'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 30,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 17
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 30,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 64
+                              },
+                              "text": "on_value_event(): client ack received (tensor)."
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 30,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 65
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 30,
+                            "column": 65
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 66
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 32,
+                "column": 4
+              },
+              "end": {
+                "row": 32,
+                "column": 75
+              },
+              "text": "# Determine if the particular debug watch key is in the current list of"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 33,
+                "column": 4
+              },
+              "end": {
+                "row": 33,
+                "column": 74
+              },
+              "text": "# breakpoints. If it is, send an EventReply() to unblock the debug op."
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 34,
+                "column": 4
+              },
+              "end": {
+                "row": 38,
+                "column": 43
+              },
+              "text": "if self._is_debug_node_in_breakpoints(event.summary.value[0].node_name):\n      logger.info('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)\n      # TODO(cais): Support receiving and sending tensor value from front-end.\n      return debug_service_pb2.EventReply()",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 34,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 34,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 75
+                  },
+                  "text": "self._is_debug_node_in_breakpoints(event.summary.value[0].node_name)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 34,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 41
+                      },
+                      "text": "self._is_debug_node_in_breakpoints",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 34,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 11
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 34,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 12
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 34,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 41
+                          },
+                          "text": "_is_debug_node_in_breakpoints"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 34,
+                        "column": 41
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 75
+                      },
+                      "text": "(event.summary.value[0].node_name)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 34,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 42
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 34,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 74
+                          },
+                          "text": "event.summary.value[0].node_name",
+                          "children": [
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 34,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 64
+                              },
+                              "text": "event.summary.value[0]",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 61
+                                  },
+                                  "text": "event.summary.value",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 55
+                                      },
+                                      "text": "event.summary",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 47
+                                          },
+                                          "text": "event"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 48
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 55
+                                          },
+                                          "text": "summary"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 55
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 56
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 56
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 61
+                                      },
+                                      "text": "value"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 62
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 62
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 63
+                                  },
+                                  "text": "0"
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 63
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 64
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 34,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 65
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 34,
+                                "column": 65
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 74
+                              },
+                              "text": "node_name"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 34,
+                            "column": 74
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 75
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 34,
+                    "column": 75
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 76
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 35,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 38,
+                    "column": 43
+                  },
+                  "text": "logger.info('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)\n      # TODO(cais): Support receiving and sending tensor value from front-end.\n      return debug_service_pb2.EventReply()",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 35,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 55
+                      },
+                      "text": "logger.info('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 35,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 55
+                          },
+                          "text": "logger.info('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 35,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 17
+                              },
+                              "text": "logger.info",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 12
+                                  },
+                                  "text": "logger"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 13
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 17
+                                  },
+                                  "text": "info"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 35,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 55
+                              },
+                              "text": "('Sending empty EventReply for breakpoint: %s',\n                      event.summary.value[0].node_name)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 18
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 63
+                                  },
+                                  "text": "'Sending empty EventReply for breakpoint: %s'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 19
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 62
+                                      },
+                                      "text": "Sending empty EventReply for breakpoint: %s"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 62
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 63
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 63
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 64
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 54
+                                  },
+                                  "text": "event.summary.value[0].node_name",
+                                  "children": [
+                                    {
+                                      "type": "subscript",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 44
+                                      },
+                                      "text": "event.summary.value[0]",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 41
+                                          },
+                                          "text": "event.summary.value",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 22
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 35
+                                              },
+                                              "text": "event.summary",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 36,
+                                                    "column": 22
+                                                  },
+                                                  "end": {
+                                                    "row": 36,
+                                                    "column": 27
+                                                  },
+                                                  "text": "event"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 36,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 36,
+                                                    "column": 28
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 36,
+                                                    "column": 28
+                                                  },
+                                                  "end": {
+                                                    "row": 36,
+                                                    "column": 35
+                                                  },
+                                                  "text": "summary"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 36
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 41
+                                              },
+                                              "text": "value"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 42
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "integer",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 43
+                                          },
+                                          "text": "0"
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 44
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 45
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 54
+                                      },
+                                      "text": "node_name"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 54
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 55
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "comment",
+                      "start": {
+                        "row": 37,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 78
+                      },
+                      "text": "# TODO(cais): Support receiving and sending tensor value from front-end."
+                    },
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 38,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 43
+                      },
+                      "text": "return debug_service_pb2.EventReply()",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 38,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 12
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 38,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 43
+                          },
+                          "text": "debug_service_pb2.EventReply()",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 38,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 41
+                              },
+                              "text": "debug_service_pb2.EventReply",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 30
+                                  },
+                                  "text": "debug_service_pb2"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 31
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 41
+                                  },
+                                  "text": "EventReply"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 38,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 43
+                              },
+                              "text": "()",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 42
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 43
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 39,
+                "column": 4
+              },
+              "end": {
+                "row": 39,
+                "column": 15
+              },
+              "text": "return None",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 39,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 39,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 15
+                  },
+                  "text": "None"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

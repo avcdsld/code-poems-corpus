@@ -1,0 +1,3362 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 50,
+    "column": 49
+  },
+  "text": "def treeAggregate(self, zeroValue, seqOp, combOp, depth=2):\n        \"\"\"\n        Aggregates the elements of this RDD in a multi-level tree\n        pattern.\n\n        :param depth: suggested depth of the tree (default: 2)\n\n        >>> add = lambda x, y: x + y\n        >>> rdd = sc.parallelize([-5, -4, -3, -2, -1, 1, 2, 3, 4], 10)\n        >>> rdd.treeAggregate(0, add, add)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 1)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 2)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 5)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 10)\n        -5\n        \"\"\"\n        if depth < 1:\n            raise ValueError(\"Depth cannot be smaller than 1 but got %d.\" % depth)\n\n        if self.getNumPartitions() == 0:\n            return zeroValue\n\n        def aggregatePartition(iterator):\n            acc = zeroValue\n            for obj in iterator:\n                acc = seqOp(acc, obj)\n            yield acc\n\n        partiallyAggregated = self.mapPartitions(aggregatePartition)\n        numPartitions = partiallyAggregated.getNumPartitions()\n        scale = max(int(ceil(pow(numPartitions, 1.0 / depth))), 2)\n        # If creating an extra level doesn't help reduce the wall-clock time, we stop the tree\n        # aggregation.\n        while numPartitions > scale + numPartitions / scale:\n            numPartitions /= scale\n            curNumPartitions = int(numPartitions)\n\n            def mapPartition(i, iterator):\n                for obj in iterator:\n                    yield (i % curNumPartitions, obj)\n\n            partiallyAggregated = partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()\n\n        return partiallyAggregated.reduce(combOp)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 50,
+        "column": 49
+      },
+      "text": "def treeAggregate(self, zeroValue, seqOp, combOp, depth=2):\n        \"\"\"\n        Aggregates the elements of this RDD in a multi-level tree\n        pattern.\n\n        :param depth: suggested depth of the tree (default: 2)\n\n        >>> add = lambda x, y: x + y\n        >>> rdd = sc.parallelize([-5, -4, -3, -2, -1, 1, 2, 3, 4], 10)\n        >>> rdd.treeAggregate(0, add, add)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 1)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 2)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 5)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 10)\n        -5\n        \"\"\"\n        if depth < 1:\n            raise ValueError(\"Depth cannot be smaller than 1 but got %d.\" % depth)\n\n        if self.getNumPartitions() == 0:\n            return zeroValue\n\n        def aggregatePartition(iterator):\n            acc = zeroValue\n            for obj in iterator:\n                acc = seqOp(acc, obj)\n            yield acc\n\n        partiallyAggregated = self.mapPartitions(aggregatePartition)\n        numPartitions = partiallyAggregated.getNumPartitions()\n        scale = max(int(ceil(pow(numPartitions, 1.0 / depth))), 2)\n        # If creating an extra level doesn't help reduce the wall-clock time, we stop the tree\n        # aggregation.\n        while numPartitions > scale + numPartitions / scale:\n            numPartitions /= scale\n            curNumPartitions = int(numPartitions)\n\n            def mapPartition(i, iterator):\n                for obj in iterator:\n                    yield (i % curNumPartitions, obj)\n\n            partiallyAggregated = partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()\n\n        return partiallyAggregated.reduce(combOp)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 17
+          },
+          "text": "treeAggregate"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 17
+          },
+          "end": {
+            "row": 0,
+            "column": 58
+          },
+          "text": "(self, zeroValue, seqOp, combOp, depth=2)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 17
+              },
+              "end": {
+                "row": 0,
+                "column": 18
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 18
+              },
+              "end": {
+                "row": 0,
+                "column": 22
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 22
+              },
+              "end": {
+                "row": 0,
+                "column": 23
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 24
+              },
+              "end": {
+                "row": 0,
+                "column": 33
+              },
+              "text": "zeroValue"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 33
+              },
+              "end": {
+                "row": 0,
+                "column": 34
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 35
+              },
+              "end": {
+                "row": 0,
+                "column": 40
+              },
+              "text": "seqOp"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 40
+              },
+              "end": {
+                "row": 0,
+                "column": 41
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 42
+              },
+              "end": {
+                "row": 0,
+                "column": 48
+              },
+              "text": "combOp"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 48
+              },
+              "end": {
+                "row": 0,
+                "column": 49
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 50
+              },
+              "end": {
+                "row": 0,
+                "column": 57
+              },
+              "text": "depth=2",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 50
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 55
+                  },
+                  "text": "depth"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 55
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 56
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "integer",
+                  "start": {
+                    "row": 0,
+                    "column": 56
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 57
+                  },
+                  "text": "2"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 57
+              },
+              "end": {
+                "row": 0,
+                "column": 58
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 58
+          },
+          "end": {
+            "row": 0,
+            "column": 59
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 8
+          },
+          "end": {
+            "row": 50,
+            "column": 49
+          },
+          "text": "\"\"\"\n        Aggregates the elements of this RDD in a multi-level tree\n        pattern.\n\n        :param depth: suggested depth of the tree (default: 2)\n\n        >>> add = lambda x, y: x + y\n        >>> rdd = sc.parallelize([-5, -4, -3, -2, -1, 1, 2, 3, 4], 10)\n        >>> rdd.treeAggregate(0, add, add)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 1)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 2)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 5)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 10)\n        -5\n        \"\"\"\n        if depth < 1:\n            raise ValueError(\"Depth cannot be smaller than 1 but got %d.\" % depth)\n\n        if self.getNumPartitions() == 0:\n            return zeroValue\n\n        def aggregatePartition(iterator):\n            acc = zeroValue\n            for obj in iterator:\n                acc = seqOp(acc, obj)\n            yield acc\n\n        partiallyAggregated = self.mapPartitions(aggregatePartition)\n        numPartitions = partiallyAggregated.getNumPartitions()\n        scale = max(int(ceil(pow(numPartitions, 1.0 / depth))), 2)\n        # If creating an extra level doesn't help reduce the wall-clock time, we stop the tree\n        # aggregation.\n        while numPartitions > scale + numPartitions / scale:\n            numPartitions /= scale\n            curNumPartitions = int(numPartitions)\n\n            def mapPartition(i, iterator):\n                for obj in iterator:\n                    yield (i % curNumPartitions, obj)\n\n            partiallyAggregated = partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()\n\n        return partiallyAggregated.reduce(combOp)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 19,
+                "column": 11
+              },
+              "text": "\"\"\"\n        Aggregates the elements of this RDD in a multi-level tree\n        pattern.\n\n        :param depth: suggested depth of the tree (default: 2)\n\n        >>> add = lambda x, y: x + y\n        >>> rdd = sc.parallelize([-5, -4, -3, -2, -1, 1, 2, 3, 4], 10)\n        >>> rdd.treeAggregate(0, add, add)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 1)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 2)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 5)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 10)\n        -5\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 11
+                  },
+                  "text": "\"\"\"\n        Aggregates the elements of this RDD in a multi-level tree\n        pattern.\n\n        :param depth: suggested depth of the tree (default: 2)\n\n        >>> add = lambda x, y: x + y\n        >>> rdd = sc.parallelize([-5, -4, -3, -2, -1, 1, 2, 3, 4], 10)\n        >>> rdd.treeAggregate(0, add, add)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 1)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 2)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 5)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 10)\n        -5\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 8
+                      },
+                      "text": "\n        Aggregates the elements of this RDD in a multi-level tree\n        pattern.\n\n        :param depth: suggested depth of the tree (default: 2)\n\n        >>> add = lambda x, y: x + y\n        >>> rdd = sc.parallelize([-5, -4, -3, -2, -1, 1, 2, 3, 4], 10)\n        >>> rdd.treeAggregate(0, add, add)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 1)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 2)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 5)\n        -5\n        >>> rdd.treeAggregate(0, add, add, 10)\n        -5\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 19,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 20,
+                "column": 8
+              },
+              "end": {
+                "row": 21,
+                "column": 82
+              },
+              "text": "if depth < 1:\n            raise ValueError(\"Depth cannot be smaller than 1 but got %d.\" % depth)",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 20,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 20,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 20
+                  },
+                  "text": "depth < 1",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 20,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 16
+                      },
+                      "text": "depth"
+                    },
+                    {
+                      "type": "<",
+                      "start": {
+                        "row": 20,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 18
+                      },
+                      "text": "<"
+                    },
+                    {
+                      "type": "integer",
+                      "start": {
+                        "row": 20,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 20
+                      },
+                      "text": "1"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 20,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 21
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 21,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 82
+                  },
+                  "text": "raise ValueError(\"Depth cannot be smaller than 1 but got %d.\" % depth)",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 21,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 82
+                      },
+                      "text": "raise ValueError(\"Depth cannot be smaller than 1 but got %d.\" % depth)",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 21,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 17
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 21,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 82
+                          },
+                          "text": "ValueError(\"Depth cannot be smaller than 1 but got %d.\" % depth)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 28
+                              },
+                              "text": "ValueError"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 21,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 82
+                              },
+                              "text": "(\"Depth cannot be smaller than 1 but got %d.\" % depth)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 29
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "binary_operator",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 81
+                                  },
+                                  "text": "\"Depth cannot be smaller than 1 but got %d.\" % depth",
+                                  "children": [
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 73
+                                      },
+                                      "text": "\"Depth cannot be smaller than 1 but got %d.\"",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 21,
+                                            "column": 30
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 21,
+                                            "column": 72
+                                          },
+                                          "text": "Depth cannot be smaller than 1 but got %d."
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 72
+                                          },
+                                          "end": {
+                                            "row": 21,
+                                            "column": 73
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "%",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 74
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 75
+                                      },
+                                      "text": "%"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 76
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 81
+                                      },
+                                      "text": "depth"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 81
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 82
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 23,
+                "column": 8
+              },
+              "end": {
+                "row": 24,
+                "column": 28
+              },
+              "text": "if self.getNumPartitions() == 0:\n            return zeroValue",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 23,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 23,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 39
+                  },
+                  "text": "self.getNumPartitions() == 0",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 23,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 34
+                      },
+                      "text": "self.getNumPartitions()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 23,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 32
+                          },
+                          "text": "self.getNumPartitions",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 15
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 23,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 16
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 32
+                              },
+                              "text": "getNumPartitions"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 23,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 34
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 23,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 33
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 23,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 34
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "==",
+                      "start": {
+                        "row": 23,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 37
+                      },
+                      "text": "=="
+                    },
+                    {
+                      "type": "integer",
+                      "start": {
+                        "row": 23,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 39
+                      },
+                      "text": "0"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 23,
+                    "column": 39
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 40
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 24,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 28
+                  },
+                  "text": "return zeroValue",
+                  "children": [
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 24,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 28
+                      },
+                      "text": "return zeroValue",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 24,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 18
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 24,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 28
+                          },
+                          "text": "zeroValue"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "function_definition",
+              "start": {
+                "row": 26,
+                "column": 8
+              },
+              "end": {
+                "row": 30,
+                "column": 21
+              },
+              "text": "def aggregatePartition(iterator):\n            acc = zeroValue\n            for obj in iterator:\n                acc = seqOp(acc, obj)\n            yield acc",
+              "children": [
+                {
+                  "type": "def",
+                  "start": {
+                    "row": 26,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 11
+                  },
+                  "text": "def"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 26,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 30
+                  },
+                  "text": "aggregatePartition"
+                },
+                {
+                  "type": "parameters",
+                  "start": {
+                    "row": 26,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 40
+                  },
+                  "text": "(iterator)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 26,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 31
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 26,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 39
+                      },
+                      "text": "iterator"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 26,
+                        "column": 39
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 40
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 26,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 41
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 27,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 21
+                  },
+                  "text": "acc = zeroValue\n            for obj in iterator:\n                acc = seqOp(acc, obj)\n            yield acc",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 27,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 27
+                      },
+                      "text": "acc = zeroValue",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 27,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 27
+                          },
+                          "text": "acc = zeroValue",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 27,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 15
+                              },
+                              "text": "acc"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 27,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 17
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 27,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 27
+                              },
+                              "text": "zeroValue"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "for_statement",
+                      "start": {
+                        "row": 28,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 37
+                      },
+                      "text": "for obj in iterator:\n                acc = seqOp(acc, obj)",
+                      "children": [
+                        {
+                          "type": "for",
+                          "start": {
+                            "row": 28,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 15
+                          },
+                          "text": "for"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 28,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 19
+                          },
+                          "text": "obj"
+                        },
+                        {
+                          "type": "in",
+                          "start": {
+                            "row": 28,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 22
+                          },
+                          "text": "in"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 28,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 31
+                          },
+                          "text": "iterator"
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 28,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 32
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 29,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 37
+                          },
+                          "text": "acc = seqOp(acc, obj)",
+                          "children": [
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 29,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 37
+                              },
+                              "text": "acc = seqOp(acc, obj)",
+                              "children": [
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 37
+                                  },
+                                  "text": "acc = seqOp(acc, obj)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 19
+                                      },
+                                      "text": "acc"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 21
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 37
+                                      },
+                                      "text": "seqOp(acc, obj)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 27
+                                          },
+                                          "text": "seqOp"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 37
+                                          },
+                                          "text": "(acc, obj)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 28
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 31
+                                              },
+                                              "text": "acc"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 31
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 32
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 36
+                                              },
+                                              "text": "obj"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 37
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 30,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 21
+                      },
+                      "text": "yield acc",
+                      "children": [
+                        {
+                          "type": "yield",
+                          "start": {
+                            "row": 30,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 21
+                          },
+                          "text": "yield acc",
+                          "children": [
+                            {
+                              "type": "yield",
+                              "start": {
+                                "row": 30,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 17
+                              },
+                              "text": "yield"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 30,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 21
+                              },
+                              "text": "acc"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 32,
+                "column": 8
+              },
+              "end": {
+                "row": 32,
+                "column": 68
+              },
+              "text": "partiallyAggregated = self.mapPartitions(aggregatePartition)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 32,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 68
+                  },
+                  "text": "partiallyAggregated = self.mapPartitions(aggregatePartition)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 32,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 27
+                      },
+                      "text": "partiallyAggregated"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 32,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 29
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 32,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 68
+                      },
+                      "text": "self.mapPartitions(aggregatePartition)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 32,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 48
+                          },
+                          "text": "self.mapPartitions",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 32,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 34
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 32,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 35
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 32,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 48
+                              },
+                              "text": "mapPartitions"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 32,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 68
+                          },
+                          "text": "(aggregatePartition)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 32,
+                                "column": 48
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 49
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 32,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 67
+                              },
+                              "text": "aggregatePartition"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 32,
+                                "column": 67
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 68
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 33,
+                "column": 8
+              },
+              "end": {
+                "row": 33,
+                "column": 62
+              },
+              "text": "numPartitions = partiallyAggregated.getNumPartitions()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 33,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 33,
+                    "column": 62
+                  },
+                  "text": "numPartitions = partiallyAggregated.getNumPartitions()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 33,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 21
+                      },
+                      "text": "numPartitions"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 33,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 23
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 33,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 62
+                      },
+                      "text": "partiallyAggregated.getNumPartitions()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 33,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 60
+                          },
+                          "text": "partiallyAggregated.getNumPartitions",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 43
+                              },
+                              "text": "partiallyAggregated"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 33,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 44
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 60
+                              },
+                              "text": "getNumPartitions"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 33,
+                            "column": 60
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 62
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 33,
+                                "column": 60
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 61
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 33,
+                                "column": 61
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 62
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 34,
+                "column": 8
+              },
+              "end": {
+                "row": 34,
+                "column": 66
+              },
+              "text": "scale = max(int(ceil(pow(numPartitions, 1.0 / depth))), 2)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 34,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 66
+                  },
+                  "text": "scale = max(int(ceil(pow(numPartitions, 1.0 / depth))), 2)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 34,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 13
+                      },
+                      "text": "scale"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 34,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 34,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 66
+                      },
+                      "text": "max(int(ceil(pow(numPartitions, 1.0 / depth))), 2)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 34,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 19
+                          },
+                          "text": "max"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 34,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 66
+                          },
+                          "text": "(int(ceil(pow(numPartitions, 1.0 / depth))), 2)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 34,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 20
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 34,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 62
+                              },
+                              "text": "int(ceil(pow(numPartitions, 1.0 / depth)))",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 23
+                                  },
+                                  "text": "int"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 62
+                                  },
+                                  "text": "(ceil(pow(numPartitions, 1.0 / depth)))",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 24
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 61
+                                      },
+                                      "text": "ceil(pow(numPartitions, 1.0 / depth))",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 28
+                                          },
+                                          "text": "ceil"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 61
+                                          },
+                                          "text": "(pow(numPartitions, 1.0 / depth))",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 29
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "call",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 60
+                                              },
+                                              "text": "pow(numPartitions, 1.0 / depth)",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 34,
+                                                    "column": 29
+                                                  },
+                                                  "end": {
+                                                    "row": 34,
+                                                    "column": 32
+                                                  },
+                                                  "text": "pow"
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 34,
+                                                    "column": 32
+                                                  },
+                                                  "end": {
+                                                    "row": 34,
+                                                    "column": 60
+                                                  },
+                                                  "text": "(numPartitions, 1.0 / depth)",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 34,
+                                                        "column": 32
+                                                      },
+                                                      "end": {
+                                                        "row": 34,
+                                                        "column": 33
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 34,
+                                                        "column": 33
+                                                      },
+                                                      "end": {
+                                                        "row": 34,
+                                                        "column": 46
+                                                      },
+                                                      "text": "numPartitions"
+                                                    },
+                                                    {
+                                                      "type": ",",
+                                                      "start": {
+                                                        "row": 34,
+                                                        "column": 46
+                                                      },
+                                                      "end": {
+                                                        "row": 34,
+                                                        "column": 47
+                                                      },
+                                                      "text": ","
+                                                    },
+                                                    {
+                                                      "type": "binary_operator",
+                                                      "start": {
+                                                        "row": 34,
+                                                        "column": 48
+                                                      },
+                                                      "end": {
+                                                        "row": 34,
+                                                        "column": 59
+                                                      },
+                                                      "text": "1.0 / depth",
+                                                      "children": [
+                                                        {
+                                                          "type": "float",
+                                                          "start": {
+                                                            "row": 34,
+                                                            "column": 48
+                                                          },
+                                                          "end": {
+                                                            "row": 34,
+                                                            "column": 51
+                                                          },
+                                                          "text": "1.0"
+                                                        },
+                                                        {
+                                                          "type": "/",
+                                                          "start": {
+                                                            "row": 34,
+                                                            "column": 52
+                                                          },
+                                                          "end": {
+                                                            "row": 34,
+                                                            "column": 53
+                                                          },
+                                                          "text": "/"
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 34,
+                                                            "column": 54
+                                                          },
+                                                          "end": {
+                                                            "row": 34,
+                                                            "column": 59
+                                                          },
+                                                          "text": "depth"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 34,
+                                                        "column": 59
+                                                      },
+                                                      "end": {
+                                                        "row": 34,
+                                                        "column": 60
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 60
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 61
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 62
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 34,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 63
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 34,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 65
+                              },
+                              "text": "2"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 34,
+                                "column": 65
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 66
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 35,
+                "column": 8
+              },
+              "end": {
+                "row": 35,
+                "column": 94
+              },
+              "text": "# If creating an extra level doesn't help reduce the wall-clock time, we stop the tree"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 36,
+                "column": 8
+              },
+              "end": {
+                "row": 36,
+                "column": 22
+              },
+              "text": "# aggregation."
+            },
+            {
+              "type": "while_statement",
+              "start": {
+                "row": 37,
+                "column": 8
+              },
+              "end": {
+                "row": 48,
+                "column": 25
+              },
+              "text": "while numPartitions > scale + numPartitions / scale:\n            numPartitions /= scale\n            curNumPartitions = int(numPartitions)\n\n            def mapPartition(i, iterator):\n                for obj in iterator:\n                    yield (i % curNumPartitions, obj)\n\n            partiallyAggregated = partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()",
+              "children": [
+                {
+                  "type": "while",
+                  "start": {
+                    "row": 37,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 13
+                  },
+                  "text": "while"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 37,
+                    "column": 14
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 59
+                  },
+                  "text": "numPartitions > scale + numPartitions / scale",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 37,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 27
+                      },
+                      "text": "numPartitions"
+                    },
+                    {
+                      "type": ">",
+                      "start": {
+                        "row": 37,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 29
+                      },
+                      "text": ">"
+                    },
+                    {
+                      "type": "binary_operator",
+                      "start": {
+                        "row": 37,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 59
+                      },
+                      "text": "scale + numPartitions / scale",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 37,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 35
+                          },
+                          "text": "scale"
+                        },
+                        {
+                          "type": "+",
+                          "start": {
+                            "row": 37,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 37
+                          },
+                          "text": "+"
+                        },
+                        {
+                          "type": "binary_operator",
+                          "start": {
+                            "row": 37,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 59
+                          },
+                          "text": "numPartitions / scale",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 51
+                              },
+                              "text": "numPartitions"
+                            },
+                            {
+                              "type": "/",
+                              "start": {
+                                "row": 37,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 53
+                              },
+                              "text": "/"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 54
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 59
+                              },
+                              "text": "scale"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 37,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 60
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 38,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 48,
+                    "column": 25
+                  },
+                  "text": "numPartitions /= scale\n            curNumPartitions = int(numPartitions)\n\n            def mapPartition(i, iterator):\n                for obj in iterator:\n                    yield (i % curNumPartitions, obj)\n\n            partiallyAggregated = partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 38,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 34
+                      },
+                      "text": "numPartitions /= scale",
+                      "children": [
+                        {
+                          "type": "augmented_assignment",
+                          "start": {
+                            "row": 38,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 34
+                          },
+                          "text": "numPartitions /= scale",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 38,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 25
+                              },
+                              "text": "numPartitions"
+                            },
+                            {
+                              "type": "/=",
+                              "start": {
+                                "row": 38,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 28
+                              },
+                              "text": "/="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 38,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 34
+                              },
+                              "text": "scale"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 39,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 49
+                      },
+                      "text": "curNumPartitions = int(numPartitions)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 39,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 49
+                          },
+                          "text": "curNumPartitions = int(numPartitions)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 39,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 28
+                              },
+                              "text": "curNumPartitions"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 39,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 30
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 39,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 49
+                              },
+                              "text": "int(numPartitions)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 34
+                                  },
+                                  "text": "int"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 49
+                                  },
+                                  "text": "(numPartitions)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 35
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 48
+                                      },
+                                      "text": "numPartitions"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 49
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "function_definition",
+                      "start": {
+                        "row": 41,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 53
+                      },
+                      "text": "def mapPartition(i, iterator):\n                for obj in iterator:\n                    yield (i % curNumPartitions, obj)",
+                      "children": [
+                        {
+                          "type": "def",
+                          "start": {
+                            "row": 41,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 15
+                          },
+                          "text": "def"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 41,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 28
+                          },
+                          "text": "mapPartition"
+                        },
+                        {
+                          "type": "parameters",
+                          "start": {
+                            "row": 41,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 41
+                          },
+                          "text": "(i, iterator)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 41,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 29
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 41,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 30
+                              },
+                              "text": "i"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 41,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 31
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 41,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 40
+                              },
+                              "text": "iterator"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 41,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 41
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 41,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 42
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 42,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 53
+                          },
+                          "text": "for obj in iterator:\n                    yield (i % curNumPartitions, obj)",
+                          "children": [
+                            {
+                              "type": "for_statement",
+                              "start": {
+                                "row": 42,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 53
+                              },
+                              "text": "for obj in iterator:\n                    yield (i % curNumPartitions, obj)",
+                              "children": [
+                                {
+                                  "type": "for",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 19
+                                  },
+                                  "text": "for"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 23
+                                  },
+                                  "text": "obj"
+                                },
+                                {
+                                  "type": "in",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 26
+                                  },
+                                  "text": "in"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 35
+                                  },
+                                  "text": "iterator"
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 36
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 53
+                                  },
+                                  "text": "yield (i % curNumPartitions, obj)",
+                                  "children": [
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 53
+                                      },
+                                      "text": "yield (i % curNumPartitions, obj)",
+                                      "children": [
+                                        {
+                                          "type": "yield",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 53
+                                          },
+                                          "text": "yield (i % curNumPartitions, obj)",
+                                          "children": [
+                                            {
+                                              "type": "yield",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 20
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 25
+                                              },
+                                              "text": "yield"
+                                            },
+                                            {
+                                              "type": "tuple",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 53
+                                              },
+                                              "text": "(i % curNumPartitions, obj)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 27
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "binary_operator",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 47
+                                                  },
+                                                  "text": "i % curNumPartitions",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 43,
+                                                        "column": 27
+                                                      },
+                                                      "end": {
+                                                        "row": 43,
+                                                        "column": 28
+                                                      },
+                                                      "text": "i"
+                                                    },
+                                                    {
+                                                      "type": "%",
+                                                      "start": {
+                                                        "row": 43,
+                                                        "column": 29
+                                                      },
+                                                      "end": {
+                                                        "row": 43,
+                                                        "column": 30
+                                                      },
+                                                      "text": "%"
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 43,
+                                                        "column": 31
+                                                      },
+                                                      "end": {
+                                                        "row": 43,
+                                                        "column": 47
+                                                      },
+                                                      "text": "curNumPartitions"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ",",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 47
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 48
+                                                  },
+                                                  "text": ","
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 49
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 52
+                                                  },
+                                                  "text": "obj"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 52
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 53
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 45,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 48,
+                        "column": 25
+                      },
+                      "text": "partiallyAggregated = partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 45,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 25
+                          },
+                          "text": "partiallyAggregated = partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 45,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 31
+                              },
+                              "text": "partiallyAggregated"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 45,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 33
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 45,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 25
+                              },
+                              "text": "partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values()",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 23
+                                  },
+                                  "text": "partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions) \\\n                .values",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 54
+                                      },
+                                      "text": "partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey(combOp, curNumPartitions)",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 28
+                                          },
+                                          "text": "partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition) \\\n                .reduceByKey",
+                                          "children": [
+                                            {
+                                              "type": "call",
+                                              "start": {
+                                                "row": 45,
+                                                "column": 34
+                                              },
+                                              "end": {
+                                                "row": 46,
+                                                "column": 53
+                                              },
+                                              "text": "partiallyAggregated \\\n                .mapPartitionsWithIndex(mapPartition)",
+                                              "children": [
+                                                {
+                                                  "type": "attribute",
+                                                  "start": {
+                                                    "row": 45,
+                                                    "column": 34
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 39
+                                                  },
+                                                  "text": "partiallyAggregated \\\n                .mapPartitionsWithIndex",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 45,
+                                                        "column": 34
+                                                      },
+                                                      "end": {
+                                                        "row": 45,
+                                                        "column": 53
+                                                      },
+                                                      "text": "partiallyAggregated"
+                                                    },
+                                                    {
+                                                      "type": "line_continuation",
+                                                      "start": {
+                                                        "row": 45,
+                                                        "column": 54
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 0
+                                                      },
+                                                      "text": "\\\n"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 17
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 17
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 39
+                                                      },
+                                                      "text": "mapPartitionsWithIndex"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 46,
+                                                    "column": 39
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 53
+                                                  },
+                                                  "text": "(mapPartition)",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 39
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 40
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 40
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 52
+                                                      },
+                                                      "text": "mapPartition"
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 52
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 53
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "line_continuation",
+                                              "start": {
+                                                "row": 46,
+                                                "column": 54
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 0
+                                              },
+                                              "text": "\\\n"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 17
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 28
+                                              },
+                                              "text": "reduceByKey"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 54
+                                          },
+                                          "text": "(combOp, curNumPartitions)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 29
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 35
+                                              },
+                                              "text": "combOp"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 36
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 53
+                                              },
+                                              "text": "curNumPartitions"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 53
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 54
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "line_continuation",
+                                      "start": {
+                                        "row": 47,
+                                        "column": 55
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 0
+                                      },
+                                      "text": "\\\n"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 48,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 17
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 48,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 23
+                                      },
+                                      "text": "values"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 25
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 48,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 24
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 48,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 25
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 50,
+                "column": 8
+              },
+              "end": {
+                "row": 50,
+                "column": 49
+              },
+              "text": "return partiallyAggregated.reduce(combOp)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 50,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 50,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 49
+                  },
+                  "text": "partiallyAggregated.reduce(combOp)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 50,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 41
+                      },
+                      "text": "partiallyAggregated.reduce",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 34
+                          },
+                          "text": "partiallyAggregated"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 50,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 35
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 41
+                          },
+                          "text": "reduce"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 50,
+                        "column": 41
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 49
+                      },
+                      "text": "(combOp)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 50,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 42
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 48
+                          },
+                          "text": "combOp"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 50,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 49
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

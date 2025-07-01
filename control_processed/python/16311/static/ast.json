@@ -1,0 +1,3530 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 91,
+    "column": 56
+  },
+  "text": "def get_vertices(self, ids=[], fields={}, format='sframe'):\n        \"\"\"\n        get_vertices(self, ids=list(), fields={}, format='sframe')\n        Return a collection of vertices and their attributes.\n\n        Parameters\n        ----------\n\n        ids : list [int | float | str] or SArray\n            List of vertex IDs to retrieve. Only vertices in this list will be\n            returned. Also accepts a single vertex id.\n\n        fields : dict | pandas.DataFrame\n            Dictionary specifying equality constraint on field values. For\n            example ``{'gender': 'M'}``, returns only vertices whose 'gender'\n            field is 'M'. ``None`` can be used to designate a wild card. For\n            example, {'relationship': None} will find all vertices with the\n            field 'relationship' regardless of the value.\n\n        format : {'sframe', 'list'}\n            Output format. The SFrame output (default) contains a column\n            ``__src_id`` with vertex IDs and a column for each vertex attribute.\n            List output returns a list of Vertex objects.\n\n        Returns\n        -------\n        out : SFrame or list [Vertex]\n            An SFrame or list of Vertex objects.\n\n        See Also\n        --------\n        vertices, get_edges\n\n        Examples\n        --------\n        Return all vertices in the graph.\n\n        >>> from turicreate import SGraph, Vertex\n        >>> g = SGraph().add_vertices([Vertex(0, attr={'gender': 'M'}),\n                                       Vertex(1, attr={'gender': 'F'}),\n                                       Vertex(2, attr={'gender': 'F'})])\n        >>> g.get_vertices()\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        |  1   |   F    |\n        +------+--------+\n\n        Return vertices 0 and 2.\n\n        >>> g.get_vertices(ids=[0, 2])\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        +------+--------+\n\n        Return vertices with the vertex attribute \"gender\" equal to \"M\".\n\n        >>> g.get_vertices(fields={'gender': 'M'})\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        +------+--------+\n        \"\"\"\n\n        if not _is_non_string_iterable(ids):\n            ids = [ids]\n\n        if type(ids) not in (list, SArray):\n            raise TypeError('ids must be list or SArray type')\n\n        with cython_context():\n            sf = SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))\n\n        if (format == 'sframe'):\n            return sf\n        elif (format == 'dataframe'):\n            assert HAS_PANDAS, 'Cannot use dataframe because Pandas is not available or version is too low.'\n            if sf.num_rows() == 0:\n                return pd.DataFrame()\n            else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')\n        elif (format == 'list'):\n            return _dataframe_to_vertex_list(sf.to_dataframe())\n        else:\n            raise ValueError(\"Invalid format specifier\")",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 91,
+        "column": 56
+      },
+      "text": "def get_vertices(self, ids=[], fields={}, format='sframe'):\n        \"\"\"\n        get_vertices(self, ids=list(), fields={}, format='sframe')\n        Return a collection of vertices and their attributes.\n\n        Parameters\n        ----------\n\n        ids : list [int | float | str] or SArray\n            List of vertex IDs to retrieve. Only vertices in this list will be\n            returned. Also accepts a single vertex id.\n\n        fields : dict | pandas.DataFrame\n            Dictionary specifying equality constraint on field values. For\n            example ``{'gender': 'M'}``, returns only vertices whose 'gender'\n            field is 'M'. ``None`` can be used to designate a wild card. For\n            example, {'relationship': None} will find all vertices with the\n            field 'relationship' regardless of the value.\n\n        format : {'sframe', 'list'}\n            Output format. The SFrame output (default) contains a column\n            ``__src_id`` with vertex IDs and a column for each vertex attribute.\n            List output returns a list of Vertex objects.\n\n        Returns\n        -------\n        out : SFrame or list [Vertex]\n            An SFrame or list of Vertex objects.\n\n        See Also\n        --------\n        vertices, get_edges\n\n        Examples\n        --------\n        Return all vertices in the graph.\n\n        >>> from turicreate import SGraph, Vertex\n        >>> g = SGraph().add_vertices([Vertex(0, attr={'gender': 'M'}),\n                                       Vertex(1, attr={'gender': 'F'}),\n                                       Vertex(2, attr={'gender': 'F'})])\n        >>> g.get_vertices()\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        |  1   |   F    |\n        +------+--------+\n\n        Return vertices 0 and 2.\n\n        >>> g.get_vertices(ids=[0, 2])\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        +------+--------+\n\n        Return vertices with the vertex attribute \"gender\" equal to \"M\".\n\n        >>> g.get_vertices(fields={'gender': 'M'})\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        +------+--------+\n        \"\"\"\n\n        if not _is_non_string_iterable(ids):\n            ids = [ids]\n\n        if type(ids) not in (list, SArray):\n            raise TypeError('ids must be list or SArray type')\n\n        with cython_context():\n            sf = SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))\n\n        if (format == 'sframe'):\n            return sf\n        elif (format == 'dataframe'):\n            assert HAS_PANDAS, 'Cannot use dataframe because Pandas is not available or version is too low.'\n            if sf.num_rows() == 0:\n                return pd.DataFrame()\n            else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')\n        elif (format == 'list'):\n            return _dataframe_to_vertex_list(sf.to_dataframe())\n        else:\n            raise ValueError(\"Invalid format specifier\")",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 16
+          },
+          "text": "get_vertices"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 16
+          },
+          "end": {
+            "row": 0,
+            "column": 58
+          },
+          "text": "(self, ids=[], fields={}, format='sframe')",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 16
+              },
+              "end": {
+                "row": 0,
+                "column": 17
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 17
+              },
+              "end": {
+                "row": 0,
+                "column": 21
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 21
+              },
+              "end": {
+                "row": 0,
+                "column": 22
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 23
+              },
+              "end": {
+                "row": 0,
+                "column": 29
+              },
+              "text": "ids=[]",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 26
+                  },
+                  "text": "ids"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "list",
+                  "start": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 29
+                  },
+                  "text": "[]",
+                  "children": [
+                    {
+                      "type": "[",
+                      "start": {
+                        "row": 0,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 28
+                      },
+                      "text": "["
+                    },
+                    {
+                      "type": "]",
+                      "start": {
+                        "row": 0,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 29
+                      },
+                      "text": "]"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 29
+              },
+              "end": {
+                "row": 0,
+                "column": 30
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 31
+              },
+              "end": {
+                "row": 0,
+                "column": 40
+              },
+              "text": "fields={}",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 31
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 37
+                  },
+                  "text": "fields"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 37
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "dictionary",
+                  "start": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 40
+                  },
+                  "text": "{}",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 0,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 39
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 0,
+                        "column": 39
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 40
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 40
+              },
+              "end": {
+                "row": 0,
+                "column": 41
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 42
+              },
+              "end": {
+                "row": 0,
+                "column": 57
+              },
+              "text": "format='sframe'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 48
+                  },
+                  "text": "format"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 48
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 49
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 0,
+                    "column": 49
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 57
+                  },
+                  "text": "'sframe'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 0,
+                        "column": 49
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 50
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 0,
+                        "column": 50
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 56
+                      },
+                      "text": "sframe"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 0,
+                        "column": 56
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 57
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 57
+              },
+              "end": {
+                "row": 0,
+                "column": 58
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 58
+          },
+          "end": {
+            "row": 0,
+            "column": 59
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 8
+          },
+          "end": {
+            "row": 91,
+            "column": 56
+          },
+          "text": "\"\"\"\n        get_vertices(self, ids=list(), fields={}, format='sframe')\n        Return a collection of vertices and their attributes.\n\n        Parameters\n        ----------\n\n        ids : list [int | float | str] or SArray\n            List of vertex IDs to retrieve. Only vertices in this list will be\n            returned. Also accepts a single vertex id.\n\n        fields : dict | pandas.DataFrame\n            Dictionary specifying equality constraint on field values. For\n            example ``{'gender': 'M'}``, returns only vertices whose 'gender'\n            field is 'M'. ``None`` can be used to designate a wild card. For\n            example, {'relationship': None} will find all vertices with the\n            field 'relationship' regardless of the value.\n\n        format : {'sframe', 'list'}\n            Output format. The SFrame output (default) contains a column\n            ``__src_id`` with vertex IDs and a column for each vertex attribute.\n            List output returns a list of Vertex objects.\n\n        Returns\n        -------\n        out : SFrame or list [Vertex]\n            An SFrame or list of Vertex objects.\n\n        See Also\n        --------\n        vertices, get_edges\n\n        Examples\n        --------\n        Return all vertices in the graph.\n\n        >>> from turicreate import SGraph, Vertex\n        >>> g = SGraph().add_vertices([Vertex(0, attr={'gender': 'M'}),\n                                       Vertex(1, attr={'gender': 'F'}),\n                                       Vertex(2, attr={'gender': 'F'})])\n        >>> g.get_vertices()\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        |  1   |   F    |\n        +------+--------+\n\n        Return vertices 0 and 2.\n\n        >>> g.get_vertices(ids=[0, 2])\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        +------+--------+\n\n        Return vertices with the vertex attribute \"gender\" equal to \"M\".\n\n        >>> g.get_vertices(fields={'gender': 'M'})\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        +------+--------+\n        \"\"\"\n\n        if not _is_non_string_iterable(ids):\n            ids = [ids]\n\n        if type(ids) not in (list, SArray):\n            raise TypeError('ids must be list or SArray type')\n\n        with cython_context():\n            sf = SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))\n\n        if (format == 'sframe'):\n            return sf\n        elif (format == 'dataframe'):\n            assert HAS_PANDAS, 'Cannot use dataframe because Pandas is not available or version is too low.'\n            if sf.num_rows() == 0:\n                return pd.DataFrame()\n            else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')\n        elif (format == 'list'):\n            return _dataframe_to_vertex_list(sf.to_dataframe())\n        else:\n            raise ValueError(\"Invalid format specifier\")",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 68,
+                "column": 11
+              },
+              "text": "\"\"\"\n        get_vertices(self, ids=list(), fields={}, format='sframe')\n        Return a collection of vertices and their attributes.\n\n        Parameters\n        ----------\n\n        ids : list [int | float | str] or SArray\n            List of vertex IDs to retrieve. Only vertices in this list will be\n            returned. Also accepts a single vertex id.\n\n        fields : dict | pandas.DataFrame\n            Dictionary specifying equality constraint on field values. For\n            example ``{'gender': 'M'}``, returns only vertices whose 'gender'\n            field is 'M'. ``None`` can be used to designate a wild card. For\n            example, {'relationship': None} will find all vertices with the\n            field 'relationship' regardless of the value.\n\n        format : {'sframe', 'list'}\n            Output format. The SFrame output (default) contains a column\n            ``__src_id`` with vertex IDs and a column for each vertex attribute.\n            List output returns a list of Vertex objects.\n\n        Returns\n        -------\n        out : SFrame or list [Vertex]\n            An SFrame or list of Vertex objects.\n\n        See Also\n        --------\n        vertices, get_edges\n\n        Examples\n        --------\n        Return all vertices in the graph.\n\n        >>> from turicreate import SGraph, Vertex\n        >>> g = SGraph().add_vertices([Vertex(0, attr={'gender': 'M'}),\n                                       Vertex(1, attr={'gender': 'F'}),\n                                       Vertex(2, attr={'gender': 'F'})])\n        >>> g.get_vertices()\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        |  1   |   F    |\n        +------+--------+\n\n        Return vertices 0 and 2.\n\n        >>> g.get_vertices(ids=[0, 2])\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        +------+--------+\n\n        Return vertices with the vertex attribute \"gender\" equal to \"M\".\n\n        >>> g.get_vertices(fields={'gender': 'M'})\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        +------+--------+\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 68,
+                    "column": 11
+                  },
+                  "text": "\"\"\"\n        get_vertices(self, ids=list(), fields={}, format='sframe')\n        Return a collection of vertices and their attributes.\n\n        Parameters\n        ----------\n\n        ids : list [int | float | str] or SArray\n            List of vertex IDs to retrieve. Only vertices in this list will be\n            returned. Also accepts a single vertex id.\n\n        fields : dict | pandas.DataFrame\n            Dictionary specifying equality constraint on field values. For\n            example ``{'gender': 'M'}``, returns only vertices whose 'gender'\n            field is 'M'. ``None`` can be used to designate a wild card. For\n            example, {'relationship': None} will find all vertices with the\n            field 'relationship' regardless of the value.\n\n        format : {'sframe', 'list'}\n            Output format. The SFrame output (default) contains a column\n            ``__src_id`` with vertex IDs and a column for each vertex attribute.\n            List output returns a list of Vertex objects.\n\n        Returns\n        -------\n        out : SFrame or list [Vertex]\n            An SFrame or list of Vertex objects.\n\n        See Also\n        --------\n        vertices, get_edges\n\n        Examples\n        --------\n        Return all vertices in the graph.\n\n        >>> from turicreate import SGraph, Vertex\n        >>> g = SGraph().add_vertices([Vertex(0, attr={'gender': 'M'}),\n                                       Vertex(1, attr={'gender': 'F'}),\n                                       Vertex(2, attr={'gender': 'F'})])\n        >>> g.get_vertices()\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        |  1   |   F    |\n        +------+--------+\n\n        Return vertices 0 and 2.\n\n        >>> g.get_vertices(ids=[0, 2])\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        +------+--------+\n\n        Return vertices with the vertex attribute \"gender\" equal to \"M\".\n\n        >>> g.get_vertices(fields={'gender': 'M'})\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        +------+--------+\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 68,
+                        "column": 8
+                      },
+                      "text": "\n        get_vertices(self, ids=list(), fields={}, format='sframe')\n        Return a collection of vertices and their attributes.\n\n        Parameters\n        ----------\n\n        ids : list [int | float | str] or SArray\n            List of vertex IDs to retrieve. Only vertices in this list will be\n            returned. Also accepts a single vertex id.\n\n        fields : dict | pandas.DataFrame\n            Dictionary specifying equality constraint on field values. For\n            example ``{'gender': 'M'}``, returns only vertices whose 'gender'\n            field is 'M'. ``None`` can be used to designate a wild card. For\n            example, {'relationship': None} will find all vertices with the\n            field 'relationship' regardless of the value.\n\n        format : {'sframe', 'list'}\n            Output format. The SFrame output (default) contains a column\n            ``__src_id`` with vertex IDs and a column for each vertex attribute.\n            List output returns a list of Vertex objects.\n\n        Returns\n        -------\n        out : SFrame or list [Vertex]\n            An SFrame or list of Vertex objects.\n\n        See Also\n        --------\n        vertices, get_edges\n\n        Examples\n        --------\n        Return all vertices in the graph.\n\n        >>> from turicreate import SGraph, Vertex\n        >>> g = SGraph().add_vertices([Vertex(0, attr={'gender': 'M'}),\n                                       Vertex(1, attr={'gender': 'F'}),\n                                       Vertex(2, attr={'gender': 'F'})])\n        >>> g.get_vertices()\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        |  1   |   F    |\n        +------+--------+\n\n        Return vertices 0 and 2.\n\n        >>> g.get_vertices(ids=[0, 2])\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        |  2   |   F    |\n        +------+--------+\n\n        Return vertices with the vertex attribute \"gender\" equal to \"M\".\n\n        >>> g.get_vertices(fields={'gender': 'M'})\n        +------+--------+\n        | __id | gender |\n        +------+--------+\n        |  0   |   M    |\n        +------+--------+\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 68,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 68,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 70,
+                "column": 8
+              },
+              "end": {
+                "row": 71,
+                "column": 23
+              },
+              "text": "if not _is_non_string_iterable(ids):\n            ids = [ids]",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 70,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 70,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "not_operator",
+                  "start": {
+                    "row": 70,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 70,
+                    "column": 43
+                  },
+                  "text": "not _is_non_string_iterable(ids)",
+                  "children": [
+                    {
+                      "type": "not",
+                      "start": {
+                        "row": 70,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 70,
+                        "column": 14
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 70,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 70,
+                        "column": 43
+                      },
+                      "text": "_is_non_string_iterable(ids)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 70,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 70,
+                            "column": 38
+                          },
+                          "text": "_is_non_string_iterable"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 70,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 70,
+                            "column": 43
+                          },
+                          "text": "(ids)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 70,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 39
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 70,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 42
+                              },
+                              "text": "ids"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 70,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 43
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 70,
+                    "column": 43
+                  },
+                  "end": {
+                    "row": 70,
+                    "column": 44
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 71,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 71,
+                    "column": 23
+                  },
+                  "text": "ids = [ids]",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 71,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 71,
+                        "column": 23
+                      },
+                      "text": "ids = [ids]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 71,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 71,
+                            "column": 23
+                          },
+                          "text": "ids = [ids]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 71,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 71,
+                                "column": 15
+                              },
+                              "text": "ids"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 71,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 71,
+                                "column": 17
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "list",
+                              "start": {
+                                "row": 71,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 71,
+                                "column": 23
+                              },
+                              "text": "[ids]",
+                              "children": [
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 71,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 71,
+                                    "column": 19
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 71,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 71,
+                                    "column": 22
+                                  },
+                                  "text": "ids"
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 71,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 71,
+                                    "column": 23
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 73,
+                "column": 8
+              },
+              "end": {
+                "row": 74,
+                "column": 62
+              },
+              "text": "if type(ids) not in (list, SArray):\n            raise TypeError('ids must be list or SArray type')",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 73,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 73,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 73,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 73,
+                    "column": 42
+                  },
+                  "text": "type(ids) not in (list, SArray)",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 73,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 73,
+                        "column": 20
+                      },
+                      "text": "type(ids)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 73,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 73,
+                            "column": 15
+                          },
+                          "text": "type"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 73,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 73,
+                            "column": 20
+                          },
+                          "text": "(ids)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 73,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 73,
+                                "column": 16
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 73,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 73,
+                                "column": 19
+                              },
+                              "text": "ids"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 73,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 73,
+                                "column": 20
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "not in",
+                      "start": {
+                        "row": 73,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 73,
+                        "column": 24
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "not in",
+                      "start": {
+                        "row": 73,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 73,
+                        "column": 27
+                      },
+                      "text": "in"
+                    },
+                    {
+                      "type": "tuple",
+                      "start": {
+                        "row": 73,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 73,
+                        "column": 42
+                      },
+                      "text": "(list, SArray)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 73,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 73,
+                            "column": 29
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 73,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 73,
+                            "column": 33
+                          },
+                          "text": "list"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 73,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 73,
+                            "column": 34
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 73,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 73,
+                            "column": 41
+                          },
+                          "text": "SArray"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 73,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 73,
+                            "column": 42
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 73,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 73,
+                    "column": 43
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 74,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 74,
+                    "column": 62
+                  },
+                  "text": "raise TypeError('ids must be list or SArray type')",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 74,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 74,
+                        "column": 62
+                      },
+                      "text": "raise TypeError('ids must be list or SArray type')",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 74,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 74,
+                            "column": 17
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 74,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 74,
+                            "column": 62
+                          },
+                          "text": "TypeError('ids must be list or SArray type')",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 74,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 74,
+                                "column": 27
+                              },
+                              "text": "TypeError"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 74,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 74,
+                                "column": 62
+                              },
+                              "text": "('ids must be list or SArray type')",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 74,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 74,
+                                    "column": 28
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 74,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 74,
+                                    "column": 61
+                                  },
+                                  "text": "'ids must be list or SArray type'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 74,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 74,
+                                        "column": 29
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 74,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 74,
+                                        "column": 60
+                                      },
+                                      "text": "ids must be list or SArray type"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 74,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 74,
+                                        "column": 61
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 74,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 74,
+                                    "column": 62
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "with_statement",
+              "start": {
+                "row": 76,
+                "column": 8
+              },
+              "end": {
+                "row": 77,
+                "column": 72
+              },
+              "text": "with cython_context():\n            sf = SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))",
+              "children": [
+                {
+                  "type": "with",
+                  "start": {
+                    "row": 76,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 76,
+                    "column": 12
+                  },
+                  "text": "with"
+                },
+                {
+                  "type": "with_clause",
+                  "start": {
+                    "row": 76,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 76,
+                    "column": 29
+                  },
+                  "text": "cython_context()",
+                  "children": [
+                    {
+                      "type": "with_item",
+                      "start": {
+                        "row": 76,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 76,
+                        "column": 29
+                      },
+                      "text": "cython_context()",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 76,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 76,
+                            "column": 29
+                          },
+                          "text": "cython_context()",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 76,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 76,
+                                "column": 27
+                              },
+                              "text": "cython_context"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 76,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 76,
+                                "column": 29
+                              },
+                              "text": "()",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 76,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 76,
+                                    "column": 28
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 76,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 76,
+                                    "column": 29
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 76,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 76,
+                    "column": 30
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 77,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 77,
+                    "column": 72
+                  },
+                  "text": "sf = SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 77,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 77,
+                        "column": 72
+                      },
+                      "text": "sf = SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 77,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 77,
+                            "column": 72
+                          },
+                          "text": "sf = SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 77,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 77,
+                                "column": 14
+                              },
+                              "text": "sf"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 77,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 77,
+                                "column": 16
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 77,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 77,
+                                "column": 72
+                              },
+                              "text": "SFrame(_proxy=self.__proxy__.get_vertices(ids, fields))",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 77,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 77,
+                                    "column": 23
+                                  },
+                                  "text": "SFrame"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 77,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 77,
+                                    "column": 72
+                                  },
+                                  "text": "(_proxy=self.__proxy__.get_vertices(ids, fields))",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 77,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 77,
+                                        "column": 24
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "keyword_argument",
+                                      "start": {
+                                        "row": 77,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 77,
+                                        "column": 71
+                                      },
+                                      "text": "_proxy=self.__proxy__.get_vertices(ids, fields)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 77,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 77,
+                                            "column": 30
+                                          },
+                                          "text": "_proxy"
+                                        },
+                                        {
+                                          "type": "=",
+                                          "start": {
+                                            "row": 77,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 77,
+                                            "column": 31
+                                          },
+                                          "text": "="
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 77,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 77,
+                                            "column": 71
+                                          },
+                                          "text": "self.__proxy__.get_vertices(ids, fields)",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 77,
+                                                "column": 31
+                                              },
+                                              "end": {
+                                                "row": 77,
+                                                "column": 58
+                                              },
+                                              "text": "self.__proxy__.get_vertices",
+                                              "children": [
+                                                {
+                                                  "type": "attribute",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 45
+                                                  },
+                                                  "text": "self.__proxy__",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 77,
+                                                        "column": 31
+                                                      },
+                                                      "end": {
+                                                        "row": 77,
+                                                        "column": 35
+                                                      },
+                                                      "text": "self"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 77,
+                                                        "column": 35
+                                                      },
+                                                      "end": {
+                                                        "row": 77,
+                                                        "column": 36
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 77,
+                                                        "column": 36
+                                                      },
+                                                      "end": {
+                                                        "row": 77,
+                                                        "column": 45
+                                                      },
+                                                      "text": "__proxy__"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 45
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 46
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 46
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 58
+                                                  },
+                                                  "text": "get_vertices"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 77,
+                                                "column": 58
+                                              },
+                                              "end": {
+                                                "row": 77,
+                                                "column": 71
+                                              },
+                                              "text": "(ids, fields)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 58
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 59
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 59
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 62
+                                                  },
+                                                  "text": "ids"
+                                                },
+                                                {
+                                                  "type": ",",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 62
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 63
+                                                  },
+                                                  "text": ","
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 64
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 70
+                                                  },
+                                                  "text": "fields"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 77,
+                                                    "column": 70
+                                                  },
+                                                  "end": {
+                                                    "row": 77,
+                                                    "column": 71
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 77,
+                                        "column": 71
+                                      },
+                                      "end": {
+                                        "row": 77,
+                                        "column": 72
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 79,
+                "column": 8
+              },
+              "end": {
+                "row": 91,
+                "column": 56
+              },
+              "text": "if (format == 'sframe'):\n            return sf\n        elif (format == 'dataframe'):\n            assert HAS_PANDAS, 'Cannot use dataframe because Pandas is not available or version is too low.'\n            if sf.num_rows() == 0:\n                return pd.DataFrame()\n            else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')\n        elif (format == 'list'):\n            return _dataframe_to_vertex_list(sf.to_dataframe())\n        else:\n            raise ValueError(\"Invalid format specifier\")",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 79,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 79,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "parenthesized_expression",
+                  "start": {
+                    "row": 79,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 79,
+                    "column": 31
+                  },
+                  "text": "(format == 'sframe')",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 79,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 79,
+                        "column": 12
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "comparison_operator",
+                      "start": {
+                        "row": 79,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 79,
+                        "column": 30
+                      },
+                      "text": "format == 'sframe'",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 79,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 79,
+                            "column": 18
+                          },
+                          "text": "format"
+                        },
+                        {
+                          "type": "==",
+                          "start": {
+                            "row": 79,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 79,
+                            "column": 21
+                          },
+                          "text": "=="
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 79,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 79,
+                            "column": 30
+                          },
+                          "text": "'sframe'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 79,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 79,
+                                "column": 23
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 79,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 79,
+                                "column": 29
+                              },
+                              "text": "sframe"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 79,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 79,
+                                "column": 30
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 79,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 79,
+                        "column": 31
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 79,
+                    "column": 31
+                  },
+                  "end": {
+                    "row": 79,
+                    "column": 32
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 80,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 80,
+                    "column": 21
+                  },
+                  "text": "return sf",
+                  "children": [
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 80,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 80,
+                        "column": 21
+                      },
+                      "text": "return sf",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 80,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 80,
+                            "column": 18
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 80,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 80,
+                            "column": 21
+                          },
+                          "text": "sf"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "elif_clause",
+                  "start": {
+                    "row": 81,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 87,
+                    "column": 43
+                  },
+                  "text": "elif (format == 'dataframe'):\n            assert HAS_PANDAS, 'Cannot use dataframe because Pandas is not available or version is too low.'\n            if sf.num_rows() == 0:\n                return pd.DataFrame()\n            else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')",
+                  "children": [
+                    {
+                      "type": "elif",
+                      "start": {
+                        "row": 81,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 81,
+                        "column": 12
+                      },
+                      "text": "elif"
+                    },
+                    {
+                      "type": "parenthesized_expression",
+                      "start": {
+                        "row": 81,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 81,
+                        "column": 36
+                      },
+                      "text": "(format == 'dataframe')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 81,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 81,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 81,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 81,
+                            "column": 35
+                          },
+                          "text": "format == 'dataframe'",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 81,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 81,
+                                "column": 20
+                              },
+                              "text": "format"
+                            },
+                            {
+                              "type": "==",
+                              "start": {
+                                "row": 81,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 81,
+                                "column": 23
+                              },
+                              "text": "=="
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 81,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 81,
+                                "column": 35
+                              },
+                              "text": "'dataframe'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 81,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 81,
+                                    "column": 25
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 81,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 81,
+                                    "column": 34
+                                  },
+                                  "text": "dataframe"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 81,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 81,
+                                    "column": 35
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 81,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 81,
+                            "column": 36
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 81,
+                        "column": 36
+                      },
+                      "end": {
+                        "row": 81,
+                        "column": 37
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 82,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 87,
+                        "column": 43
+                      },
+                      "text": "assert HAS_PANDAS, 'Cannot use dataframe because Pandas is not available or version is too low.'\n            if sf.num_rows() == 0:\n                return pd.DataFrame()\n            else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')",
+                      "children": [
+                        {
+                          "type": "assert_statement",
+                          "start": {
+                            "row": 82,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 82,
+                            "column": 108
+                          },
+                          "text": "assert HAS_PANDAS, 'Cannot use dataframe because Pandas is not available or version is too low.'",
+                          "children": [
+                            {
+                              "type": "assert",
+                              "start": {
+                                "row": 82,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 82,
+                                "column": 18
+                              },
+                              "text": "assert"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 82,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 82,
+                                "column": 29
+                              },
+                              "text": "HAS_PANDAS"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 82,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 82,
+                                "column": 30
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 82,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 82,
+                                "column": 108
+                              },
+                              "text": "'Cannot use dataframe because Pandas is not available or version is too low.'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 82,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 82,
+                                    "column": 32
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 82,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 82,
+                                    "column": 107
+                                  },
+                                  "text": "Cannot use dataframe because Pandas is not available or version is too low."
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 82,
+                                    "column": 107
+                                  },
+                                  "end": {
+                                    "row": 82,
+                                    "column": 108
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "if_statement",
+                          "start": {
+                            "row": 83,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 87,
+                            "column": 43
+                          },
+                          "text": "if sf.num_rows() == 0:\n                return pd.DataFrame()\n            else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')",
+                          "children": [
+                            {
+                              "type": "if",
+                              "start": {
+                                "row": 83,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 83,
+                                "column": 14
+                              },
+                              "text": "if"
+                            },
+                            {
+                              "type": "comparison_operator",
+                              "start": {
+                                "row": 83,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 83,
+                                "column": 33
+                              },
+                              "text": "sf.num_rows() == 0",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 83,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 83,
+                                    "column": 28
+                                  },
+                                  "text": "sf.num_rows()",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 83,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 83,
+                                        "column": 26
+                                      },
+                                      "text": "sf.num_rows",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 83,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 83,
+                                            "column": 17
+                                          },
+                                          "text": "sf"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 83,
+                                            "column": 17
+                                          },
+                                          "end": {
+                                            "row": 83,
+                                            "column": 18
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 83,
+                                            "column": 18
+                                          },
+                                          "end": {
+                                            "row": 83,
+                                            "column": 26
+                                          },
+                                          "text": "num_rows"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 83,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 83,
+                                        "column": 28
+                                      },
+                                      "text": "()",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 83,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 83,
+                                            "column": 27
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 83,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 83,
+                                            "column": 28
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "==",
+                                  "start": {
+                                    "row": 83,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 83,
+                                    "column": 31
+                                  },
+                                  "text": "=="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 83,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 83,
+                                    "column": 33
+                                  },
+                                  "text": "0"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 83,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 83,
+                                "column": 34
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "block",
+                              "start": {
+                                "row": 84,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 84,
+                                "column": 37
+                              },
+                              "text": "return pd.DataFrame()",
+                              "children": [
+                                {
+                                  "type": "return_statement",
+                                  "start": {
+                                    "row": 84,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 84,
+                                    "column": 37
+                                  },
+                                  "text": "return pd.DataFrame()",
+                                  "children": [
+                                    {
+                                      "type": "return",
+                                      "start": {
+                                        "row": 84,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 84,
+                                        "column": 22
+                                      },
+                                      "text": "return"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 84,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 84,
+                                        "column": 37
+                                      },
+                                      "text": "pd.DataFrame()",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 84,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 84,
+                                            "column": 35
+                                          },
+                                          "text": "pd.DataFrame",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 84,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 84,
+                                                "column": 25
+                                              },
+                                              "text": "pd"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 84,
+                                                "column": 25
+                                              },
+                                              "end": {
+                                                "row": 84,
+                                                "column": 26
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 84,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 84,
+                                                "column": 35
+                                              },
+                                              "text": "DataFrame"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 84,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 84,
+                                            "column": 37
+                                          },
+                                          "text": "()",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 84,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 84,
+                                                "column": 36
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 84,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 84,
+                                                "column": 37
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "else_clause",
+                              "start": {
+                                "row": 85,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 87,
+                                "column": 43
+                              },
+                              "text": "else:\n                df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')",
+                              "children": [
+                                {
+                                  "type": "else",
+                                  "start": {
+                                    "row": 85,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 85,
+                                    "column": 16
+                                  },
+                                  "text": "else"
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 85,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 85,
+                                    "column": 17
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 86,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 87,
+                                    "column": 43
+                                  },
+                                  "text": "df = sf.head(sf.num_rows()).to_dataframe()\n                return df.set_index('__id')",
+                                  "children": [
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 86,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 86,
+                                        "column": 58
+                                      },
+                                      "text": "df = sf.head(sf.num_rows()).to_dataframe()",
+                                      "children": [
+                                        {
+                                          "type": "assignment",
+                                          "start": {
+                                            "row": 86,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 86,
+                                            "column": 58
+                                          },
+                                          "text": "df = sf.head(sf.num_rows()).to_dataframe()",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 86,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 86,
+                                                "column": 18
+                                              },
+                                              "text": "df"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 86,
+                                                "column": 19
+                                              },
+                                              "end": {
+                                                "row": 86,
+                                                "column": 20
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "call",
+                                              "start": {
+                                                "row": 86,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 86,
+                                                "column": 58
+                                              },
+                                              "text": "sf.head(sf.num_rows()).to_dataframe()",
+                                              "children": [
+                                                {
+                                                  "type": "attribute",
+                                                  "start": {
+                                                    "row": 86,
+                                                    "column": 21
+                                                  },
+                                                  "end": {
+                                                    "row": 86,
+                                                    "column": 56
+                                                  },
+                                                  "text": "sf.head(sf.num_rows()).to_dataframe",
+                                                  "children": [
+                                                    {
+                                                      "type": "call",
+                                                      "start": {
+                                                        "row": 86,
+                                                        "column": 21
+                                                      },
+                                                      "end": {
+                                                        "row": 86,
+                                                        "column": 43
+                                                      },
+                                                      "text": "sf.head(sf.num_rows())",
+                                                      "children": [
+                                                        {
+                                                          "type": "attribute",
+                                                          "start": {
+                                                            "row": 86,
+                                                            "column": 21
+                                                          },
+                                                          "end": {
+                                                            "row": 86,
+                                                            "column": 28
+                                                          },
+                                                          "text": "sf.head",
+                                                          "children": [
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 86,
+                                                                "column": 21
+                                                              },
+                                                              "end": {
+                                                                "row": 86,
+                                                                "column": 23
+                                                              },
+                                                              "text": "sf"
+                                                            },
+                                                            {
+                                                              "type": ".",
+                                                              "start": {
+                                                                "row": 86,
+                                                                "column": 23
+                                                              },
+                                                              "end": {
+                                                                "row": 86,
+                                                                "column": 24
+                                                              },
+                                                              "text": "."
+                                                            },
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 86,
+                                                                "column": 24
+                                                              },
+                                                              "end": {
+                                                                "row": 86,
+                                                                "column": 28
+                                                              },
+                                                              "text": "head"
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "argument_list",
+                                                          "start": {
+                                                            "row": 86,
+                                                            "column": 28
+                                                          },
+                                                          "end": {
+                                                            "row": 86,
+                                                            "column": 43
+                                                          },
+                                                          "text": "(sf.num_rows())",
+                                                          "children": [
+                                                            {
+                                                              "type": "(",
+                                                              "start": {
+                                                                "row": 86,
+                                                                "column": 28
+                                                              },
+                                                              "end": {
+                                                                "row": 86,
+                                                                "column": 29
+                                                              },
+                                                              "text": "("
+                                                            },
+                                                            {
+                                                              "type": "call",
+                                                              "start": {
+                                                                "row": 86,
+                                                                "column": 29
+                                                              },
+                                                              "end": {
+                                                                "row": 86,
+                                                                "column": 42
+                                                              },
+                                                              "text": "sf.num_rows()",
+                                                              "children": [
+                                                                {
+                                                                  "type": "attribute",
+                                                                  "start": {
+                                                                    "row": 86,
+                                                                    "column": 29
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 86,
+                                                                    "column": 40
+                                                                  },
+                                                                  "text": "sf.num_rows",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 86,
+                                                                        "column": 29
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 86,
+                                                                        "column": 31
+                                                                      },
+                                                                      "text": "sf"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 86,
+                                                                        "column": 31
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 86,
+                                                                        "column": 32
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 86,
+                                                                        "column": 32
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 86,
+                                                                        "column": 40
+                                                                      },
+                                                                      "text": "num_rows"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": "argument_list",
+                                                                  "start": {
+                                                                    "row": 86,
+                                                                    "column": 40
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 86,
+                                                                    "column": 42
+                                                                  },
+                                                                  "text": "()",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "(",
+                                                                      "start": {
+                                                                        "row": 86,
+                                                                        "column": 40
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 86,
+                                                                        "column": 41
+                                                                      },
+                                                                      "text": "("
+                                                                    },
+                                                                    {
+                                                                      "type": ")",
+                                                                      "start": {
+                                                                        "row": 86,
+                                                                        "column": 41
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 86,
+                                                                        "column": 42
+                                                                      },
+                                                                      "text": ")"
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": ")",
+                                                              "start": {
+                                                                "row": 86,
+                                                                "column": 42
+                                                              },
+                                                              "end": {
+                                                                "row": 86,
+                                                                "column": 43
+                                                              },
+                                                              "text": ")"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 86,
+                                                        "column": 43
+                                                      },
+                                                      "end": {
+                                                        "row": 86,
+                                                        "column": 44
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 86,
+                                                        "column": 44
+                                                      },
+                                                      "end": {
+                                                        "row": 86,
+                                                        "column": 56
+                                                      },
+                                                      "text": "to_dataframe"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 86,
+                                                    "column": 56
+                                                  },
+                                                  "end": {
+                                                    "row": 86,
+                                                    "column": 58
+                                                  },
+                                                  "text": "()",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 86,
+                                                        "column": 56
+                                                      },
+                                                      "end": {
+                                                        "row": 86,
+                                                        "column": 57
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 86,
+                                                        "column": 57
+                                                      },
+                                                      "end": {
+                                                        "row": 86,
+                                                        "column": 58
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "return_statement",
+                                      "start": {
+                                        "row": 87,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 87,
+                                        "column": 43
+                                      },
+                                      "text": "return df.set_index('__id')",
+                                      "children": [
+                                        {
+                                          "type": "return",
+                                          "start": {
+                                            "row": 87,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 87,
+                                            "column": 22
+                                          },
+                                          "text": "return"
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 87,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 87,
+                                            "column": 43
+                                          },
+                                          "text": "df.set_index('__id')",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 87,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 87,
+                                                "column": 35
+                                              },
+                                              "text": "df.set_index",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 87,
+                                                    "column": 23
+                                                  },
+                                                  "end": {
+                                                    "row": 87,
+                                                    "column": 25
+                                                  },
+                                                  "text": "df"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 87,
+                                                    "column": 25
+                                                  },
+                                                  "end": {
+                                                    "row": 87,
+                                                    "column": 26
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 87,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 87,
+                                                    "column": 35
+                                                  },
+                                                  "text": "set_index"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 87,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 87,
+                                                "column": 43
+                                              },
+                                              "text": "('__id')",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 87,
+                                                    "column": 35
+                                                  },
+                                                  "end": {
+                                                    "row": 87,
+                                                    "column": 36
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "start": {
+                                                    "row": 87,
+                                                    "column": 36
+                                                  },
+                                                  "end": {
+                                                    "row": 87,
+                                                    "column": 42
+                                                  },
+                                                  "text": "'__id'",
+                                                  "children": [
+                                                    {
+                                                      "type": "string_start",
+                                                      "start": {
+                                                        "row": 87,
+                                                        "column": 36
+                                                      },
+                                                      "end": {
+                                                        "row": 87,
+                                                        "column": 37
+                                                      },
+                                                      "text": "'"
+                                                    },
+                                                    {
+                                                      "type": "string_content",
+                                                      "start": {
+                                                        "row": 87,
+                                                        "column": 37
+                                                      },
+                                                      "end": {
+                                                        "row": 87,
+                                                        "column": 41
+                                                      },
+                                                      "text": "__id"
+                                                    },
+                                                    {
+                                                      "type": "string_end",
+                                                      "start": {
+                                                        "row": 87,
+                                                        "column": 41
+                                                      },
+                                                      "end": {
+                                                        "row": 87,
+                                                        "column": 42
+                                                      },
+                                                      "text": "'"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 87,
+                                                    "column": 42
+                                                  },
+                                                  "end": {
+                                                    "row": 87,
+                                                    "column": 43
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "elif_clause",
+                  "start": {
+                    "row": 88,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 89,
+                    "column": 63
+                  },
+                  "text": "elif (format == 'list'):\n            return _dataframe_to_vertex_list(sf.to_dataframe())",
+                  "children": [
+                    {
+                      "type": "elif",
+                      "start": {
+                        "row": 88,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 88,
+                        "column": 12
+                      },
+                      "text": "elif"
+                    },
+                    {
+                      "type": "parenthesized_expression",
+                      "start": {
+                        "row": 88,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 88,
+                        "column": 31
+                      },
+                      "text": "(format == 'list')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 88,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 88,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 88,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 88,
+                            "column": 30
+                          },
+                          "text": "format == 'list'",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 88,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 88,
+                                "column": 20
+                              },
+                              "text": "format"
+                            },
+                            {
+                              "type": "==",
+                              "start": {
+                                "row": 88,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 88,
+                                "column": 23
+                              },
+                              "text": "=="
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 88,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 88,
+                                "column": 30
+                              },
+                              "text": "'list'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 88,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 88,
+                                    "column": 25
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 88,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 88,
+                                    "column": 29
+                                  },
+                                  "text": "list"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 88,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 88,
+                                    "column": 30
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 88,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 88,
+                            "column": 31
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 88,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 88,
+                        "column": 32
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 89,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 89,
+                        "column": 63
+                      },
+                      "text": "return _dataframe_to_vertex_list(sf.to_dataframe())",
+                      "children": [
+                        {
+                          "type": "return_statement",
+                          "start": {
+                            "row": 89,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 63
+                          },
+                          "text": "return _dataframe_to_vertex_list(sf.to_dataframe())",
+                          "children": [
+                            {
+                              "type": "return",
+                              "start": {
+                                "row": 89,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 18
+                              },
+                              "text": "return"
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 89,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 63
+                              },
+                              "text": "_dataframe_to_vertex_list(sf.to_dataframe())",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 89,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 89,
+                                    "column": 44
+                                  },
+                                  "text": "_dataframe_to_vertex_list"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 89,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 89,
+                                    "column": 63
+                                  },
+                                  "text": "(sf.to_dataframe())",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 89,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 89,
+                                        "column": 45
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 89,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 89,
+                                        "column": 62
+                                      },
+                                      "text": "sf.to_dataframe()",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 89,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 89,
+                                            "column": 60
+                                          },
+                                          "text": "sf.to_dataframe",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 89,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 89,
+                                                "column": 47
+                                              },
+                                              "text": "sf"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 89,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 89,
+                                                "column": 48
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 89,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 89,
+                                                "column": 60
+                                              },
+                                              "text": "to_dataframe"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 89,
+                                            "column": 60
+                                          },
+                                          "end": {
+                                            "row": 89,
+                                            "column": 62
+                                          },
+                                          "text": "()",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 89,
+                                                "column": 60
+                                              },
+                                              "end": {
+                                                "row": 89,
+                                                "column": 61
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 89,
+                                                "column": 61
+                                              },
+                                              "end": {
+                                                "row": 89,
+                                                "column": 62
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 89,
+                                        "column": 62
+                                      },
+                                      "end": {
+                                        "row": 89,
+                                        "column": 63
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "else_clause",
+                  "start": {
+                    "row": 90,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 91,
+                    "column": 56
+                  },
+                  "text": "else:\n            raise ValueError(\"Invalid format specifier\")",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 90,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 90,
+                        "column": 12
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 90,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 90,
+                        "column": 13
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 91,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 91,
+                        "column": 56
+                      },
+                      "text": "raise ValueError(\"Invalid format specifier\")",
+                      "children": [
+                        {
+                          "type": "raise_statement",
+                          "start": {
+                            "row": 91,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 91,
+                            "column": 56
+                          },
+                          "text": "raise ValueError(\"Invalid format specifier\")",
+                          "children": [
+                            {
+                              "type": "raise",
+                              "start": {
+                                "row": 91,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 91,
+                                "column": 17
+                              },
+                              "text": "raise"
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 91,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 91,
+                                "column": 56
+                              },
+                              "text": "ValueError(\"Invalid format specifier\")",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 91,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 91,
+                                    "column": 28
+                                  },
+                                  "text": "ValueError"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 91,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 91,
+                                    "column": 56
+                                  },
+                                  "text": "(\"Invalid format specifier\")",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 91,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 91,
+                                        "column": 29
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 91,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 91,
+                                        "column": 55
+                                      },
+                                      "text": "\"Invalid format specifier\"",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 91,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 91,
+                                            "column": 30
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 91,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 91,
+                                            "column": 54
+                                          },
+                                          "text": "Invalid format specifier"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 91,
+                                            "column": 54
+                                          },
+                                          "end": {
+                                            "row": 91,
+                                            "column": 55
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 91,
+                                        "column": 55
+                                      },
+                                      "end": {
+                                        "row": 91,
+                                        "column": 56
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

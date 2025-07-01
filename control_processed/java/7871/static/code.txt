@@ -1,0 +1,4 @@
+@SafeVarargs
+	public static <T> LinkedList<T> newLinkedList(T... values) {
+		return (LinkedList<T>) list(true, values);
+	}

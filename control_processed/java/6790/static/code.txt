@@ -1,0 +1,3 @@
+public static MongoDS getDS(Setting setting, Collection<String> groups) {
+		return getDS(setting, groups.toArray(new String[groups.size()]));
+	}

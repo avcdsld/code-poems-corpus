@@ -1,0 +1,7 @@
+@SafeVarargs
+	public static <T> T[] append(T[] buffer, T... newElements) {
+		if(isEmpty(buffer)) {
+			return newElements;
+		}
+		return insert(buffer, buffer.length, newElements);
+	}

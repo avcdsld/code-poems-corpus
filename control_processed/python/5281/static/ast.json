@@ -1,0 +1,3234 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 43,
+    "column": 38
+  },
+  "text": "def gather_dilated_memory_blocks(x,\n                                 num_memory_blocks,\n                                 gap_size,\n                                 query_block_size,\n                                 memory_block_size,\n                                 gather_indices,\n                                 direction=\"left\"):\n  \"\"\"Gathers blocks with gaps in between.\n\n  Args:\n    x: Tensor of shape [length, batch, heads, depth]\n    num_memory_blocks: how many memory blocks to look in \"direction\". Each will\n      be separated by gap_size.\n    gap_size: an integer indicating the gap size\n    query_block_size: an integer indicating size of query block\n    memory_block_size: an integer indicating the size of a memory block.\n    gather_indices: The indices to gather from.\n    direction: left or right\n\n  Returns:\n    Tensor of shape [batch, heads, blocks, block_length, depth]\n  \"\"\"\n  gathered_blocks = []\n  # gathering memory blocks\n  for block_id in range(num_memory_blocks):\n    block_end_index = -(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)\n    block_start_index = (\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))\n    if direction != \"left\":\n      [block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]\n    if block_end_index == 0:\n      x_block = x[block_start_index:]\n    else:\n      x_block = x[block_start_index:block_end_index]\n\n    def gather_dilated_1d_blocks(x, gather_indices):\n      x_new = tf.gather(x, gather_indices)\n      # [batch, heads, blocks, block_length, dim]\n      return tf.transpose(x_new, [2, 3, 0, 1, 4])\n\n    gathered_blocks.append(gather_dilated_1d_blocks(x_block, gather_indices))\n  return tf.concat(gathered_blocks, 3)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 43,
+        "column": 38
+      },
+      "text": "def gather_dilated_memory_blocks(x,\n                                 num_memory_blocks,\n                                 gap_size,\n                                 query_block_size,\n                                 memory_block_size,\n                                 gather_indices,\n                                 direction=\"left\"):\n  \"\"\"Gathers blocks with gaps in between.\n\n  Args:\n    x: Tensor of shape [length, batch, heads, depth]\n    num_memory_blocks: how many memory blocks to look in \"direction\". Each will\n      be separated by gap_size.\n    gap_size: an integer indicating the gap size\n    query_block_size: an integer indicating size of query block\n    memory_block_size: an integer indicating the size of a memory block.\n    gather_indices: The indices to gather from.\n    direction: left or right\n\n  Returns:\n    Tensor of shape [batch, heads, blocks, block_length, depth]\n  \"\"\"\n  gathered_blocks = []\n  # gathering memory blocks\n  for block_id in range(num_memory_blocks):\n    block_end_index = -(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)\n    block_start_index = (\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))\n    if direction != \"left\":\n      [block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]\n    if block_end_index == 0:\n      x_block = x[block_start_index:]\n    else:\n      x_block = x[block_start_index:block_end_index]\n\n    def gather_dilated_1d_blocks(x, gather_indices):\n      x_new = tf.gather(x, gather_indices)\n      # [batch, heads, blocks, block_length, dim]\n      return tf.transpose(x_new, [2, 3, 0, 1, 4])\n\n    gathered_blocks.append(gather_dilated_1d_blocks(x_block, gather_indices))\n  return tf.concat(gathered_blocks, 3)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 32
+          },
+          "text": "gather_dilated_memory_blocks"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 32
+          },
+          "end": {
+            "row": 6,
+            "column": 50
+          },
+          "text": "(x,\n                                 num_memory_blocks,\n                                 gap_size,\n                                 query_block_size,\n                                 memory_block_size,\n                                 gather_indices,\n                                 direction=\"left\")",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 32
+              },
+              "end": {
+                "row": 0,
+                "column": 33
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 33
+              },
+              "end": {
+                "row": 0,
+                "column": 34
+              },
+              "text": "x"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 34
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 1,
+                "column": 33
+              },
+              "end": {
+                "row": 1,
+                "column": 50
+              },
+              "text": "num_memory_blocks"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 50
+              },
+              "end": {
+                "row": 1,
+                "column": 51
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 2,
+                "column": 33
+              },
+              "end": {
+                "row": 2,
+                "column": 41
+              },
+              "text": "gap_size"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 2,
+                "column": 41
+              },
+              "end": {
+                "row": 2,
+                "column": 42
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 3,
+                "column": 33
+              },
+              "end": {
+                "row": 3,
+                "column": 49
+              },
+              "text": "query_block_size"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 3,
+                "column": 49
+              },
+              "end": {
+                "row": 3,
+                "column": 50
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 4,
+                "column": 33
+              },
+              "end": {
+                "row": 4,
+                "column": 50
+              },
+              "text": "memory_block_size"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 4,
+                "column": 50
+              },
+              "end": {
+                "row": 4,
+                "column": 51
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 5,
+                "column": 33
+              },
+              "end": {
+                "row": 5,
+                "column": 47
+              },
+              "text": "gather_indices"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 5,
+                "column": 47
+              },
+              "end": {
+                "row": 5,
+                "column": 48
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 6,
+                "column": 33
+              },
+              "end": {
+                "row": 6,
+                "column": 49
+              },
+              "text": "direction=\"left\"",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 6,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 42
+                  },
+                  "text": "direction"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 6,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 43
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 6,
+                    "column": 43
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 49
+                  },
+                  "text": "\"left\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 6,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 44
+                      },
+                      "text": "\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 6,
+                        "column": 44
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 48
+                      },
+                      "text": "left"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 6,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 49
+                      },
+                      "text": "\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 6,
+                "column": 49
+              },
+              "end": {
+                "row": 6,
+                "column": 50
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 6,
+            "column": 50
+          },
+          "end": {
+            "row": 6,
+            "column": 51
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 7,
+            "column": 2
+          },
+          "end": {
+            "row": 43,
+            "column": 38
+          },
+          "text": "\"\"\"Gathers blocks with gaps in between.\n\n  Args:\n    x: Tensor of shape [length, batch, heads, depth]\n    num_memory_blocks: how many memory blocks to look in \"direction\". Each will\n      be separated by gap_size.\n    gap_size: an integer indicating the gap size\n    query_block_size: an integer indicating size of query block\n    memory_block_size: an integer indicating the size of a memory block.\n    gather_indices: The indices to gather from.\n    direction: left or right\n\n  Returns:\n    Tensor of shape [batch, heads, blocks, block_length, depth]\n  \"\"\"\n  gathered_blocks = []\n  # gathering memory blocks\n  for block_id in range(num_memory_blocks):\n    block_end_index = -(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)\n    block_start_index = (\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))\n    if direction != \"left\":\n      [block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]\n    if block_end_index == 0:\n      x_block = x[block_start_index:]\n    else:\n      x_block = x[block_start_index:block_end_index]\n\n    def gather_dilated_1d_blocks(x, gather_indices):\n      x_new = tf.gather(x, gather_indices)\n      # [batch, heads, blocks, block_length, dim]\n      return tf.transpose(x_new, [2, 3, 0, 1, 4])\n\n    gathered_blocks.append(gather_dilated_1d_blocks(x_block, gather_indices))\n  return tf.concat(gathered_blocks, 3)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 7,
+                "column": 2
+              },
+              "end": {
+                "row": 21,
+                "column": 5
+              },
+              "text": "\"\"\"Gathers blocks with gaps in between.\n\n  Args:\n    x: Tensor of shape [length, batch, heads, depth]\n    num_memory_blocks: how many memory blocks to look in \"direction\". Each will\n      be separated by gap_size.\n    gap_size: an integer indicating the gap size\n    query_block_size: an integer indicating size of query block\n    memory_block_size: an integer indicating the size of a memory block.\n    gather_indices: The indices to gather from.\n    direction: left or right\n\n  Returns:\n    Tensor of shape [batch, heads, blocks, block_length, depth]\n  \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 7,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 5
+                  },
+                  "text": "\"\"\"Gathers blocks with gaps in between.\n\n  Args:\n    x: Tensor of shape [length, batch, heads, depth]\n    num_memory_blocks: how many memory blocks to look in \"direction\". Each will\n      be separated by gap_size.\n    gap_size: an integer indicating the gap size\n    query_block_size: an integer indicating size of query block\n    memory_block_size: an integer indicating the size of a memory block.\n    gather_indices: The indices to gather from.\n    direction: left or right\n\n  Returns:\n    Tensor of shape [batch, heads, blocks, block_length, depth]\n  \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 7,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 5
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 7,
+                        "column": 5
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 2
+                      },
+                      "text": "Gathers blocks with gaps in between.\n\n  Args:\n    x: Tensor of shape [length, batch, heads, depth]\n    num_memory_blocks: how many memory blocks to look in \"direction\". Each will\n      be separated by gap_size.\n    gap_size: an integer indicating the gap size\n    query_block_size: an integer indicating size of query block\n    memory_block_size: an integer indicating the size of a memory block.\n    gather_indices: The indices to gather from.\n    direction: left or right\n\n  Returns:\n    Tensor of shape [batch, heads, blocks, block_length, depth]\n  "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 21,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 5
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 22,
+                "column": 2
+              },
+              "end": {
+                "row": 22,
+                "column": 22
+              },
+              "text": "gathered_blocks = []",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 22,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 22
+                  },
+                  "text": "gathered_blocks = []",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 22,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 17
+                      },
+                      "text": "gathered_blocks"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 22,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 19
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "list",
+                      "start": {
+                        "row": 22,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 22
+                      },
+                      "text": "[]",
+                      "children": [
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 22,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 21
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 22,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 22
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 23,
+                "column": 2
+              },
+              "end": {
+                "row": 23,
+                "column": 27
+              },
+              "text": "# gathering memory blocks"
+            },
+            {
+              "type": "for_statement",
+              "start": {
+                "row": 24,
+                "column": 2
+              },
+              "end": {
+                "row": 42,
+                "column": 77
+              },
+              "text": "for block_id in range(num_memory_blocks):\n    block_end_index = -(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)\n    block_start_index = (\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))\n    if direction != \"left\":\n      [block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]\n    if block_end_index == 0:\n      x_block = x[block_start_index:]\n    else:\n      x_block = x[block_start_index:block_end_index]\n\n    def gather_dilated_1d_blocks(x, gather_indices):\n      x_new = tf.gather(x, gather_indices)\n      # [batch, heads, blocks, block_length, dim]\n      return tf.transpose(x_new, [2, 3, 0, 1, 4])\n\n    gathered_blocks.append(gather_dilated_1d_blocks(x_block, gather_indices))",
+              "children": [
+                {
+                  "type": "for",
+                  "start": {
+                    "row": 24,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 5
+                  },
+                  "text": "for"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 24,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 14
+                  },
+                  "text": "block_id"
+                },
+                {
+                  "type": "in",
+                  "start": {
+                    "row": 24,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 17
+                  },
+                  "text": "in"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 24,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 42
+                  },
+                  "text": "range(num_memory_blocks)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 24,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 23
+                      },
+                      "text": "range"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 24,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 42
+                      },
+                      "text": "(num_memory_blocks)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 24,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 24
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 24,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 41
+                          },
+                          "text": "num_memory_blocks"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 24,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 42
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 24,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 43
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 25,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 77
+                  },
+                  "text": "block_end_index = -(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)\n    block_start_index = (\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))\n    if direction != \"left\":\n      [block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]\n    if block_end_index == 0:\n      x_block = x[block_start_index:]\n    else:\n      x_block = x[block_start_index:block_end_index]\n\n    def gather_dilated_1d_blocks(x, gather_indices):\n      x_new = tf.gather(x, gather_indices)\n      # [batch, heads, blocks, block_length, dim]\n      return tf.transpose(x_new, [2, 3, 0, 1, 4])\n\n    gathered_blocks.append(gather_dilated_1d_blocks(x_block, gather_indices))",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 25,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 70
+                      },
+                      "text": "block_end_index = -(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 25,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 70
+                          },
+                          "text": "block_end_index = -(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 25,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 19
+                              },
+                              "text": "block_end_index"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 25,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 21
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "unary_operator",
+                              "start": {
+                                "row": 25,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 70
+                              },
+                              "text": "-(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)",
+                              "children": [
+                                {
+                                  "type": "-",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 23
+                                  },
+                                  "text": "-"
+                                },
+                                {
+                                  "type": "parenthesized_expression",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 70
+                                  },
+                                  "text": "(query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 24
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "binary_operator",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 69
+                                      },
+                                      "text": "query_block_size + gap_size *\n                        (block_id + 1) + memory_block_size * block_id",
+                                      "children": [
+                                        {
+                                          "type": "binary_operator",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 38
+                                          },
+                                          "text": "query_block_size + gap_size *\n                        (block_id + 1)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 24
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 40
+                                              },
+                                              "text": "query_block_size"
+                                            },
+                                            {
+                                              "type": "+",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 42
+                                              },
+                                              "text": "+"
+                                            },
+                                            {
+                                              "type": "binary_operator",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 43
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 38
+                                              },
+                                              "text": "gap_size *\n                        (block_id + 1)",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 43
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 51
+                                                  },
+                                                  "text": "gap_size"
+                                                },
+                                                {
+                                                  "type": "*",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 52
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 53
+                                                  },
+                                                  "text": "*"
+                                                },
+                                                {
+                                                  "type": "parenthesized_expression",
+                                                  "start": {
+                                                    "row": 26,
+                                                    "column": 24
+                                                  },
+                                                  "end": {
+                                                    "row": 26,
+                                                    "column": 38
+                                                  },
+                                                  "text": "(block_id + 1)",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 24
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 25
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "binary_operator",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 25
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 37
+                                                      },
+                                                      "text": "block_id + 1",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 25
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 33
+                                                          },
+                                                          "text": "block_id"
+                                                        },
+                                                        {
+                                                          "type": "+",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 34
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 35
+                                                          },
+                                                          "text": "+"
+                                                        },
+                                                        {
+                                                          "type": "integer",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 36
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 37
+                                                          },
+                                                          "text": "1"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 37
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 38
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "+",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 39
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 40
+                                          },
+                                          "text": "+"
+                                        },
+                                        {
+                                          "type": "binary_operator",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 69
+                                          },
+                                          "text": "memory_block_size * block_id",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 58
+                                              },
+                                              "text": "memory_block_size"
+                                            },
+                                            {
+                                              "type": "*",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 59
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 60
+                                              },
+                                              "text": "*"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 61
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 69
+                                              },
+                                              "text": "block_id"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 69
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 70
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 27,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 78
+                      },
+                      "text": "block_start_index = (\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 27,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 78
+                          },
+                          "text": "block_start_index = (\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 27,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 21
+                              },
+                              "text": "block_start_index"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 27,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 23
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "parenthesized_expression",
+                              "start": {
+                                "row": 27,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 78
+                              },
+                              "text": "(\n        (memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1)))",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 25
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "binary_operator",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 77
+                                  },
+                                  "text": "(memory_block_size + gap_size) * (num_memory_blocks - (block_id + 1))",
+                                  "children": [
+                                    {
+                                      "type": "parenthesized_expression",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 38
+                                      },
+                                      "text": "(memory_block_size + gap_size)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 9
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "binary_operator",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 9
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 37
+                                          },
+                                          "text": "memory_block_size + gap_size",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 9
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 26
+                                              },
+                                              "text": "memory_block_size"
+                                            },
+                                            {
+                                              "type": "+",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 28
+                                              },
+                                              "text": "+"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 37
+                                              },
+                                              "text": "gap_size"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 37
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 38
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "*",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 40
+                                      },
+                                      "text": "*"
+                                    },
+                                    {
+                                      "type": "parenthesized_expression",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 41
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 77
+                                      },
+                                      "text": "(num_memory_blocks - (block_id + 1))",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 42
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "binary_operator",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 76
+                                          },
+                                          "text": "num_memory_blocks - (block_id + 1)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 42
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 59
+                                              },
+                                              "text": "num_memory_blocks"
+                                            },
+                                            {
+                                              "type": "-",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 60
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 61
+                                              },
+                                              "text": "-"
+                                            },
+                                            {
+                                              "type": "parenthesized_expression",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 62
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 76
+                                              },
+                                              "text": "(block_id + 1)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 28,
+                                                    "column": 62
+                                                  },
+                                                  "end": {
+                                                    "row": 28,
+                                                    "column": 63
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "binary_operator",
+                                                  "start": {
+                                                    "row": 28,
+                                                    "column": 63
+                                                  },
+                                                  "end": {
+                                                    "row": 28,
+                                                    "column": 75
+                                                  },
+                                                  "text": "block_id + 1",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 28,
+                                                        "column": 63
+                                                      },
+                                                      "end": {
+                                                        "row": 28,
+                                                        "column": 71
+                                                      },
+                                                      "text": "block_id"
+                                                    },
+                                                    {
+                                                      "type": "+",
+                                                      "start": {
+                                                        "row": 28,
+                                                        "column": 72
+                                                      },
+                                                      "end": {
+                                                        "row": 28,
+                                                        "column": 73
+                                                      },
+                                                      "text": "+"
+                                                    },
+                                                    {
+                                                      "type": "integer",
+                                                      "start": {
+                                                        "row": 28,
+                                                        "column": 74
+                                                      },
+                                                      "end": {
+                                                        "row": 28,
+                                                        "column": 75
+                                                      },
+                                                      "text": "1"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 28,
+                                                    "column": 75
+                                                  },
+                                                  "end": {
+                                                    "row": 28,
+                                                    "column": 76
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 76
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 77
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 77
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 78
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 29,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 66
+                      },
+                      "text": "if direction != \"left\":\n      [block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 29,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 6
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 29,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 26
+                          },
+                          "text": "direction != \"left\"",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 29,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 16
+                              },
+                              "text": "direction"
+                            },
+                            {
+                              "type": "!=",
+                              "start": {
+                                "row": 29,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 19
+                              },
+                              "text": "!="
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 29,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 26
+                              },
+                              "text": "\"left\"",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 21
+                                  },
+                                  "text": "\""
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 25
+                                  },
+                                  "text": "left"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 26
+                                  },
+                                  "text": "\""
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 29,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 27
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 30,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 66
+                          },
+                          "text": "[block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]",
+                          "children": [
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 30,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 66
+                              },
+                              "text": "[block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]",
+                              "children": [
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 66
+                                  },
+                                  "text": "[block_end_index,\n       block_start_index] = [-block_start_index, -block_end_index]",
+                                  "children": [
+                                    {
+                                      "type": "list_pattern",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 25
+                                      },
+                                      "text": "[block_end_index,\n       block_start_index]",
+                                      "children": [
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 6
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 7
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 7
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 22
+                                          },
+                                          "text": "block_end_index"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 23
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 7
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 24
+                                          },
+                                          "text": "block_start_index"
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 25
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 31,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 27
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "list",
+                                      "start": {
+                                        "row": 31,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 66
+                                      },
+                                      "text": "[-block_start_index, -block_end_index]",
+                                      "children": [
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 29
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "unary_operator",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 47
+                                          },
+                                          "text": "-block_start_index",
+                                          "children": [
+                                            {
+                                              "type": "-",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 30
+                                              },
+                                              "text": "-"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 30
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 47
+                                              },
+                                              "text": "block_start_index"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 48
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "unary_operator",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 65
+                                          },
+                                          "text": "-block_end_index",
+                                          "children": [
+                                            {
+                                              "type": "-",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 49
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 50
+                                              },
+                                              "text": "-"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 50
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 65
+                                              },
+                                              "text": "block_end_index"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 65
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 66
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 32,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 52
+                      },
+                      "text": "if block_end_index == 0:\n      x_block = x[block_start_index:]\n    else:\n      x_block = x[block_start_index:block_end_index]",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 32,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 6
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 32,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 27
+                          },
+                          "text": "block_end_index == 0",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 32,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 22
+                              },
+                              "text": "block_end_index"
+                            },
+                            {
+                              "type": "==",
+                              "start": {
+                                "row": 32,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 25
+                              },
+                              "text": "=="
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 32,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 27
+                              },
+                              "text": "0"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 32,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 28
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 33,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 37
+                          },
+                          "text": "x_block = x[block_start_index:]",
+                          "children": [
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 33,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 37
+                              },
+                              "text": "x_block = x[block_start_index:]",
+                              "children": [
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 37
+                                  },
+                                  "text": "x_block = x[block_start_index:]",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 13
+                                      },
+                                      "text": "x_block"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 15
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "subscript",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 37
+                                      },
+                                      "text": "x[block_start_index:]",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 17
+                                          },
+                                          "text": "x"
+                                        },
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 17
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 18
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "slice",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 18
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 36
+                                          },
+                                          "text": "block_start_index:",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 33,
+                                                "column": 18
+                                              },
+                                              "end": {
+                                                "row": 33,
+                                                "column": 35
+                                              },
+                                              "text": "block_start_index"
+                                            },
+                                            {
+                                              "type": ":",
+                                              "start": {
+                                                "row": 33,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 33,
+                                                "column": 36
+                                              },
+                                              "text": ":"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 37
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else_clause",
+                          "start": {
+                            "row": 34,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 52
+                          },
+                          "text": "else:\n      x_block = x[block_start_index:block_end_index]",
+                          "children": [
+                            {
+                              "type": "else",
+                              "start": {
+                                "row": 34,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 8
+                              },
+                              "text": "else"
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 34,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 9
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "block",
+                              "start": {
+                                "row": 35,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 52
+                              },
+                              "text": "x_block = x[block_start_index:block_end_index]",
+                              "children": [
+                                {
+                                  "type": "expression_statement",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 52
+                                  },
+                                  "text": "x_block = x[block_start_index:block_end_index]",
+                                  "children": [
+                                    {
+                                      "type": "assignment",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 52
+                                      },
+                                      "text": "x_block = x[block_start_index:block_end_index]",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 6
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 13
+                                          },
+                                          "text": "x_block"
+                                        },
+                                        {
+                                          "type": "=",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 15
+                                          },
+                                          "text": "="
+                                        },
+                                        {
+                                          "type": "subscript",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 52
+                                          },
+                                          "text": "x[block_start_index:block_end_index]",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 35,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 35,
+                                                "column": 17
+                                              },
+                                              "text": "x"
+                                            },
+                                            {
+                                              "type": "[",
+                                              "start": {
+                                                "row": 35,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 35,
+                                                "column": 18
+                                              },
+                                              "text": "["
+                                            },
+                                            {
+                                              "type": "slice",
+                                              "start": {
+                                                "row": 35,
+                                                "column": 18
+                                              },
+                                              "end": {
+                                                "row": 35,
+                                                "column": 51
+                                              },
+                                              "text": "block_start_index:block_end_index",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 18
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 35
+                                                  },
+                                                  "text": "block_start_index"
+                                                },
+                                                {
+                                                  "type": ":",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 35
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 36
+                                                  },
+                                                  "text": ":"
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 36
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 51
+                                                  },
+                                                  "text": "block_end_index"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "]",
+                                              "start": {
+                                                "row": 35,
+                                                "column": 51
+                                              },
+                                              "end": {
+                                                "row": 35,
+                                                "column": 52
+                                              },
+                                              "text": "]"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "function_definition",
+                      "start": {
+                        "row": 37,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 40,
+                        "column": 49
+                      },
+                      "text": "def gather_dilated_1d_blocks(x, gather_indices):\n      x_new = tf.gather(x, gather_indices)\n      # [batch, heads, blocks, block_length, dim]\n      return tf.transpose(x_new, [2, 3, 0, 1, 4])",
+                      "children": [
+                        {
+                          "type": "def",
+                          "start": {
+                            "row": 37,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 7
+                          },
+                          "text": "def"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 37,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 32
+                          },
+                          "text": "gather_dilated_1d_blocks"
+                        },
+                        {
+                          "type": "parameters",
+                          "start": {
+                            "row": 37,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 51
+                          },
+                          "text": "(x, gather_indices)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 37,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 33
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 34
+                              },
+                              "text": "x"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 37,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 35
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 50
+                              },
+                              "text": "gather_indices"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 37,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 51
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 37,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 52
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 38,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 49
+                          },
+                          "text": "x_new = tf.gather(x, gather_indices)\n      # [batch, heads, blocks, block_length, dim]\n      return tf.transpose(x_new, [2, 3, 0, 1, 4])",
+                          "children": [
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 38,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 42
+                              },
+                              "text": "x_new = tf.gather(x, gather_indices)",
+                              "children": [
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 42
+                                  },
+                                  "text": "x_new = tf.gather(x, gather_indices)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 11
+                                      },
+                                      "text": "x_new"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 13
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 42
+                                      },
+                                      "text": "tf.gather(x, gather_indices)",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 38,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 38,
+                                            "column": 23
+                                          },
+                                          "text": "tf.gather",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 16
+                                              },
+                                              "text": "tf"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 17
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 23
+                                              },
+                                              "text": "gather"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 38,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 38,
+                                            "column": 42
+                                          },
+                                          "text": "(x, gather_indices)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 24
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 24
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 25
+                                              },
+                                              "text": "x"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 25
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 26
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 41
+                                              },
+                                              "text": "gather_indices"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 38,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 38,
+                                                "column": 42
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "comment",
+                              "start": {
+                                "row": 39,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 49
+                              },
+                              "text": "# [batch, heads, blocks, block_length, dim]"
+                            },
+                            {
+                              "type": "return_statement",
+                              "start": {
+                                "row": 40,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 49
+                              },
+                              "text": "return tf.transpose(x_new, [2, 3, 0, 1, 4])",
+                              "children": [
+                                {
+                                  "type": "return",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 12
+                                  },
+                                  "text": "return"
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 49
+                                  },
+                                  "text": "tf.transpose(x_new, [2, 3, 0, 1, 4])",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 25
+                                      },
+                                      "text": "tf.transpose",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 15
+                                          },
+                                          "text": "tf"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 16
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 25
+                                          },
+                                          "text": "transpose"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 49
+                                      },
+                                      "text": "(x_new, [2, 3, 0, 1, 4])",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 26
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 31
+                                          },
+                                          "text": "x_new"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 32
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "list",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 33
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 48
+                                          },
+                                          "text": "[2, 3, 0, 1, 4]",
+                                          "children": [
+                                            {
+                                              "type": "[",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 34
+                                              },
+                                              "text": "["
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 34
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 35
+                                              },
+                                              "text": "2"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 36
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 38
+                                              },
+                                              "text": "3"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 38
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 39
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 41
+                                              },
+                                              "text": "0"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 42
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 43
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 44
+                                              },
+                                              "text": "1"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 44
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 45
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 47
+                                              },
+                                              "text": "4"
+                                            },
+                                            {
+                                              "type": "]",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 48
+                                              },
+                                              "text": "]"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 49
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 42,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 77
+                      },
+                      "text": "gathered_blocks.append(gather_dilated_1d_blocks(x_block, gather_indices))",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 42,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 77
+                          },
+                          "text": "gathered_blocks.append(gather_dilated_1d_blocks(x_block, gather_indices))",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 42,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 26
+                              },
+                              "text": "gathered_blocks.append",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 19
+                                  },
+                                  "text": "gathered_blocks"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 20
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 26
+                                  },
+                                  "text": "append"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 42,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 77
+                              },
+                              "text": "(gather_dilated_1d_blocks(x_block, gather_indices))",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 27
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 76
+                                  },
+                                  "text": "gather_dilated_1d_blocks(x_block, gather_indices)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 51
+                                      },
+                                      "text": "gather_dilated_1d_blocks"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 76
+                                      },
+                                      "text": "(x_block, gather_indices)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 51
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 52
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 59
+                                          },
+                                          "text": "x_block"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 60
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 61
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 75
+                                          },
+                                          "text": "gather_indices"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 75
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 76
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 76
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 77
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 43,
+                "column": 2
+              },
+              "end": {
+                "row": 43,
+                "column": 38
+              },
+              "text": "return tf.concat(gathered_blocks, 3)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 43,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 8
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 43,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 38
+                  },
+                  "text": "tf.concat(gathered_blocks, 3)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 43,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 18
+                      },
+                      "text": "tf.concat",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 43,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 11
+                          },
+                          "text": "tf"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 43,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 12
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 43,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 18
+                          },
+                          "text": "concat"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 43,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 38
+                      },
+                      "text": "(gathered_blocks, 3)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 43,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 19
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 43,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 34
+                          },
+                          "text": "gathered_blocks"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 43,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 35
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "integer",
+                          "start": {
+                            "row": 43,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 37
+                          },
+                          "text": "3"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 43,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 38
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+public JSONArray toJSONArray(Collection<String> names) throws JSONException {
+		if (CollectionUtil.isEmpty(names)) {
+			return null;
+		}
+		final JSONArray ja = new JSONArray();
+		Object value;
+		for (String name : names) {
+			value = this.get(name);
+			if (null != value) {
+				ja.put(value);
+			}
+		}
+		return ja;
+	}

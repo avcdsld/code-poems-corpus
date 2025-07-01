@@ -1,0 +1,4032 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 48,
+    "column": 62
+  },
+  "text": "def jdbc(self, url, table, column=None, lowerBound=None, upperBound=None, numPartitions=None,\n             predicates=None, properties=None):\n        \"\"\"\n        Construct a :class:`DataFrame` representing the database table named ``table``\n        accessible via JDBC URL ``url`` and connection ``properties``.\n\n        Partitions of the table will be retrieved in parallel if either ``column`` or\n        ``predicates`` is specified. ``lowerBound`, ``upperBound`` and ``numPartitions``\n        is needed when ``column`` is specified.\n\n        If both ``column`` and ``predicates`` are specified, ``column`` will be used.\n\n        .. note:: Don't create too many partitions in parallel on a large cluster;\n            otherwise Spark might crash your external database systems.\n\n        :param url: a JDBC URL of the form ``jdbc:subprotocol:subname``\n        :param table: the name of the table\n        :param column: the name of an integer column that will be used for partitioning;\n                       if this parameter is specified, then ``numPartitions``, ``lowerBound``\n                       (inclusive), and ``upperBound`` (exclusive) will form partition strides\n                       for generated WHERE clause expressions used to split the column\n                       ``column`` evenly\n        :param lowerBound: the minimum value of ``column`` used to decide partition stride\n        :param upperBound: the maximum value of ``column`` used to decide partition stride\n        :param numPartitions: the number of partitions\n        :param predicates: a list of expressions suitable for inclusion in WHERE clauses;\n                           each one defines one partition of the :class:`DataFrame`\n        :param properties: a dictionary of JDBC database connection arguments. Normally at\n                           least properties \"user\" and \"password\" with their corresponding values.\n                           For example { 'user' : 'SYSTEM', 'password' : 'mypassword' }\n        :return: a DataFrame\n        \"\"\"\n        if properties is None:\n            properties = dict()\n        jprop = JavaClass(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)()\n        for k in properties:\n            jprop.setProperty(k, properties[k])\n        if column is not None:\n            assert lowerBound is not None, \"lowerBound can not be None when ``column`` is specified\"\n            assert upperBound is not None, \"upperBound can not be None when ``column`` is specified\"\n            assert numPartitions is not None, \\\n                \"numPartitions can not be None when ``column`` is specified\"\n            return self._df(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))\n        if predicates is not None:\n            gateway = self._spark._sc._gateway\n            jpredicates = utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)\n            return self._df(self._jreader.jdbc(url, table, jpredicates, jprop))\n        return self._df(self._jreader.jdbc(url, table, jprop))",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 48,
+        "column": 62
+      },
+      "text": "def jdbc(self, url, table, column=None, lowerBound=None, upperBound=None, numPartitions=None,\n             predicates=None, properties=None):\n        \"\"\"\n        Construct a :class:`DataFrame` representing the database table named ``table``\n        accessible via JDBC URL ``url`` and connection ``properties``.\n\n        Partitions of the table will be retrieved in parallel if either ``column`` or\n        ``predicates`` is specified. ``lowerBound`, ``upperBound`` and ``numPartitions``\n        is needed when ``column`` is specified.\n\n        If both ``column`` and ``predicates`` are specified, ``column`` will be used.\n\n        .. note:: Don't create too many partitions in parallel on a large cluster;\n            otherwise Spark might crash your external database systems.\n\n        :param url: a JDBC URL of the form ``jdbc:subprotocol:subname``\n        :param table: the name of the table\n        :param column: the name of an integer column that will be used for partitioning;\n                       if this parameter is specified, then ``numPartitions``, ``lowerBound``\n                       (inclusive), and ``upperBound`` (exclusive) will form partition strides\n                       for generated WHERE clause expressions used to split the column\n                       ``column`` evenly\n        :param lowerBound: the minimum value of ``column`` used to decide partition stride\n        :param upperBound: the maximum value of ``column`` used to decide partition stride\n        :param numPartitions: the number of partitions\n        :param predicates: a list of expressions suitable for inclusion in WHERE clauses;\n                           each one defines one partition of the :class:`DataFrame`\n        :param properties: a dictionary of JDBC database connection arguments. Normally at\n                           least properties \"user\" and \"password\" with their corresponding values.\n                           For example { 'user' : 'SYSTEM', 'password' : 'mypassword' }\n        :return: a DataFrame\n        \"\"\"\n        if properties is None:\n            properties = dict()\n        jprop = JavaClass(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)()\n        for k in properties:\n            jprop.setProperty(k, properties[k])\n        if column is not None:\n            assert lowerBound is not None, \"lowerBound can not be None when ``column`` is specified\"\n            assert upperBound is not None, \"upperBound can not be None when ``column`` is specified\"\n            assert numPartitions is not None, \\\n                \"numPartitions can not be None when ``column`` is specified\"\n            return self._df(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))\n        if predicates is not None:\n            gateway = self._spark._sc._gateway\n            jpredicates = utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)\n            return self._df(self._jreader.jdbc(url, table, jpredicates, jprop))\n        return self._df(self._jreader.jdbc(url, table, jprop))",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 8
+          },
+          "text": "jdbc"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 8
+          },
+          "end": {
+            "row": 1,
+            "column": 46
+          },
+          "text": "(self, url, table, column=None, lowerBound=None, upperBound=None, numPartitions=None,\n             predicates=None, properties=None)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 8
+              },
+              "end": {
+                "row": 0,
+                "column": 9
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 9
+              },
+              "end": {
+                "row": 0,
+                "column": 13
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 13
+              },
+              "end": {
+                "row": 0,
+                "column": 14
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 15
+              },
+              "end": {
+                "row": 0,
+                "column": 18
+              },
+              "text": "url"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 18
+              },
+              "end": {
+                "row": 0,
+                "column": 19
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 25
+              },
+              "text": "table"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 25
+              },
+              "end": {
+                "row": 0,
+                "column": 26
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 27
+              },
+              "end": {
+                "row": 0,
+                "column": 38
+              },
+              "text": "column=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 33
+                  },
+                  "text": "column"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 38
+              },
+              "end": {
+                "row": 0,
+                "column": 39
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 40
+              },
+              "end": {
+                "row": 0,
+                "column": 55
+              },
+              "text": "lowerBound=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 50
+                  },
+                  "text": "lowerBound"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 50
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 51
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 51
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 55
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 55
+              },
+              "end": {
+                "row": 0,
+                "column": 56
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 57
+              },
+              "end": {
+                "row": 0,
+                "column": 72
+              },
+              "text": "upperBound=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 57
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 67
+                  },
+                  "text": "upperBound"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 67
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 68
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 68
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 72
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 72
+              },
+              "end": {
+                "row": 0,
+                "column": 73
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 74
+              },
+              "end": {
+                "row": 0,
+                "column": 92
+              },
+              "text": "numPartitions=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 74
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 87
+                  },
+                  "text": "numPartitions"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 87
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 88
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 88
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 92
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 92
+              },
+              "end": {
+                "row": 0,
+                "column": 93
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 1,
+                "column": 13
+              },
+              "end": {
+                "row": 1,
+                "column": 28
+              },
+              "text": "predicates=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 23
+                  },
+                  "text": "predicates"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 1,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 24
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 1,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 28
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 28
+              },
+              "end": {
+                "row": 1,
+                "column": 29
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 1,
+                "column": 30
+              },
+              "end": {
+                "row": 1,
+                "column": 45
+              },
+              "text": "properties=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 40
+                  },
+                  "text": "properties"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 1,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 41
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 1,
+                    "column": 41
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 45
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 1,
+                "column": 45
+              },
+              "end": {
+                "row": 1,
+                "column": 46
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 1,
+            "column": 46
+          },
+          "end": {
+            "row": 1,
+            "column": 47
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 2,
+            "column": 8
+          },
+          "end": {
+            "row": 48,
+            "column": 62
+          },
+          "text": "\"\"\"\n        Construct a :class:`DataFrame` representing the database table named ``table``\n        accessible via JDBC URL ``url`` and connection ``properties``.\n\n        Partitions of the table will be retrieved in parallel if either ``column`` or\n        ``predicates`` is specified. ``lowerBound`, ``upperBound`` and ``numPartitions``\n        is needed when ``column`` is specified.\n\n        If both ``column`` and ``predicates`` are specified, ``column`` will be used.\n\n        .. note:: Don't create too many partitions in parallel on a large cluster;\n            otherwise Spark might crash your external database systems.\n\n        :param url: a JDBC URL of the form ``jdbc:subprotocol:subname``\n        :param table: the name of the table\n        :param column: the name of an integer column that will be used for partitioning;\n                       if this parameter is specified, then ``numPartitions``, ``lowerBound``\n                       (inclusive), and ``upperBound`` (exclusive) will form partition strides\n                       for generated WHERE clause expressions used to split the column\n                       ``column`` evenly\n        :param lowerBound: the minimum value of ``column`` used to decide partition stride\n        :param upperBound: the maximum value of ``column`` used to decide partition stride\n        :param numPartitions: the number of partitions\n        :param predicates: a list of expressions suitable for inclusion in WHERE clauses;\n                           each one defines one partition of the :class:`DataFrame`\n        :param properties: a dictionary of JDBC database connection arguments. Normally at\n                           least properties \"user\" and \"password\" with their corresponding values.\n                           For example { 'user' : 'SYSTEM', 'password' : 'mypassword' }\n        :return: a DataFrame\n        \"\"\"\n        if properties is None:\n            properties = dict()\n        jprop = JavaClass(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)()\n        for k in properties:\n            jprop.setProperty(k, properties[k])\n        if column is not None:\n            assert lowerBound is not None, \"lowerBound can not be None when ``column`` is specified\"\n            assert upperBound is not None, \"upperBound can not be None when ``column`` is specified\"\n            assert numPartitions is not None, \\\n                \"numPartitions can not be None when ``column`` is specified\"\n            return self._df(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))\n        if predicates is not None:\n            gateway = self._spark._sc._gateway\n            jpredicates = utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)\n            return self._df(self._jreader.jdbc(url, table, jpredicates, jprop))\n        return self._df(self._jreader.jdbc(url, table, jprop))",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 2,
+                "column": 8
+              },
+              "end": {
+                "row": 31,
+                "column": 11
+              },
+              "text": "\"\"\"\n        Construct a :class:`DataFrame` representing the database table named ``table``\n        accessible via JDBC URL ``url`` and connection ``properties``.\n\n        Partitions of the table will be retrieved in parallel if either ``column`` or\n        ``predicates`` is specified. ``lowerBound`, ``upperBound`` and ``numPartitions``\n        is needed when ``column`` is specified.\n\n        If both ``column`` and ``predicates`` are specified, ``column`` will be used.\n\n        .. note:: Don't create too many partitions in parallel on a large cluster;\n            otherwise Spark might crash your external database systems.\n\n        :param url: a JDBC URL of the form ``jdbc:subprotocol:subname``\n        :param table: the name of the table\n        :param column: the name of an integer column that will be used for partitioning;\n                       if this parameter is specified, then ``numPartitions``, ``lowerBound``\n                       (inclusive), and ``upperBound`` (exclusive) will form partition strides\n                       for generated WHERE clause expressions used to split the column\n                       ``column`` evenly\n        :param lowerBound: the minimum value of ``column`` used to decide partition stride\n        :param upperBound: the maximum value of ``column`` used to decide partition stride\n        :param numPartitions: the number of partitions\n        :param predicates: a list of expressions suitable for inclusion in WHERE clauses;\n                           each one defines one partition of the :class:`DataFrame`\n        :param properties: a dictionary of JDBC database connection arguments. Normally at\n                           least properties \"user\" and \"password\" with their corresponding values.\n                           For example { 'user' : 'SYSTEM', 'password' : 'mypassword' }\n        :return: a DataFrame\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 2,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 11
+                  },
+                  "text": "\"\"\"\n        Construct a :class:`DataFrame` representing the database table named ``table``\n        accessible via JDBC URL ``url`` and connection ``properties``.\n\n        Partitions of the table will be retrieved in parallel if either ``column`` or\n        ``predicates`` is specified. ``lowerBound`, ``upperBound`` and ``numPartitions``\n        is needed when ``column`` is specified.\n\n        If both ``column`` and ``predicates`` are specified, ``column`` will be used.\n\n        .. note:: Don't create too many partitions in parallel on a large cluster;\n            otherwise Spark might crash your external database systems.\n\n        :param url: a JDBC URL of the form ``jdbc:subprotocol:subname``\n        :param table: the name of the table\n        :param column: the name of an integer column that will be used for partitioning;\n                       if this parameter is specified, then ``numPartitions``, ``lowerBound``\n                       (inclusive), and ``upperBound`` (exclusive) will form partition strides\n                       for generated WHERE clause expressions used to split the column\n                       ``column`` evenly\n        :param lowerBound: the minimum value of ``column`` used to decide partition stride\n        :param upperBound: the maximum value of ``column`` used to decide partition stride\n        :param numPartitions: the number of partitions\n        :param predicates: a list of expressions suitable for inclusion in WHERE clauses;\n                           each one defines one partition of the :class:`DataFrame`\n        :param properties: a dictionary of JDBC database connection arguments. Normally at\n                           least properties \"user\" and \"password\" with their corresponding values.\n                           For example { 'user' : 'SYSTEM', 'password' : 'mypassword' }\n        :return: a DataFrame\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 2,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 2,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "text": "\n        Construct a :class:`DataFrame` representing the database table named ``table``\n        accessible via JDBC URL ``url`` and connection ``properties``.\n\n        Partitions of the table will be retrieved in parallel if either ``column`` or\n        ``predicates`` is specified. ``lowerBound`, ``upperBound`` and ``numPartitions``\n        is needed when ``column`` is specified.\n\n        If both ``column`` and ``predicates`` are specified, ``column`` will be used.\n\n        .. note:: Don't create too many partitions in parallel on a large cluster;\n            otherwise Spark might crash your external database systems.\n\n        :param url: a JDBC URL of the form ``jdbc:subprotocol:subname``\n        :param table: the name of the table\n        :param column: the name of an integer column that will be used for partitioning;\n                       if this parameter is specified, then ``numPartitions``, ``lowerBound``\n                       (inclusive), and ``upperBound`` (exclusive) will form partition strides\n                       for generated WHERE clause expressions used to split the column\n                       ``column`` evenly\n        :param lowerBound: the minimum value of ``column`` used to decide partition stride\n        :param upperBound: the maximum value of ``column`` used to decide partition stride\n        :param numPartitions: the number of partitions\n        :param predicates: a list of expressions suitable for inclusion in WHERE clauses;\n                           each one defines one partition of the :class:`DataFrame`\n        :param properties: a dictionary of JDBC database connection arguments. Normally at\n                           least properties \"user\" and \"password\" with their corresponding values.\n                           For example { 'user' : 'SYSTEM', 'password' : 'mypassword' }\n        :return: a DataFrame\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 32,
+                "column": 8
+              },
+              "end": {
+                "row": 33,
+                "column": 31
+              },
+              "text": "if properties is None:\n            properties = dict()",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 32,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 32,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 29
+                  },
+                  "text": "properties is None",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 32,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 21
+                      },
+                      "text": "properties"
+                    },
+                    {
+                      "type": "is",
+                      "start": {
+                        "row": 32,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 24
+                      },
+                      "text": "is"
+                    },
+                    {
+                      "type": "none",
+                      "start": {
+                        "row": 32,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 29
+                      },
+                      "text": "None"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 32,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 30
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 33,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 33,
+                    "column": 31
+                  },
+                  "text": "properties = dict()",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 33,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 31
+                      },
+                      "text": "properties = dict()",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 33,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 31
+                          },
+                          "text": "properties = dict()",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 22
+                              },
+                              "text": "properties"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 33,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 24
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 33,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 31
+                              },
+                              "text": "dict()",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 29
+                                  },
+                                  "text": "dict"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 31
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 30
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 31
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 34,
+                "column": 8
+              },
+              "end": {
+                "row": 34,
+                "column": 93
+              },
+              "text": "jprop = JavaClass(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 34,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 93
+                  },
+                  "text": "jprop = JavaClass(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 34,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 13
+                      },
+                      "text": "jprop"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 34,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 34,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 93
+                      },
+                      "text": "JavaClass(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)()",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 34,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 91
+                          },
+                          "text": "JavaClass(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 34,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 25
+                              },
+                              "text": "JavaClass"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 34,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 91
+                              },
+                              "text": "(\"java.util.Properties\", self._spark._sc._gateway._gateway_client)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 26
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 48
+                                  },
+                                  "text": "\"java.util.Properties\"",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 27
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 47
+                                      },
+                                      "text": "java.util.Properties"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 48
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 49
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 90
+                                  },
+                                  "text": "self._spark._sc._gateway._gateway_client",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 74
+                                      },
+                                      "text": "self._spark._sc._gateway",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 65
+                                          },
+                                          "text": "self._spark._sc",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 50
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 61
+                                              },
+                                              "text": "self._spark",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 34,
+                                                    "column": 50
+                                                  },
+                                                  "end": {
+                                                    "row": 34,
+                                                    "column": 54
+                                                  },
+                                                  "text": "self"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 34,
+                                                    "column": 54
+                                                  },
+                                                  "end": {
+                                                    "row": 34,
+                                                    "column": 55
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 34,
+                                                    "column": 55
+                                                  },
+                                                  "end": {
+                                                    "row": 34,
+                                                    "column": 61
+                                                  },
+                                                  "text": "_spark"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 61
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 62
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 62
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 65
+                                              },
+                                              "text": "_sc"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 65
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 66
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 66
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 74
+                                          },
+                                          "text": "_gateway"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 74
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 75
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 75
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 90
+                                      },
+                                      "text": "_gateway_client"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 90
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 91
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 34,
+                            "column": 91
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 93
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 34,
+                                "column": 91
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 92
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 34,
+                                "column": 92
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 93
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "for_statement",
+              "start": {
+                "row": 35,
+                "column": 8
+              },
+              "end": {
+                "row": 36,
+                "column": 47
+              },
+              "text": "for k in properties:\n            jprop.setProperty(k, properties[k])",
+              "children": [
+                {
+                  "type": "for",
+                  "start": {
+                    "row": 35,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 11
+                  },
+                  "text": "for"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 35,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 13
+                  },
+                  "text": "k"
+                },
+                {
+                  "type": "in",
+                  "start": {
+                    "row": 35,
+                    "column": 14
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 16
+                  },
+                  "text": "in"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 35,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 27
+                  },
+                  "text": "properties"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 35,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 28
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 36,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 47
+                  },
+                  "text": "jprop.setProperty(k, properties[k])",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 36,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 47
+                      },
+                      "text": "jprop.setProperty(k, properties[k])",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 36,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 47
+                          },
+                          "text": "jprop.setProperty(k, properties[k])",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 36,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 29
+                              },
+                              "text": "jprop.setProperty",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 17
+                                  },
+                                  "text": "jprop"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 18
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 29
+                                  },
+                                  "text": "setProperty"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 36,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 47
+                              },
+                              "text": "(k, properties[k])",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 30
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 31
+                                  },
+                                  "text": "k"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 32
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "subscript",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 46
+                                  },
+                                  "text": "properties[k]",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 43
+                                      },
+                                      "text": "properties"
+                                    },
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 44
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 45
+                                      },
+                                      "text": "k"
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 46
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 47
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 37,
+                "column": 8
+              },
+              "end": {
+                "row": 43,
+                "column": 74
+              },
+              "text": "if column is not None:\n            assert lowerBound is not None, \"lowerBound can not be None when ``column`` is specified\"\n            assert upperBound is not None, \"upperBound can not be None when ``column`` is specified\"\n            assert numPartitions is not None, \\\n                \"numPartitions can not be None when ``column`` is specified\"\n            return self._df(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 37,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 37,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 29
+                  },
+                  "text": "column is not None",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 37,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 17
+                      },
+                      "text": "column"
+                    },
+                    {
+                      "type": "is not",
+                      "start": {
+                        "row": 37,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 20
+                      },
+                      "text": "is"
+                    },
+                    {
+                      "type": "is not",
+                      "start": {
+                        "row": 37,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 24
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "none",
+                      "start": {
+                        "row": 37,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 29
+                      },
+                      "text": "None"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 37,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 30
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 38,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 74
+                  },
+                  "text": "assert lowerBound is not None, \"lowerBound can not be None when ``column`` is specified\"\n            assert upperBound is not None, \"upperBound can not be None when ``column`` is specified\"\n            assert numPartitions is not None, \\\n                \"numPartitions can not be None when ``column`` is specified\"\n            return self._df(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))",
+                  "children": [
+                    {
+                      "type": "assert_statement",
+                      "start": {
+                        "row": 38,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 100
+                      },
+                      "text": "assert lowerBound is not None, \"lowerBound can not be None when ``column`` is specified\"",
+                      "children": [
+                        {
+                          "type": "assert",
+                          "start": {
+                            "row": 38,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 18
+                          },
+                          "text": "assert"
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 38,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 41
+                          },
+                          "text": "lowerBound is not None",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 38,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 29
+                              },
+                              "text": "lowerBound"
+                            },
+                            {
+                              "type": "is not",
+                              "start": {
+                                "row": 38,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 32
+                              },
+                              "text": "is"
+                            },
+                            {
+                              "type": "is not",
+                              "start": {
+                                "row": 38,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 36
+                              },
+                              "text": "not"
+                            },
+                            {
+                              "type": "none",
+                              "start": {
+                                "row": 38,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 41
+                              },
+                              "text": "None"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 38,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 42
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 38,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 100
+                          },
+                          "text": "\"lowerBound can not be None when ``column`` is specified\"",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 38,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 44
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 38,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 99
+                              },
+                              "text": "lowerBound can not be None when ``column`` is specified"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 38,
+                                "column": 99
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 100
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "assert_statement",
+                      "start": {
+                        "row": 39,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 100
+                      },
+                      "text": "assert upperBound is not None, \"upperBound can not be None when ``column`` is specified\"",
+                      "children": [
+                        {
+                          "type": "assert",
+                          "start": {
+                            "row": 39,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 18
+                          },
+                          "text": "assert"
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 39,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 41
+                          },
+                          "text": "upperBound is not None",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 39,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 29
+                              },
+                              "text": "upperBound"
+                            },
+                            {
+                              "type": "is not",
+                              "start": {
+                                "row": 39,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 32
+                              },
+                              "text": "is"
+                            },
+                            {
+                              "type": "is not",
+                              "start": {
+                                "row": 39,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 36
+                              },
+                              "text": "not"
+                            },
+                            {
+                              "type": "none",
+                              "start": {
+                                "row": 39,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 41
+                              },
+                              "text": "None"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 39,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 42
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 39,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 100
+                          },
+                          "text": "\"upperBound can not be None when ``column`` is specified\"",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 39,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 44
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 39,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 99
+                              },
+                              "text": "upperBound can not be None when ``column`` is specified"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 39,
+                                "column": 99
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 100
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "assert_statement",
+                      "start": {
+                        "row": 40,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 76
+                      },
+                      "text": "assert numPartitions is not None, \\\n                \"numPartitions can not be None when ``column`` is specified\"",
+                      "children": [
+                        {
+                          "type": "assert",
+                          "start": {
+                            "row": 40,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 18
+                          },
+                          "text": "assert"
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 40,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 44
+                          },
+                          "text": "numPartitions is not None",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 32
+                              },
+                              "text": "numPartitions"
+                            },
+                            {
+                              "type": "is not",
+                              "start": {
+                                "row": 40,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 35
+                              },
+                              "text": "is"
+                            },
+                            {
+                              "type": "is not",
+                              "start": {
+                                "row": 40,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 39
+                              },
+                              "text": "not"
+                            },
+                            {
+                              "type": "none",
+                              "start": {
+                                "row": 40,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 44
+                              },
+                              "text": "None"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 40,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 45
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 41,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 76
+                          },
+                          "text": "\"numPartitions can not be None when ``column`` is specified\"",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 41,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 17
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 41,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 75
+                              },
+                              "text": "numPartitions can not be None when ``column`` is specified"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 41,
+                                "column": 75
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 76
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 42,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 74
+                      },
+                      "text": "return self._df(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 42,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 18
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 42,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 74
+                          },
+                          "text": "self._df(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 42,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 27
+                              },
+                              "text": "self._df",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 23
+                                  },
+                                  "text": "self"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 24
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 27
+                                  },
+                                  "text": "_df"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 42,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 74
+                              },
+                              "text": "(self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop))",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 28
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 73
+                                  },
+                                  "text": "self._jreader.jdbc(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 46
+                                      },
+                                      "text": "self._jreader.jdbc",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 41
+                                          },
+                                          "text": "self._jreader",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 32
+                                              },
+                                              "text": "self"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 32
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 33
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 41
+                                              },
+                                              "text": "_jreader"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 42
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 46
+                                          },
+                                          "text": "jdbc"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 73
+                                      },
+                                      "text": "(url, table, column, int(lowerBound), int(upperBound),\n                                               int(numPartitions), jprop)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 47
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 50
+                                          },
+                                          "text": "url"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 51
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 57
+                                          },
+                                          "text": "table"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 57
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 58
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 65
+                                          },
+                                          "text": "column"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 65
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 66
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 67
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 82
+                                          },
+                                          "text": "int(lowerBound)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 67
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 70
+                                              },
+                                              "text": "int"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 70
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 82
+                                              },
+                                              "text": "(lowerBound)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 70
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 71
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 71
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 81
+                                                  },
+                                                  "text": "lowerBound"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 81
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 82
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 82
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 83
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 84
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 99
+                                          },
+                                          "text": "int(upperBound)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 84
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 87
+                                              },
+                                              "text": "int"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 87
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 99
+                                              },
+                                              "text": "(upperBound)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 87
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 88
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 88
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 98
+                                                  },
+                                                  "text": "upperBound"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 98
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 99
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 99
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 100
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 65
+                                          },
+                                          "text": "int(numPartitions)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 50
+                                              },
+                                              "text": "int"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 50
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 65
+                                              },
+                                              "text": "(numPartitions)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 50
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 51
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 51
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 64
+                                                  },
+                                                  "text": "numPartitions"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 64
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 65
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 65
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 66
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 67
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 72
+                                          },
+                                          "text": "jprop"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 72
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 73
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 73
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 74
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 44,
+                "column": 8
+              },
+              "end": {
+                "row": 47,
+                "column": 79
+              },
+              "text": "if predicates is not None:\n            gateway = self._spark._sc._gateway\n            jpredicates = utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)\n            return self._df(self._jreader.jdbc(url, table, jpredicates, jprop))",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 44,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 44,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 33
+                  },
+                  "text": "predicates is not None",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 44,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 21
+                      },
+                      "text": "predicates"
+                    },
+                    {
+                      "type": "is not",
+                      "start": {
+                        "row": 44,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 24
+                      },
+                      "text": "is"
+                    },
+                    {
+                      "type": "is not",
+                      "start": {
+                        "row": 44,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 28
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "none",
+                      "start": {
+                        "row": 44,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 33
+                      },
+                      "text": "None"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 44,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 34
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 45,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 47,
+                    "column": 79
+                  },
+                  "text": "gateway = self._spark._sc._gateway\n            jpredicates = utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)\n            return self._df(self._jreader.jdbc(url, table, jpredicates, jprop))",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 45,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 46
+                      },
+                      "text": "gateway = self._spark._sc._gateway",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 45,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 46
+                          },
+                          "text": "gateway = self._spark._sc._gateway",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 45,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 19
+                              },
+                              "text": "gateway"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 45,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 21
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 45,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 46
+                              },
+                              "text": "self._spark._sc._gateway",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 37
+                                  },
+                                  "text": "self._spark._sc",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 33
+                                      },
+                                      "text": "self._spark",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 26
+                                          },
+                                          "text": "self"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 27
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 33
+                                          },
+                                          "text": "_spark"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 34
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 37
+                                      },
+                                      "text": "_sc"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 38
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 46
+                                  },
+                                  "text": "_gateway"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 46,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 91
+                      },
+                      "text": "jpredicates = utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 46,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 91
+                          },
+                          "text": "jpredicates = utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 23
+                              },
+                              "text": "jpredicates"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 46,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 25
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 46,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 91
+                              },
+                              "text": "utils.toJArray(gateway, gateway.jvm.java.lang.String, predicates)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 40
+                                  },
+                                  "text": "utils.toJArray",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 31
+                                      },
+                                      "text": "utils"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 32
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 40
+                                      },
+                                      "text": "toJArray"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 91
+                                  },
+                                  "text": "(gateway, gateway.jvm.java.lang.String, predicates)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 41
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 41
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 48
+                                      },
+                                      "text": "gateway"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 49
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 78
+                                      },
+                                      "text": "gateway.jvm.java.lang.String",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 46,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 46,
+                                            "column": 71
+                                          },
+                                          "text": "gateway.jvm.java.lang",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 46,
+                                                "column": 50
+                                              },
+                                              "end": {
+                                                "row": 46,
+                                                "column": 66
+                                              },
+                                              "text": "gateway.jvm.java",
+                                              "children": [
+                                                {
+                                                  "type": "attribute",
+                                                  "start": {
+                                                    "row": 46,
+                                                    "column": 50
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 61
+                                                  },
+                                                  "text": "gateway.jvm",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 50
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 57
+                                                      },
+                                                      "text": "gateway"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 57
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 58
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 58
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 61
+                                                      },
+                                                      "text": "jvm"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 46,
+                                                    "column": 61
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 62
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 46,
+                                                    "column": 62
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 66
+                                                  },
+                                                  "text": "java"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 46,
+                                                "column": 66
+                                              },
+                                              "end": {
+                                                "row": 46,
+                                                "column": 67
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 46,
+                                                "column": 67
+                                              },
+                                              "end": {
+                                                "row": 46,
+                                                "column": 71
+                                              },
+                                              "text": "lang"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 46,
+                                            "column": 71
+                                          },
+                                          "end": {
+                                            "row": 46,
+                                            "column": 72
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 46,
+                                            "column": 72
+                                          },
+                                          "end": {
+                                            "row": 46,
+                                            "column": 78
+                                          },
+                                          "text": "String"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 78
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 79
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 80
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 90
+                                      },
+                                      "text": "predicates"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 90
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 91
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 47,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 79
+                      },
+                      "text": "return self._df(self._jreader.jdbc(url, table, jpredicates, jprop))",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 47,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 18
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 47,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 79
+                          },
+                          "text": "self._df(self._jreader.jdbc(url, table, jpredicates, jprop))",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 47,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 27
+                              },
+                              "text": "self._df",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 23
+                                  },
+                                  "text": "self"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 24
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 27
+                                  },
+                                  "text": "_df"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 47,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 79
+                              },
+                              "text": "(self._jreader.jdbc(url, table, jpredicates, jprop))",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 28
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 78
+                                  },
+                                  "text": "self._jreader.jdbc(url, table, jpredicates, jprop)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 47,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 46
+                                      },
+                                      "text": "self._jreader.jdbc",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 41
+                                          },
+                                          "text": "self._jreader",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 32
+                                              },
+                                              "text": "self"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 32
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 33
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 47,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 47,
+                                                "column": 41
+                                              },
+                                              "text": "_jreader"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 42
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 46
+                                          },
+                                          "text": "jdbc"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 47,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 78
+                                      },
+                                      "text": "(url, table, jpredicates, jprop)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 47
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 50
+                                          },
+                                          "text": "url"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 51
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 57
+                                          },
+                                          "text": "table"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 57
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 58
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 70
+                                          },
+                                          "text": "jpredicates"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 70
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 71
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 72
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 77
+                                          },
+                                          "text": "jprop"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 77
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 78
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 78
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 79
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 48,
+                "column": 8
+              },
+              "end": {
+                "row": 48,
+                "column": 62
+              },
+              "text": "return self._df(self._jreader.jdbc(url, table, jprop))",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 48,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 48,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 48,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 48,
+                    "column": 62
+                  },
+                  "text": "self._df(self._jreader.jdbc(url, table, jprop))",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 48,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 48,
+                        "column": 23
+                      },
+                      "text": "self._df",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 48,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 19
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 48,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 20
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 48,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 23
+                          },
+                          "text": "_df"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 48,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 48,
+                        "column": 62
+                      },
+                      "text": "(self._jreader.jdbc(url, table, jprop))",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 48,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 24
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 48,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 61
+                          },
+                          "text": "self._jreader.jdbc(url, table, jprop)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 48,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 42
+                              },
+                              "text": "self._jreader.jdbc",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 37
+                                  },
+                                  "text": "self._jreader",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 48,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 28
+                                      },
+                                      "text": "self"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 48,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 29
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 48,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 48,
+                                        "column": 37
+                                      },
+                                      "text": "_jreader"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 38
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 42
+                                  },
+                                  "text": "jdbc"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 48,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 61
+                              },
+                              "text": "(url, table, jprop)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 43
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 46
+                                  },
+                                  "text": "url"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 47
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 53
+                                  },
+                                  "text": "table"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 54
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 60
+                                  },
+                                  "text": "jprop"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 60
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 61
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 48,
+                            "column": 61
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 62
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

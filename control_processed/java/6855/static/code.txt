@@ -1,0 +1,11 @@
+public static DocumentBuilder createDocumentBuilder() {
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		disableXXE(dbf);
+		DocumentBuilder builder = null;
+		try {
+			builder = dbf.newDocumentBuilder();
+		} catch (Exception e) {
+			throw new UtilException(e, "Create xml document error!");
+		}
+		return builder;
+	}

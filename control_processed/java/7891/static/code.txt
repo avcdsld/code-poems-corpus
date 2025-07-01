@@ -1,0 +1,12 @@
+public static List<Object> extract(Iterable<?> collection, Editor<Object> editor, boolean ignoreNull) {
+		final List<Object> fieldValueList = new ArrayList<>();
+		Object value;
+		for (Object bean : collection) {
+			value = editor.edit(bean);
+			if (null == value && ignoreNull) {
+				continue;
+			}
+			fieldValueList.add(value);
+		}
+		return fieldValueList;
+	}

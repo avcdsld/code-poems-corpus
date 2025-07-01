@@ -1,0 +1,3952 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 40,
+    "column": 1
+  },
+  "text": "function RopeJoint(def, bodyA, bodyB, anchor) {\n  if (!(this instanceof RopeJoint)) {\n    return new RopeJoint(def, bodyA, bodyB, anchor);\n  }\n\n  def = options(def, DEFAULTS);\n  Joint.call(this, def, bodyA, bodyB);\n  bodyA = this.m_bodyA;\n  bodyB = this.m_bodyB;\n\n  this.m_type = RopeJoint.TYPE;\n  this.m_localAnchorA = anchor ? bodyA.getLocalPoint(anchor) : def.localAnchorA || Vec2.neo(-1.0, 0.0);\n  this.m_localAnchorB = anchor ? bodyB.getLocalPoint(anchor) : def.localAnchorB || Vec2.neo(1.0, 0.0);\n\n  this.m_maxLength = def.maxLength;\n\n  this.m_mass = 0.0;\n  this.m_impulse = 0.0;\n  this.m_length = 0.0;\n  this.m_state = inactiveLimit;\n\n  // Solver temp\n  this.m_u; // Vec2\n  this.m_rA; // Vec2\n  this.m_rB; // Vec2\n  this.m_localCenterA; // Vec2\n  this.m_localCenterB; // Vec2\n  this.m_invMassA; // float\n  this.m_invMassB; // float\n  this.m_invIA; // float\n  this.m_invIB; // float\n  this.m_mass; // float\n\n  // Limit:\n  // C = norm(pB - pA) - L\n  // u = (pB - pA) / norm(pB - pA)\n  // Cdot = dot(u, vB + cross(wB, rB) - vA - cross(wA, rA))\n  // J = [-u -cross(rA, u) u cross(rB, u)]\n  // K = J * invM * JT\n  // = invMassA + invIA * cross(rA, u)^2 + invMassB + invIB * cross(rB, u)^2\n}",
+  "children": [
+    {
+      "type": "function_declaration",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 40,
+        "column": 1
+      },
+      "text": "function RopeJoint(def, bodyA, bodyB, anchor) {\n  if (!(this instanceof RopeJoint)) {\n    return new RopeJoint(def, bodyA, bodyB, anchor);\n  }\n\n  def = options(def, DEFAULTS);\n  Joint.call(this, def, bodyA, bodyB);\n  bodyA = this.m_bodyA;\n  bodyB = this.m_bodyB;\n\n  this.m_type = RopeJoint.TYPE;\n  this.m_localAnchorA = anchor ? bodyA.getLocalPoint(anchor) : def.localAnchorA || Vec2.neo(-1.0, 0.0);\n  this.m_localAnchorB = anchor ? bodyB.getLocalPoint(anchor) : def.localAnchorB || Vec2.neo(1.0, 0.0);\n\n  this.m_maxLength = def.maxLength;\n\n  this.m_mass = 0.0;\n  this.m_impulse = 0.0;\n  this.m_length = 0.0;\n  this.m_state = inactiveLimit;\n\n  // Solver temp\n  this.m_u; // Vec2\n  this.m_rA; // Vec2\n  this.m_rB; // Vec2\n  this.m_localCenterA; // Vec2\n  this.m_localCenterB; // Vec2\n  this.m_invMassA; // float\n  this.m_invMassB; // float\n  this.m_invIA; // float\n  this.m_invIB; // float\n  this.m_mass; // float\n\n  // Limit:\n  // C = norm(pB - pA) - L\n  // u = (pB - pA) / norm(pB - pA)\n  // Cdot = dot(u, vB + cross(wB, rB) - vA - cross(wA, rA))\n  // J = [-u -cross(rA, u) u cross(rB, u)]\n  // K = J * invM * JT\n  // = invMassA + invIA * cross(rA, u)^2 + invMassB + invIB * cross(rB, u)^2\n}",
+      "children": [
+        {
+          "type": "function",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 8
+          },
+          "text": "function"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 9
+          },
+          "end": {
+            "row": 0,
+            "column": 18
+          },
+          "text": "RopeJoint"
+        },
+        {
+          "type": "formal_parameters",
+          "start": {
+            "row": 0,
+            "column": 18
+          },
+          "end": {
+            "row": 0,
+            "column": 45
+          },
+          "text": "(def, bodyA, bodyB, anchor)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 18
+              },
+              "end": {
+                "row": 0,
+                "column": 19
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 19
+              },
+              "end": {
+                "row": 0,
+                "column": 22
+              },
+              "text": "def"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 22
+              },
+              "end": {
+                "row": 0,
+                "column": 23
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 24
+              },
+              "end": {
+                "row": 0,
+                "column": 29
+              },
+              "text": "bodyA"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 29
+              },
+              "end": {
+                "row": 0,
+                "column": 30
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 31
+              },
+              "end": {
+                "row": 0,
+                "column": 36
+              },
+              "text": "bodyB"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 36
+              },
+              "end": {
+                "row": 0,
+                "column": 37
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 38
+              },
+              "end": {
+                "row": 0,
+                "column": 44
+              },
+              "text": "anchor"
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 44
+              },
+              "end": {
+                "row": 0,
+                "column": 45
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "statement_block",
+          "start": {
+            "row": 0,
+            "column": 46
+          },
+          "end": {
+            "row": 40,
+            "column": 1
+          },
+          "text": "{\n  if (!(this instanceof RopeJoint)) {\n    return new RopeJoint(def, bodyA, bodyB, anchor);\n  }\n\n  def = options(def, DEFAULTS);\n  Joint.call(this, def, bodyA, bodyB);\n  bodyA = this.m_bodyA;\n  bodyB = this.m_bodyB;\n\n  this.m_type = RopeJoint.TYPE;\n  this.m_localAnchorA = anchor ? bodyA.getLocalPoint(anchor) : def.localAnchorA || Vec2.neo(-1.0, 0.0);\n  this.m_localAnchorB = anchor ? bodyB.getLocalPoint(anchor) : def.localAnchorB || Vec2.neo(1.0, 0.0);\n\n  this.m_maxLength = def.maxLength;\n\n  this.m_mass = 0.0;\n  this.m_impulse = 0.0;\n  this.m_length = 0.0;\n  this.m_state = inactiveLimit;\n\n  // Solver temp\n  this.m_u; // Vec2\n  this.m_rA; // Vec2\n  this.m_rB; // Vec2\n  this.m_localCenterA; // Vec2\n  this.m_localCenterB; // Vec2\n  this.m_invMassA; // float\n  this.m_invMassB; // float\n  this.m_invIA; // float\n  this.m_invIB; // float\n  this.m_mass; // float\n\n  // Limit:\n  // C = norm(pB - pA) - L\n  // u = (pB - pA) / norm(pB - pA)\n  // Cdot = dot(u, vB + cross(wB, rB) - vA - cross(wA, rA))\n  // J = [-u -cross(rA, u) u cross(rB, u)]\n  // K = J * invM * JT\n  // = invMassA + invIA * cross(rA, u)^2 + invMassB + invIB * cross(rB, u)^2\n}",
+          "children": [
+            {
+              "type": "{",
+              "start": {
+                "row": 0,
+                "column": 46
+              },
+              "end": {
+                "row": 0,
+                "column": 47
+              },
+              "text": "{"
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 1,
+                "column": 2
+              },
+              "end": {
+                "row": 3,
+                "column": 3
+              },
+              "text": "if (!(this instanceof RopeJoint)) {\n    return new RopeJoint(def, bodyA, bodyB, anchor);\n  }",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 1,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "parenthesized_expression",
+                  "start": {
+                    "row": 1,
+                    "column": 5
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 35
+                  },
+                  "text": "(!(this instanceof RopeJoint))",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 1,
+                        "column": 5
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 6
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "unary_expression",
+                      "start": {
+                        "row": 1,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 34
+                      },
+                      "text": "!(this instanceof RopeJoint)",
+                      "children": [
+                        {
+                          "type": "!",
+                          "start": {
+                            "row": 1,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 7
+                          },
+                          "text": "!"
+                        },
+                        {
+                          "type": "parenthesized_expression",
+                          "start": {
+                            "row": 1,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 34
+                          },
+                          "text": "(this instanceof RopeJoint)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 1,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 8
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "binary_expression",
+                              "start": {
+                                "row": 1,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 33
+                              },
+                              "text": "this instanceof RopeJoint",
+                              "children": [
+                                {
+                                  "type": "this",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 12
+                                  },
+                                  "text": "this"
+                                },
+                                {
+                                  "type": "instanceof",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 23
+                                  },
+                                  "text": "instanceof"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 33
+                                  },
+                                  "text": "RopeJoint"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 1,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 34
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 1,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 35
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": "statement_block",
+                  "start": {
+                    "row": 1,
+                    "column": 36
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 3
+                  },
+                  "text": "{\n    return new RopeJoint(def, bodyA, bodyB, anchor);\n  }",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 1,
+                        "column": 36
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 37
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 2,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 52
+                      },
+                      "text": "return new RopeJoint(def, bodyA, bodyB, anchor);",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 2,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 10
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "new_expression",
+                          "start": {
+                            "row": 2,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 51
+                          },
+                          "text": "new RopeJoint(def, bodyA, bodyB, anchor)",
+                          "children": [
+                            {
+                              "type": "new",
+                              "start": {
+                                "row": 2,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 14
+                              },
+                              "text": "new"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 2,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 24
+                              },
+                              "text": "RopeJoint"
+                            },
+                            {
+                              "type": "arguments",
+                              "start": {
+                                "row": 2,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 51
+                              },
+                              "text": "(def, bodyA, bodyB, anchor)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 25
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 28
+                                  },
+                                  "text": "def"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 29
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 35
+                                  },
+                                  "text": "bodyA"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 36
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 42
+                                  },
+                                  "text": "bodyB"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 43
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 50
+                                  },
+                                  "text": "anchor"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 51
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 2,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 52
+                          },
+                          "text": ";"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 3,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 3
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 5,
+                "column": 2
+              },
+              "end": {
+                "row": 5,
+                "column": 31
+              },
+              "text": "def = options(def, DEFAULTS);",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 5,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 30
+                  },
+                  "text": "def = options(def, DEFAULTS)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 5
+                      },
+                      "text": "def"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 5,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 7
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call_expression",
+                      "start": {
+                        "row": 5,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 30
+                      },
+                      "text": "options(def, DEFAULTS)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 5,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 15
+                          },
+                          "text": "options"
+                        },
+                        {
+                          "type": "arguments",
+                          "start": {
+                            "row": 5,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 30
+                          },
+                          "text": "(def, DEFAULTS)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 5,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 16
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 5,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 19
+                              },
+                              "text": "def"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 5,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 20
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 5,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 29
+                              },
+                              "text": "DEFAULTS"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 5,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 30
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 5,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 31
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 6,
+                "column": 2
+              },
+              "end": {
+                "row": 6,
+                "column": 38
+              },
+              "text": "Joint.call(this, def, bodyA, bodyB);",
+              "children": [
+                {
+                  "type": "call_expression",
+                  "start": {
+                    "row": 6,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 37
+                  },
+                  "text": "Joint.call(this, def, bodyA, bodyB)",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 6,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 12
+                      },
+                      "text": "Joint.call",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 7
+                          },
+                          "text": "Joint"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 6,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 8
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 12
+                          },
+                          "text": "call"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "arguments",
+                      "start": {
+                        "row": 6,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 37
+                      },
+                      "text": "(this, def, bodyA, bodyB)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 6,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 13
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 6,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 17
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 6,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 18
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 22
+                          },
+                          "text": "def"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 6,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 23
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 29
+                          },
+                          "text": "bodyA"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 6,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 30
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 36
+                          },
+                          "text": "bodyB"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 6,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 37
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 6,
+                    "column": 37
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 38
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 7,
+                "column": 2
+              },
+              "end": {
+                "row": 7,
+                "column": 23
+              },
+              "text": "bodyA = this.m_bodyA;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 7,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 22
+                  },
+                  "text": "bodyA = this.m_bodyA",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 7,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 7
+                      },
+                      "text": "bodyA"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 7,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 7,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 22
+                      },
+                      "text": "this.m_bodyA",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 7,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 14
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 7,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 15
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 7,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 22
+                          },
+                          "text": "m_bodyA"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 7,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 23
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 8,
+                "column": 2
+              },
+              "end": {
+                "row": 8,
+                "column": 23
+              },
+              "text": "bodyB = this.m_bodyB;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 8,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 22
+                  },
+                  "text": "bodyB = this.m_bodyB",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 8,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 7
+                      },
+                      "text": "bodyB"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 8,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 22
+                      },
+                      "text": "this.m_bodyB",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 8,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 14
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 8,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 15
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 8,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 22
+                          },
+                          "text": "m_bodyB"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 8,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 23
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 10,
+                "column": 2
+              },
+              "end": {
+                "row": 10,
+                "column": 31
+              },
+              "text": "this.m_type = RopeJoint.TYPE;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 10,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 30
+                  },
+                  "text": "this.m_type = RopeJoint.TYPE",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 10,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 13
+                      },
+                      "text": "this.m_type",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 10,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 10,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 10,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 13
+                          },
+                          "text": "m_type"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 10,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 10,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 30
+                      },
+                      "text": "RopeJoint.TYPE",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 10,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 25
+                          },
+                          "text": "RopeJoint"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 10,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 26
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 10,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 30
+                          },
+                          "text": "TYPE"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 10,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 31
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 11,
+                "column": 2
+              },
+              "end": {
+                "row": 11,
+                "column": 103
+              },
+              "text": "this.m_localAnchorA = anchor ? bodyA.getLocalPoint(anchor) : def.localAnchorA || Vec2.neo(-1.0, 0.0);",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 11,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 102
+                  },
+                  "text": "this.m_localAnchorA = anchor ? bodyA.getLocalPoint(anchor) : def.localAnchorA || Vec2.neo(-1.0, 0.0)",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 11,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 21
+                      },
+                      "text": "this.m_localAnchorA",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 11,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 11,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 11,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 21
+                          },
+                          "text": "m_localAnchorA"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 11,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 23
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "ternary_expression",
+                      "start": {
+                        "row": 11,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 102
+                      },
+                      "text": "anchor ? bodyA.getLocalPoint(anchor) : def.localAnchorA || Vec2.neo(-1.0, 0.0)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 11,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 30
+                          },
+                          "text": "anchor"
+                        },
+                        {
+                          "type": "?",
+                          "start": {
+                            "row": 11,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 32
+                          },
+                          "text": "?"
+                        },
+                        {
+                          "type": "call_expression",
+                          "start": {
+                            "row": 11,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 60
+                          },
+                          "text": "bodyA.getLocalPoint(anchor)",
+                          "children": [
+                            {
+                              "type": "member_expression",
+                              "start": {
+                                "row": 11,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 52
+                              },
+                              "text": "bodyA.getLocalPoint",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 38
+                                  },
+                                  "text": "bodyA"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 39
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 52
+                                  },
+                                  "text": "getLocalPoint"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "arguments",
+                              "start": {
+                                "row": 11,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 60
+                              },
+                              "text": "(anchor)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 53
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 59
+                                  },
+                                  "text": "anchor"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 60
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 11,
+                            "column": 61
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 62
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "binary_expression",
+                          "start": {
+                            "row": 11,
+                            "column": 63
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 102
+                          },
+                          "text": "def.localAnchorA || Vec2.neo(-1.0, 0.0)",
+                          "children": [
+                            {
+                              "type": "member_expression",
+                              "start": {
+                                "row": 11,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 79
+                              },
+                              "text": "def.localAnchorA",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 63
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 66
+                                  },
+                                  "text": "def"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 67
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 67
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 79
+                                  },
+                                  "text": "localAnchorA"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "||",
+                              "start": {
+                                "row": 11,
+                                "column": 80
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 82
+                              },
+                              "text": "||"
+                            },
+                            {
+                              "type": "call_expression",
+                              "start": {
+                                "row": 11,
+                                "column": 83
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 102
+                              },
+                              "text": "Vec2.neo(-1.0, 0.0)",
+                              "children": [
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 83
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 91
+                                  },
+                                  "text": "Vec2.neo",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 83
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 87
+                                      },
+                                      "text": "Vec2"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 87
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 88
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 88
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 91
+                                      },
+                                      "text": "neo"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "arguments",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 91
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 102
+                                  },
+                                  "text": "(-1.0, 0.0)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 91
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 92
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "unary_expression",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 92
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 96
+                                      },
+                                      "text": "-1.0",
+                                      "children": [
+                                        {
+                                          "type": "-",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 92
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 93
+                                          },
+                                          "text": "-"
+                                        },
+                                        {
+                                          "type": "number",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 93
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 96
+                                          },
+                                          "text": "1.0"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 96
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 97
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "number",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 98
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 101
+                                      },
+                                      "text": "0.0"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 101
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 102
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 11,
+                    "column": 102
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 103
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 12,
+                "column": 2
+              },
+              "end": {
+                "row": 12,
+                "column": 102
+              },
+              "text": "this.m_localAnchorB = anchor ? bodyB.getLocalPoint(anchor) : def.localAnchorB || Vec2.neo(1.0, 0.0);",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 12,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 101
+                  },
+                  "text": "this.m_localAnchorB = anchor ? bodyB.getLocalPoint(anchor) : def.localAnchorB || Vec2.neo(1.0, 0.0)",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 12,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 21
+                      },
+                      "text": "this.m_localAnchorB",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 12,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 12,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 12,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 21
+                          },
+                          "text": "m_localAnchorB"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 12,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 23
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "ternary_expression",
+                      "start": {
+                        "row": 12,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 101
+                      },
+                      "text": "anchor ? bodyB.getLocalPoint(anchor) : def.localAnchorB || Vec2.neo(1.0, 0.0)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 12,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 30
+                          },
+                          "text": "anchor"
+                        },
+                        {
+                          "type": "?",
+                          "start": {
+                            "row": 12,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 32
+                          },
+                          "text": "?"
+                        },
+                        {
+                          "type": "call_expression",
+                          "start": {
+                            "row": 12,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 60
+                          },
+                          "text": "bodyB.getLocalPoint(anchor)",
+                          "children": [
+                            {
+                              "type": "member_expression",
+                              "start": {
+                                "row": 12,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 52
+                              },
+                              "text": "bodyB.getLocalPoint",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 38
+                                  },
+                                  "text": "bodyB"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 39
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 52
+                                  },
+                                  "text": "getLocalPoint"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "arguments",
+                              "start": {
+                                "row": 12,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 60
+                              },
+                              "text": "(anchor)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 53
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 59
+                                  },
+                                  "text": "anchor"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 60
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 12,
+                            "column": 61
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 62
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "binary_expression",
+                          "start": {
+                            "row": 12,
+                            "column": 63
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 101
+                          },
+                          "text": "def.localAnchorB || Vec2.neo(1.0, 0.0)",
+                          "children": [
+                            {
+                              "type": "member_expression",
+                              "start": {
+                                "row": 12,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 79
+                              },
+                              "text": "def.localAnchorB",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 63
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 66
+                                  },
+                                  "text": "def"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 67
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 67
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 79
+                                  },
+                                  "text": "localAnchorB"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "||",
+                              "start": {
+                                "row": 12,
+                                "column": 80
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 82
+                              },
+                              "text": "||"
+                            },
+                            {
+                              "type": "call_expression",
+                              "start": {
+                                "row": 12,
+                                "column": 83
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 101
+                              },
+                              "text": "Vec2.neo(1.0, 0.0)",
+                              "children": [
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 83
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 91
+                                  },
+                                  "text": "Vec2.neo",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 83
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 87
+                                      },
+                                      "text": "Vec2"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 87
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 88
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 88
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 91
+                                      },
+                                      "text": "neo"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "arguments",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 91
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 101
+                                  },
+                                  "text": "(1.0, 0.0)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 91
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 92
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "number",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 92
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 95
+                                      },
+                                      "text": "1.0"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 95
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 96
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "number",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 97
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 100
+                                      },
+                                      "text": "0.0"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 100
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 101
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 12,
+                    "column": 101
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 102
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 14,
+                "column": 2
+              },
+              "end": {
+                "row": 14,
+                "column": 35
+              },
+              "text": "this.m_maxLength = def.maxLength;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 14,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 34
+                  },
+                  "text": "this.m_maxLength = def.maxLength",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 14,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 18
+                      },
+                      "text": "this.m_maxLength",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 14,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 14,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 18
+                          },
+                          "text": "m_maxLength"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 14,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 20
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 14,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 34
+                      },
+                      "text": "def.maxLength",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 24
+                          },
+                          "text": "def"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 14,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 25
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 34
+                          },
+                          "text": "maxLength"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 14,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 35
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 16,
+                "column": 2
+              },
+              "end": {
+                "row": 16,
+                "column": 20
+              },
+              "text": "this.m_mass = 0.0;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 16,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 19
+                  },
+                  "text": "this.m_mass = 0.0",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 16,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 13
+                      },
+                      "text": "this.m_mass",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 16,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 16,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 16,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 13
+                          },
+                          "text": "m_mass"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 16,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "number",
+                      "start": {
+                        "row": 16,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 19
+                      },
+                      "text": "0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 16,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 20
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 17,
+                "column": 2
+              },
+              "end": {
+                "row": 17,
+                "column": 23
+              },
+              "text": "this.m_impulse = 0.0;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 17,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 22
+                  },
+                  "text": "this.m_impulse = 0.0",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 17,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 16
+                      },
+                      "text": "this.m_impulse",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 17,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 17,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 16
+                          },
+                          "text": "m_impulse"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 17,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 18
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "number",
+                      "start": {
+                        "row": 17,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 22
+                      },
+                      "text": "0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 17,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 23
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 18,
+                "column": 2
+              },
+              "end": {
+                "row": 18,
+                "column": 22
+              },
+              "text": "this.m_length = 0.0;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 18,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 21
+                  },
+                  "text": "this.m_length = 0.0",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 18,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 15
+                      },
+                      "text": "this.m_length",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 18,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 18,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 15
+                          },
+                          "text": "m_length"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 18,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 17
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "number",
+                      "start": {
+                        "row": 18,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 21
+                      },
+                      "text": "0.0"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 18,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 22
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 19,
+                "column": 2
+              },
+              "end": {
+                "row": 19,
+                "column": 31
+              },
+              "text": "this.m_state = inactiveLimit;",
+              "children": [
+                {
+                  "type": "assignment_expression",
+                  "start": {
+                    "row": 19,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 30
+                  },
+                  "text": "this.m_state = inactiveLimit",
+                  "children": [
+                    {
+                      "type": "member_expression",
+                      "start": {
+                        "row": 19,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 14
+                      },
+                      "text": "this.m_state",
+                      "children": [
+                        {
+                          "type": "this",
+                          "start": {
+                            "row": 19,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 6
+                          },
+                          "text": "this"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 19,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 7
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "property_identifier",
+                          "start": {
+                            "row": 19,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 14
+                          },
+                          "text": "m_state"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 19,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 16
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 19,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 30
+                      },
+                      "text": "inactiveLimit"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 19,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 31
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 21,
+                "column": 2
+              },
+              "end": {
+                "row": 21,
+                "column": 16
+              },
+              "text": "// Solver temp"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 22,
+                "column": 2
+              },
+              "end": {
+                "row": 22,
+                "column": 11
+              },
+              "text": "this.m_u;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 22,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 10
+                  },
+                  "text": "this.m_u",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 22,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 22,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 22,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 10
+                      },
+                      "text": "m_u"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 22,
+                    "column": 10
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 11
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 22,
+                "column": 12
+              },
+              "end": {
+                "row": 22,
+                "column": 19
+              },
+              "text": "// Vec2"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 23,
+                "column": 2
+              },
+              "end": {
+                "row": 23,
+                "column": 12
+              },
+              "text": "this.m_rA;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 23,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 11
+                  },
+                  "text": "this.m_rA",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 23,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 23,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 23,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 11
+                      },
+                      "text": "m_rA"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 23,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 12
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 23,
+                "column": 13
+              },
+              "end": {
+                "row": 23,
+                "column": 20
+              },
+              "text": "// Vec2"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 24,
+                "column": 2
+              },
+              "end": {
+                "row": 24,
+                "column": 12
+              },
+              "text": "this.m_rB;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 24,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 11
+                  },
+                  "text": "this.m_rB",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 24,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 24,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 24,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 11
+                      },
+                      "text": "m_rB"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 24,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 12
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 24,
+                "column": 13
+              },
+              "end": {
+                "row": 24,
+                "column": 20
+              },
+              "text": "// Vec2"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 25,
+                "column": 2
+              },
+              "end": {
+                "row": 25,
+                "column": 22
+              },
+              "text": "this.m_localCenterA;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 25,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 21
+                  },
+                  "text": "this.m_localCenterA",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 25,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 25,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 25,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 21
+                      },
+                      "text": "m_localCenterA"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 25,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 22
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 25,
+                "column": 23
+              },
+              "end": {
+                "row": 25,
+                "column": 30
+              },
+              "text": "// Vec2"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 26,
+                "column": 2
+              },
+              "end": {
+                "row": 26,
+                "column": 22
+              },
+              "text": "this.m_localCenterB;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 26,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 21
+                  },
+                  "text": "this.m_localCenterB",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 26,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 26,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 26,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 21
+                      },
+                      "text": "m_localCenterB"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 26,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 22
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 26,
+                "column": 23
+              },
+              "end": {
+                "row": 26,
+                "column": 30
+              },
+              "text": "// Vec2"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 27,
+                "column": 2
+              },
+              "end": {
+                "row": 27,
+                "column": 18
+              },
+              "text": "this.m_invMassA;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 27,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 17
+                  },
+                  "text": "this.m_invMassA",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 27,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 27,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 17
+                      },
+                      "text": "m_invMassA"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 27,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 18
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 27,
+                "column": 19
+              },
+              "end": {
+                "row": 27,
+                "column": 27
+              },
+              "text": "// float"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 28,
+                "column": 2
+              },
+              "end": {
+                "row": 28,
+                "column": 18
+              },
+              "text": "this.m_invMassB;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 28,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 17
+                  },
+                  "text": "this.m_invMassB",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 28,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 28,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 28,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 17
+                      },
+                      "text": "m_invMassB"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 28,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 18
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 28,
+                "column": 19
+              },
+              "end": {
+                "row": 28,
+                "column": 27
+              },
+              "text": "// float"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 29,
+                "column": 2
+              },
+              "end": {
+                "row": 29,
+                "column": 15
+              },
+              "text": "this.m_invIA;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 29,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 14
+                  },
+                  "text": "this.m_invIA",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 29,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 29,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 29,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 14
+                      },
+                      "text": "m_invIA"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 29,
+                    "column": 14
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 15
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 29,
+                "column": 16
+              },
+              "end": {
+                "row": 29,
+                "column": 24
+              },
+              "text": "// float"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 30,
+                "column": 2
+              },
+              "end": {
+                "row": 30,
+                "column": 15
+              },
+              "text": "this.m_invIB;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 30,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 14
+                  },
+                  "text": "this.m_invIB",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 30,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 30,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 30,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 14
+                      },
+                      "text": "m_invIB"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 30,
+                    "column": 14
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 15
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 30,
+                "column": 16
+              },
+              "end": {
+                "row": 30,
+                "column": 24
+              },
+              "text": "// float"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 31,
+                "column": 2
+              },
+              "end": {
+                "row": 31,
+                "column": 14
+              },
+              "text": "this.m_mass;",
+              "children": [
+                {
+                  "type": "member_expression",
+                  "start": {
+                    "row": 31,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 13
+                  },
+                  "text": "this.m_mass",
+                  "children": [
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 31,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 6
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 31,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 7
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "property_identifier",
+                      "start": {
+                        "row": 31,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 13
+                      },
+                      "text": "m_mass"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 31,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 14
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 31,
+                "column": 15
+              },
+              "end": {
+                "row": 31,
+                "column": 23
+              },
+              "text": "// float"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 33,
+                "column": 2
+              },
+              "end": {
+                "row": 33,
+                "column": 11
+              },
+              "text": "// Limit:"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 34,
+                "column": 2
+              },
+              "end": {
+                "row": 34,
+                "column": 26
+              },
+              "text": "// C = norm(pB - pA) - L"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 35,
+                "column": 2
+              },
+              "end": {
+                "row": 35,
+                "column": 34
+              },
+              "text": "// u = (pB - pA) / norm(pB - pA)"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 36,
+                "column": 2
+              },
+              "end": {
+                "row": 36,
+                "column": 59
+              },
+              "text": "// Cdot = dot(u, vB + cross(wB, rB) - vA - cross(wA, rA))"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 37,
+                "column": 2
+              },
+              "end": {
+                "row": 37,
+                "column": 42
+              },
+              "text": "// J = [-u -cross(rA, u) u cross(rB, u)]"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 38,
+                "column": 2
+              },
+              "end": {
+                "row": 38,
+                "column": 22
+              },
+              "text": "// K = J * invM * JT"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 39,
+                "column": 2
+              },
+              "end": {
+                "row": 39,
+                "column": 76
+              },
+              "text": "// = invMassA + invIA * cross(rA, u)^2 + invMassB + invIB * cross(rB, u)^2"
+            },
+            {
+              "type": "}",
+              "start": {
+                "row": 40,
+                "column": 0
+              },
+              "end": {
+                "row": 40,
+                "column": 1
+              },
+              "text": "}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

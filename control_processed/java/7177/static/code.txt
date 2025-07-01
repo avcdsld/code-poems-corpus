@@ -1,0 +1,11 @@
+public int insertOrUpdate(Entity record, String... keys) throws SQLException {
+		Connection conn = null;
+		try {
+			conn = this.getConnection();
+			return runner.insertOrUpdate(conn, record, keys);
+		} catch (SQLException e) {
+			throw e;
+		} finally {
+			this.closeConnection(conn);
+		}
+	}

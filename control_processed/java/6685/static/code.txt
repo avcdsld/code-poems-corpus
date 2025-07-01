@@ -1,0 +1,3 @@
+public static PushbackInputStream toPushbackStream(InputStream in, int pushBackSize) {
+		return (in instanceof PushbackInputStream) ? (PushbackInputStream) in : new PushbackInputStream(in, pushBackSize);
+	}

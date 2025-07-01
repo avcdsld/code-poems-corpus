@@ -1,0 +1,3 @@
+def go_to_parent_directory(self):
+        """Go to parent directory"""
+        self.chdir(osp.abspath(osp.join(getcwd_or_home(), os.pardir)))

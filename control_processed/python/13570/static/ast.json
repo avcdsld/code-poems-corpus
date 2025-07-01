@@ -1,0 +1,3456 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 35,
+    "column": 69
+  },
+  "text": "def eval(self, expr, **kwargs):\n        \"\"\"Returns a new QueryCompiler with expr evaluated on columns.\n\n        Args:\n            expr: The string expression to evaluate.\n\n        Returns:\n            A new QueryCompiler with new columns after applying expr.\n        \"\"\"\n        columns = self.index if self._is_transposed else self.columns\n        index = self.columns if self._is_transposed else self.index\n\n        # Make a copy of columns and eval on the copy to determine if result type is\n        # series or not\n        columns_copy = pandas.DataFrame(columns=self.columns)\n        columns_copy = columns_copy.eval(expr, inplace=False, **kwargs)\n        expect_series = isinstance(columns_copy, pandas.Series)\n\n        def eval_builder(df, **kwargs):\n            # pop the `axis` parameter because it was needed to build the mapreduce\n            # function but it is not a parameter used by `eval`.\n            kwargs.pop(\"axis\", None)\n            df.columns = columns\n            result = df.eval(expr, inplace=False, **kwargs)\n            return result\n\n        func = self._build_mapreduce_func(eval_builder, axis=1, **kwargs)\n        new_data = self._map_across_full_axis(1, func)\n\n        if expect_series:\n            new_columns = [columns_copy.name]\n            new_index = index\n        else:\n            new_columns = columns_copy.columns\n            new_index = self.index\n        return self.__constructor__(new_data, new_index, new_columns)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 35,
+        "column": 69
+      },
+      "text": "def eval(self, expr, **kwargs):\n        \"\"\"Returns a new QueryCompiler with expr evaluated on columns.\n\n        Args:\n            expr: The string expression to evaluate.\n\n        Returns:\n            A new QueryCompiler with new columns after applying expr.\n        \"\"\"\n        columns = self.index if self._is_transposed else self.columns\n        index = self.columns if self._is_transposed else self.index\n\n        # Make a copy of columns and eval on the copy to determine if result type is\n        # series or not\n        columns_copy = pandas.DataFrame(columns=self.columns)\n        columns_copy = columns_copy.eval(expr, inplace=False, **kwargs)\n        expect_series = isinstance(columns_copy, pandas.Series)\n\n        def eval_builder(df, **kwargs):\n            # pop the `axis` parameter because it was needed to build the mapreduce\n            # function but it is not a parameter used by `eval`.\n            kwargs.pop(\"axis\", None)\n            df.columns = columns\n            result = df.eval(expr, inplace=False, **kwargs)\n            return result\n\n        func = self._build_mapreduce_func(eval_builder, axis=1, **kwargs)\n        new_data = self._map_across_full_axis(1, func)\n\n        if expect_series:\n            new_columns = [columns_copy.name]\n            new_index = index\n        else:\n            new_columns = columns_copy.columns\n            new_index = self.index\n        return self.__constructor__(new_data, new_index, new_columns)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 8
+          },
+          "text": "eval"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 8
+          },
+          "end": {
+            "row": 0,
+            "column": 30
+          },
+          "text": "(self, expr, **kwargs)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 8
+              },
+              "end": {
+                "row": 0,
+                "column": 9
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 9
+              },
+              "end": {
+                "row": 0,
+                "column": 13
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 13
+              },
+              "end": {
+                "row": 0,
+                "column": 14
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 15
+              },
+              "end": {
+                "row": 0,
+                "column": 19
+              },
+              "text": "expr"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 19
+              },
+              "end": {
+                "row": 0,
+                "column": 20
+              },
+              "text": ","
+            },
+            {
+              "type": "dictionary_splat_pattern",
+              "start": {
+                "row": 0,
+                "column": 21
+              },
+              "end": {
+                "row": 0,
+                "column": 29
+              },
+              "text": "**kwargs",
+              "children": [
+                {
+                  "type": "**",
+                  "start": {
+                    "row": 0,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 23
+                  },
+                  "text": "**"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 29
+                  },
+                  "text": "kwargs"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 29
+              },
+              "end": {
+                "row": 0,
+                "column": 30
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 30
+          },
+          "end": {
+            "row": 0,
+            "column": 31
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 8
+          },
+          "end": {
+            "row": 35,
+            "column": 69
+          },
+          "text": "\"\"\"Returns a new QueryCompiler with expr evaluated on columns.\n\n        Args:\n            expr: The string expression to evaluate.\n\n        Returns:\n            A new QueryCompiler with new columns after applying expr.\n        \"\"\"\n        columns = self.index if self._is_transposed else self.columns\n        index = self.columns if self._is_transposed else self.index\n\n        # Make a copy of columns and eval on the copy to determine if result type is\n        # series or not\n        columns_copy = pandas.DataFrame(columns=self.columns)\n        columns_copy = columns_copy.eval(expr, inplace=False, **kwargs)\n        expect_series = isinstance(columns_copy, pandas.Series)\n\n        def eval_builder(df, **kwargs):\n            # pop the `axis` parameter because it was needed to build the mapreduce\n            # function but it is not a parameter used by `eval`.\n            kwargs.pop(\"axis\", None)\n            df.columns = columns\n            result = df.eval(expr, inplace=False, **kwargs)\n            return result\n\n        func = self._build_mapreduce_func(eval_builder, axis=1, **kwargs)\n        new_data = self._map_across_full_axis(1, func)\n\n        if expect_series:\n            new_columns = [columns_copy.name]\n            new_index = index\n        else:\n            new_columns = columns_copy.columns\n            new_index = self.index\n        return self.__constructor__(new_data, new_index, new_columns)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 8,
+                "column": 11
+              },
+              "text": "\"\"\"Returns a new QueryCompiler with expr evaluated on columns.\n\n        Args:\n            expr: The string expression to evaluate.\n\n        Returns:\n            A new QueryCompiler with new columns after applying expr.\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 11
+                  },
+                  "text": "\"\"\"Returns a new QueryCompiler with expr evaluated on columns.\n\n        Args:\n            expr: The string expression to evaluate.\n\n        Returns:\n            A new QueryCompiler with new columns after applying expr.\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "text": "Returns a new QueryCompiler with expr evaluated on columns.\n\n        Args:\n            expr: The string expression to evaluate.\n\n        Returns:\n            A new QueryCompiler with new columns after applying expr.\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 9,
+                "column": 8
+              },
+              "end": {
+                "row": 9,
+                "column": 69
+              },
+              "text": "columns = self.index if self._is_transposed else self.columns",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 9,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 69
+                  },
+                  "text": "columns = self.index if self._is_transposed else self.columns",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 15
+                      },
+                      "text": "columns"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 9,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 17
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "conditional_expression",
+                      "start": {
+                        "row": 9,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 69
+                      },
+                      "text": "self.index if self._is_transposed else self.columns",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 9,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 28
+                          },
+                          "text": "self.index",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 22
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 9,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 23
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 28
+                              },
+                              "text": "index"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 9,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 31
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 9,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 51
+                          },
+                          "text": "self._is_transposed",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 36
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 9,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 37
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 51
+                              },
+                              "text": "_is_transposed"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else",
+                          "start": {
+                            "row": 9,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 56
+                          },
+                          "text": "else"
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 9,
+                            "column": 57
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 69
+                          },
+                          "text": "self.columns",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 57
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 61
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 9,
+                                "column": 61
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 62
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 69
+                              },
+                              "text": "columns"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 10,
+                "column": 8
+              },
+              "end": {
+                "row": 10,
+                "column": 67
+              },
+              "text": "index = self.columns if self._is_transposed else self.index",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 10,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 67
+                  },
+                  "text": "index = self.columns if self._is_transposed else self.index",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 10,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 13
+                      },
+                      "text": "index"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 10,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "conditional_expression",
+                      "start": {
+                        "row": 10,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 67
+                      },
+                      "text": "self.columns if self._is_transposed else self.index",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 10,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 28
+                          },
+                          "text": "self.columns",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 20
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 10,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 21
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 28
+                              },
+                              "text": "columns"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 10,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 31
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 10,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 51
+                          },
+                          "text": "self._is_transposed",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 36
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 10,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 37
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 51
+                              },
+                              "text": "_is_transposed"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else",
+                          "start": {
+                            "row": 10,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 56
+                          },
+                          "text": "else"
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 10,
+                            "column": 57
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 67
+                          },
+                          "text": "self.index",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 57
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 61
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 10,
+                                "column": 61
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 62
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 67
+                              },
+                              "text": "index"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 12,
+                "column": 8
+              },
+              "end": {
+                "row": 12,
+                "column": 84
+              },
+              "text": "# Make a copy of columns and eval on the copy to determine if result type is"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 13,
+                "column": 8
+              },
+              "end": {
+                "row": 13,
+                "column": 23
+              },
+              "text": "# series or not"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 14,
+                "column": 8
+              },
+              "end": {
+                "row": 14,
+                "column": 61
+              },
+              "text": "columns_copy = pandas.DataFrame(columns=self.columns)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 14,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 61
+                  },
+                  "text": "columns_copy = pandas.DataFrame(columns=self.columns)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 14,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 20
+                      },
+                      "text": "columns_copy"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 14,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 22
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 14,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 61
+                      },
+                      "text": "pandas.DataFrame(columns=self.columns)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 14,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 39
+                          },
+                          "text": "pandas.DataFrame",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 14,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 29
+                              },
+                              "text": "pandas"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 14,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 30
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 14,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 39
+                              },
+                              "text": "DataFrame"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 14,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 61
+                          },
+                          "text": "(columns=self.columns)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 14,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 40
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 14,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 60
+                              },
+                              "text": "columns=self.columns",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 47
+                                  },
+                                  "text": "columns"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 48
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 60
+                                  },
+                                  "text": "self.columns",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 52
+                                      },
+                                      "text": "self"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 53
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 60
+                                      },
+                                      "text": "columns"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 14,
+                                "column": 60
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 61
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 15,
+                "column": 8
+              },
+              "end": {
+                "row": 15,
+                "column": 71
+              },
+              "text": "columns_copy = columns_copy.eval(expr, inplace=False, **kwargs)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 15,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 71
+                  },
+                  "text": "columns_copy = columns_copy.eval(expr, inplace=False, **kwargs)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 15,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 20
+                      },
+                      "text": "columns_copy"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 15,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 22
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 15,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 71
+                      },
+                      "text": "columns_copy.eval(expr, inplace=False, **kwargs)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 15,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 40
+                          },
+                          "text": "columns_copy.eval",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 35
+                              },
+                              "text": "columns_copy"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 15,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 36
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 40
+                              },
+                              "text": "eval"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 15,
+                            "column": 40
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 71
+                          },
+                          "text": "(expr, inplace=False, **kwargs)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 15,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 41
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 45
+                              },
+                              "text": "expr"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 15,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 46
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 15,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 60
+                              },
+                              "text": "inplace=False",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 54
+                                  },
+                                  "text": "inplace"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 54
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 55
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "false",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 60
+                                  },
+                                  "text": "False"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 15,
+                                "column": 60
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 61
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "dictionary_splat",
+                              "start": {
+                                "row": 15,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 70
+                              },
+                              "text": "**kwargs",
+                              "children": [
+                                {
+                                  "type": "**",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 62
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 64
+                                  },
+                                  "text": "**"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 64
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 70
+                                  },
+                                  "text": "kwargs"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 15,
+                                "column": 70
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 71
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 16,
+                "column": 8
+              },
+              "end": {
+                "row": 16,
+                "column": 63
+              },
+              "text": "expect_series = isinstance(columns_copy, pandas.Series)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 16,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 63
+                  },
+                  "text": "expect_series = isinstance(columns_copy, pandas.Series)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 16,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 21
+                      },
+                      "text": "expect_series"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 16,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 23
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 16,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 63
+                      },
+                      "text": "isinstance(columns_copy, pandas.Series)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 16,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 34
+                          },
+                          "text": "isinstance"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 16,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 63
+                          },
+                          "text": "(columns_copy, pandas.Series)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 16,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 35
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 16,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 47
+                              },
+                              "text": "columns_copy"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 16,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 48
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 16,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 62
+                              },
+                              "text": "pandas.Series",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 49
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 55
+                                  },
+                                  "text": "pandas"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 56
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 56
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 62
+                                  },
+                                  "text": "Series"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 16,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 63
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "function_definition",
+              "start": {
+                "row": 18,
+                "column": 8
+              },
+              "end": {
+                "row": 24,
+                "column": 25
+              },
+              "text": "def eval_builder(df, **kwargs):\n            # pop the `axis` parameter because it was needed to build the mapreduce\n            # function but it is not a parameter used by `eval`.\n            kwargs.pop(\"axis\", None)\n            df.columns = columns\n            result = df.eval(expr, inplace=False, **kwargs)\n            return result",
+              "children": [
+                {
+                  "type": "def",
+                  "start": {
+                    "row": 18,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 11
+                  },
+                  "text": "def"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 18,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 24
+                  },
+                  "text": "eval_builder"
+                },
+                {
+                  "type": "parameters",
+                  "start": {
+                    "row": 18,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 38
+                  },
+                  "text": "(df, **kwargs)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 18,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 25
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 18,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 27
+                      },
+                      "text": "df"
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 18,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 28
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "dictionary_splat_pattern",
+                      "start": {
+                        "row": 18,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 37
+                      },
+                      "text": "**kwargs",
+                      "children": [
+                        {
+                          "type": "**",
+                          "start": {
+                            "row": 18,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 31
+                          },
+                          "text": "**"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 37
+                          },
+                          "text": "kwargs"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 18,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 38
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 18,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 39
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 19,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 83
+                  },
+                  "text": "# pop the `axis` parameter because it was needed to build the mapreduce"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 20,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 64
+                  },
+                  "text": "# function but it is not a parameter used by `eval`."
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 21,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 25
+                  },
+                  "text": "kwargs.pop(\"axis\", None)\n            df.columns = columns\n            result = df.eval(expr, inplace=False, **kwargs)\n            return result",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 21,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 36
+                      },
+                      "text": "kwargs.pop(\"axis\", None)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 21,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 36
+                          },
+                          "text": "kwargs.pop(\"axis\", None)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 21,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 22
+                              },
+                              "text": "kwargs.pop",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 18
+                                  },
+                                  "text": "kwargs"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 19
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 22
+                                  },
+                                  "text": "pop"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 21,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 36
+                              },
+                              "text": "(\"axis\", None)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 23
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 29
+                                  },
+                                  "text": "\"axis\"",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 24
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 28
+                                      },
+                                      "text": "axis"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 29
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 30
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "none",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 35
+                                  },
+                                  "text": "None"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 36
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 22,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 32
+                      },
+                      "text": "df.columns = columns",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 22,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 32
+                          },
+                          "text": "df.columns = columns",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 22,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 22
+                              },
+                              "text": "df.columns",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 14
+                                  },
+                                  "text": "df"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 15
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 22
+                                  },
+                                  "text": "columns"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 22,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 24
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 22,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 32
+                              },
+                              "text": "columns"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 23,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 59
+                      },
+                      "text": "result = df.eval(expr, inplace=False, **kwargs)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 23,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 59
+                          },
+                          "text": "result = df.eval(expr, inplace=False, **kwargs)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 18
+                              },
+                              "text": "result"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 23,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 23,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 59
+                              },
+                              "text": "df.eval(expr, inplace=False, **kwargs)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 28
+                                  },
+                                  "text": "df.eval",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 23
+                                      },
+                                      "text": "df"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 24
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 28
+                                      },
+                                      "text": "eval"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 59
+                                  },
+                                  "text": "(expr, inplace=False, **kwargs)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 29
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 33
+                                      },
+                                      "text": "expr"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 34
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "keyword_argument",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 48
+                                      },
+                                      "text": "inplace=False",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 42
+                                          },
+                                          "text": "inplace"
+                                        },
+                                        {
+                                          "type": "=",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 43
+                                          },
+                                          "text": "="
+                                        },
+                                        {
+                                          "type": "false",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 48
+                                          },
+                                          "text": "False"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 49
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "dictionary_splat",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 58
+                                      },
+                                      "text": "**kwargs",
+                                      "children": [
+                                        {
+                                          "type": "**",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 52
+                                          },
+                                          "text": "**"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 58
+                                          },
+                                          "text": "kwargs"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 59
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 24,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 25
+                      },
+                      "text": "return result",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 24,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 18
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 24,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 25
+                          },
+                          "text": "result"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 26,
+                "column": 8
+              },
+              "end": {
+                "row": 26,
+                "column": 73
+              },
+              "text": "func = self._build_mapreduce_func(eval_builder, axis=1, **kwargs)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 26,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 73
+                  },
+                  "text": "func = self._build_mapreduce_func(eval_builder, axis=1, **kwargs)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 26,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 12
+                      },
+                      "text": "func"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 26,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 14
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 26,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 73
+                      },
+                      "text": "self._build_mapreduce_func(eval_builder, axis=1, **kwargs)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 26,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 41
+                          },
+                          "text": "self._build_mapreduce_func",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 19
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 26,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 20
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 41
+                              },
+                              "text": "_build_mapreduce_func"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 26,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 73
+                          },
+                          "text": "(eval_builder, axis=1, **kwargs)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 26,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 42
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 54
+                              },
+                              "text": "eval_builder"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 26,
+                                "column": 54
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 55
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 26,
+                                "column": 56
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 62
+                              },
+                              "text": "axis=1",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 56
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 60
+                                  },
+                                  "text": "axis"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 60
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 61
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 62
+                                  },
+                                  "text": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 26,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 63
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "dictionary_splat",
+                              "start": {
+                                "row": 26,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 72
+                              },
+                              "text": "**kwargs",
+                              "children": [
+                                {
+                                  "type": "**",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 64
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 66
+                                  },
+                                  "text": "**"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 72
+                                  },
+                                  "text": "kwargs"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 26,
+                                "column": 72
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 73
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 27,
+                "column": 8
+              },
+              "end": {
+                "row": 27,
+                "column": 54
+              },
+              "text": "new_data = self._map_across_full_axis(1, func)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 27,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 54
+                  },
+                  "text": "new_data = self._map_across_full_axis(1, func)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 16
+                      },
+                      "text": "new_data"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 27,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 18
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 27,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 54
+                      },
+                      "text": "self._map_across_full_axis(1, func)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 27,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 45
+                          },
+                          "text": "self._map_across_full_axis",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 27,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 23
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 27,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 24
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 27,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 45
+                              },
+                              "text": "_map_across_full_axis"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 27,
+                            "column": 45
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 54
+                          },
+                          "text": "(1, func)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 27,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 46
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 27,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 47
+                              },
+                              "text": "1"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 27,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 48
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 27,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 53
+                              },
+                              "text": "func"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 27,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 54
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 29,
+                "column": 8
+              },
+              "end": {
+                "row": 34,
+                "column": 34
+              },
+              "text": "if expect_series:\n            new_columns = [columns_copy.name]\n            new_index = index\n        else:\n            new_columns = columns_copy.columns\n            new_index = self.index",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 29,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 29,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 24
+                  },
+                  "text": "expect_series"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 29,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 25
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 30,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 29
+                  },
+                  "text": "new_columns = [columns_copy.name]\n            new_index = index",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 30,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 45
+                      },
+                      "text": "new_columns = [columns_copy.name]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 30,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 45
+                          },
+                          "text": "new_columns = [columns_copy.name]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 30,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 23
+                              },
+                              "text": "new_columns"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 30,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 25
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "list",
+                              "start": {
+                                "row": 30,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 45
+                              },
+                              "text": "[columns_copy.name]",
+                              "children": [
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 27
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 44
+                                  },
+                                  "text": "columns_copy.name",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 39
+                                      },
+                                      "text": "columns_copy"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 40
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 44
+                                      },
+                                      "text": "name"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 45
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 31,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 29
+                      },
+                      "text": "new_index = index",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 31,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 29
+                          },
+                          "text": "new_index = index",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 31,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 21
+                              },
+                              "text": "new_index"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 31,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 23
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 31,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 29
+                              },
+                              "text": "index"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "else_clause",
+                  "start": {
+                    "row": 32,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 34
+                  },
+                  "text": "else:\n            new_columns = columns_copy.columns\n            new_index = self.index",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 32,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 12
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 32,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 13
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 33,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 34
+                      },
+                      "text": "new_columns = columns_copy.columns\n            new_index = self.index",
+                      "children": [
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 33,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 46
+                          },
+                          "text": "new_columns = columns_copy.columns",
+                          "children": [
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 33,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 46
+                              },
+                              "text": "new_columns = columns_copy.columns",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 23
+                                  },
+                                  "text": "new_columns"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 25
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 46
+                                  },
+                                  "text": "columns_copy.columns",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 38
+                                      },
+                                      "text": "columns_copy"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 39
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 46
+                                      },
+                                      "text": "columns"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 34,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 34
+                          },
+                          "text": "new_index = self.index",
+                          "children": [
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 34,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 34
+                              },
+                              "text": "new_index = self.index",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 21
+                                  },
+                                  "text": "new_index"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 23
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 34
+                                  },
+                                  "text": "self.index",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 28
+                                      },
+                                      "text": "self"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 29
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 34
+                                      },
+                                      "text": "index"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 35,
+                "column": 8
+              },
+              "end": {
+                "row": 35,
+                "column": 69
+              },
+              "text": "return self.__constructor__(new_data, new_index, new_columns)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 35,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 35,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 69
+                  },
+                  "text": "self.__constructor__(new_data, new_index, new_columns)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 35,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 35
+                      },
+                      "text": "self.__constructor__",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 35,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 19
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 35,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 20
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 35,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 35
+                          },
+                          "text": "__constructor__"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 35,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 69
+                      },
+                      "text": "(new_data, new_index, new_columns)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 35,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 36
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 35,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 44
+                          },
+                          "text": "new_data"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 35,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 45
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 35,
+                            "column": 46
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 55
+                          },
+                          "text": "new_index"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 35,
+                            "column": 55
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 56
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 35,
+                            "column": 57
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 68
+                          },
+                          "text": "new_columns"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 35,
+                            "column": 68
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 69
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

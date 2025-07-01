@@ -1,0 +1,19 @@
+private static int getChsAscii(String chs) {
+		int asc = 0;
+		byte[] bytes = chs.getBytes(CharsetUtil.CHARSET_GBK);
+		switch (bytes.length) {
+		case 1:
+			// 英文字符
+			asc = bytes[0];
+			break;
+		case 2:
+			// 中文字符
+			int hightByte = 256 + bytes[0];
+			int lowByte = 256 + bytes[1];
+			asc = (256 * hightByte + lowByte) - 256 * 256;
+			break;
+		default:
+			throw new UtilException("Illegal resource string");
+		}
+		return asc;
+	}

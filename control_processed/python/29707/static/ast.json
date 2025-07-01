@@ -1,0 +1,4068 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 72,
+    "column": 35
+  },
+  "text": "def get_distribution(name, region=None, key=None, keyid=None, profile=None):\n    '''\n    Get information about a CloudFront distribution (configuration, tags) with a given name.\n\n    name\n        Name of the CloudFront distribution\n\n    region\n        Region to connect to\n\n    key\n        Secret key to use\n\n    keyid\n        Access key to use\n\n    profile\n        A dict with region, key, and keyid,\n        or a pillar key (string) that contains such a dict.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt myminion boto_cloudfront.get_distribution name=mydistribution profile=awsprofile\n\n    '''\n    distribution = _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )\n    if distribution:\n        return {'result': distribution}\n\n    conn = _get_conn(region=region, key=key, keyid=keyid, profile=profile)\n    try:\n        for _, dist in _list_distributions(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        ):\n            # _list_distributions should only return the one distribution\n            # that we want (with the given name).\n            # In case of multiple distributions with the same name tag,\n            # our use of caching means list_distributions will just\n            # return the first one over and over again,\n            # so only the first result is useful.\n            if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}\n            distribution = dist\n    except botocore.exceptions.ClientError as err:\n        return {'error': __utils__['boto3.get_error'](err)}\n    if not distribution:\n        return {'result': None}\n\n    _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        resource_id=distribution,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )\n    return {'result': distribution}",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 72,
+        "column": 35
+      },
+      "text": "def get_distribution(name, region=None, key=None, keyid=None, profile=None):\n    '''\n    Get information about a CloudFront distribution (configuration, tags) with a given name.\n\n    name\n        Name of the CloudFront distribution\n\n    region\n        Region to connect to\n\n    key\n        Secret key to use\n\n    keyid\n        Access key to use\n\n    profile\n        A dict with region, key, and keyid,\n        or a pillar key (string) that contains such a dict.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt myminion boto_cloudfront.get_distribution name=mydistribution profile=awsprofile\n\n    '''\n    distribution = _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )\n    if distribution:\n        return {'result': distribution}\n\n    conn = _get_conn(region=region, key=key, keyid=keyid, profile=profile)\n    try:\n        for _, dist in _list_distributions(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        ):\n            # _list_distributions should only return the one distribution\n            # that we want (with the given name).\n            # In case of multiple distributions with the same name tag,\n            # our use of caching means list_distributions will just\n            # return the first one over and over again,\n            # so only the first result is useful.\n            if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}\n            distribution = dist\n    except botocore.exceptions.ClientError as err:\n        return {'error': __utils__['boto3.get_error'](err)}\n    if not distribution:\n        return {'result': None}\n\n    _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        resource_id=distribution,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )\n    return {'result': distribution}",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 20
+          },
+          "text": "get_distribution"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 20
+          },
+          "end": {
+            "row": 0,
+            "column": 75
+          },
+          "text": "(name, region=None, key=None, keyid=None, profile=None)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 21
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 21
+              },
+              "end": {
+                "row": 0,
+                "column": 25
+              },
+              "text": "name"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 25
+              },
+              "end": {
+                "row": 0,
+                "column": 26
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 27
+              },
+              "end": {
+                "row": 0,
+                "column": 38
+              },
+              "text": "region=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 33
+                  },
+                  "text": "region"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 38
+              },
+              "end": {
+                "row": 0,
+                "column": 39
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 40
+              },
+              "end": {
+                "row": 0,
+                "column": 48
+              },
+              "text": "key=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 43
+                  },
+                  "text": "key"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 43
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 44
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 44
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 48
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 48
+              },
+              "end": {
+                "row": 0,
+                "column": 49
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 50
+              },
+              "end": {
+                "row": 0,
+                "column": 60
+              },
+              "text": "keyid=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 50
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 55
+                  },
+                  "text": "keyid"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 55
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 56
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 56
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 60
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 60
+              },
+              "end": {
+                "row": 0,
+                "column": 61
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 62
+              },
+              "end": {
+                "row": 0,
+                "column": 74
+              },
+              "text": "profile=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 62
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 69
+                  },
+                  "text": "profile"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 69
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 70
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 70
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 74
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 74
+              },
+              "end": {
+                "row": 0,
+                "column": 75
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 75
+          },
+          "end": {
+            "row": 0,
+            "column": 76
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 4
+          },
+          "end": {
+            "row": 72,
+            "column": 35
+          },
+          "text": "'''\n    Get information about a CloudFront distribution (configuration, tags) with a given name.\n\n    name\n        Name of the CloudFront distribution\n\n    region\n        Region to connect to\n\n    key\n        Secret key to use\n\n    keyid\n        Access key to use\n\n    profile\n        A dict with region, key, and keyid,\n        or a pillar key (string) that contains such a dict.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt myminion boto_cloudfront.get_distribution name=mydistribution profile=awsprofile\n\n    '''\n    distribution = _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )\n    if distribution:\n        return {'result': distribution}\n\n    conn = _get_conn(region=region, key=key, keyid=keyid, profile=profile)\n    try:\n        for _, dist in _list_distributions(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        ):\n            # _list_distributions should only return the one distribution\n            # that we want (with the given name).\n            # In case of multiple distributions with the same name tag,\n            # our use of caching means list_distributions will just\n            # return the first one over and over again,\n            # so only the first result is useful.\n            if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}\n            distribution = dist\n    except botocore.exceptions.ClientError as err:\n        return {'error': __utils__['boto3.get_error'](err)}\n    if not distribution:\n        return {'result': None}\n\n    _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        resource_id=distribution,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )\n    return {'result': distribution}",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 4
+              },
+              "end": {
+                "row": 26,
+                "column": 7
+              },
+              "text": "'''\n    Get information about a CloudFront distribution (configuration, tags) with a given name.\n\n    name\n        Name of the CloudFront distribution\n\n    region\n        Region to connect to\n\n    key\n        Secret key to use\n\n    keyid\n        Access key to use\n\n    profile\n        A dict with region, key, and keyid,\n        or a pillar key (string) that contains such a dict.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt myminion boto_cloudfront.get_distribution name=mydistribution profile=awsprofile\n\n    '''",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 7
+                  },
+                  "text": "'''\n    Get information about a CloudFront distribution (configuration, tags) with a given name.\n\n    name\n        Name of the CloudFront distribution\n\n    region\n        Region to connect to\n\n    key\n        Secret key to use\n\n    keyid\n        Access key to use\n\n    profile\n        A dict with region, key, and keyid,\n        or a pillar key (string) that contains such a dict.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt myminion boto_cloudfront.get_distribution name=mydistribution profile=awsprofile\n\n    '''",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 4
+                      },
+                      "text": "\n    Get information about a CloudFront distribution (configuration, tags) with a given name.\n\n    name\n        Name of the CloudFront distribution\n\n    region\n        Region to connect to\n\n    key\n        Secret key to use\n\n    keyid\n        Access key to use\n\n    profile\n        A dict with region, key, and keyid,\n        or a pillar key (string) that contains such a dict.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt myminion boto_cloudfront.get_distribution name=mydistribution profile=awsprofile\n\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 26,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 27,
+                "column": 4
+              },
+              "end": {
+                "row": 34,
+                "column": 5
+              },
+              "text": "distribution = _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 27,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 5
+                  },
+                  "text": "distribution = _cache_id(\n        'cloudfront',\n        sub_resource=name,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 16
+                      },
+                      "text": "distribution"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 27,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 18
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 27,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 5
+                      },
+                      "text": "_cache_id(\n        'cloudfront',\n        sub_resource=name,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 27,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 28
+                          },
+                          "text": "_cache_id"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 27,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 5
+                          },
+                          "text": "(\n        'cloudfront',\n        sub_resource=name,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 27,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 29
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 28,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 20
+                              },
+                              "text": "'cloudfront'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 9
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 9
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 19
+                                  },
+                                  "text": "cloudfront"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 20
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 28,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 21
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 29,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 25
+                              },
+                              "text": "sub_resource=name",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 20
+                                  },
+                                  "text": "sub_resource"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 21
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 25
+                                  },
+                                  "text": "name"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 29,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 26
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 30,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 21
+                              },
+                              "text": "region=region",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 14
+                                  },
+                                  "text": "region"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 15
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 21
+                                  },
+                                  "text": "region"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 30,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 22
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 31,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 15
+                              },
+                              "text": "key=key",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 11
+                                  },
+                                  "text": "key"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 12
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 15
+                                  },
+                                  "text": "key"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 31,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 16
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 32,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 19
+                              },
+                              "text": "keyid=keyid",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 32,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 32,
+                                    "column": 13
+                                  },
+                                  "text": "keyid"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 32,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 32,
+                                    "column": 14
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 32,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 32,
+                                    "column": 19
+                                  },
+                                  "text": "keyid"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 32,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 20
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 33,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 23
+                              },
+                              "text": "profile=profile",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 15
+                                  },
+                                  "text": "profile"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 16
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 23
+                                  },
+                                  "text": "profile"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 33,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 24
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 34,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 5
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 35,
+                "column": 4
+              },
+              "end": {
+                "row": 36,
+                "column": 39
+              },
+              "text": "if distribution:\n        return {'result': distribution}",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 35,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 35,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 19
+                  },
+                  "text": "distribution"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 35,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 20
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 36,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 39
+                  },
+                  "text": "return {'result': distribution}",
+                  "children": [
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 36,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 39
+                      },
+                      "text": "return {'result': distribution}",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 36,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 14
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "dictionary",
+                          "start": {
+                            "row": 36,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 39
+                          },
+                          "text": "{'result': distribution}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 36,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 16
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 36,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 38
+                              },
+                              "text": "'result': distribution",
+                              "children": [
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 24
+                                  },
+                                  "text": "'result'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 17
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 23
+                                      },
+                                      "text": "result"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 24
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 25
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 38
+                                  },
+                                  "text": "distribution"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 36,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 39
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 38,
+                "column": 4
+              },
+              "end": {
+                "row": 38,
+                "column": 74
+              },
+              "text": "conn = _get_conn(region=region, key=key, keyid=keyid, profile=profile)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 38,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 38,
+                    "column": 74
+                  },
+                  "text": "conn = _get_conn(region=region, key=key, keyid=keyid, profile=profile)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 38,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 8
+                      },
+                      "text": "conn"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 38,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 10
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 38,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 74
+                      },
+                      "text": "_get_conn(region=region, key=key, keyid=keyid, profile=profile)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 38,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 20
+                          },
+                          "text": "_get_conn"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 38,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 74
+                          },
+                          "text": "(region=region, key=key, keyid=keyid, profile=profile)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 38,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 21
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 38,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 34
+                              },
+                              "text": "region=region",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 27
+                                  },
+                                  "text": "region"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 28
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 34
+                                  },
+                                  "text": "region"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 38,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 35
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 38,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 43
+                              },
+                              "text": "key=key",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 39
+                                  },
+                                  "text": "key"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 40
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 43
+                                  },
+                                  "text": "key"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 38,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 44
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 38,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 56
+                              },
+                              "text": "keyid=keyid",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 45
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 50
+                                  },
+                                  "text": "keyid"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 51
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 56
+                                  },
+                                  "text": "keyid"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 38,
+                                "column": 56
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 57
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 38,
+                                "column": 58
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 73
+                              },
+                              "text": "profile=profile",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 65
+                                  },
+                                  "text": "profile"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 65
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 66
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 73
+                                  },
+                                  "text": "profile"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 38,
+                                "column": 73
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 74
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "try_statement",
+              "start": {
+                "row": 39,
+                "column": 4
+              },
+              "end": {
+                "row": 59,
+                "column": 59
+              },
+              "text": "try:\n        for _, dist in _list_distributions(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        ):\n            # _list_distributions should only return the one distribution\n            # that we want (with the given name).\n            # In case of multiple distributions with the same name tag,\n            # our use of caching means list_distributions will just\n            # return the first one over and over again,\n            # so only the first result is useful.\n            if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}\n            distribution = dist\n    except botocore.exceptions.ClientError as err:\n        return {'error': __utils__['boto3.get_error'](err)}",
+              "children": [
+                {
+                  "type": "try",
+                  "start": {
+                    "row": 39,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 7
+                  },
+                  "text": "try"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 39,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 8
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 40,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 57,
+                    "column": 31
+                  },
+                  "text": "for _, dist in _list_distributions(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        ):\n            # _list_distributions should only return the one distribution\n            # that we want (with the given name).\n            # In case of multiple distributions with the same name tag,\n            # our use of caching means list_distributions will just\n            # return the first one over and over again,\n            # so only the first result is useful.\n            if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}\n            distribution = dist",
+                  "children": [
+                    {
+                      "type": "for_statement",
+                      "start": {
+                        "row": 40,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 57,
+                        "column": 31
+                      },
+                      "text": "for _, dist in _list_distributions(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        ):\n            # _list_distributions should only return the one distribution\n            # that we want (with the given name).\n            # In case of multiple distributions with the same name tag,\n            # our use of caching means list_distributions will just\n            # return the first one over and over again,\n            # so only the first result is useful.\n            if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}\n            distribution = dist",
+                      "children": [
+                        {
+                          "type": "for",
+                          "start": {
+                            "row": 40,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 11
+                          },
+                          "text": "for"
+                        },
+                        {
+                          "type": "pattern_list",
+                          "start": {
+                            "row": 40,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 19
+                          },
+                          "text": "_, dist",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 13
+                              },
+                              "text": "_"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 40,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 14
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 19
+                              },
+                              "text": "dist"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "in",
+                          "start": {
+                            "row": 40,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 22
+                          },
+                          "text": "in"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 40,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 9
+                          },
+                          "text": "_list_distributions(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 42
+                              },
+                              "text": "_list_distributions"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 40,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 9
+                              },
+                              "text": "(\n            conn,\n            name=name,\n            region=region,\n            key=key,\n            keyid=keyid,\n            profile=profile,\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 43
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 16
+                                  },
+                                  "text": "conn"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 17
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "keyword_argument",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 21
+                                  },
+                                  "text": "name=name",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 16
+                                      },
+                                      "text": "name"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 17
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 21
+                                      },
+                                      "text": "name"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 22
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "keyword_argument",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 25
+                                  },
+                                  "text": "region=region",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 18
+                                      },
+                                      "text": "region"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 19
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 25
+                                      },
+                                      "text": "region"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 26
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "keyword_argument",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 19
+                                  },
+                                  "text": "key=key",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 44,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 44,
+                                        "column": 15
+                                      },
+                                      "text": "key"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 44,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 44,
+                                        "column": 16
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 44,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 44,
+                                        "column": 19
+                                      },
+                                      "text": "key"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 20
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "keyword_argument",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 23
+                                  },
+                                  "text": "keyid=keyid",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 17
+                                      },
+                                      "text": "keyid"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 18
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 23
+                                      },
+                                      "text": "keyid"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 24
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "keyword_argument",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 27
+                                  },
+                                  "text": "profile=profile",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 19
+                                      },
+                                      "text": "profile"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 20
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 27
+                                      },
+                                      "text": "profile"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 28
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 47,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 10
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 48,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 73
+                          },
+                          "text": "# _list_distributions should only return the one distribution"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 49,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 49
+                          },
+                          "text": "# that we want (with the given name)."
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 50,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 71
+                          },
+                          "text": "# In case of multiple distributions with the same name tag,"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 51,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 67
+                          },
+                          "text": "# our use of caching means list_distributions will just"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 52,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 55
+                          },
+                          "text": "# return the first one over and over again,"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 53,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 53,
+                            "column": 49
+                          },
+                          "text": "# so only the first result is useful."
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 54,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 57,
+                            "column": 31
+                          },
+                          "text": "if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}\n            distribution = dist",
+                          "children": [
+                            {
+                              "type": "if_statement",
+                              "start": {
+                                "row": 54,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 50
+                              },
+                              "text": "if distribution is not None:\n                msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}",
+                              "children": [
+                                {
+                                  "type": "if",
+                                  "start": {
+                                    "row": 54,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 14
+                                  },
+                                  "text": "if"
+                                },
+                                {
+                                  "type": "comparison_operator",
+                                  "start": {
+                                    "row": 54,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 39
+                                  },
+                                  "text": "distribution is not None",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 27
+                                      },
+                                      "text": "distribution"
+                                    },
+                                    {
+                                      "type": "is not",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 30
+                                      },
+                                      "text": "is"
+                                    },
+                                    {
+                                      "type": "is not",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 34
+                                      },
+                                      "text": "not"
+                                    },
+                                    {
+                                      "type": "none",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 39
+                                      },
+                                      "text": "None"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 54,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 40
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 55,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 56,
+                                    "column": 50
+                                  },
+                                  "text": "msg = 'More than one distribution found with name {0}'\n                return {'error': msg.format(name)}",
+                                  "children": [
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 55,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 55,
+                                        "column": 70
+                                      },
+                                      "text": "msg = 'More than one distribution found with name {0}'",
+                                      "children": [
+                                        {
+                                          "type": "assignment",
+                                          "start": {
+                                            "row": 55,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 55,
+                                            "column": 70
+                                          },
+                                          "text": "msg = 'More than one distribution found with name {0}'",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 55,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 55,
+                                                "column": 19
+                                              },
+                                              "text": "msg"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 55,
+                                                "column": 20
+                                              },
+                                              "end": {
+                                                "row": 55,
+                                                "column": 21
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 55,
+                                                "column": 22
+                                              },
+                                              "end": {
+                                                "row": 55,
+                                                "column": 70
+                                              },
+                                              "text": "'More than one distribution found with name {0}'",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 55,
+                                                    "column": 22
+                                                  },
+                                                  "end": {
+                                                    "row": 55,
+                                                    "column": 23
+                                                  },
+                                                  "text": "'"
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 55,
+                                                    "column": 23
+                                                  },
+                                                  "end": {
+                                                    "row": 55,
+                                                    "column": 69
+                                                  },
+                                                  "text": "More than one distribution found with name {0}"
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 55,
+                                                    "column": 69
+                                                  },
+                                                  "end": {
+                                                    "row": 55,
+                                                    "column": 70
+                                                  },
+                                                  "text": "'"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "return_statement",
+                                      "start": {
+                                        "row": 56,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 56,
+                                        "column": 50
+                                      },
+                                      "text": "return {'error': msg.format(name)}",
+                                      "children": [
+                                        {
+                                          "type": "return",
+                                          "start": {
+                                            "row": 56,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 56,
+                                            "column": 22
+                                          },
+                                          "text": "return"
+                                        },
+                                        {
+                                          "type": "dictionary",
+                                          "start": {
+                                            "row": 56,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 56,
+                                            "column": 50
+                                          },
+                                          "text": "{'error': msg.format(name)}",
+                                          "children": [
+                                            {
+                                              "type": "{",
+                                              "start": {
+                                                "row": 56,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 56,
+                                                "column": 24
+                                              },
+                                              "text": "{"
+                                            },
+                                            {
+                                              "type": "pair",
+                                              "start": {
+                                                "row": 56,
+                                                "column": 24
+                                              },
+                                              "end": {
+                                                "row": 56,
+                                                "column": 49
+                                              },
+                                              "text": "'error': msg.format(name)",
+                                              "children": [
+                                                {
+                                                  "type": "string",
+                                                  "start": {
+                                                    "row": 56,
+                                                    "column": 24
+                                                  },
+                                                  "end": {
+                                                    "row": 56,
+                                                    "column": 31
+                                                  },
+                                                  "text": "'error'",
+                                                  "children": [
+                                                    {
+                                                      "type": "string_start",
+                                                      "start": {
+                                                        "row": 56,
+                                                        "column": 24
+                                                      },
+                                                      "end": {
+                                                        "row": 56,
+                                                        "column": 25
+                                                      },
+                                                      "text": "'"
+                                                    },
+                                                    {
+                                                      "type": "string_content",
+                                                      "start": {
+                                                        "row": 56,
+                                                        "column": 25
+                                                      },
+                                                      "end": {
+                                                        "row": 56,
+                                                        "column": 30
+                                                      },
+                                                      "text": "error"
+                                                    },
+                                                    {
+                                                      "type": "string_end",
+                                                      "start": {
+                                                        "row": 56,
+                                                        "column": 30
+                                                      },
+                                                      "end": {
+                                                        "row": 56,
+                                                        "column": 31
+                                                      },
+                                                      "text": "'"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ":",
+                                                  "start": {
+                                                    "row": 56,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 56,
+                                                    "column": 32
+                                                  },
+                                                  "text": ":"
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 56,
+                                                    "column": 33
+                                                  },
+                                                  "end": {
+                                                    "row": 56,
+                                                    "column": 49
+                                                  },
+                                                  "text": "msg.format(name)",
+                                                  "children": [
+                                                    {
+                                                      "type": "attribute",
+                                                      "start": {
+                                                        "row": 56,
+                                                        "column": 33
+                                                      },
+                                                      "end": {
+                                                        "row": 56,
+                                                        "column": 43
+                                                      },
+                                                      "text": "msg.format",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 56,
+                                                            "column": 33
+                                                          },
+                                                          "end": {
+                                                            "row": 56,
+                                                            "column": 36
+                                                          },
+                                                          "text": "msg"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 56,
+                                                            "column": 36
+                                                          },
+                                                          "end": {
+                                                            "row": 56,
+                                                            "column": 37
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 56,
+                                                            "column": 37
+                                                          },
+                                                          "end": {
+                                                            "row": 56,
+                                                            "column": 43
+                                                          },
+                                                          "text": "format"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 56,
+                                                        "column": 43
+                                                      },
+                                                      "end": {
+                                                        "row": 56,
+                                                        "column": 49
+                                                      },
+                                                      "text": "(name)",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 56,
+                                                            "column": 43
+                                                          },
+                                                          "end": {
+                                                            "row": 56,
+                                                            "column": 44
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 56,
+                                                            "column": 44
+                                                          },
+                                                          "end": {
+                                                            "row": 56,
+                                                            "column": 48
+                                                          },
+                                                          "text": "name"
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 56,
+                                                            "column": 48
+                                                          },
+                                                          "end": {
+                                                            "row": 56,
+                                                            "column": 49
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "}",
+                                              "start": {
+                                                "row": 56,
+                                                "column": 49
+                                              },
+                                              "end": {
+                                                "row": 56,
+                                                "column": 50
+                                              },
+                                              "text": "}"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 57,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 31
+                              },
+                              "text": "distribution = dist",
+                              "children": [
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 31
+                                  },
+                                  "text": "distribution = dist",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 57,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 57,
+                                        "column": 24
+                                      },
+                                      "text": "distribution"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 57,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 57,
+                                        "column": 26
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 57,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 57,
+                                        "column": 31
+                                      },
+                                      "text": "dist"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "except_clause",
+                  "start": {
+                    "row": 58,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 59,
+                    "column": 59
+                  },
+                  "text": "except botocore.exceptions.ClientError as err:\n        return {'error': __utils__['boto3.get_error'](err)}",
+                  "children": [
+                    {
+                      "type": "except",
+                      "start": {
+                        "row": 58,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 10
+                      },
+                      "text": "except"
+                    },
+                    {
+                      "type": "as_pattern",
+                      "start": {
+                        "row": 58,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 49
+                      },
+                      "text": "botocore.exceptions.ClientError as err",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 58,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 58,
+                            "column": 42
+                          },
+                          "text": "botocore.exceptions.ClientError",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 58,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 30
+                              },
+                              "text": "botocore.exceptions",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 58,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 58,
+                                    "column": 19
+                                  },
+                                  "text": "botocore"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 58,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 58,
+                                    "column": 20
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 58,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 58,
+                                    "column": 30
+                                  },
+                                  "text": "exceptions"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 58,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 31
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 58,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 42
+                              },
+                              "text": "ClientError"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "as",
+                          "start": {
+                            "row": 58,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 58,
+                            "column": 45
+                          },
+                          "text": "as"
+                        },
+                        {
+                          "type": "as_pattern_target",
+                          "start": {
+                            "row": 58,
+                            "column": 46
+                          },
+                          "end": {
+                            "row": 58,
+                            "column": 49
+                          },
+                          "text": "err",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 58,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 49
+                              },
+                              "text": "err"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 58,
+                        "column": 49
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 50
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 59,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 59,
+                        "column": 59
+                      },
+                      "text": "return {'error': __utils__['boto3.get_error'](err)}",
+                      "children": [
+                        {
+                          "type": "return_statement",
+                          "start": {
+                            "row": 59,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 59,
+                            "column": 59
+                          },
+                          "text": "return {'error': __utils__['boto3.get_error'](err)}",
+                          "children": [
+                            {
+                              "type": "return",
+                              "start": {
+                                "row": 59,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 59,
+                                "column": 14
+                              },
+                              "text": "return"
+                            },
+                            {
+                              "type": "dictionary",
+                              "start": {
+                                "row": 59,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 59,
+                                "column": 59
+                              },
+                              "text": "{'error': __utils__['boto3.get_error'](err)}",
+                              "children": [
+                                {
+                                  "type": "{",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 16
+                                  },
+                                  "text": "{"
+                                },
+                                {
+                                  "type": "pair",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 58
+                                  },
+                                  "text": "'error': __utils__['boto3.get_error'](err)",
+                                  "children": [
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 23
+                                      },
+                                      "text": "'error'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 59,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 59,
+                                            "column": 17
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 59,
+                                            "column": 17
+                                          },
+                                          "end": {
+                                            "row": 59,
+                                            "column": 22
+                                          },
+                                          "text": "error"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 59,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 59,
+                                            "column": 23
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 24
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 58
+                                      },
+                                      "text": "__utils__['boto3.get_error'](err)",
+                                      "children": [
+                                        {
+                                          "type": "subscript",
+                                          "start": {
+                                            "row": 59,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 59,
+                                            "column": 53
+                                          },
+                                          "text": "__utils__['boto3.get_error']",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 59,
+                                                "column": 25
+                                              },
+                                              "end": {
+                                                "row": 59,
+                                                "column": 34
+                                              },
+                                              "text": "__utils__"
+                                            },
+                                            {
+                                              "type": "[",
+                                              "start": {
+                                                "row": 59,
+                                                "column": 34
+                                              },
+                                              "end": {
+                                                "row": 59,
+                                                "column": 35
+                                              },
+                                              "text": "["
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 59,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 59,
+                                                "column": 52
+                                              },
+                                              "text": "'boto3.get_error'",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 59,
+                                                    "column": 35
+                                                  },
+                                                  "end": {
+                                                    "row": 59,
+                                                    "column": 36
+                                                  },
+                                                  "text": "'"
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 59,
+                                                    "column": 36
+                                                  },
+                                                  "end": {
+                                                    "row": 59,
+                                                    "column": 51
+                                                  },
+                                                  "text": "boto3.get_error"
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 59,
+                                                    "column": 51
+                                                  },
+                                                  "end": {
+                                                    "row": 59,
+                                                    "column": 52
+                                                  },
+                                                  "text": "'"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "]",
+                                              "start": {
+                                                "row": 59,
+                                                "column": 52
+                                              },
+                                              "end": {
+                                                "row": 59,
+                                                "column": 53
+                                              },
+                                              "text": "]"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 59,
+                                            "column": 53
+                                          },
+                                          "end": {
+                                            "row": 59,
+                                            "column": 58
+                                          },
+                                          "text": "(err)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 59,
+                                                "column": 53
+                                              },
+                                              "end": {
+                                                "row": 59,
+                                                "column": 54
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 59,
+                                                "column": 54
+                                              },
+                                              "end": {
+                                                "row": 59,
+                                                "column": 57
+                                              },
+                                              "text": "err"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 59,
+                                                "column": 57
+                                              },
+                                              "end": {
+                                                "row": 59,
+                                                "column": 58
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 59
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 60,
+                "column": 4
+              },
+              "end": {
+                "row": 61,
+                "column": 31
+              },
+              "text": "if not distribution:\n        return {'result': None}",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 60,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 60,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "not_operator",
+                  "start": {
+                    "row": 60,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 60,
+                    "column": 23
+                  },
+                  "text": "not distribution",
+                  "children": [
+                    {
+                      "type": "not",
+                      "start": {
+                        "row": 60,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 60,
+                        "column": 10
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 60,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 60,
+                        "column": 23
+                      },
+                      "text": "distribution"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 60,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 60,
+                    "column": 24
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 61,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 61,
+                    "column": 31
+                  },
+                  "text": "return {'result': None}",
+                  "children": [
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 61,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 61,
+                        "column": 31
+                      },
+                      "text": "return {'result': None}",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 61,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 61,
+                            "column": 14
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "dictionary",
+                          "start": {
+                            "row": 61,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 61,
+                            "column": 31
+                          },
+                          "text": "{'result': None}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 61,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 61,
+                                "column": 16
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 61,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 61,
+                                "column": 30
+                              },
+                              "text": "'result': None",
+                              "children": [
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 61,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 61,
+                                    "column": 24
+                                  },
+                                  "text": "'result'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 61,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 61,
+                                        "column": 17
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 61,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 61,
+                                        "column": 23
+                                      },
+                                      "text": "result"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 61,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 61,
+                                        "column": 24
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 61,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 61,
+                                    "column": 25
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "none",
+                                  "start": {
+                                    "row": 61,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 61,
+                                    "column": 30
+                                  },
+                                  "text": "None"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 61,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 61,
+                                "column": 31
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 63,
+                "column": 4
+              },
+              "end": {
+                "row": 71,
+                "column": 5
+              },
+              "text": "_cache_id(\n        'cloudfront',\n        sub_resource=name,\n        resource_id=distribution,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 63,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 71,
+                    "column": 5
+                  },
+                  "text": "_cache_id(\n        'cloudfront',\n        sub_resource=name,\n        resource_id=distribution,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 63,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 63,
+                        "column": 13
+                      },
+                      "text": "_cache_id"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 63,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 71,
+                        "column": 5
+                      },
+                      "text": "(\n        'cloudfront',\n        sub_resource=name,\n        resource_id=distribution,\n        region=region,\n        key=key,\n        keyid=keyid,\n        profile=profile,\n    )",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 63,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 63,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 64,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 64,
+                            "column": 20
+                          },
+                          "text": "'cloudfront'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 64,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 64,
+                                "column": 9
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 64,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 64,
+                                "column": 19
+                              },
+                              "text": "cloudfront"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 64,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 64,
+                                "column": 20
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 64,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 64,
+                            "column": 21
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 65,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 25
+                          },
+                          "text": "sub_resource=name",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 65,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 65,
+                                "column": 20
+                              },
+                              "text": "sub_resource"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 65,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 65,
+                                "column": 21
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 65,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 65,
+                                "column": 25
+                              },
+                              "text": "name"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 65,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 26
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 66,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 66,
+                            "column": 32
+                          },
+                          "text": "resource_id=distribution",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 66,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 19
+                              },
+                              "text": "resource_id"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 66,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 66,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 32
+                              },
+                              "text": "distribution"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 66,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 66,
+                            "column": 33
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 67,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 21
+                          },
+                          "text": "region=region",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 67,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 14
+                              },
+                              "text": "region"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 67,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 15
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 67,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 21
+                              },
+                              "text": "region"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 67,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 22
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 68,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 68,
+                            "column": 15
+                          },
+                          "text": "key=key",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 68,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 68,
+                                "column": 11
+                              },
+                              "text": "key"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 68,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 68,
+                                "column": 12
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 68,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 68,
+                                "column": 15
+                              },
+                              "text": "key"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 68,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 68,
+                            "column": 16
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 69,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 69,
+                            "column": 19
+                          },
+                          "text": "keyid=keyid",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 69,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 13
+                              },
+                              "text": "keyid"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 69,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 14
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 69,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 19
+                              },
+                              "text": "keyid"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 69,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 69,
+                            "column": 20
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 70,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 70,
+                            "column": 23
+                          },
+                          "text": "profile=profile",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 70,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 15
+                              },
+                              "text": "profile"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 70,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 16
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 70,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 70,
+                                "column": 23
+                              },
+                              "text": "profile"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 70,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 70,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 71,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 71,
+                            "column": 5
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 72,
+                "column": 4
+              },
+              "end": {
+                "row": 72,
+                "column": 35
+              },
+              "text": "return {'result': distribution}",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 72,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 72,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "dictionary",
+                  "start": {
+                    "row": 72,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 72,
+                    "column": 35
+                  },
+                  "text": "{'result': distribution}",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 72,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 72,
+                        "column": 12
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "pair",
+                      "start": {
+                        "row": 72,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 72,
+                        "column": 34
+                      },
+                      "text": "'result': distribution",
+                      "children": [
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 72,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 72,
+                            "column": 20
+                          },
+                          "text": "'result'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 72,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 72,
+                                "column": 13
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 72,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 72,
+                                "column": 19
+                              },
+                              "text": "result"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 72,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 72,
+                                "column": 20
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 72,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 72,
+                            "column": 21
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 72,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 72,
+                            "column": 34
+                          },
+                          "text": "distribution"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 72,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 72,
+                        "column": 35
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+public static File zip(String srcPath, String zipPath, boolean withSrcDir) throws UtilException {
+		return zip(srcPath, zipPath, DEFAULT_CHARSET, withSrcDir);
+	}

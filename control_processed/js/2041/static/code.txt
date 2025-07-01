@@ -1,0 +1,26 @@
+function(message) {
+        var error = false;
+
+        // Check for errors in the <open /> tag
+        var ns = message.getAttribute("xmlns");
+        if (typeof ns !== "string") {
+            error = "Missing xmlns in <open />";
+        } else if (ns !== Strophe.NS.FRAMING) {
+            error = "Wrong xmlns in <open />: " + ns;
+        }
+
+        var ver = message.getAttribute("version");
+        if (typeof ver !== "string") {
+            error = "Missing version in <open />";
+        } else if (ver !== "1.0") {
+            error = "Wrong version in <open />: " + ver;
+        }
+
+        if (error) {
+            this._conn._changeConnectStatus(Strophe.Status.CONNFAIL, error);
+            this._conn._doDisconnect();
+            return false;
+        }
+
+        return true;
+    }

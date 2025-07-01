@@ -1,0 +1,67 @@
+protected JPanel getJPanel() {
+		if (jPanel == null) {
+			java.awt.GridBagConstraints gridBagConstraints6 = new GridBagConstraints();
+
+			java.awt.GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
+
+			java.awt.GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
+
+			java.awt.GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+
+			java.awt.GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
+
+			java.awt.GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
+
+			javax.swing.JLabel jLabel2 = new JLabel();
+
+			javax.swing.JLabel jLabel1 = new JLabel();
+
+			javax.swing.JLabel jLabel = new JLabel();
+
+			jPanel = new JPanel();
+			jPanel.setLayout(new GridBagLayout());
+			// ZAP: i18n
+			jLabel.setText(Constant.messages.getString("filter.replacedialog.pattern") + ":");
+			jLabel1.setText(Constant.messages.getString("filter.replacedialog.replace") + ":");
+			jLabel2.setText(Constant.messages.getString("filter.replacedialog.title"));
+			gridBagConstraints1.gridx = 0;
+			gridBagConstraints1.gridy = 0;
+			gridBagConstraints1.insets = new java.awt.Insets(5,5,5,5);
+			gridBagConstraints1.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints1.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints1.gridwidth = 2;
+			gridBagConstraints1.weightx = 1.0D;
+			gridBagConstraints2.gridx = 0;
+			gridBagConstraints2.gridy = 1;
+			gridBagConstraints2.insets = new java.awt.Insets(2,5,2,5);
+			gridBagConstraints2.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints3.gridx = 1;
+			gridBagConstraints3.gridy = 1;
+			gridBagConstraints3.weightx = 1.0;
+			gridBagConstraints3.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints3.insets = new java.awt.Insets(2,5,2,5);
+			gridBagConstraints3.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints4.gridx = 0;
+			gridBagConstraints4.gridy = 2;
+			gridBagConstraints4.insets = new java.awt.Insets(2,5,2,5);
+			gridBagConstraints4.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints5.gridx = 1;
+			gridBagConstraints5.gridy = 2;
+			gridBagConstraints5.weightx = 1.0;
+			gridBagConstraints5.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints5.insets = new java.awt.Insets(2,5,2,5);
+			gridBagConstraints5.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			gridBagConstraints6.anchor = java.awt.GridBagConstraints.SOUTHEAST;
+			gridBagConstraints6.gridwidth = 2;
+			gridBagConstraints6.gridx = 0;
+			gridBagConstraints6.gridy = 3;
+			gridBagConstraints6.insets = new java.awt.Insets(2,2,2,2);
+			jPanel.add(jLabel2, gridBagConstraints1);
+			jPanel.add(jLabel, gridBagConstraints2);
+			jPanel.add(getTxtPattern(), gridBagConstraints3);
+			jPanel.add(jLabel1, gridBagConstraints4);
+			jPanel.add(getTxtReplaceWith(), gridBagConstraints5);
+			jPanel.add(getJPanel1(), gridBagConstraints6);
+		}
+		return jPanel;
+	}

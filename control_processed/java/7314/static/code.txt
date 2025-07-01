@@ -1,0 +1,3 @@
+public static String rowIdToString(RowId rowId) {
+		return StrUtil.str(rowId.getBytes(), CharsetUtil.CHARSET_ISO_8859_1);
+	}

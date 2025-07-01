@@ -1,0 +1,3550 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 57,
+    "column": 7
+  },
+  "text": "def main_loop\n      debug(\"Entering request handler main loop\")\n      reset_signal_handlers\n      begin\n        @graceful_termination_pipe = IO.pipe\n        @graceful_termination_pipe[0].close_on_exec!\n        @graceful_termination_pipe[1].close_on_exec!\n\n        @main_loop_thread_lock.synchronize do\n          @main_loop_generation += 1\n          @main_loop_running = true\n          @main_loop_thread_cond.broadcast\n\n          @select_timeout = nil\n\n          @selectable_sockets = []\n          @server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end\n          @selectable_sockets << @owner_pipe\n          @selectable_sockets << @graceful_termination_pipe[0]\n        end\n\n        install_useful_signal_handlers\n        start_threads\n        wait_until_termination_requested\n        wait_until_all_threads_are_idle\n        terminate_threads\n        debug(\"Request handler main loop exited normally\")\n\n      rescue EOFError\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by EOFError exception\")\n      rescue Interrupt\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by Interrupt exception\")\n      rescue SignalException => signal\n        trace(2, \"Request handler main loop interrupted by SignalException\")\n        if signal.message != HARD_TERMINATION_SIGNAL\n          raise\n        end\n      rescue Exception => e\n        trace(2, \"Request handler main loop interrupted by #{e.class} exception\")\n        raise\n      ensure\n        debug(\"Exiting request handler main loop\")\n        revert_signal_handlers\n        @main_loop_thread_lock.synchronize do\n          @graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast\n        end\n      end\n    end",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 57,
+        "column": 7
+      },
+      "text": "def main_loop\n      debug(\"Entering request handler main loop\")\n      reset_signal_handlers\n      begin\n        @graceful_termination_pipe = IO.pipe\n        @graceful_termination_pipe[0].close_on_exec!\n        @graceful_termination_pipe[1].close_on_exec!\n\n        @main_loop_thread_lock.synchronize do\n          @main_loop_generation += 1\n          @main_loop_running = true\n          @main_loop_thread_cond.broadcast\n\n          @select_timeout = nil\n\n          @selectable_sockets = []\n          @server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end\n          @selectable_sockets << @owner_pipe\n          @selectable_sockets << @graceful_termination_pipe[0]\n        end\n\n        install_useful_signal_handlers\n        start_threads\n        wait_until_termination_requested\n        wait_until_all_threads_are_idle\n        terminate_threads\n        debug(\"Request handler main loop exited normally\")\n\n      rescue EOFError\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by EOFError exception\")\n      rescue Interrupt\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by Interrupt exception\")\n      rescue SignalException => signal\n        trace(2, \"Request handler main loop interrupted by SignalException\")\n        if signal.message != HARD_TERMINATION_SIGNAL\n          raise\n        end\n      rescue Exception => e\n        trace(2, \"Request handler main loop interrupted by #{e.class} exception\")\n        raise\n      ensure\n        debug(\"Exiting request handler main loop\")\n        revert_signal_handlers\n        @main_loop_thread_lock.synchronize do\n          @graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast\n        end\n      end\n    end",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 13
+          },
+          "text": "main_loop"
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 56,
+            "column": 9
+          },
+          "text": "debug(\"Entering request handler main loop\")\n      reset_signal_handlers\n      begin\n        @graceful_termination_pipe = IO.pipe\n        @graceful_termination_pipe[0].close_on_exec!\n        @graceful_termination_pipe[1].close_on_exec!\n\n        @main_loop_thread_lock.synchronize do\n          @main_loop_generation += 1\n          @main_loop_running = true\n          @main_loop_thread_cond.broadcast\n\n          @select_timeout = nil\n\n          @selectable_sockets = []\n          @server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end\n          @selectable_sockets << @owner_pipe\n          @selectable_sockets << @graceful_termination_pipe[0]\n        end\n\n        install_useful_signal_handlers\n        start_threads\n        wait_until_termination_requested\n        wait_until_all_threads_are_idle\n        terminate_threads\n        debug(\"Request handler main loop exited normally\")\n\n      rescue EOFError\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by EOFError exception\")\n      rescue Interrupt\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by Interrupt exception\")\n      rescue SignalException => signal\n        trace(2, \"Request handler main loop interrupted by SignalException\")\n        if signal.message != HARD_TERMINATION_SIGNAL\n          raise\n        end\n      rescue Exception => e\n        trace(2, \"Request handler main loop interrupted by #{e.class} exception\")\n        raise\n      ensure\n        debug(\"Exiting request handler main loop\")\n        revert_signal_handlers\n        @main_loop_thread_lock.synchronize do\n          @graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast\n        end\n      end",
+          "children": [
+            {
+              "type": "call",
+              "start": {
+                "row": 1,
+                "column": 6
+              },
+              "end": {
+                "row": 1,
+                "column": 49
+              },
+              "text": "debug(\"Entering request handler main loop\")",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 11
+                  },
+                  "text": "debug"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 1,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 49
+                  },
+                  "text": "(\"Entering request handler main loop\")",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 12
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "string",
+                      "start": {
+                        "row": 1,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 48
+                      },
+                      "text": "\"Entering request handler main loop\"",
+                      "children": [
+                        {
+                          "type": "\"",
+                          "start": {
+                            "row": 1,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 13
+                          },
+                          "text": "\""
+                        },
+                        {
+                          "type": "string_content",
+                          "start": {
+                            "row": 1,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 47
+                          },
+                          "text": "Entering request handler main loop"
+                        },
+                        {
+                          "type": "\"",
+                          "start": {
+                            "row": 1,
+                            "column": 47
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 48
+                          },
+                          "text": "\""
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 1,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 49
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 2,
+                "column": 6
+              },
+              "end": {
+                "row": 2,
+                "column": 27
+              },
+              "text": "reset_signal_handlers"
+            },
+            {
+              "type": "begin",
+              "start": {
+                "row": 3,
+                "column": 6
+              },
+              "end": {
+                "row": 56,
+                "column": 9
+              },
+              "text": "begin\n        @graceful_termination_pipe = IO.pipe\n        @graceful_termination_pipe[0].close_on_exec!\n        @graceful_termination_pipe[1].close_on_exec!\n\n        @main_loop_thread_lock.synchronize do\n          @main_loop_generation += 1\n          @main_loop_running = true\n          @main_loop_thread_cond.broadcast\n\n          @select_timeout = nil\n\n          @selectable_sockets = []\n          @server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end\n          @selectable_sockets << @owner_pipe\n          @selectable_sockets << @graceful_termination_pipe[0]\n        end\n\n        install_useful_signal_handlers\n        start_threads\n        wait_until_termination_requested\n        wait_until_all_threads_are_idle\n        terminate_threads\n        debug(\"Request handler main loop exited normally\")\n\n      rescue EOFError\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by EOFError exception\")\n      rescue Interrupt\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by Interrupt exception\")\n      rescue SignalException => signal\n        trace(2, \"Request handler main loop interrupted by SignalException\")\n        if signal.message != HARD_TERMINATION_SIGNAL\n          raise\n        end\n      rescue Exception => e\n        trace(2, \"Request handler main loop interrupted by #{e.class} exception\")\n        raise\n      ensure\n        debug(\"Exiting request handler main loop\")\n        revert_signal_handlers\n        @main_loop_thread_lock.synchronize do\n          @graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast\n        end\n      end",
+              "children": [
+                {
+                  "type": "begin",
+                  "start": {
+                    "row": 3,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 11
+                  },
+                  "text": "begin"
+                },
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 4,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 44
+                  },
+                  "text": "@graceful_termination_pipe = IO.pipe",
+                  "children": [
+                    {
+                      "type": "instance_variable",
+                      "start": {
+                        "row": 4,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 34
+                      },
+                      "text": "@graceful_termination_pipe"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 4,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 36
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 4,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 44
+                      },
+                      "text": "IO.pipe",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 4,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 39
+                          },
+                          "text": "IO"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 4,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 40
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 40
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 44
+                          },
+                          "text": "pipe"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 5,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 52
+                  },
+                  "text": "@graceful_termination_pipe[0].close_on_exec!",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 5,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 37
+                      },
+                      "text": "@graceful_termination_pipe[0]",
+                      "children": [
+                        {
+                          "type": "instance_variable",
+                          "start": {
+                            "row": 5,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 34
+                          },
+                          "text": "@graceful_termination_pipe"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 5,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 35
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "integer",
+                          "start": {
+                            "row": 5,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 36
+                          },
+                          "text": "0"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 5,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 37
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 5,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 38
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 52
+                      },
+                      "text": "close_on_exec!"
+                    }
+                  ]
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 6,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 52
+                  },
+                  "text": "@graceful_termination_pipe[1].close_on_exec!",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 6,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 37
+                      },
+                      "text": "@graceful_termination_pipe[1]",
+                      "children": [
+                        {
+                          "type": "instance_variable",
+                          "start": {
+                            "row": 6,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 34
+                          },
+                          "text": "@graceful_termination_pipe"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 6,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 35
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "integer",
+                          "start": {
+                            "row": 6,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 36
+                          },
+                          "text": "1"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 6,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 37
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 6,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 38
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 6,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 52
+                      },
+                      "text": "close_on_exec!"
+                    }
+                  ]
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 8,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 11
+                  },
+                  "text": "@main_loop_thread_lock.synchronize do\n          @main_loop_generation += 1\n          @main_loop_running = true\n          @main_loop_thread_cond.broadcast\n\n          @select_timeout = nil\n\n          @selectable_sockets = []\n          @server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end\n          @selectable_sockets << @owner_pipe\n          @selectable_sockets << @graceful_termination_pipe[0]\n        end",
+                  "children": [
+                    {
+                      "type": "instance_variable",
+                      "start": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 30
+                      },
+                      "text": "@main_loop_thread_lock"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 8,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 31
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 8,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 42
+                      },
+                      "text": "synchronize"
+                    },
+                    {
+                      "type": "do_block",
+                      "start": {
+                        "row": 8,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 11
+                      },
+                      "text": "do\n          @main_loop_generation += 1\n          @main_loop_running = true\n          @main_loop_thread_cond.broadcast\n\n          @select_timeout = nil\n\n          @selectable_sockets = []\n          @server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end\n          @selectable_sockets << @owner_pipe\n          @selectable_sockets << @graceful_termination_pipe[0]\n        end",
+                      "children": [
+                        {
+                          "type": "do",
+                          "start": {
+                            "row": 8,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 45
+                          },
+                          "text": "do"
+                        },
+                        {
+                          "type": "body_statement",
+                          "start": {
+                            "row": 9,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 62
+                          },
+                          "text": "@main_loop_generation += 1\n          @main_loop_running = true\n          @main_loop_thread_cond.broadcast\n\n          @select_timeout = nil\n\n          @selectable_sockets = []\n          @server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end\n          @selectable_sockets << @owner_pipe\n          @selectable_sockets << @graceful_termination_pipe[0]",
+                          "children": [
+                            {
+                              "type": "operator_assignment",
+                              "start": {
+                                "row": 9,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 36
+                              },
+                              "text": "@main_loop_generation += 1",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 31
+                                  },
+                                  "text": "@main_loop_generation"
+                                },
+                                {
+                                  "type": "+=",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 34
+                                  },
+                                  "text": "+="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 36
+                                  },
+                                  "text": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 10,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 35
+                              },
+                              "text": "@main_loop_running = true",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 28
+                                  },
+                                  "text": "@main_loop_running"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 30
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "true",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 35
+                                  },
+                                  "text": "true"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 11,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 42
+                              },
+                              "text": "@main_loop_thread_cond.broadcast",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 32
+                                  },
+                                  "text": "@main_loop_thread_cond"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 33
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 42
+                                  },
+                                  "text": "broadcast"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 13,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 31
+                              },
+                              "text": "@select_timeout = nil",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 25
+                                  },
+                                  "text": "@select_timeout"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 27
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "nil",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 31
+                                  },
+                                  "text": "nil",
+                                  "children": [
+                                    {
+                                      "type": "nil",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 31
+                                      },
+                                      "text": "nil"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 15,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 34
+                              },
+                              "text": "@selectable_sockets = []",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 29
+                                  },
+                                  "text": "@selectable_sockets"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 31
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "array",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 34
+                                  },
+                                  "text": "[]",
+                                  "children": [
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 33
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 34
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 16,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 13
+                              },
+                              "text": "@server_sockets.each_value do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 25
+                                  },
+                                  "text": "@server_sockets"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 26
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 36
+                                  },
+                                  "text": "each_value"
+                                },
+                                {
+                                  "type": "do_block",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 13
+                                  },
+                                  "text": "do |value|\n            socket = value[2]\n            @selectable_sockets << socket if socket\n          end",
+                                  "children": [
+                                    {
+                                      "type": "do",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 39
+                                      },
+                                      "text": "do"
+                                    },
+                                    {
+                                      "type": "block_parameters",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 47
+                                      },
+                                      "text": "|value|",
+                                      "children": [
+                                        {
+                                          "type": "|",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 41
+                                          },
+                                          "text": "|"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 46
+                                          },
+                                          "text": "value"
+                                        },
+                                        {
+                                          "type": "|",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 47
+                                          },
+                                          "text": "|"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "body_statement",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 51
+                                      },
+                                      "text": "socket = value[2]\n            @selectable_sockets << socket if socket",
+                                      "children": [
+                                        {
+                                          "type": "assignment",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 29
+                                          },
+                                          "text": "socket = value[2]",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 12
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 18
+                                              },
+                                              "text": "socket"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 19
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 20
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "element_reference",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 29
+                                              },
+                                              "text": "value[2]",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 21
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 26
+                                                  },
+                                                  "text": "value"
+                                                },
+                                                {
+                                                  "type": "[",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 27
+                                                  },
+                                                  "text": "["
+                                                },
+                                                {
+                                                  "type": "integer",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 28
+                                                  },
+                                                  "text": "2"
+                                                },
+                                                {
+                                                  "type": "]",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 28
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 29
+                                                  },
+                                                  "text": "]"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "if_modifier",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 51
+                                          },
+                                          "text": "@selectable_sockets << socket if socket",
+                                          "children": [
+                                            {
+                                              "type": "binary",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 12
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 41
+                                              },
+                                              "text": "@selectable_sockets << socket",
+                                              "children": [
+                                                {
+                                                  "type": "instance_variable",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 12
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 31
+                                                  },
+                                                  "text": "@selectable_sockets"
+                                                },
+                                                {
+                                                  "type": "<<",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 32
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 34
+                                                  },
+                                                  "text": "<<"
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 35
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 41
+                                                  },
+                                                  "text": "socket"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "if",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 42
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 44
+                                              },
+                                              "text": "if"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 51
+                                              },
+                                              "text": "socket"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "end",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 13
+                                      },
+                                      "text": "end"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "binary",
+                              "start": {
+                                "row": 20,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 44
+                              },
+                              "text": "@selectable_sockets << @owner_pipe",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 29
+                                  },
+                                  "text": "@selectable_sockets"
+                                },
+                                {
+                                  "type": "<<",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 32
+                                  },
+                                  "text": "<<"
+                                },
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 44
+                                  },
+                                  "text": "@owner_pipe"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "binary",
+                              "start": {
+                                "row": 21,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 62
+                              },
+                              "text": "@selectable_sockets << @graceful_termination_pipe[0]",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 29
+                                  },
+                                  "text": "@selectable_sockets"
+                                },
+                                {
+                                  "type": "<<",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 32
+                                  },
+                                  "text": "<<"
+                                },
+                                {
+                                  "type": "element_reference",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 62
+                                  },
+                                  "text": "@graceful_termination_pipe[0]",
+                                  "children": [
+                                    {
+                                      "type": "instance_variable",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 59
+                                      },
+                                      "text": "@graceful_termination_pipe"
+                                    },
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 59
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 60
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 61
+                                      },
+                                      "text": "0"
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 62
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "end",
+                          "start": {
+                            "row": 22,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 11
+                          },
+                          "text": "end"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 24,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 38
+                  },
+                  "text": "install_useful_signal_handlers"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 25,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 21
+                  },
+                  "text": "start_threads"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 26,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 40
+                  },
+                  "text": "wait_until_termination_requested"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 27,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 39
+                  },
+                  "text": "wait_until_all_threads_are_idle"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 28,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 25
+                  },
+                  "text": "terminate_threads"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 29,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 58
+                  },
+                  "text": "debug(\"Request handler main loop exited normally\")",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 29,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 13
+                      },
+                      "text": "debug"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 29,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 58
+                      },
+                      "text": "(\"Request handler main loop exited normally\")",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 29,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 29,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 57
+                          },
+                          "text": "\"Request handler main loop exited normally\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 29,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 15
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 29,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 56
+                              },
+                              "text": "Request handler main loop exited normally"
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 29,
+                                "column": 56
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 57
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 29,
+                            "column": 57
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 58
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rescue",
+                  "start": {
+                    "row": 31,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 33,
+                    "column": 79
+                  },
+                  "text": "rescue EOFError\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by EOFError exception\")",
+                  "children": [
+                    {
+                      "type": "rescue",
+                      "start": {
+                        "row": 31,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 12
+                      },
+                      "text": "rescue"
+                    },
+                    {
+                      "type": "exceptions",
+                      "start": {
+                        "row": 31,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 21
+                      },
+                      "text": "EOFError",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 31,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 21
+                          },
+                          "text": "EOFError"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "comment",
+                      "start": {
+                        "row": 32,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 25
+                      },
+                      "text": "# Exit main loop."
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 32,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 79
+                      },
+                      "text": "\n        trace(2, \"Request handler main loop interrupted by EOFError exception\")",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 33,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 79
+                          },
+                          "text": "trace(2, \"Request handler main loop interrupted by EOFError exception\")",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 13
+                              },
+                              "text": "trace"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 33,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 79
+                              },
+                              "text": "(2, \"Request handler main loop interrupted by EOFError exception\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 14
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 15
+                                  },
+                                  "text": "2"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 16
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 78
+                                  },
+                                  "text": "\"Request handler main loop interrupted by EOFError exception\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 18
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 77
+                                      },
+                                      "text": "Request handler main loop interrupted by EOFError exception"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 77
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 78
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 78
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 79
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rescue",
+                  "start": {
+                    "row": 34,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 80
+                  },
+                  "text": "rescue Interrupt\n        # Exit main loop.\n        trace(2, \"Request handler main loop interrupted by Interrupt exception\")",
+                  "children": [
+                    {
+                      "type": "rescue",
+                      "start": {
+                        "row": 34,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 12
+                      },
+                      "text": "rescue"
+                    },
+                    {
+                      "type": "exceptions",
+                      "start": {
+                        "row": 34,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 22
+                      },
+                      "text": "Interrupt",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 34,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 22
+                          },
+                          "text": "Interrupt"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "comment",
+                      "start": {
+                        "row": 35,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 25
+                      },
+                      "text": "# Exit main loop."
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 35,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 80
+                      },
+                      "text": "\n        trace(2, \"Request handler main loop interrupted by Interrupt exception\")",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 36,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 80
+                          },
+                          "text": "trace(2, \"Request handler main loop interrupted by Interrupt exception\")",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 36,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 13
+                              },
+                              "text": "trace"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 36,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 80
+                              },
+                              "text": "(2, \"Request handler main loop interrupted by Interrupt exception\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 14
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 15
+                                  },
+                                  "text": "2"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 16
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 79
+                                  },
+                                  "text": "\"Request handler main loop interrupted by Interrupt exception\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 18
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 78
+                                      },
+                                      "text": "Request handler main loop interrupted by Interrupt exception"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 78
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 79
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 79
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 80
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rescue",
+                  "start": {
+                    "row": 37,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 41,
+                    "column": 11
+                  },
+                  "text": "rescue SignalException => signal\n        trace(2, \"Request handler main loop interrupted by SignalException\")\n        if signal.message != HARD_TERMINATION_SIGNAL\n          raise\n        end",
+                  "children": [
+                    {
+                      "type": "rescue",
+                      "start": {
+                        "row": 37,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 12
+                      },
+                      "text": "rescue"
+                    },
+                    {
+                      "type": "exceptions",
+                      "start": {
+                        "row": 37,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 28
+                      },
+                      "text": "SignalException",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 37,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 28
+                          },
+                          "text": "SignalException"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "exception_variable",
+                      "start": {
+                        "row": 37,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 38
+                      },
+                      "text": "=> signal",
+                      "children": [
+                        {
+                          "type": "=>",
+                          "start": {
+                            "row": 37,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 31
+                          },
+                          "text": "=>"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 37,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 38
+                          },
+                          "text": "signal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 37,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 11
+                      },
+                      "text": "\n        trace(2, \"Request handler main loop interrupted by SignalException\")\n        if signal.message != HARD_TERMINATION_SIGNAL\n          raise\n        end",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 38,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 76
+                          },
+                          "text": "trace(2, \"Request handler main loop interrupted by SignalException\")",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 38,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 13
+                              },
+                              "text": "trace"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 38,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 76
+                              },
+                              "text": "(2, \"Request handler main loop interrupted by SignalException\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 14
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 15
+                                  },
+                                  "text": "2"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 16
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 75
+                                  },
+                                  "text": "\"Request handler main loop interrupted by SignalException\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 18
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 74
+                                      },
+                                      "text": "Request handler main loop interrupted by SignalException"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 74
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 75
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 75
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 76
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 39,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 11
+                          },
+                          "text": "if signal.message != HARD_TERMINATION_SIGNAL\n          raise\n        end",
+                          "children": [
+                            {
+                              "type": "if",
+                              "start": {
+                                "row": 39,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 10
+                              },
+                              "text": "if"
+                            },
+                            {
+                              "type": "binary",
+                              "start": {
+                                "row": 39,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 52
+                              },
+                              "text": "signal.message != HARD_TERMINATION_SIGNAL",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 25
+                                  },
+                                  "text": "signal.message",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 11
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 17
+                                      },
+                                      "text": "signal"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 18
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 25
+                                      },
+                                      "text": "message"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "!=",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 28
+                                  },
+                                  "text": "!="
+                                },
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 52
+                                  },
+                                  "text": "HARD_TERMINATION_SIGNAL"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "then",
+                              "start": {
+                                "row": 39,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 15
+                              },
+                              "text": "\n          raise",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 15
+                                  },
+                                  "text": "raise"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "end",
+                              "start": {
+                                "row": 41,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 11
+                              },
+                              "text": "end"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rescue",
+                  "start": {
+                    "row": 42,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 13
+                  },
+                  "text": "rescue Exception => e\n        trace(2, \"Request handler main loop interrupted by #{e.class} exception\")\n        raise",
+                  "children": [
+                    {
+                      "type": "rescue",
+                      "start": {
+                        "row": 42,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 12
+                      },
+                      "text": "rescue"
+                    },
+                    {
+                      "type": "exceptions",
+                      "start": {
+                        "row": 42,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 22
+                      },
+                      "text": "Exception",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 42,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 22
+                          },
+                          "text": "Exception"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "exception_variable",
+                      "start": {
+                        "row": 42,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 27
+                      },
+                      "text": "=> e",
+                      "children": [
+                        {
+                          "type": "=>",
+                          "start": {
+                            "row": 42,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 25
+                          },
+                          "text": "=>"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 42,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 27
+                          },
+                          "text": "e"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 42,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 13
+                      },
+                      "text": "\n        trace(2, \"Request handler main loop interrupted by #{e.class} exception\")\n        raise",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 43,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 81
+                          },
+                          "text": "trace(2, \"Request handler main loop interrupted by #{e.class} exception\")",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 43,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 13
+                              },
+                              "text": "trace"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 43,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 81
+                              },
+                              "text": "(2, \"Request handler main loop interrupted by #{e.class} exception\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 14
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 15
+                                  },
+                                  "text": "2"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 16
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 80
+                                  },
+                                  "text": "\"Request handler main loop interrupted by #{e.class} exception\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 18
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 59
+                                      },
+                                      "text": "Request handler main loop interrupted by "
+                                    },
+                                    {
+                                      "type": "interpolation",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 59
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 69
+                                      },
+                                      "text": "#{e.class}",
+                                      "children": [
+                                        {
+                                          "type": "#{",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 61
+                                          },
+                                          "text": "#{"
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 61
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 68
+                                          },
+                                          "text": "e.class",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 61
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 62
+                                              },
+                                              "text": "e"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 62
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 63
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 63
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 68
+                                              },
+                                              "text": "class"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 68
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 69
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 69
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 79
+                                      },
+                                      "text": " exception"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 79
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 80
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 80
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 81
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 44,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ensure",
+                  "start": {
+                    "row": 45,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 55,
+                    "column": 11
+                  },
+                  "text": "ensure\n        debug(\"Exiting request handler main loop\")\n        revert_signal_handlers\n        @main_loop_thread_lock.synchronize do\n          @graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast\n        end",
+                  "children": [
+                    {
+                      "type": "ensure",
+                      "start": {
+                        "row": 45,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 12
+                      },
+                      "text": "ensure"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 46,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 50
+                      },
+                      "text": "debug(\"Exiting request handler main loop\")",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 46,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 13
+                          },
+                          "text": "debug"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 46,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 50
+                          },
+                          "text": "(\"Exiting request handler main loop\")",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 46,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 14
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 46,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 49
+                              },
+                              "text": "\"Exiting request handler main loop\"",
+                              "children": [
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 15
+                                  },
+                                  "text": "\""
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 48
+                                  },
+                                  "text": "Exiting request handler main loop"
+                                },
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 49
+                                  },
+                                  "text": "\""
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 46,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 50
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 47,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 30
+                      },
+                      "text": "revert_signal_handlers"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 48,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 55,
+                        "column": 11
+                      },
+                      "text": "@main_loop_thread_lock.synchronize do\n          @graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast\n        end",
+                      "children": [
+                        {
+                          "type": "instance_variable",
+                          "start": {
+                            "row": 48,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 30
+                          },
+                          "text": "@main_loop_thread_lock"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 48,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 31
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 48,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 42
+                          },
+                          "text": "synchronize"
+                        },
+                        {
+                          "type": "do_block",
+                          "start": {
+                            "row": 48,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 55,
+                            "column": 11
+                          },
+                          "text": "do\n          @graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast\n        end",
+                          "children": [
+                            {
+                              "type": "do",
+                              "start": {
+                                "row": 48,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 45
+                              },
+                              "text": "do"
+                            },
+                            {
+                              "type": "body_statement",
+                              "start": {
+                                "row": 49,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 54,
+                                "column": 42
+                              },
+                              "text": "@graceful_termination_pipe[1].close rescue nil\n          @graceful_termination_pipe[0].close rescue nil\n          @selectable_sockets = []\n          @main_loop_generation += 1\n          @main_loop_running = false\n          @main_loop_thread_cond.broadcast",
+                              "children": [
+                                {
+                                  "type": "rescue_modifier",
+                                  "start": {
+                                    "row": 49,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 49,
+                                    "column": 56
+                                  },
+                                  "text": "@graceful_termination_pipe[1].close rescue nil",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 49,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 49,
+                                        "column": 45
+                                      },
+                                      "text": "@graceful_termination_pipe[1].close",
+                                      "children": [
+                                        {
+                                          "type": "element_reference",
+                                          "start": {
+                                            "row": 49,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 49,
+                                            "column": 39
+                                          },
+                                          "text": "@graceful_termination_pipe[1]",
+                                          "children": [
+                                            {
+                                              "type": "instance_variable",
+                                              "start": {
+                                                "row": 49,
+                                                "column": 10
+                                              },
+                                              "end": {
+                                                "row": 49,
+                                                "column": 36
+                                              },
+                                              "text": "@graceful_termination_pipe"
+                                            },
+                                            {
+                                              "type": "[",
+                                              "start": {
+                                                "row": 49,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 49,
+                                                "column": 37
+                                              },
+                                              "text": "["
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 49,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 49,
+                                                "column": 38
+                                              },
+                                              "text": "1"
+                                            },
+                                            {
+                                              "type": "]",
+                                              "start": {
+                                                "row": 49,
+                                                "column": 38
+                                              },
+                                              "end": {
+                                                "row": 49,
+                                                "column": 39
+                                              },
+                                              "text": "]"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 49,
+                                            "column": 39
+                                          },
+                                          "end": {
+                                            "row": 49,
+                                            "column": 40
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 49,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 49,
+                                            "column": 45
+                                          },
+                                          "text": "close"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "rescue",
+                                      "start": {
+                                        "row": 49,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 49,
+                                        "column": 52
+                                      },
+                                      "text": "rescue"
+                                    },
+                                    {
+                                      "type": "nil",
+                                      "start": {
+                                        "row": 49,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 49,
+                                        "column": 56
+                                      },
+                                      "text": "nil",
+                                      "children": [
+                                        {
+                                          "type": "nil",
+                                          "start": {
+                                            "row": 49,
+                                            "column": 53
+                                          },
+                                          "end": {
+                                            "row": 49,
+                                            "column": 56
+                                          },
+                                          "text": "nil"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "rescue_modifier",
+                                  "start": {
+                                    "row": 50,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 50,
+                                    "column": 56
+                                  },
+                                  "text": "@graceful_termination_pipe[0].close rescue nil",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 45
+                                      },
+                                      "text": "@graceful_termination_pipe[0].close",
+                                      "children": [
+                                        {
+                                          "type": "element_reference",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 39
+                                          },
+                                          "text": "@graceful_termination_pipe[0]",
+                                          "children": [
+                                            {
+                                              "type": "instance_variable",
+                                              "start": {
+                                                "row": 50,
+                                                "column": 10
+                                              },
+                                              "end": {
+                                                "row": 50,
+                                                "column": 36
+                                              },
+                                              "text": "@graceful_termination_pipe"
+                                            },
+                                            {
+                                              "type": "[",
+                                              "start": {
+                                                "row": 50,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 50,
+                                                "column": 37
+                                              },
+                                              "text": "["
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 50,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 50,
+                                                "column": 38
+                                              },
+                                              "text": "0"
+                                            },
+                                            {
+                                              "type": "]",
+                                              "start": {
+                                                "row": 50,
+                                                "column": 38
+                                              },
+                                              "end": {
+                                                "row": 50,
+                                                "column": 39
+                                              },
+                                              "text": "]"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 39
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 40
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 45
+                                          },
+                                          "text": "close"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "rescue",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 52
+                                      },
+                                      "text": "rescue"
+                                    },
+                                    {
+                                      "type": "nil",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 56
+                                      },
+                                      "text": "nil",
+                                      "children": [
+                                        {
+                                          "type": "nil",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 53
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 56
+                                          },
+                                          "text": "nil"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 34
+                                  },
+                                  "text": "@selectable_sockets = []",
+                                  "children": [
+                                    {
+                                      "type": "instance_variable",
+                                      "start": {
+                                        "row": 51,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 51,
+                                        "column": 29
+                                      },
+                                      "text": "@selectable_sockets"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 51,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 51,
+                                        "column": 31
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "array",
+                                      "start": {
+                                        "row": 51,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 51,
+                                        "column": 34
+                                      },
+                                      "text": "[]",
+                                      "children": [
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 51,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 51,
+                                            "column": 33
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 51,
+                                            "column": 33
+                                          },
+                                          "end": {
+                                            "row": 51,
+                                            "column": 34
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "operator_assignment",
+                                  "start": {
+                                    "row": 52,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 52,
+                                    "column": 36
+                                  },
+                                  "text": "@main_loop_generation += 1",
+                                  "children": [
+                                    {
+                                      "type": "instance_variable",
+                                      "start": {
+                                        "row": 52,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 52,
+                                        "column": 31
+                                      },
+                                      "text": "@main_loop_generation"
+                                    },
+                                    {
+                                      "type": "+=",
+                                      "start": {
+                                        "row": 52,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 52,
+                                        "column": 34
+                                      },
+                                      "text": "+="
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 52,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 52,
+                                        "column": 36
+                                      },
+                                      "text": "1"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 36
+                                  },
+                                  "text": "@main_loop_running = false",
+                                  "children": [
+                                    {
+                                      "type": "instance_variable",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 28
+                                      },
+                                      "text": "@main_loop_running"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 30
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "false",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 36
+                                      },
+                                      "text": "false"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 54,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 42
+                                  },
+                                  "text": "@main_loop_thread_cond.broadcast",
+                                  "children": [
+                                    {
+                                      "type": "instance_variable",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 32
+                                      },
+                                      "text": "@main_loop_thread_cond"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 33
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 42
+                                      },
+                                      "text": "broadcast"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "end",
+                              "start": {
+                                "row": 55,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 55,
+                                "column": 11
+                              },
+                              "text": "end"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "end",
+                  "start": {
+                    "row": 56,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 56,
+                    "column": 9
+                  },
+                  "text": "end"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 57,
+            "column": 4
+          },
+          "end": {
+            "row": 57,
+            "column": 7
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

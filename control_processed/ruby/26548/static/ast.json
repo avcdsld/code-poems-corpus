@@ -1,0 +1,4148 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 35,
+    "column": 7
+  },
+  "text": "def create_drr(series=nil, options={})\n      raise ArgumentError, \"Invalid argument 'series'.\" if series && !series.is_a?(RTImage)\n      raise \"This Beam instance has no associated control points. Unable to provide enough information to create a DRR.\" unless @control_points.length > 0\n      # Get the necessary information from the first associated control point:\n      gantry_angle = @control_points.first.gantry_angle\n      isocenter = @control_points.first.iso\n      # Set default values to undefined options:\n      columns = options[:columns] || 512\n      rows = options[:rows] || 512\n      delta_col = options[:delta_col] || 1.0\n      delta_row = options[:delta_row] || 1.0\n      sdd = options[:sdd] || 1600.0\n      sid = options[:sid] || 1000.0\n      # Create an RT Image series if not given:\n      series = RTImage.new(RTKIT.series_uid, @plan) unless series\n      # Create a voxel space from the associated image series:\n      vs = @plan.struct.image_series.first.to_voxel_space\n      # Create a DRR pixel space:\n      ps = PixelSpace.setup(columns, rows, delta_col, delta_row, gantry_angle, sdd, isocenter)\n      # Create a beam geometric setup:\n      bg = BeamGeometry.setup(gantry_angle, sid, isocenter, vs)\n      # Create the DRR image data:\n      bg.create_drr(ps)\n      # Create the DRR DICOM projection image instance:\n      drr = ProjectionImage.new(RTKIT.sop_uid, series, :beam => self)\n      drr.columns = columns\n      drr.rows = rows\n      drr.row_spacing = ps.delta_row\n      drr.col_spacing = ps.delta_col\n      # Transfer data from the pixel space to the projection image:\n      drr.narray = NArray.new(NArray::SINT, columns, rows)\n      drr.narray[] = ps\n      drr.set_positions\n      # Return the DRR (DICOM image) instance:\n      drr\n    end",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 35,
+        "column": 7
+      },
+      "text": "def create_drr(series=nil, options={})\n      raise ArgumentError, \"Invalid argument 'series'.\" if series && !series.is_a?(RTImage)\n      raise \"This Beam instance has no associated control points. Unable to provide enough information to create a DRR.\" unless @control_points.length > 0\n      # Get the necessary information from the first associated control point:\n      gantry_angle = @control_points.first.gantry_angle\n      isocenter = @control_points.first.iso\n      # Set default values to undefined options:\n      columns = options[:columns] || 512\n      rows = options[:rows] || 512\n      delta_col = options[:delta_col] || 1.0\n      delta_row = options[:delta_row] || 1.0\n      sdd = options[:sdd] || 1600.0\n      sid = options[:sid] || 1000.0\n      # Create an RT Image series if not given:\n      series = RTImage.new(RTKIT.series_uid, @plan) unless series\n      # Create a voxel space from the associated image series:\n      vs = @plan.struct.image_series.first.to_voxel_space\n      # Create a DRR pixel space:\n      ps = PixelSpace.setup(columns, rows, delta_col, delta_row, gantry_angle, sdd, isocenter)\n      # Create a beam geometric setup:\n      bg = BeamGeometry.setup(gantry_angle, sid, isocenter, vs)\n      # Create the DRR image data:\n      bg.create_drr(ps)\n      # Create the DRR DICOM projection image instance:\n      drr = ProjectionImage.new(RTKIT.sop_uid, series, :beam => self)\n      drr.columns = columns\n      drr.rows = rows\n      drr.row_spacing = ps.delta_row\n      drr.col_spacing = ps.delta_col\n      # Transfer data from the pixel space to the projection image:\n      drr.narray = NArray.new(NArray::SINT, columns, rows)\n      drr.narray[] = ps\n      drr.set_positions\n      # Return the DRR (DICOM image) instance:\n      drr\n    end",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 14
+          },
+          "text": "create_drr"
+        },
+        {
+          "type": "method_parameters",
+          "start": {
+            "row": 0,
+            "column": 14
+          },
+          "end": {
+            "row": 0,
+            "column": 38
+          },
+          "text": "(series=nil, options={})",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 14
+              },
+              "end": {
+                "row": 0,
+                "column": 15
+              },
+              "text": "("
+            },
+            {
+              "type": "optional_parameter",
+              "start": {
+                "row": 0,
+                "column": 15
+              },
+              "end": {
+                "row": 0,
+                "column": 25
+              },
+              "text": "series=nil",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 21
+                  },
+                  "text": "series"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 22
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "nil",
+                  "start": {
+                    "row": 0,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 25
+                  },
+                  "text": "nil",
+                  "children": [
+                    {
+                      "type": "nil",
+                      "start": {
+                        "row": 0,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 25
+                      },
+                      "text": "nil"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 25
+              },
+              "end": {
+                "row": 0,
+                "column": 26
+              },
+              "text": ","
+            },
+            {
+              "type": "optional_parameter",
+              "start": {
+                "row": 0,
+                "column": 27
+              },
+              "end": {
+                "row": 0,
+                "column": 37
+              },
+              "text": "options={}",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "text": "options"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 35
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "hash",
+                  "start": {
+                    "row": 0,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 37
+                  },
+                  "text": "{}",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 0,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 36
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 0,
+                        "column": 36
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 37
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 37
+              },
+              "end": {
+                "row": 0,
+                "column": 38
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 34,
+            "column": 9
+          },
+          "text": "raise ArgumentError, \"Invalid argument 'series'.\" if series && !series.is_a?(RTImage)\n      raise \"This Beam instance has no associated control points. Unable to provide enough information to create a DRR.\" unless @control_points.length > 0\n      # Get the necessary information from the first associated control point:\n      gantry_angle = @control_points.first.gantry_angle\n      isocenter = @control_points.first.iso\n      # Set default values to undefined options:\n      columns = options[:columns] || 512\n      rows = options[:rows] || 512\n      delta_col = options[:delta_col] || 1.0\n      delta_row = options[:delta_row] || 1.0\n      sdd = options[:sdd] || 1600.0\n      sid = options[:sid] || 1000.0\n      # Create an RT Image series if not given:\n      series = RTImage.new(RTKIT.series_uid, @plan) unless series\n      # Create a voxel space from the associated image series:\n      vs = @plan.struct.image_series.first.to_voxel_space\n      # Create a DRR pixel space:\n      ps = PixelSpace.setup(columns, rows, delta_col, delta_row, gantry_angle, sdd, isocenter)\n      # Create a beam geometric setup:\n      bg = BeamGeometry.setup(gantry_angle, sid, isocenter, vs)\n      # Create the DRR image data:\n      bg.create_drr(ps)\n      # Create the DRR DICOM projection image instance:\n      drr = ProjectionImage.new(RTKIT.sop_uid, series, :beam => self)\n      drr.columns = columns\n      drr.rows = rows\n      drr.row_spacing = ps.delta_row\n      drr.col_spacing = ps.delta_col\n      # Transfer data from the pixel space to the projection image:\n      drr.narray = NArray.new(NArray::SINT, columns, rows)\n      drr.narray[] = ps\n      drr.set_positions\n      # Return the DRR (DICOM image) instance:\n      drr",
+          "children": [
+            {
+              "type": "if_modifier",
+              "start": {
+                "row": 1,
+                "column": 6
+              },
+              "end": {
+                "row": 1,
+                "column": 91
+              },
+              "text": "raise ArgumentError, \"Invalid argument 'series'.\" if series && !series.is_a?(RTImage)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 1,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 55
+                  },
+                  "text": "raise ArgumentError, \"Invalid argument 'series'.\"",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "raise"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 1,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 55
+                      },
+                      "text": "ArgumentError, \"Invalid argument 'series'.\"",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 1,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 25
+                          },
+                          "text": "ArgumentError"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 1,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 26
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 1,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 55
+                          },
+                          "text": "\"Invalid argument 'series'.\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 1,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 28
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 1,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 54
+                              },
+                              "text": "Invalid argument 'series'."
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 1,
+                                "column": 54
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 55
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 1,
+                    "column": 56
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 58
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 1,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 91
+                  },
+                  "text": "series && !series.is_a?(RTImage)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 59
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 65
+                      },
+                      "text": "series"
+                    },
+                    {
+                      "type": "&&",
+                      "start": {
+                        "row": 1,
+                        "column": 66
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 68
+                      },
+                      "text": "&&"
+                    },
+                    {
+                      "type": "unary",
+                      "start": {
+                        "row": 1,
+                        "column": 69
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 91
+                      },
+                      "text": "!series.is_a?(RTImage)",
+                      "children": [
+                        {
+                          "type": "!",
+                          "start": {
+                            "row": 1,
+                            "column": 69
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 70
+                          },
+                          "text": "!"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 1,
+                            "column": 70
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 91
+                          },
+                          "text": "series.is_a?(RTImage)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 1,
+                                "column": 70
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 76
+                              },
+                              "text": "series"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 1,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 77
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 1,
+                                "column": 77
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 82
+                              },
+                              "text": "is_a?"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 1,
+                                "column": 82
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 91
+                              },
+                              "text": "(RTImage)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 82
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 83
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 83
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 90
+                                  },
+                                  "text": "RTImage"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 90
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 91
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "unless_modifier",
+              "start": {
+                "row": 2,
+                "column": 6
+              },
+              "end": {
+                "row": 2,
+                "column": 154
+              },
+              "text": "raise \"This Beam instance has no associated control points. Unable to provide enough information to create a DRR.\" unless @control_points.length > 0",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 2,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 120
+                  },
+                  "text": "raise \"This Beam instance has no associated control points. Unable to provide enough information to create a DRR.\"",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 2,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 11
+                      },
+                      "text": "raise"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 2,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 120
+                      },
+                      "text": "\"This Beam instance has no associated control points. Unable to provide enough information to create a DRR.\"",
+                      "children": [
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 2,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 120
+                          },
+                          "text": "\"This Beam instance has no associated control points. Unable to provide enough information to create a DRR.\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 2,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 13
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 2,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 119
+                              },
+                              "text": "This Beam instance has no associated control points. Unable to provide enough information to create a DRR."
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 2,
+                                "column": 119
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 120
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "unless",
+                  "start": {
+                    "row": 2,
+                    "column": 121
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 127
+                  },
+                  "text": "unless"
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 2,
+                    "column": 128
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 154
+                  },
+                  "text": "@control_points.length > 0",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 2,
+                        "column": 128
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 150
+                      },
+                      "text": "@control_points.length",
+                      "children": [
+                        {
+                          "type": "instance_variable",
+                          "start": {
+                            "row": 2,
+                            "column": 128
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 143
+                          },
+                          "text": "@control_points"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 2,
+                            "column": 143
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 144
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 2,
+                            "column": 144
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 150
+                          },
+                          "text": "length"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ">",
+                      "start": {
+                        "row": 2,
+                        "column": 151
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 152
+                      },
+                      "text": ">"
+                    },
+                    {
+                      "type": "integer",
+                      "start": {
+                        "row": 2,
+                        "column": 153
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 154
+                      },
+                      "text": "0"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 3,
+                "column": 6
+              },
+              "end": {
+                "row": 3,
+                "column": 78
+              },
+              "text": "# Get the necessary information from the first associated control point:"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 4,
+                "column": 6
+              },
+              "end": {
+                "row": 4,
+                "column": 55
+              },
+              "text": "gantry_angle = @control_points.first.gantry_angle",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 18
+                  },
+                  "text": "gantry_angle"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 4,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 20
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 4,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 55
+                  },
+                  "text": "@control_points.first.gantry_angle",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 4,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 42
+                      },
+                      "text": "@control_points.first",
+                      "children": [
+                        {
+                          "type": "instance_variable",
+                          "start": {
+                            "row": 4,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 36
+                          },
+                          "text": "@control_points"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 4,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 37
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 42
+                          },
+                          "text": "first"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 4,
+                        "column": 42
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 43
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 4,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 55
+                      },
+                      "text": "gantry_angle"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 5,
+                "column": 6
+              },
+              "end": {
+                "row": 5,
+                "column": 43
+              },
+              "text": "isocenter = @control_points.first.iso",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 5,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 15
+                  },
+                  "text": "isocenter"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 5,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 17
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 5,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 43
+                  },
+                  "text": "@control_points.first.iso",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 5,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 39
+                      },
+                      "text": "@control_points.first",
+                      "children": [
+                        {
+                          "type": "instance_variable",
+                          "start": {
+                            "row": 5,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 33
+                          },
+                          "text": "@control_points"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 5,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 34
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 5,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 39
+                          },
+                          "text": "first"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 5,
+                        "column": 39
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 40
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 40
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 43
+                      },
+                      "text": "iso"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 6,
+                "column": 6
+              },
+              "end": {
+                "row": 6,
+                "column": 48
+              },
+              "text": "# Set default values to undefined options:"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 7,
+                "column": 6
+              },
+              "end": {
+                "row": 7,
+                "column": 40
+              },
+              "text": "columns = options[:columns] || 512",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 7,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 13
+                  },
+                  "text": "columns"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 7,
+                    "column": 14
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 15
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 7,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 40
+                  },
+                  "text": "options[:columns] || 512",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 7,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 33
+                      },
+                      "text": "options[:columns]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 7,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 23
+                          },
+                          "text": "options"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 7,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 24
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 7,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 32
+                          },
+                          "text": ":columns"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 7,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 33
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "||",
+                      "start": {
+                        "row": 7,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 36
+                      },
+                      "text": "||"
+                    },
+                    {
+                      "type": "integer",
+                      "start": {
+                        "row": 7,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 40
+                      },
+                      "text": "512"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 8,
+                "column": 6
+              },
+              "end": {
+                "row": 8,
+                "column": 34
+              },
+              "text": "rows = options[:rows] || 512",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 8,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 10
+                  },
+                  "text": "rows"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 8,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 12
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 8,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 34
+                  },
+                  "text": "options[:rows] || 512",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 8,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 27
+                      },
+                      "text": "options[:rows]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 8,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 20
+                          },
+                          "text": "options"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 8,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 21
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 8,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 26
+                          },
+                          "text": ":rows"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 8,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 27
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "||",
+                      "start": {
+                        "row": 8,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 30
+                      },
+                      "text": "||"
+                    },
+                    {
+                      "type": "integer",
+                      "start": {
+                        "row": 8,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 34
+                      },
+                      "text": "512"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 9,
+                "column": 6
+              },
+              "end": {
+                "row": 9,
+                "column": 44
+              },
+              "text": "delta_col = options[:delta_col] || 1.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 9,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 15
+                  },
+                  "text": "delta_col"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 9,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 17
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 9,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 44
+                  },
+                  "text": "options[:delta_col] || 1.0",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 9,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 37
+                      },
+                      "text": "options[:delta_col]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 9,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 25
+                          },
+                          "text": "options"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 9,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 26
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 9,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 36
+                          },
+                          "text": ":delta_col"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 9,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 37
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "||",
+                      "start": {
+                        "row": 9,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 40
+                      },
+                      "text": "||"
+                    },
+                    {
+                      "type": "float",
+                      "start": {
+                        "row": 9,
+                        "column": 41
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 44
+                      },
+                      "text": "1.0"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 10,
+                "column": 6
+              },
+              "end": {
+                "row": 10,
+                "column": 44
+              },
+              "text": "delta_row = options[:delta_row] || 1.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 10,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 15
+                  },
+                  "text": "delta_row"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 10,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 17
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 10,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 44
+                  },
+                  "text": "options[:delta_row] || 1.0",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 10,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 37
+                      },
+                      "text": "options[:delta_row]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 10,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 25
+                          },
+                          "text": "options"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 10,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 26
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 10,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 36
+                          },
+                          "text": ":delta_row"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 10,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 37
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "||",
+                      "start": {
+                        "row": 10,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 40
+                      },
+                      "text": "||"
+                    },
+                    {
+                      "type": "float",
+                      "start": {
+                        "row": 10,
+                        "column": 41
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 44
+                      },
+                      "text": "1.0"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 11,
+                "column": 6
+              },
+              "end": {
+                "row": 11,
+                "column": 35
+              },
+              "text": "sdd = options[:sdd] || 1600.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 11,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 9
+                  },
+                  "text": "sdd"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 11,
+                    "column": 10
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 11
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 11,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 35
+                  },
+                  "text": "options[:sdd] || 1600.0",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 11,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 25
+                      },
+                      "text": "options[:sdd]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 11,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 19
+                          },
+                          "text": "options"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 11,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 20
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 11,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 24
+                          },
+                          "text": ":sdd"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 11,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 25
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "||",
+                      "start": {
+                        "row": 11,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 28
+                      },
+                      "text": "||"
+                    },
+                    {
+                      "type": "float",
+                      "start": {
+                        "row": 11,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 35
+                      },
+                      "text": "1600.0"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 12,
+                "column": 6
+              },
+              "end": {
+                "row": 12,
+                "column": 35
+              },
+              "text": "sid = options[:sid] || 1000.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 12,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 9
+                  },
+                  "text": "sid"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 12,
+                    "column": 10
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 11
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 12,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 35
+                  },
+                  "text": "options[:sid] || 1000.0",
+                  "children": [
+                    {
+                      "type": "element_reference",
+                      "start": {
+                        "row": 12,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 25
+                      },
+                      "text": "options[:sid]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 12,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 19
+                          },
+                          "text": "options"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 12,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 20
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 12,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 24
+                          },
+                          "text": ":sid"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 12,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 25
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "||",
+                      "start": {
+                        "row": 12,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 28
+                      },
+                      "text": "||"
+                    },
+                    {
+                      "type": "float",
+                      "start": {
+                        "row": 12,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 35
+                      },
+                      "text": "1000.0"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 13,
+                "column": 6
+              },
+              "end": {
+                "row": 13,
+                "column": 47
+              },
+              "text": "# Create an RT Image series if not given:"
+            },
+            {
+              "type": "unless_modifier",
+              "start": {
+                "row": 14,
+                "column": 6
+              },
+              "end": {
+                "row": 14,
+                "column": 65
+              },
+              "text": "series = RTImage.new(RTKIT.series_uid, @plan) unless series",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 14,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 51
+                  },
+                  "text": "series = RTImage.new(RTKIT.series_uid, @plan)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 14,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 12
+                      },
+                      "text": "series"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 14,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 14
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 14,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 51
+                      },
+                      "text": "RTImage.new(RTKIT.series_uid, @plan)",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 14,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 22
+                          },
+                          "text": "RTImage"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 14,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 23
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 26
+                          },
+                          "text": "new"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 14,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 51
+                          },
+                          "text": "(RTKIT.series_uid, @plan)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 14,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 27
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 14,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 43
+                              },
+                              "text": "RTKIT.series_uid",
+                              "children": [
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 32
+                                  },
+                                  "text": "RTKIT"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 33
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 43
+                                  },
+                                  "text": "series_uid"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 14,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 44
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "instance_variable",
+                              "start": {
+                                "row": 14,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 50
+                              },
+                              "text": "@plan"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 14,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 51
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "unless",
+                  "start": {
+                    "row": 14,
+                    "column": 52
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 58
+                  },
+                  "text": "unless"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 14,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 65
+                  },
+                  "text": "series"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 15,
+                "column": 6
+              },
+              "end": {
+                "row": 15,
+                "column": 62
+              },
+              "text": "# Create a voxel space from the associated image series:"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 16,
+                "column": 6
+              },
+              "end": {
+                "row": 16,
+                "column": 57
+              },
+              "text": "vs = @plan.struct.image_series.first.to_voxel_space",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 16,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 8
+                  },
+                  "text": "vs"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 16,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 10
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 16,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 57
+                  },
+                  "text": "@plan.struct.image_series.first.to_voxel_space",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 16,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 42
+                      },
+                      "text": "@plan.struct.image_series.first",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 16,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 36
+                          },
+                          "text": "@plan.struct.image_series",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 16,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 23
+                              },
+                              "text": "@plan.struct",
+                              "children": [
+                                {
+                                  "type": "instance_variable",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 16
+                                  },
+                                  "text": "@plan"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 17
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 23
+                                  },
+                                  "text": "struct"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 16,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 24
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 16,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 36
+                              },
+                              "text": "image_series"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 16,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 37
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 16,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 42
+                          },
+                          "text": "first"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 16,
+                        "column": 42
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 43
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 16,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 57
+                      },
+                      "text": "to_voxel_space"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 17,
+                "column": 6
+              },
+              "end": {
+                "row": 17,
+                "column": 33
+              },
+              "text": "# Create a DRR pixel space:"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 18,
+                "column": 6
+              },
+              "end": {
+                "row": 18,
+                "column": 94
+              },
+              "text": "ps = PixelSpace.setup(columns, rows, delta_col, delta_row, gantry_angle, sdd, isocenter)",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 18,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 8
+                  },
+                  "text": "ps"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 18,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 10
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 18,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 94
+                  },
+                  "text": "PixelSpace.setup(columns, rows, delta_col, delta_row, gantry_angle, sdd, isocenter)",
+                  "children": [
+                    {
+                      "type": "constant",
+                      "start": {
+                        "row": 18,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 21
+                      },
+                      "text": "PixelSpace"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 18,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 22
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 18,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 27
+                      },
+                      "text": "setup"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 18,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 94
+                      },
+                      "text": "(columns, rows, delta_col, delta_row, gantry_angle, sdd, isocenter)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 18,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 28
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 35
+                          },
+                          "text": "columns"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 18,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 36
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 41
+                          },
+                          "text": "rows"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 18,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 42
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 52
+                          },
+                          "text": "delta_col"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 18,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 53
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 54
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 63
+                          },
+                          "text": "delta_row"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 18,
+                            "column": 63
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 64
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 65
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 77
+                          },
+                          "text": "gantry_angle"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 18,
+                            "column": 77
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 78
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 79
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 82
+                          },
+                          "text": "sdd"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 18,
+                            "column": 82
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 83
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 84
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 93
+                          },
+                          "text": "isocenter"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 18,
+                            "column": 93
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 94
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 19,
+                "column": 6
+              },
+              "end": {
+                "row": 19,
+                "column": 38
+              },
+              "text": "# Create a beam geometric setup:"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 20,
+                "column": 6
+              },
+              "end": {
+                "row": 20,
+                "column": 63
+              },
+              "text": "bg = BeamGeometry.setup(gantry_angle, sid, isocenter, vs)",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 20,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 8
+                  },
+                  "text": "bg"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 20,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 10
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 20,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 63
+                  },
+                  "text": "BeamGeometry.setup(gantry_angle, sid, isocenter, vs)",
+                  "children": [
+                    {
+                      "type": "constant",
+                      "start": {
+                        "row": 20,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 23
+                      },
+                      "text": "BeamGeometry"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 20,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 24
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 20,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 29
+                      },
+                      "text": "setup"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 20,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 63
+                      },
+                      "text": "(gantry_angle, sid, isocenter, vs)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 20,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 30
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 42
+                          },
+                          "text": "gantry_angle"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 43
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 47
+                          },
+                          "text": "sid"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 47
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 48
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 58
+                          },
+                          "text": "isocenter"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 58
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 59
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 60
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 62
+                          },
+                          "text": "vs"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 20,
+                            "column": 62
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 63
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 21,
+                "column": 6
+              },
+              "end": {
+                "row": 21,
+                "column": 34
+              },
+              "text": "# Create the DRR image data:"
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 22,
+                "column": 6
+              },
+              "end": {
+                "row": 22,
+                "column": 23
+              },
+              "text": "bg.create_drr(ps)",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 22,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 8
+                  },
+                  "text": "bg"
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 22,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 9
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 22,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 19
+                  },
+                  "text": "create_drr"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 22,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 23
+                  },
+                  "text": "(ps)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 22,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 20
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 22,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 22
+                      },
+                      "text": "ps"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 22,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 23
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 23,
+                "column": 6
+              },
+              "end": {
+                "row": 23,
+                "column": 55
+              },
+              "text": "# Create the DRR DICOM projection image instance:"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 24,
+                "column": 6
+              },
+              "end": {
+                "row": 24,
+                "column": 69
+              },
+              "text": "drr = ProjectionImage.new(RTKIT.sop_uid, series, :beam => self)",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 24,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 9
+                  },
+                  "text": "drr"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 24,
+                    "column": 10
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 11
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 24,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 69
+                  },
+                  "text": "ProjectionImage.new(RTKIT.sop_uid, series, :beam => self)",
+                  "children": [
+                    {
+                      "type": "constant",
+                      "start": {
+                        "row": 24,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 27
+                      },
+                      "text": "ProjectionImage"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 24,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 28
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 24,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 31
+                      },
+                      "text": "new"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 24,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 69
+                      },
+                      "text": "(RTKIT.sop_uid, series, :beam => self)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 24,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 32
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 24,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 45
+                          },
+                          "text": "RTKIT.sop_uid",
+                          "children": [
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 24,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 37
+                              },
+                              "text": "RTKIT"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 24,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 38
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 45
+                              },
+                              "text": "sop_uid"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 24,
+                            "column": 45
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 46
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 24,
+                            "column": 47
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 53
+                          },
+                          "text": "series"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 24,
+                            "column": 53
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 54
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 24,
+                            "column": 55
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 68
+                          },
+                          "text": ":beam => self",
+                          "children": [
+                            {
+                              "type": "simple_symbol",
+                              "start": {
+                                "row": 24,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 60
+                              },
+                              "text": ":beam"
+                            },
+                            {
+                              "type": "=>",
+                              "start": {
+                                "row": 24,
+                                "column": 61
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 63
+                              },
+                              "text": "=>"
+                            },
+                            {
+                              "type": "self",
+                              "start": {
+                                "row": 24,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 68
+                              },
+                              "text": "self"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 24,
+                            "column": 68
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 69
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 25,
+                "column": 6
+              },
+              "end": {
+                "row": 25,
+                "column": 27
+              },
+              "text": "drr.columns = columns",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 25,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 17
+                  },
+                  "text": "drr.columns",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 25,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 9
+                      },
+                      "text": "drr"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 25,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 10
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 25,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 17
+                      },
+                      "text": "columns"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 25,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 19
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 25,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 27
+                  },
+                  "text": "columns"
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 26,
+                "column": 6
+              },
+              "end": {
+                "row": 26,
+                "column": 21
+              },
+              "text": "drr.rows = rows",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 26,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 14
+                  },
+                  "text": "drr.rows",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 26,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 9
+                      },
+                      "text": "drr"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 26,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 10
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 26,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 14
+                      },
+                      "text": "rows"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 26,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 16
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 26,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 21
+                  },
+                  "text": "rows"
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 27,
+                "column": 6
+              },
+              "end": {
+                "row": 27,
+                "column": 36
+              },
+              "text": "drr.row_spacing = ps.delta_row",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 27,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 21
+                  },
+                  "text": "drr.row_spacing",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 9
+                      },
+                      "text": "drr"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 27,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 10
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 21
+                      },
+                      "text": "row_spacing"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 27,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 23
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 27,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 36
+                  },
+                  "text": "ps.delta_row",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 26
+                      },
+                      "text": "ps"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 27,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 27
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 27,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 36
+                      },
+                      "text": "delta_row"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 28,
+                "column": 6
+              },
+              "end": {
+                "row": 28,
+                "column": 36
+              },
+              "text": "drr.col_spacing = ps.delta_col",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 28,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 21
+                  },
+                  "text": "drr.col_spacing",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 28,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 9
+                      },
+                      "text": "drr"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 28,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 10
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 28,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 21
+                      },
+                      "text": "col_spacing"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 28,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 23
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 28,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 36
+                  },
+                  "text": "ps.delta_col",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 28,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 26
+                      },
+                      "text": "ps"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 28,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 27
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 28,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 36
+                      },
+                      "text": "delta_col"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 29,
+                "column": 6
+              },
+              "end": {
+                "row": 29,
+                "column": 67
+              },
+              "text": "# Transfer data from the pixel space to the projection image:"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 30,
+                "column": 6
+              },
+              "end": {
+                "row": 30,
+                "column": 58
+              },
+              "text": "drr.narray = NArray.new(NArray::SINT, columns, rows)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 30,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 16
+                  },
+                  "text": "drr.narray",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 30,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 9
+                      },
+                      "text": "drr"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 30,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 10
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 30,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 16
+                      },
+                      "text": "narray"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 30,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 18
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 30,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 58
+                  },
+                  "text": "NArray.new(NArray::SINT, columns, rows)",
+                  "children": [
+                    {
+                      "type": "constant",
+                      "start": {
+                        "row": 30,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 25
+                      },
+                      "text": "NArray"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 30,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 26
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 30,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 29
+                      },
+                      "text": "new"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 30,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 58
+                      },
+                      "text": "(NArray::SINT, columns, rows)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 30,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 30
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "scope_resolution",
+                          "start": {
+                            "row": 30,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 42
+                          },
+                          "text": "NArray::SINT",
+                          "children": [
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 30,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 36
+                              },
+                              "text": "NArray"
+                            },
+                            {
+                              "type": "::",
+                              "start": {
+                                "row": 30,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 38
+                              },
+                              "text": "::"
+                            },
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 30,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 42
+                              },
+                              "text": "SINT"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 30,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 43
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 30,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 51
+                          },
+                          "text": "columns"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 30,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 52
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 30,
+                            "column": 53
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 57
+                          },
+                          "text": "rows"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 30,
+                            "column": 57
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 58
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 31,
+                "column": 6
+              },
+              "end": {
+                "row": 31,
+                "column": 23
+              },
+              "text": "drr.narray[] = ps",
+              "children": [
+                {
+                  "type": "element_reference",
+                  "start": {
+                    "row": 31,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 18
+                  },
+                  "text": "drr.narray[]",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 31,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 16
+                      },
+                      "text": "drr.narray",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 31,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 9
+                          },
+                          "text": "drr"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 31,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 10
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 31,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 16
+                          },
+                          "text": "narray"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "[",
+                      "start": {
+                        "row": 31,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 17
+                      },
+                      "text": "["
+                    },
+                    {
+                      "type": "]",
+                      "start": {
+                        "row": 31,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 18
+                      },
+                      "text": "]"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 31,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 20
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 31,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 23
+                  },
+                  "text": "ps"
+                }
+              ]
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 32,
+                "column": 6
+              },
+              "end": {
+                "row": 32,
+                "column": 23
+              },
+              "text": "drr.set_positions",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 32,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 9
+                  },
+                  "text": "drr"
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 32,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 10
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 32,
+                    "column": 10
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 23
+                  },
+                  "text": "set_positions"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 33,
+                "column": 6
+              },
+              "end": {
+                "row": 33,
+                "column": 46
+              },
+              "text": "# Return the DRR (DICOM image) instance:"
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 34,
+                "column": 6
+              },
+              "end": {
+                "row": 34,
+                "column": 9
+              },
+              "text": "drr"
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 35,
+            "column": 4
+          },
+          "end": {
+            "row": 35,
+            "column": 7
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

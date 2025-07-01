@@ -1,0 +1,9 @@
+def assert test, msg = nil
+      msg ||= "Failed assertion, no message given."
+      # comment out self.assertions += 1 to counting assertions
+      unless test then
+        msg = msg.call if Proc === msg
+        raise RWebSpec::Assertion, msg
+      end
+      true
+    end

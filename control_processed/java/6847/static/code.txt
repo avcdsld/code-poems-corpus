@@ -1,0 +1,3 @@
+public static <T> T readObjectFromXml(String xmlStr) throws IOException {
+		return readObjectFromXml(new InputSource(StrUtil.getReader(xmlStr)));
+	}

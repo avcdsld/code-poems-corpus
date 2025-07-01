@@ -1,0 +1,12 @@
+function (elem, elemName, func)
+    {
+        var i, childNode;
+
+        for (i = 0; i < elem.childNodes.length; i++) {
+            childNode = elem.childNodes[i];
+            if (childNode.nodeType == Strophe.ElementType.NORMAL &&
+                (!elemName || this.isTagEqual(childNode, elemName))) {
+                func(childNode);
+            }
+        }
+    }

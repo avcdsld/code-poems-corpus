@@ -1,0 +1,2730 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 50,
+    "column": 3
+  },
+  "text": "def create\n    # have a working copy of the params in case Tenant callbacks\n    # make any changes\n  tenant_params = sign_up_params_tenant\n  user_params   = sign_up_params_user\n  coupon_params = sign_up_params_coupon\n\n  sign_out_session!\n     # next two lines prep signup view parameters\n  prep_signup_view( tenant_params, user_params, coupon_params )\n\n     # validate recaptcha first unless not enabled\n  if !::Milia.use_recaptcha  ||  verify_recaptcha\n\n    Tenant.transaction  do\n      @tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors\n\n    end  #  wrap tenant/user creation in a transaction\n\n  else\n    flash[:error] = \"Recaptcha codes didn't match; please try again\"\n       # all validation errors are passed when the sign_up form is re-rendered\n    resource.valid?\n    @tenant.valid?\n    log_action( \"recaptcha failed\", resource )\n    render :new\n  end\n\nend",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 50,
+        "column": 3
+      },
+      "text": "def create\n    # have a working copy of the params in case Tenant callbacks\n    # make any changes\n  tenant_params = sign_up_params_tenant\n  user_params   = sign_up_params_user\n  coupon_params = sign_up_params_coupon\n\n  sign_out_session!\n     # next two lines prep signup view parameters\n  prep_signup_view( tenant_params, user_params, coupon_params )\n\n     # validate recaptcha first unless not enabled\n  if !::Milia.use_recaptcha  ||  verify_recaptcha\n\n    Tenant.transaction  do\n      @tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors\n\n    end  #  wrap tenant/user creation in a transaction\n\n  else\n    flash[:error] = \"Recaptcha codes didn't match; please try again\"\n       # all validation errors are passed when the sign_up form is re-rendered\n    resource.valid?\n    @tenant.valid?\n    log_action( \"recaptcha failed\", resource )\n    render :new\n  end\n\nend",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 10
+          },
+          "text": "create"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 1,
+            "column": 4
+          },
+          "end": {
+            "row": 1,
+            "column": 64
+          },
+          "text": "# have a working copy of the params in case Tenant callbacks"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 2,
+            "column": 4
+          },
+          "end": {
+            "row": 2,
+            "column": 22
+          },
+          "text": "# make any changes"
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 3,
+            "column": 2
+          },
+          "end": {
+            "row": 48,
+            "column": 5
+          },
+          "text": "tenant_params = sign_up_params_tenant\n  user_params   = sign_up_params_user\n  coupon_params = sign_up_params_coupon\n\n  sign_out_session!\n     # next two lines prep signup view parameters\n  prep_signup_view( tenant_params, user_params, coupon_params )\n\n     # validate recaptcha first unless not enabled\n  if !::Milia.use_recaptcha  ||  verify_recaptcha\n\n    Tenant.transaction  do\n      @tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors\n\n    end  #  wrap tenant/user creation in a transaction\n\n  else\n    flash[:error] = \"Recaptcha codes didn't match; please try again\"\n       # all validation errors are passed when the sign_up form is re-rendered\n    resource.valid?\n    @tenant.valid?\n    log_action( \"recaptcha failed\", resource )\n    render :new\n  end",
+          "children": [
+            {
+              "type": "assignment",
+              "start": {
+                "row": 3,
+                "column": 2
+              },
+              "end": {
+                "row": 3,
+                "column": 39
+              },
+              "text": "tenant_params = sign_up_params_tenant",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 15
+                  },
+                  "text": "tenant_params"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 3,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 17
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 39
+                  },
+                  "text": "sign_up_params_tenant"
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 4,
+                "column": 2
+              },
+              "end": {
+                "row": 4,
+                "column": 37
+              },
+              "text": "user_params   = sign_up_params_user",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 13
+                  },
+                  "text": "user_params"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 4,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 17
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 37
+                  },
+                  "text": "sign_up_params_user"
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 5,
+                "column": 2
+              },
+              "end": {
+                "row": 5,
+                "column": 39
+              },
+              "text": "coupon_params = sign_up_params_coupon",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 5,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 15
+                  },
+                  "text": "coupon_params"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 5,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 17
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 5,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 39
+                  },
+                  "text": "sign_up_params_coupon"
+                }
+              ]
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 7,
+                "column": 2
+              },
+              "end": {
+                "row": 7,
+                "column": 19
+              },
+              "text": "sign_out_session!",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 7,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 19
+                  },
+                  "text": "sign_out_session!"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 8,
+                "column": 5
+              },
+              "end": {
+                "row": 8,
+                "column": 49
+              },
+              "text": "# next two lines prep signup view parameters"
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 9,
+                "column": 2
+              },
+              "end": {
+                "row": 9,
+                "column": 63
+              },
+              "text": "prep_signup_view( tenant_params, user_params, coupon_params )",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 9,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 18
+                  },
+                  "text": "prep_signup_view"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 9,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 63
+                  },
+                  "text": "( tenant_params, user_params, coupon_params )",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 9,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 19
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 33
+                      },
+                      "text": "tenant_params"
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 9,
+                        "column": 33
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 34
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 46
+                      },
+                      "text": "user_params"
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 9,
+                        "column": 46
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 47
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 61
+                      },
+                      "text": "coupon_params"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 9,
+                        "column": 62
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 63
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 11,
+                "column": 5
+              },
+              "end": {
+                "row": 11,
+                "column": 50
+              },
+              "text": "# validate recaptcha first unless not enabled"
+            },
+            {
+              "type": "if",
+              "start": {
+                "row": 12,
+                "column": 2
+              },
+              "end": {
+                "row": 48,
+                "column": 5
+              },
+              "text": "if !::Milia.use_recaptcha  ||  verify_recaptcha\n\n    Tenant.transaction  do\n      @tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors\n\n    end  #  wrap tenant/user creation in a transaction\n\n  else\n    flash[:error] = \"Recaptcha codes didn't match; please try again\"\n       # all validation errors are passed when the sign_up form is re-rendered\n    resource.valid?\n    @tenant.valid?\n    log_action( \"recaptcha failed\", resource )\n    render :new\n  end",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 12,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 4
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 12,
+                    "column": 5
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 49
+                  },
+                  "text": "!::Milia.use_recaptcha  ||  verify_recaptcha",
+                  "children": [
+                    {
+                      "type": "unary",
+                      "start": {
+                        "row": 12,
+                        "column": 5
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 27
+                      },
+                      "text": "!::Milia.use_recaptcha",
+                      "children": [
+                        {
+                          "type": "!",
+                          "start": {
+                            "row": 12,
+                            "column": 5
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 6
+                          },
+                          "text": "!"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 12,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 27
+                          },
+                          "text": "::Milia.use_recaptcha",
+                          "children": [
+                            {
+                              "type": "scope_resolution",
+                              "start": {
+                                "row": 12,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 13
+                              },
+                              "text": "::Milia",
+                              "children": [
+                                {
+                                  "type": "::",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 8
+                                  },
+                                  "text": "::"
+                                },
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 13
+                                  },
+                                  "text": "Milia"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 12,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 14
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 12,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 27
+                              },
+                              "text": "use_recaptcha"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "||",
+                      "start": {
+                        "row": 12,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 31
+                      },
+                      "text": "||"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 12,
+                        "column": 33
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 49
+                      },
+                      "text": "verify_recaptcha"
+                    }
+                  ]
+                },
+                {
+                  "type": "then",
+                  "start": {
+                    "row": 12,
+                    "column": 49
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 54
+                  },
+                  "text": "\n\n    Tenant.transaction  do\n      @tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors\n\n    end  #  wrap tenant/user creation in a transaction",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 14,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 7
+                      },
+                      "text": "Tenant.transaction  do\n      @tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors\n\n    end",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 14,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 10
+                          },
+                          "text": "Tenant"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 14,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 11
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 22
+                          },
+                          "text": "transaction"
+                        },
+                        {
+                          "type": "do_block",
+                          "start": {
+                            "row": 14,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 7
+                          },
+                          "text": "do\n      @tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors\n\n    end",
+                          "children": [
+                            {
+                              "type": "do",
+                              "start": {
+                                "row": 14,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 26
+                              },
+                              "text": "do"
+                            },
+                            {
+                              "type": "body_statement",
+                              "start": {
+                                "row": 15,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 47
+                              },
+                              "text": "@tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)\n      if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end # if .. then .. else no tenant errors",
+                              "children": [
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 84
+                                  },
+                                  "text": "@tenant = Tenant.create_new_tenant( tenant_params, user_params, coupon_params)",
+                                  "children": [
+                                    {
+                                      "type": "instance_variable",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 13
+                                      },
+                                      "text": "@tenant"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 15
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 84
+                                      },
+                                      "text": "Tenant.create_new_tenant( tenant_params, user_params, coupon_params)",
+                                      "children": [
+                                        {
+                                          "type": "constant",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 22
+                                          },
+                                          "text": "Tenant"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 23
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 40
+                                          },
+                                          "text": "create_new_tenant"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 84
+                                          },
+                                          "text": "( tenant_params, user_params, coupon_params)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 41
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 42
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 55
+                                              },
+                                              "text": "tenant_params"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 55
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 56
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 57
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 68
+                                              },
+                                              "text": "user_params"
+                                            },
+                                            {
+                                              "type": ",",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 68
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 69
+                                              },
+                                              "text": ","
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 70
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 83
+                                              },
+                                              "text": "coupon_params"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 83
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 84
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "if",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 9
+                                  },
+                                  "text": "if @tenant.errors.empty?   # tenant created\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation\n\n      else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new\n      end",
+                                  "children": [
+                                    {
+                                      "type": "if",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 8
+                                      },
+                                      "text": "if"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 9
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 30
+                                      },
+                                      "text": "@tenant.errors.empty?",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 9
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 23
+                                          },
+                                          "text": "@tenant.errors",
+                                          "children": [
+                                            {
+                                              "type": "instance_variable",
+                                              "start": {
+                                                "row": 16,
+                                                "column": 9
+                                              },
+                                              "end": {
+                                                "row": 16,
+                                                "column": 16
+                                              },
+                                              "text": "@tenant"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 16,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 16,
+                                                "column": 17
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 16,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 16,
+                                                "column": 23
+                                              },
+                                              "text": "errors"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 24
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 30
+                                          },
+                                          "text": "empty?"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "comment",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 49
+                                      },
+                                      "text": "# tenant created"
+                                    },
+                                    {
+                                      "type": "then",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 53
+                                      },
+                                      "text": "\n\n        initiate_tenant( @tenant )    # first time stuff for new tenant\n\n        devise_create( user_params )   # devise resource(user) creation; sets resource\n\n        if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end  # if..then..else for valid user creation",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 34
+                                          },
+                                          "text": "initiate_tenant( @tenant )",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 23
+                                              },
+                                              "text": "initiate_tenant"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 34
+                                              },
+                                              "text": "( @tenant )",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 23
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 24
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "instance_variable",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 25
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 32
+                                                  },
+                                                  "text": "@tenant"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 33
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 34
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "comment",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 71
+                                          },
+                                          "text": "# first time stuff for new tenant"
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 36
+                                          },
+                                          "text": "devise_create( user_params )",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 21
+                                              },
+                                              "text": "devise_create"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 36
+                                              },
+                                              "text": "( user_params )",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 21
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 22
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 23
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 34
+                                                  },
+                                                  "text": "user_params"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 35
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 36
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "comment",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 39
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 86
+                                          },
+                                          "text": "# devise resource(user) creation; sets resource"
+                                        },
+                                        {
+                                          "type": "if",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 11
+                                          },
+                                          "text": "if resource.errors.empty?   #  SUCCESS!\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)\n\n        else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back\n        end",
+                                          "children": [
+                                            {
+                                              "type": "if",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 10
+                                              },
+                                              "text": "if"
+                                            },
+                                            {
+                                              "type": "call",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 11
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 33
+                                              },
+                                              "text": "resource.errors.empty?",
+                                              "children": [
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 11
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 26
+                                                  },
+                                                  "text": "resource.errors",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 22,
+                                                        "column": 11
+                                                      },
+                                                      "end": {
+                                                        "row": 22,
+                                                        "column": 19
+                                                      },
+                                                      "text": "resource"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 22,
+                                                        "column": 19
+                                                      },
+                                                      "end": {
+                                                        "row": 22,
+                                                        "column": 20
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 22,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 22,
+                                                        "column": 26
+                                                      },
+                                                      "text": "errors"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 27
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 33
+                                                  },
+                                                  "text": "empty?"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "comment",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 47
+                                              },
+                                              "text": "#  SUCCESS!"
+                                            },
+                                            {
+                                              "type": "then",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 64
+                                              },
+                                              "text": "\n\n          log_action( \"signup user/tenant success\", resource )\n            # do any needed tenant initial setup\n          Tenant.tenant_signup(resource, @tenant, coupon_params)",
+                                              "children": [
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 24,
+                                                    "column": 10
+                                                  },
+                                                  "end": {
+                                                    "row": 24,
+                                                    "column": 62
+                                                  },
+                                                  "text": "log_action( \"signup user/tenant success\", resource )",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 10
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 20
+                                                      },
+                                                      "text": "log_action"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 62
+                                                      },
+                                                      "text": "( \"signup user/tenant success\", resource )",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 20
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 21
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": "string",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 22
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 50
+                                                          },
+                                                          "text": "\"signup user/tenant success\"",
+                                                          "children": [
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 22
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 23
+                                                              },
+                                                              "text": "\""
+                                                            },
+                                                            {
+                                                              "type": "string_content",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 23
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 49
+                                                              },
+                                                              "text": "signup user/tenant success"
+                                                            },
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 49
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 50
+                                                              },
+                                                              "text": "\""
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": ",",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 50
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 51
+                                                          },
+                                                          "text": ","
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 52
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 60
+                                                          },
+                                                          "text": "resource"
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 61
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 62
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "comment",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 12
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 48
+                                                  },
+                                                  "text": "# do any needed tenant initial setup"
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 26,
+                                                    "column": 10
+                                                  },
+                                                  "end": {
+                                                    "row": 26,
+                                                    "column": 64
+                                                  },
+                                                  "text": "Tenant.tenant_signup(resource, @tenant, coupon_params)",
+                                                  "children": [
+                                                    {
+                                                      "type": "constant",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 10
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 16
+                                                      },
+                                                      "text": "Tenant"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 17
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 17
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 30
+                                                      },
+                                                      "text": "tenant_signup"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 30
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 64
+                                                      },
+                                                      "text": "(resource, @tenant, coupon_params)",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 30
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 31
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 31
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 39
+                                                          },
+                                                          "text": "resource"
+                                                        },
+                                                        {
+                                                          "type": ",",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 39
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 40
+                                                          },
+                                                          "text": ","
+                                                        },
+                                                        {
+                                                          "type": "instance_variable",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 41
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 48
+                                                          },
+                                                          "text": "@tenant"
+                                                        },
+                                                        {
+                                                          "type": ",",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 48
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 49
+                                                          },
+                                                          "text": ","
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 50
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 63
+                                                          },
+                                                          "text": "coupon_params"
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 63
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 64
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "else",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 89
+                                              },
+                                              "text": "else  # user creation failed; force tenant rollback\n          log_action( \"signup user create failed\", resource )\n          raise ActiveRecord::Rollback   # force the tenant transaction to be rolled back",
+                                              "children": [
+                                                {
+                                                  "type": "else",
+                                                  "start": {
+                                                    "row": 28,
+                                                    "column": 8
+                                                  },
+                                                  "end": {
+                                                    "row": 28,
+                                                    "column": 12
+                                                  },
+                                                  "text": "else"
+                                                },
+                                                {
+                                                  "type": "comment",
+                                                  "start": {
+                                                    "row": 28,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 28,
+                                                    "column": 59
+                                                  },
+                                                  "text": "# user creation failed; force tenant rollback"
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 29,
+                                                    "column": 10
+                                                  },
+                                                  "end": {
+                                                    "row": 29,
+                                                    "column": 61
+                                                  },
+                                                  "text": "log_action( \"signup user create failed\", resource )",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 29,
+                                                        "column": 10
+                                                      },
+                                                      "end": {
+                                                        "row": 29,
+                                                        "column": 20
+                                                      },
+                                                      "text": "log_action"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 29,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 29,
+                                                        "column": 61
+                                                      },
+                                                      "text": "( \"signup user create failed\", resource )",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 29,
+                                                            "column": 20
+                                                          },
+                                                          "end": {
+                                                            "row": 29,
+                                                            "column": 21
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": "string",
+                                                          "start": {
+                                                            "row": 29,
+                                                            "column": 22
+                                                          },
+                                                          "end": {
+                                                            "row": 29,
+                                                            "column": 49
+                                                          },
+                                                          "text": "\"signup user create failed\"",
+                                                          "children": [
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 29,
+                                                                "column": 22
+                                                              },
+                                                              "end": {
+                                                                "row": 29,
+                                                                "column": 23
+                                                              },
+                                                              "text": "\""
+                                                            },
+                                                            {
+                                                              "type": "string_content",
+                                                              "start": {
+                                                                "row": 29,
+                                                                "column": 23
+                                                              },
+                                                              "end": {
+                                                                "row": 29,
+                                                                "column": 48
+                                                              },
+                                                              "text": "signup user create failed"
+                                                            },
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 29,
+                                                                "column": 48
+                                                              },
+                                                              "end": {
+                                                                "row": 29,
+                                                                "column": 49
+                                                              },
+                                                              "text": "\""
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": ",",
+                                                          "start": {
+                                                            "row": 29,
+                                                            "column": 49
+                                                          },
+                                                          "end": {
+                                                            "row": 29,
+                                                            "column": 50
+                                                          },
+                                                          "text": ","
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 29,
+                                                            "column": 51
+                                                          },
+                                                          "end": {
+                                                            "row": 29,
+                                                            "column": 59
+                                                          },
+                                                          "text": "resource"
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 29,
+                                                            "column": 60
+                                                          },
+                                                          "end": {
+                                                            "row": 29,
+                                                            "column": 61
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 10
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 38
+                                                  },
+                                                  "text": "raise ActiveRecord::Rollback",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 30,
+                                                        "column": 10
+                                                      },
+                                                      "end": {
+                                                        "row": 30,
+                                                        "column": 15
+                                                      },
+                                                      "text": "raise"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 30,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 30,
+                                                        "column": 38
+                                                      },
+                                                      "text": "ActiveRecord::Rollback",
+                                                      "children": [
+                                                        {
+                                                          "type": "scope_resolution",
+                                                          "start": {
+                                                            "row": 30,
+                                                            "column": 16
+                                                          },
+                                                          "end": {
+                                                            "row": 30,
+                                                            "column": 38
+                                                          },
+                                                          "text": "ActiveRecord::Rollback",
+                                                          "children": [
+                                                            {
+                                                              "type": "constant",
+                                                              "start": {
+                                                                "row": 30,
+                                                                "column": 16
+                                                              },
+                                                              "end": {
+                                                                "row": 30,
+                                                                "column": 28
+                                                              },
+                                                              "text": "ActiveRecord"
+                                                            },
+                                                            {
+                                                              "type": "::",
+                                                              "start": {
+                                                                "row": 30,
+                                                                "column": 28
+                                                              },
+                                                              "end": {
+                                                                "row": 30,
+                                                                "column": 30
+                                                              },
+                                                              "text": "::"
+                                                            },
+                                                            {
+                                                              "type": "constant",
+                                                              "start": {
+                                                                "row": 30,
+                                                                "column": 30
+                                                              },
+                                                              "end": {
+                                                                "row": 30,
+                                                                "column": 38
+                                                              },
+                                                              "text": "Rollback"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "comment",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 41
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 89
+                                                  },
+                                                  "text": "# force the tenant transaction to be rolled back"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "end",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 11
+                                              },
+                                              "text": "end"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "comment",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 53
+                                          },
+                                          "text": "# if..then..else for valid user creation"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "else",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 19
+                                      },
+                                      "text": "else\n        resource.valid?\n        log_action( \"tenant create failed\", @tenant )\n        render :new",
+                                      "children": [
+                                        {
+                                          "type": "else",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 6
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 10
+                                          },
+                                          "text": "else"
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 23
+                                          },
+                                          "text": "resource.valid?",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 16
+                                              },
+                                              "text": "resource"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 17
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 34,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 23
+                                              },
+                                              "text": "valid?"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 53
+                                          },
+                                          "text": "log_action( \"tenant create failed\", @tenant )",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 35,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 35,
+                                                "column": 18
+                                              },
+                                              "text": "log_action"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 35,
+                                                "column": 18
+                                              },
+                                              "end": {
+                                                "row": 35,
+                                                "column": 53
+                                              },
+                                              "text": "( \"tenant create failed\", @tenant )",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 18
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 19
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 20
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 42
+                                                  },
+                                                  "text": "\"tenant create failed\"",
+                                                  "children": [
+                                                    {
+                                                      "type": "\"",
+                                                      "start": {
+                                                        "row": 35,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 35,
+                                                        "column": 21
+                                                      },
+                                                      "text": "\""
+                                                    },
+                                                    {
+                                                      "type": "string_content",
+                                                      "start": {
+                                                        "row": 35,
+                                                        "column": 21
+                                                      },
+                                                      "end": {
+                                                        "row": 35,
+                                                        "column": 41
+                                                      },
+                                                      "text": "tenant create failed"
+                                                    },
+                                                    {
+                                                      "type": "\"",
+                                                      "start": {
+                                                        "row": 35,
+                                                        "column": 41
+                                                      },
+                                                      "end": {
+                                                        "row": 35,
+                                                        "column": 42
+                                                      },
+                                                      "text": "\""
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ",",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 42
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 43
+                                                  },
+                                                  "text": ","
+                                                },
+                                                {
+                                                  "type": "instance_variable",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 44
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 51
+                                                  },
+                                                  "text": "@tenant"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 35,
+                                                    "column": 52
+                                                  },
+                                                  "end": {
+                                                    "row": 35,
+                                                    "column": 53
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 19
+                                          },
+                                          "text": "render :new",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 14
+                                              },
+                                              "text": "render"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 15
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 19
+                                              },
+                                              "text": ":new",
+                                              "children": [
+                                                {
+                                                  "type": "simple_symbol",
+                                                  "start": {
+                                                    "row": 36,
+                                                    "column": 15
+                                                  },
+                                                  "end": {
+                                                    "row": 36,
+                                                    "column": 19
+                                                  },
+                                                  "text": ":new"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "end",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 9
+                                      },
+                                      "text": "end"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "comment",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 47
+                                  },
+                                  "text": "# if .. then .. else no tenant errors"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "end",
+                              "start": {
+                                "row": 39,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 7
+                              },
+                              "text": "end"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "comment",
+                      "start": {
+                        "row": 39,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 54
+                      },
+                      "text": "#  wrap tenant/user creation in a transaction"
+                    }
+                  ]
+                },
+                {
+                  "type": "else",
+                  "start": {
+                    "row": 41,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 47,
+                    "column": 15
+                  },
+                  "text": "else\n    flash[:error] = \"Recaptcha codes didn't match; please try again\"\n       # all validation errors are passed when the sign_up form is re-rendered\n    resource.valid?\n    @tenant.valid?\n    log_action( \"recaptcha failed\", resource )\n    render :new",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 41,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 6
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": "assignment",
+                      "start": {
+                        "row": 42,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 68
+                      },
+                      "text": "flash[:error] = \"Recaptcha codes didn't match; please try again\"",
+                      "children": [
+                        {
+                          "type": "element_reference",
+                          "start": {
+                            "row": 42,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 17
+                          },
+                          "text": "flash[:error]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 42,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 9
+                              },
+                              "text": "flash"
+                            },
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 42,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 10
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "simple_symbol",
+                              "start": {
+                                "row": 42,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 16
+                              },
+                              "text": ":error"
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 42,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 17
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 42,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 19
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 42,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 68
+                          },
+                          "text": "\"Recaptcha codes didn't match; please try again\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 42,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 21
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 42,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 67
+                              },
+                              "text": "Recaptcha codes didn't match; please try again"
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 42,
+                                "column": 67
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 68
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "comment",
+                      "start": {
+                        "row": 43,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 78
+                      },
+                      "text": "# all validation errors are passed when the sign_up form is re-rendered"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 44,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 19
+                      },
+                      "text": "resource.valid?",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 44,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 12
+                          },
+                          "text": "resource"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 44,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 13
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 44,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 19
+                          },
+                          "text": "valid?"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 45,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 18
+                      },
+                      "text": "@tenant.valid?",
+                      "children": [
+                        {
+                          "type": "instance_variable",
+                          "start": {
+                            "row": 45,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 11
+                          },
+                          "text": "@tenant"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 45,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 12
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 45,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 18
+                          },
+                          "text": "valid?"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 46,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 46
+                      },
+                      "text": "log_action( \"recaptcha failed\", resource )",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 46,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 14
+                          },
+                          "text": "log_action"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 46,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 46
+                          },
+                          "text": "( \"recaptcha failed\", resource )",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 46,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 15
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 46,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 34
+                              },
+                              "text": "\"recaptcha failed\"",
+                              "children": [
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 17
+                                  },
+                                  "text": "\""
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 33
+                                  },
+                                  "text": "recaptcha failed"
+                                },
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 34
+                                  },
+                                  "text": "\""
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 46,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 35
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 44
+                              },
+                              "text": "resource"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 46,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 46
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 47,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 15
+                      },
+                      "text": "render :new",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 47,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 10
+                          },
+                          "text": "render"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 47,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 15
+                          },
+                          "text": ":new",
+                          "children": [
+                            {
+                              "type": "simple_symbol",
+                              "start": {
+                                "row": 47,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 15
+                              },
+                              "text": ":new"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "end",
+                  "start": {
+                    "row": 48,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 48,
+                    "column": 5
+                  },
+                  "text": "end"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 50,
+            "column": 0
+          },
+          "end": {
+            "row": 50,
+            "column": 3
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3000 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 33,
+    "column": 3
+  },
+  "text": "public void recoverIncompleteTriggerInstances() {\n    final Collection<TriggerInstance> unfinishedTriggerInstances = this.flowTriggerInstanceLoader\n        .getIncompleteTriggerInstances();\n    for (final TriggerInstance triggerInstance : unfinishedTriggerInstances) {\n      if (triggerInstance.getFlowTrigger() != null) {\n        recoverTriggerInstance(triggerInstance);\n      } else {\n        logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());\n\n        //finalize unrecoverable trigger instances\n        // the following situation would cause trigger instances unrecoverable:\n        // 1. project A with flow A associated with flow trigger A is uploaded\n        // 2. flow trigger A starts to run\n        // 3. project A with flow B without any flow trigger is uploaded\n        // 4. web server restarts\n        // in this case, flow trigger instance of flow trigger A will be equipped with latest\n        // project, thus failing to find the flow trigger since new project doesn't contain flow\n        // trigger at all\n        if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }\n      }\n    }\n  }",
+  "children": [
+    {
+      "type": "method_declaration",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 33,
+        "column": 3
+      },
+      "text": "public void recoverIncompleteTriggerInstances() {\n    final Collection<TriggerInstance> unfinishedTriggerInstances = this.flowTriggerInstanceLoader\n        .getIncompleteTriggerInstances();\n    for (final TriggerInstance triggerInstance : unfinishedTriggerInstances) {\n      if (triggerInstance.getFlowTrigger() != null) {\n        recoverTriggerInstance(triggerInstance);\n      } else {\n        logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());\n\n        //finalize unrecoverable trigger instances\n        // the following situation would cause trigger instances unrecoverable:\n        // 1. project A with flow A associated with flow trigger A is uploaded\n        // 2. flow trigger A starts to run\n        // 3. project A with flow B without any flow trigger is uploaded\n        // 4. web server restarts\n        // in this case, flow trigger instance of flow trigger A will be equipped with latest\n        // project, thus failing to find the flow trigger since new project doesn't contain flow\n        // trigger at all\n        if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }\n      }\n    }\n  }",
+      "children": [
+        {
+          "type": "modifiers",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 6
+          },
+          "text": "public",
+          "children": [
+            {
+              "type": "public",
+              "start": {
+                "row": 0,
+                "column": 0
+              },
+              "end": {
+                "row": 0,
+                "column": 6
+              },
+              "text": "public"
+            }
+          ]
+        },
+        {
+          "type": "void_type",
+          "start": {
+            "row": 0,
+            "column": 7
+          },
+          "end": {
+            "row": 0,
+            "column": 11
+          },
+          "text": "void"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 12
+          },
+          "end": {
+            "row": 0,
+            "column": 45
+          },
+          "text": "recoverIncompleteTriggerInstances"
+        },
+        {
+          "type": "formal_parameters",
+          "start": {
+            "row": 0,
+            "column": 45
+          },
+          "end": {
+            "row": 0,
+            "column": 47
+          },
+          "text": "()",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 45
+              },
+              "end": {
+                "row": 0,
+                "column": 46
+              },
+              "text": "("
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 46
+              },
+              "end": {
+                "row": 0,
+                "column": 47
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 0,
+            "column": 48
+          },
+          "end": {
+            "row": 33,
+            "column": 3
+          },
+          "text": "{\n    final Collection<TriggerInstance> unfinishedTriggerInstances = this.flowTriggerInstanceLoader\n        .getIncompleteTriggerInstances();\n    for (final TriggerInstance triggerInstance : unfinishedTriggerInstances) {\n      if (triggerInstance.getFlowTrigger() != null) {\n        recoverTriggerInstance(triggerInstance);\n      } else {\n        logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());\n\n        //finalize unrecoverable trigger instances\n        // the following situation would cause trigger instances unrecoverable:\n        // 1. project A with flow A associated with flow trigger A is uploaded\n        // 2. flow trigger A starts to run\n        // 3. project A with flow B without any flow trigger is uploaded\n        // 4. web server restarts\n        // in this case, flow trigger instance of flow trigger A will be equipped with latest\n        // project, thus failing to find the flow trigger since new project doesn't contain flow\n        // trigger at all\n        if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }\n      }\n    }\n  }",
+          "children": [
+            {
+              "type": "{",
+              "start": {
+                "row": 0,
+                "column": 48
+              },
+              "end": {
+                "row": 0,
+                "column": 49
+              },
+              "text": "{"
+            },
+            {
+              "type": "local_variable_declaration",
+              "start": {
+                "row": 1,
+                "column": 4
+              },
+              "end": {
+                "row": 2,
+                "column": 41
+              },
+              "text": "final Collection<TriggerInstance> unfinishedTriggerInstances = this.flowTriggerInstanceLoader\n        .getIncompleteTriggerInstances();",
+              "children": [
+                {
+                  "type": "modifiers",
+                  "start": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 9
+                  },
+                  "text": "final",
+                  "children": [
+                    {
+                      "type": "final",
+                      "start": {
+                        "row": 1,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 9
+                      },
+                      "text": "final"
+                    }
+                  ]
+                },
+                {
+                  "type": "generic_type",
+                  "start": {
+                    "row": 1,
+                    "column": 10
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 37
+                  },
+                  "text": "Collection<TriggerInstance>",
+                  "children": [
+                    {
+                      "type": "type_identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 20
+                      },
+                      "text": "Collection"
+                    },
+                    {
+                      "type": "type_arguments",
+                      "start": {
+                        "row": 1,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 37
+                      },
+                      "text": "<TriggerInstance>",
+                      "children": [
+                        {
+                          "type": "<",
+                          "start": {
+                            "row": 1,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 21
+                          },
+                          "text": "<"
+                        },
+                        {
+                          "type": "type_identifier",
+                          "start": {
+                            "row": 1,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 36
+                          },
+                          "text": "TriggerInstance"
+                        },
+                        {
+                          "type": ">",
+                          "start": {
+                            "row": 1,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 37
+                          },
+                          "text": ">"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "variable_declarator",
+                  "start": {
+                    "row": 1,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 40
+                  },
+                  "text": "unfinishedTriggerInstances = this.flowTriggerInstanceLoader\n        .getIncompleteTriggerInstances()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 64
+                      },
+                      "text": "unfinishedTriggerInstances"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 1,
+                        "column": 65
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 66
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "method_invocation",
+                      "start": {
+                        "row": 1,
+                        "column": 67
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 40
+                      },
+                      "text": "this.flowTriggerInstanceLoader\n        .getIncompleteTriggerInstances()",
+                      "children": [
+                        {
+                          "type": "field_access",
+                          "start": {
+                            "row": 1,
+                            "column": 67
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 97
+                          },
+                          "text": "this.flowTriggerInstanceLoader",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 1,
+                                "column": 67
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 71
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 1,
+                                "column": 71
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 72
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 1,
+                                "column": 72
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 97
+                              },
+                              "text": "flowTriggerInstanceLoader"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 2,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 9
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 2,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 38
+                          },
+                          "text": "getIncompleteTriggerInstances"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 2,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 40
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 2,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 39
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 2,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 40
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 2,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 41
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "enhanced_for_statement",
+              "start": {
+                "row": 3,
+                "column": 4
+              },
+              "end": {
+                "row": 32,
+                "column": 5
+              },
+              "text": "for (final TriggerInstance triggerInstance : unfinishedTriggerInstances) {\n      if (triggerInstance.getFlowTrigger() != null) {\n        recoverTriggerInstance(triggerInstance);\n      } else {\n        logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());\n\n        //finalize unrecoverable trigger instances\n        // the following situation would cause trigger instances unrecoverable:\n        // 1. project A with flow A associated with flow trigger A is uploaded\n        // 2. flow trigger A starts to run\n        // 3. project A with flow B without any flow trigger is uploaded\n        // 4. web server restarts\n        // in this case, flow trigger instance of flow trigger A will be equipped with latest\n        // project, thus failing to find the flow trigger since new project doesn't contain flow\n        // trigger at all\n        if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }\n      }\n    }",
+              "children": [
+                {
+                  "type": "for",
+                  "start": {
+                    "row": 3,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 7
+                  },
+                  "text": "for"
+                },
+                {
+                  "type": "(",
+                  "start": {
+                    "row": 3,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 9
+                  },
+                  "text": "("
+                },
+                {
+                  "type": "modifiers",
+                  "start": {
+                    "row": 3,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 14
+                  },
+                  "text": "final",
+                  "children": [
+                    {
+                      "type": "final",
+                      "start": {
+                        "row": 3,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 14
+                      },
+                      "text": "final"
+                    }
+                  ]
+                },
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 30
+                  },
+                  "text": "TriggerInstance"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 31
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 46
+                  },
+                  "text": "triggerInstance"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 3,
+                    "column": 47
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 48
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 49
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 75
+                  },
+                  "text": "unfinishedTriggerInstances"
+                },
+                {
+                  "type": ")",
+                  "start": {
+                    "row": 3,
+                    "column": 75
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 76
+                  },
+                  "text": ")"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 3,
+                    "column": 77
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 5
+                  },
+                  "text": "{\n      if (triggerInstance.getFlowTrigger() != null) {\n        recoverTriggerInstance(triggerInstance);\n      } else {\n        logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());\n\n        //finalize unrecoverable trigger instances\n        // the following situation would cause trigger instances unrecoverable:\n        // 1. project A with flow A associated with flow trigger A is uploaded\n        // 2. flow trigger A starts to run\n        // 3. project A with flow B without any flow trigger is uploaded\n        // 4. web server restarts\n        // in this case, flow trigger instance of flow trigger A will be equipped with latest\n        // project, thus failing to find the flow trigger since new project doesn't contain flow\n        // trigger at all\n        if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }\n      }\n    }",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 3,
+                        "column": 77
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 78
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 4,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 7
+                      },
+                      "text": "if (triggerInstance.getFlowTrigger() != null) {\n        recoverTriggerInstance(triggerInstance);\n      } else {\n        logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());\n\n        //finalize unrecoverable trigger instances\n        // the following situation would cause trigger instances unrecoverable:\n        // 1. project A with flow A associated with flow trigger A is uploaded\n        // 2. flow trigger A starts to run\n        // 3. project A with flow B without any flow trigger is uploaded\n        // 4. web server restarts\n        // in this case, flow trigger instance of flow trigger A will be equipped with latest\n        // project, thus failing to find the flow trigger since new project doesn't contain flow\n        // trigger at all\n        if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }\n      }",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 4,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 8
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "condition",
+                          "start": {
+                            "row": 4,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 51
+                          },
+                          "text": "(triggerInstance.getFlowTrigger() != null)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 4,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 10
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "binary_expression",
+                              "start": {
+                                "row": 4,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 50
+                              },
+                              "text": "triggerInstance.getFlowTrigger() != null",
+                              "children": [
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 42
+                                  },
+                                  "text": "triggerInstance.getFlowTrigger()",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 25
+                                      },
+                                      "text": "triggerInstance"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 26
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 40
+                                      },
+                                      "text": "getFlowTrigger"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 42
+                                      },
+                                      "text": "()",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 41
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 42
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "!=",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 45
+                                  },
+                                  "text": "!="
+                                },
+                                {
+                                  "type": "null_literal",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 50
+                                  },
+                                  "text": "null"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 4,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 51
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 4,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 7
+                          },
+                          "text": "{\n        recoverTriggerInstance(triggerInstance);\n      }",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 4,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 53
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 5,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 48
+                              },
+                              "text": "recoverTriggerInstance(triggerInstance);",
+                              "children": [
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 47
+                                  },
+                                  "text": "recoverTriggerInstance(triggerInstance)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 30
+                                      },
+                                      "text": "recoverTriggerInstance"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 47
+                                      },
+                                      "text": "(triggerInstance)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 5,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 5,
+                                            "column": 31
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 5,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 5,
+                                            "column": 46
+                                          },
+                                          "text": "triggerInstance"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 5,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 5,
+                                            "column": 47
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 48
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 6,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 7
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else",
+                          "start": {
+                            "row": 6,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 12
+                          },
+                          "text": "else"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 6,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 7
+                          },
+                          "text": "{\n        logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());\n\n        //finalize unrecoverable trigger instances\n        // the following situation would cause trigger instances unrecoverable:\n        // 1. project A with flow A associated with flow trigger A is uploaded\n        // 2. flow trigger A starts to run\n        // 3. project A with flow B without any flow trigger is uploaded\n        // 4. web server restarts\n        // in this case, flow trigger instance of flow trigger A will be equipped with latest\n        // project, thus failing to find the flow trigger since new project doesn't contain flow\n        // trigger at all\n        if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }\n      }",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 6,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 14
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 7,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 58
+                              },
+                              "text": "logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId());",
+                              "children": [
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 57
+                                  },
+                                  "text": "logger.error(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId())",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 14
+                                      },
+                                      "text": "logger"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 15
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 20
+                                      },
+                                      "text": "error"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 57
+                                      },
+                                      "text": "(\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \", triggerInstance.getId())",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 7,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 7,
+                                            "column": 21
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "binary_expression",
+                                          "start": {
+                                            "row": 7,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 31
+                                          },
+                                          "text": "\"cannot recover the trigger instance {}, flow trigger is null,\"\n            + \" cancelling it \"",
+                                          "children": [
+                                            {
+                                              "type": "string_literal",
+                                              "start": {
+                                                "row": 7,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 7,
+                                                "column": 84
+                                              },
+                                              "text": "\"cannot recover the trigger instance {}, flow trigger is null,\"",
+                                              "children": [
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 7,
+                                                    "column": 21
+                                                  },
+                                                  "end": {
+                                                    "row": 7,
+                                                    "column": 22
+                                                  },
+                                                  "text": "\""
+                                                },
+                                                {
+                                                  "type": "string_fragment",
+                                                  "start": {
+                                                    "row": 7,
+                                                    "column": 22
+                                                  },
+                                                  "end": {
+                                                    "row": 7,
+                                                    "column": 83
+                                                  },
+                                                  "text": "cannot recover the trigger instance {}, flow trigger is null,"
+                                                },
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 7,
+                                                    "column": 83
+                                                  },
+                                                  "end": {
+                                                    "row": 7,
+                                                    "column": 84
+                                                  },
+                                                  "text": "\""
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "+",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 12
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 13
+                                              },
+                                              "text": "+"
+                                            },
+                                            {
+                                              "type": "string_literal",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 31
+                                              },
+                                              "text": "\" cancelling it \"",
+                                              "children": [
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 8,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 8,
+                                                    "column": 15
+                                                  },
+                                                  "text": "\""
+                                                },
+                                                {
+                                                  "type": "string_fragment",
+                                                  "start": {
+                                                    "row": 8,
+                                                    "column": 15
+                                                  },
+                                                  "end": {
+                                                    "row": 8,
+                                                    "column": 30
+                                                  },
+                                                  "text": " cancelling it "
+                                                },
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 8,
+                                                    "column": 30
+                                                  },
+                                                  "end": {
+                                                    "row": 8,
+                                                    "column": 31
+                                                  },
+                                                  "text": "\""
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 32
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "method_invocation",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 33
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 56
+                                          },
+                                          "text": "triggerInstance.getId()",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 48
+                                              },
+                                              "text": "triggerInstance"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 49
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 49
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 54
+                                              },
+                                              "text": "getId"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 54
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 56
+                                              },
+                                              "text": "()",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 8,
+                                                    "column": 54
+                                                  },
+                                                  "end": {
+                                                    "row": 8,
+                                                    "column": 55
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 8,
+                                                    "column": 55
+                                                  },
+                                                  "end": {
+                                                    "row": 8,
+                                                    "column": 56
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 56
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 57
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 57
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 58
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 10,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 50
+                              },
+                              "text": "//finalize unrecoverable trigger instances"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 11,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 79
+                              },
+                              "text": "// the following situation would cause trigger instances unrecoverable:"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 12,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 78
+                              },
+                              "text": "// 1. project A with flow A associated with flow trigger A is uploaded"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 13,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 42
+                              },
+                              "text": "// 2. flow trigger A starts to run"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 14,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 72
+                              },
+                              "text": "// 3. project A with flow B without any flow trigger is uploaded"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 15,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 33
+                              },
+                              "text": "// 4. web server restarts"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 16,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 93
+                              },
+                              "text": "// in this case, flow trigger instance of flow trigger A will be equipped with latest"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 17,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 96
+                              },
+                              "text": "// project, thus failing to find the flow trigger since new project doesn't contain flow"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 18,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 25
+                              },
+                              "text": "// trigger at all"
+                            },
+                            {
+                              "type": "if_statement",
+                              "start": {
+                                "row": 19,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 9
+                              },
+                              "text": "if (isDoneButFlowNotExecuted(triggerInstance)) {\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        } else {\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }",
+                              "children": [
+                                {
+                                  "type": "if",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 10
+                                  },
+                                  "text": "if"
+                                },
+                                {
+                                  "type": "condition",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 54
+                                  },
+                                  "text": "(isDoneButFlowNotExecuted(triggerInstance))",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 11
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 12
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "method_invocation",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 53
+                                      },
+                                      "text": "isDoneButFlowNotExecuted(triggerInstance)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 36
+                                          },
+                                          "text": "isDoneButFlowNotExecuted"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 53
+                                          },
+                                          "text": "(triggerInstance)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 37
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 52
+                                              },
+                                              "text": "triggerInstance"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 52
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 53
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 54
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 9
+                                  },
+                                  "text": "{\n          triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);\n          this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);\n        }",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 55
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 56
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 66
+                                      },
+                                      "text": "triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID);",
+                                      "children": [
+                                        {
+                                          "type": "method_invocation",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 65
+                                          },
+                                          "text": "triggerInstance.setFlowExecId(Constants.FAILED_EXEC_ID)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 10
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 25
+                                              },
+                                              "text": "triggerInstance"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 25
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 26
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 39
+                                              },
+                                              "text": "setFlowExecId"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 39
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 65
+                                              },
+                                              "text": "(Constants.FAILED_EXEC_ID)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 39
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 40
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "field_access",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 40
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 64
+                                                  },
+                                                  "text": "Constants.FAILED_EXEC_ID",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 40
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 49
+                                                      },
+                                                      "text": "Constants"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 49
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 50
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 50
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 64
+                                                      },
+                                                      "text": "FAILED_EXEC_ID"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 64
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 65
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ";",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 65
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 66
+                                          },
+                                          "text": ";"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 85
+                                      },
+                                      "text": "this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance);",
+                                      "children": [
+                                        {
+                                          "type": "method_invocation",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 21,
+                                            "column": 84
+                                          },
+                                          "text": "this.flowTriggerInstanceLoader.updateAssociatedFlowExecId(triggerInstance)",
+                                          "children": [
+                                            {
+                                              "type": "field_access",
+                                              "start": {
+                                                "row": 21,
+                                                "column": 10
+                                              },
+                                              "end": {
+                                                "row": 21,
+                                                "column": 40
+                                              },
+                                              "text": "this.flowTriggerInstanceLoader",
+                                              "children": [
+                                                {
+                                                  "type": "this",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 10
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 14
+                                                  },
+                                                  "text": "this"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 15
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 15
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 40
+                                                  },
+                                                  "text": "flowTriggerInstanceLoader"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 21,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 21,
+                                                "column": 41
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 21,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 21,
+                                                "column": 67
+                                              },
+                                              "text": "updateAssociatedFlowExecId"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 21,
+                                                "column": 67
+                                              },
+                                              "end": {
+                                                "row": 21,
+                                                "column": 84
+                                              },
+                                              "text": "(triggerInstance)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 67
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 68
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 68
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 83
+                                                  },
+                                                  "text": "triggerInstance"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 83
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 84
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ";",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 84
+                                          },
+                                          "end": {
+                                            "row": 21,
+                                            "column": 85
+                                          },
+                                          "text": ";"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 9
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "else",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 14
+                                  },
+                                  "text": "else"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 9
+                                  },
+                                  "text": "{\n          for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }\n        }",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 16
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "enhanced_for_statement",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 11
+                                      },
+                                      "text": "for (final DependencyInstance depInst : triggerInstance.getDepInstances()) {\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }",
+                                      "children": [
+                                        {
+                                          "type": "for",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 13
+                                          },
+                                          "text": "for"
+                                        },
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 15
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "modifiers",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 20
+                                          },
+                                          "text": "final",
+                                          "children": [
+                                            {
+                                              "type": "final",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 15
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 20
+                                              },
+                                              "text": "final"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "type_identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 39
+                                          },
+                                          "text": "DependencyInstance"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 47
+                                          },
+                                          "text": "depInst"
+                                        },
+                                        {
+                                          "type": ":",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 49
+                                          },
+                                          "text": ":"
+                                        },
+                                        {
+                                          "type": "method_invocation",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 83
+                                          },
+                                          "text": "triggerInstance.getDepInstances()",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 50
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 65
+                                              },
+                                              "text": "triggerInstance"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 65
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 66
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 66
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 81
+                                              },
+                                              "text": "getDepInstances"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 81
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 83
+                                              },
+                                              "text": "()",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 23,
+                                                    "column": 81
+                                                  },
+                                                  "end": {
+                                                    "row": 23,
+                                                    "column": 82
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 23,
+                                                    "column": 82
+                                                  },
+                                                  "end": {
+                                                    "row": 23,
+                                                    "column": 83
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 83
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 84
+                                          },
+                                          "text": ")"
+                                        },
+                                        {
+                                          "type": "block",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 85
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 11
+                                          },
+                                          "text": "{\n            if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }\n          }",
+                                          "children": [
+                                            {
+                                              "type": "{",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 85
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 86
+                                              },
+                                              "text": "{"
+                                            },
+                                            {
+                                              "type": "if_statement",
+                                              "start": {
+                                                "row": 24,
+                                                "column": 12
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 13
+                                              },
+                                              "text": "if (!Status.isDone(depInst.getStatus())) {\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }",
+                                              "children": [
+                                                {
+                                                  "type": "if",
+                                                  "start": {
+                                                    "row": 24,
+                                                    "column": 12
+                                                  },
+                                                  "end": {
+                                                    "row": 24,
+                                                    "column": 14
+                                                  },
+                                                  "text": "if"
+                                                },
+                                                {
+                                                  "type": "condition",
+                                                  "start": {
+                                                    "row": 24,
+                                                    "column": 15
+                                                  },
+                                                  "end": {
+                                                    "row": 24,
+                                                    "column": 52
+                                                  },
+                                                  "text": "(!Status.isDone(depInst.getStatus()))",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 15
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 16
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "unary_expression",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 51
+                                                      },
+                                                      "text": "!Status.isDone(depInst.getStatus())",
+                                                      "children": [
+                                                        {
+                                                          "type": "!",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 16
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 17
+                                                          },
+                                                          "text": "!"
+                                                        },
+                                                        {
+                                                          "type": "method_invocation",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 17
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 51
+                                                          },
+                                                          "text": "Status.isDone(depInst.getStatus())",
+                                                          "children": [
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 17
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 23
+                                                              },
+                                                              "text": "Status"
+                                                            },
+                                                            {
+                                                              "type": ".",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 23
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 24
+                                                              },
+                                                              "text": "."
+                                                            },
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 24
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 30
+                                                              },
+                                                              "text": "isDone"
+                                                            },
+                                                            {
+                                                              "type": "argument_list",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 30
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 51
+                                                              },
+                                                              "text": "(depInst.getStatus())",
+                                                              "children": [
+                                                                {
+                                                                  "type": "(",
+                                                                  "start": {
+                                                                    "row": 24,
+                                                                    "column": 30
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 24,
+                                                                    "column": 31
+                                                                  },
+                                                                  "text": "("
+                                                                },
+                                                                {
+                                                                  "type": "method_invocation",
+                                                                  "start": {
+                                                                    "row": 24,
+                                                                    "column": 31
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 24,
+                                                                    "column": 50
+                                                                  },
+                                                                  "text": "depInst.getStatus()",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 31
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 38
+                                                                      },
+                                                                      "text": "depInst"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 38
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 39
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 39
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 48
+                                                                      },
+                                                                      "text": "getStatus"
+                                                                    },
+                                                                    {
+                                                                      "type": "argument_list",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 48
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 50
+                                                                      },
+                                                                      "text": "()",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "(",
+                                                                          "start": {
+                                                                            "row": 24,
+                                                                            "column": 48
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 24,
+                                                                            "column": 49
+                                                                          },
+                                                                          "text": "("
+                                                                        },
+                                                                        {
+                                                                          "type": ")",
+                                                                          "start": {
+                                                                            "row": 24,
+                                                                            "column": 49
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 24,
+                                                                            "column": 50
+                                                                          },
+                                                                          "text": ")"
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ")",
+                                                                  "start": {
+                                                                    "row": 24,
+                                                                    "column": 50
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 24,
+                                                                    "column": 51
+                                                                  },
+                                                                  "text": ")"
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 51
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 52
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "block",
+                                                  "start": {
+                                                    "row": 24,
+                                                    "column": 53
+                                                  },
+                                                  "end": {
+                                                    "row": 28,
+                                                    "column": 13
+                                                  },
+                                                  "text": "{\n              processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);\n              this.triggerProcessor.processTermination(depInst.getTriggerInstance());\n            }",
+                                                  "children": [
+                                                    {
+                                                      "type": "{",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 53
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 54
+                                                      },
+                                                      "text": "{"
+                                                    },
+                                                    {
+                                                      "type": "expression_statement",
+                                                      "start": {
+                                                        "row": 25,
+                                                        "column": 14
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 45
+                                                      },
+                                                      "text": "processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE);",
+                                                      "children": [
+                                                        {
+                                                          "type": "method_invocation",
+                                                          "start": {
+                                                            "row": 25,
+                                                            "column": 14
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 44
+                                                          },
+                                                          "text": "processStatusAndCancelCauseUpdate(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE)",
+                                                          "children": [
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 25,
+                                                                "column": 14
+                                                              },
+                                                              "end": {
+                                                                "row": 25,
+                                                                "column": 47
+                                                              },
+                                                              "text": "processStatusAndCancelCauseUpdate"
+                                                            },
+                                                            {
+                                                              "type": "argument_list",
+                                                              "start": {
+                                                                "row": 25,
+                                                                "column": 47
+                                                              },
+                                                              "end": {
+                                                                "row": 26,
+                                                                "column": 44
+                                                              },
+                                                              "text": "(depInst, Status.CANCELLED,\n                  CancellationCause.FAILURE)",
+                                                              "children": [
+                                                                {
+                                                                  "type": "(",
+                                                                  "start": {
+                                                                    "row": 25,
+                                                                    "column": 47
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 25,
+                                                                    "column": 48
+                                                                  },
+                                                                  "text": "("
+                                                                },
+                                                                {
+                                                                  "type": "identifier",
+                                                                  "start": {
+                                                                    "row": 25,
+                                                                    "column": 48
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 25,
+                                                                    "column": 55
+                                                                  },
+                                                                  "text": "depInst"
+                                                                },
+                                                                {
+                                                                  "type": ",",
+                                                                  "start": {
+                                                                    "row": 25,
+                                                                    "column": 55
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 25,
+                                                                    "column": 56
+                                                                  },
+                                                                  "text": ","
+                                                                },
+                                                                {
+                                                                  "type": "field_access",
+                                                                  "start": {
+                                                                    "row": 25,
+                                                                    "column": 57
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 25,
+                                                                    "column": 73
+                                                                  },
+                                                                  "text": "Status.CANCELLED",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 25,
+                                                                        "column": 57
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 25,
+                                                                        "column": 63
+                                                                      },
+                                                                      "text": "Status"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 25,
+                                                                        "column": 63
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 25,
+                                                                        "column": 64
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 25,
+                                                                        "column": 64
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 25,
+                                                                        "column": 73
+                                                                      },
+                                                                      "text": "CANCELLED"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ",",
+                                                                  "start": {
+                                                                    "row": 25,
+                                                                    "column": 73
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 25,
+                                                                    "column": 74
+                                                                  },
+                                                                  "text": ","
+                                                                },
+                                                                {
+                                                                  "type": "field_access",
+                                                                  "start": {
+                                                                    "row": 26,
+                                                                    "column": 18
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 26,
+                                                                    "column": 43
+                                                                  },
+                                                                  "text": "CancellationCause.FAILURE",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 26,
+                                                                        "column": 18
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 26,
+                                                                        "column": 35
+                                                                      },
+                                                                      "text": "CancellationCause"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 26,
+                                                                        "column": 35
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 26,
+                                                                        "column": 36
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 26,
+                                                                        "column": 36
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 26,
+                                                                        "column": 43
+                                                                      },
+                                                                      "text": "FAILURE"
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ")",
+                                                                  "start": {
+                                                                    "row": 26,
+                                                                    "column": 43
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 26,
+                                                                    "column": 44
+                                                                  },
+                                                                  "text": ")"
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": ";",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 44
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 45
+                                                          },
+                                                          "text": ";"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "expression_statement",
+                                                      "start": {
+                                                        "row": 27,
+                                                        "column": 14
+                                                      },
+                                                      "end": {
+                                                        "row": 27,
+                                                        "column": 85
+                                                      },
+                                                      "text": "this.triggerProcessor.processTermination(depInst.getTriggerInstance());",
+                                                      "children": [
+                                                        {
+                                                          "type": "method_invocation",
+                                                          "start": {
+                                                            "row": 27,
+                                                            "column": 14
+                                                          },
+                                                          "end": {
+                                                            "row": 27,
+                                                            "column": 84
+                                                          },
+                                                          "text": "this.triggerProcessor.processTermination(depInst.getTriggerInstance())",
+                                                          "children": [
+                                                            {
+                                                              "type": "field_access",
+                                                              "start": {
+                                                                "row": 27,
+                                                                "column": 14
+                                                              },
+                                                              "end": {
+                                                                "row": 27,
+                                                                "column": 35
+                                                              },
+                                                              "text": "this.triggerProcessor",
+                                                              "children": [
+                                                                {
+                                                                  "type": "this",
+                                                                  "start": {
+                                                                    "row": 27,
+                                                                    "column": 14
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 27,
+                                                                    "column": 18
+                                                                  },
+                                                                  "text": "this"
+                                                                },
+                                                                {
+                                                                  "type": ".",
+                                                                  "start": {
+                                                                    "row": 27,
+                                                                    "column": 18
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 27,
+                                                                    "column": 19
+                                                                  },
+                                                                  "text": "."
+                                                                },
+                                                                {
+                                                                  "type": "identifier",
+                                                                  "start": {
+                                                                    "row": 27,
+                                                                    "column": 19
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 27,
+                                                                    "column": 35
+                                                                  },
+                                                                  "text": "triggerProcessor"
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": ".",
+                                                              "start": {
+                                                                "row": 27,
+                                                                "column": 35
+                                                              },
+                                                              "end": {
+                                                                "row": 27,
+                                                                "column": 36
+                                                              },
+                                                              "text": "."
+                                                            },
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 27,
+                                                                "column": 36
+                                                              },
+                                                              "end": {
+                                                                "row": 27,
+                                                                "column": 54
+                                                              },
+                                                              "text": "processTermination"
+                                                            },
+                                                            {
+                                                              "type": "argument_list",
+                                                              "start": {
+                                                                "row": 27,
+                                                                "column": 54
+                                                              },
+                                                              "end": {
+                                                                "row": 27,
+                                                                "column": 84
+                                                              },
+                                                              "text": "(depInst.getTriggerInstance())",
+                                                              "children": [
+                                                                {
+                                                                  "type": "(",
+                                                                  "start": {
+                                                                    "row": 27,
+                                                                    "column": 54
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 27,
+                                                                    "column": 55
+                                                                  },
+                                                                  "text": "("
+                                                                },
+                                                                {
+                                                                  "type": "method_invocation",
+                                                                  "start": {
+                                                                    "row": 27,
+                                                                    "column": 55
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 27,
+                                                                    "column": 83
+                                                                  },
+                                                                  "text": "depInst.getTriggerInstance()",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 27,
+                                                                        "column": 55
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 27,
+                                                                        "column": 62
+                                                                      },
+                                                                      "text": "depInst"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 27,
+                                                                        "column": 62
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 27,
+                                                                        "column": 63
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 27,
+                                                                        "column": 63
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 27,
+                                                                        "column": 81
+                                                                      },
+                                                                      "text": "getTriggerInstance"
+                                                                    },
+                                                                    {
+                                                                      "type": "argument_list",
+                                                                      "start": {
+                                                                        "row": 27,
+                                                                        "column": 81
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 27,
+                                                                        "column": 83
+                                                                      },
+                                                                      "text": "()",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "(",
+                                                                          "start": {
+                                                                            "row": 27,
+                                                                            "column": 81
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 27,
+                                                                            "column": 82
+                                                                          },
+                                                                          "text": "("
+                                                                        },
+                                                                        {
+                                                                          "type": ")",
+                                                                          "start": {
+                                                                            "row": 27,
+                                                                            "column": 82
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 27,
+                                                                            "column": 83
+                                                                          },
+                                                                          "text": ")"
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ")",
+                                                                  "start": {
+                                                                    "row": 27,
+                                                                    "column": 83
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 27,
+                                                                    "column": 84
+                                                                  },
+                                                                  "text": ")"
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": ";",
+                                                          "start": {
+                                                            "row": 27,
+                                                            "column": 84
+                                                          },
+                                                          "end": {
+                                                            "row": 27,
+                                                            "column": 85
+                                                          },
+                                                          "text": ";"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "}",
+                                                      "start": {
+                                                        "row": 28,
+                                                        "column": 12
+                                                      },
+                                                      "end": {
+                                                        "row": 28,
+                                                        "column": 13
+                                                      },
+                                                      "text": "}"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "}",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 10
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 11
+                                              },
+                                              "text": "}"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 9
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 31,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 7
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 32,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 5
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "}",
+              "start": {
+                "row": 33,
+                "column": 2
+              },
+              "end": {
+                "row": 33,
+                "column": 3
+              },
+              "text": "}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

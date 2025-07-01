@@ -1,0 +1,3160 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 71,
+    "column": 9
+  },
+  "text": "def run_pipeline(self, pipeline, start_date, end_date):\n        \"\"\"\n        Compute a pipeline.\n\n        Parameters\n        ----------\n        pipeline : zipline.pipeline.Pipeline\n            The pipeline to run.\n        start_date : pd.Timestamp\n            Start date of the computed matrix.\n        end_date : pd.Timestamp\n            End date of the computed matrix.\n\n        Returns\n        -------\n        result : pd.DataFrame\n            A frame of computed results.\n\n            The ``result`` columns correspond to the entries of\n            `pipeline.columns`, which should be a dictionary mapping strings to\n            instances of :class:`zipline.pipeline.term.Term`.\n\n            For each date between ``start_date`` and ``end_date``, ``result``\n            will contain a row for each asset that passed `pipeline.screen`.\n            A screen of ``None`` indicates that a row should be returned for\n            each asset that existed each day.\n\n        See Also\n        --------\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_pipeline`\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_chunked_pipeline`\n        \"\"\"\n        # See notes at the top of this module for a description of the\n        # algorithm implemented here.\n        if end_date < start_date:\n            raise ValueError(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )\n\n        domain = self.resolve_domain(pipeline)\n\n        graph = pipeline.to_execution_plan(\n            domain, self._root_mask_term, start_date, end_date,\n        )\n        extra_rows = graph.extra_rows[self._root_mask_term]\n        root_mask = self._compute_root_mask(\n            domain, start_date, end_date, extra_rows,\n        )\n        dates, assets, root_mask_values = explode(root_mask)\n\n        initial_workspace = self._populate_initial_workspace(\n            {\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            },\n            self._root_mask_term,\n            graph,\n            dates,\n            assets,\n        )\n\n        results = self.compute_chunk(graph, dates, assets, initial_workspace)\n\n        return self._to_narrow(\n            graph.outputs,\n            results,\n            results.pop(graph.screen_name),\n            dates[extra_rows:],\n            assets,\n        )",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 71,
+        "column": 9
+      },
+      "text": "def run_pipeline(self, pipeline, start_date, end_date):\n        \"\"\"\n        Compute a pipeline.\n\n        Parameters\n        ----------\n        pipeline : zipline.pipeline.Pipeline\n            The pipeline to run.\n        start_date : pd.Timestamp\n            Start date of the computed matrix.\n        end_date : pd.Timestamp\n            End date of the computed matrix.\n\n        Returns\n        -------\n        result : pd.DataFrame\n            A frame of computed results.\n\n            The ``result`` columns correspond to the entries of\n            `pipeline.columns`, which should be a dictionary mapping strings to\n            instances of :class:`zipline.pipeline.term.Term`.\n\n            For each date between ``start_date`` and ``end_date``, ``result``\n            will contain a row for each asset that passed `pipeline.screen`.\n            A screen of ``None`` indicates that a row should be returned for\n            each asset that existed each day.\n\n        See Also\n        --------\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_pipeline`\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_chunked_pipeline`\n        \"\"\"\n        # See notes at the top of this module for a description of the\n        # algorithm implemented here.\n        if end_date < start_date:\n            raise ValueError(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )\n\n        domain = self.resolve_domain(pipeline)\n\n        graph = pipeline.to_execution_plan(\n            domain, self._root_mask_term, start_date, end_date,\n        )\n        extra_rows = graph.extra_rows[self._root_mask_term]\n        root_mask = self._compute_root_mask(\n            domain, start_date, end_date, extra_rows,\n        )\n        dates, assets, root_mask_values = explode(root_mask)\n\n        initial_workspace = self._populate_initial_workspace(\n            {\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            },\n            self._root_mask_term,\n            graph,\n            dates,\n            assets,\n        )\n\n        results = self.compute_chunk(graph, dates, assets, initial_workspace)\n\n        return self._to_narrow(\n            graph.outputs,\n            results,\n            results.pop(graph.screen_name),\n            dates[extra_rows:],\n            assets,\n        )",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 16
+          },
+          "text": "run_pipeline"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 16
+          },
+          "end": {
+            "row": 0,
+            "column": 54
+          },
+          "text": "(self, pipeline, start_date, end_date)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 16
+              },
+              "end": {
+                "row": 0,
+                "column": 17
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 17
+              },
+              "end": {
+                "row": 0,
+                "column": 21
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 21
+              },
+              "end": {
+                "row": 0,
+                "column": 22
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 23
+              },
+              "end": {
+                "row": 0,
+                "column": 31
+              },
+              "text": "pipeline"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 31
+              },
+              "end": {
+                "row": 0,
+                "column": 32
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 33
+              },
+              "end": {
+                "row": 0,
+                "column": 43
+              },
+              "text": "start_date"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 43
+              },
+              "end": {
+                "row": 0,
+                "column": 44
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 45
+              },
+              "end": {
+                "row": 0,
+                "column": 53
+              },
+              "text": "end_date"
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 53
+              },
+              "end": {
+                "row": 0,
+                "column": 54
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 54
+          },
+          "end": {
+            "row": 0,
+            "column": 55
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 8
+          },
+          "end": {
+            "row": 71,
+            "column": 9
+          },
+          "text": "\"\"\"\n        Compute a pipeline.\n\n        Parameters\n        ----------\n        pipeline : zipline.pipeline.Pipeline\n            The pipeline to run.\n        start_date : pd.Timestamp\n            Start date of the computed matrix.\n        end_date : pd.Timestamp\n            End date of the computed matrix.\n\n        Returns\n        -------\n        result : pd.DataFrame\n            A frame of computed results.\n\n            The ``result`` columns correspond to the entries of\n            `pipeline.columns`, which should be a dictionary mapping strings to\n            instances of :class:`zipline.pipeline.term.Term`.\n\n            For each date between ``start_date`` and ``end_date``, ``result``\n            will contain a row for each asset that passed `pipeline.screen`.\n            A screen of ``None`` indicates that a row should be returned for\n            each asset that existed each day.\n\n        See Also\n        --------\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_pipeline`\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_chunked_pipeline`\n        \"\"\"\n        # See notes at the top of this module for a description of the\n        # algorithm implemented here.\n        if end_date < start_date:\n            raise ValueError(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )\n\n        domain = self.resolve_domain(pipeline)\n\n        graph = pipeline.to_execution_plan(\n            domain, self._root_mask_term, start_date, end_date,\n        )\n        extra_rows = graph.extra_rows[self._root_mask_term]\n        root_mask = self._compute_root_mask(\n            domain, start_date, end_date, extra_rows,\n        )\n        dates, assets, root_mask_values = explode(root_mask)\n\n        initial_workspace = self._populate_initial_workspace(\n            {\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            },\n            self._root_mask_term,\n            graph,\n            dates,\n            assets,\n        )\n\n        results = self.compute_chunk(graph, dates, assets, initial_workspace)\n\n        return self._to_narrow(\n            graph.outputs,\n            results,\n            results.pop(graph.screen_name),\n            dates[extra_rows:],\n            assets,\n        )",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 31,
+                "column": 11
+              },
+              "text": "\"\"\"\n        Compute a pipeline.\n\n        Parameters\n        ----------\n        pipeline : zipline.pipeline.Pipeline\n            The pipeline to run.\n        start_date : pd.Timestamp\n            Start date of the computed matrix.\n        end_date : pd.Timestamp\n            End date of the computed matrix.\n\n        Returns\n        -------\n        result : pd.DataFrame\n            A frame of computed results.\n\n            The ``result`` columns correspond to the entries of\n            `pipeline.columns`, which should be a dictionary mapping strings to\n            instances of :class:`zipline.pipeline.term.Term`.\n\n            For each date between ``start_date`` and ``end_date``, ``result``\n            will contain a row for each asset that passed `pipeline.screen`.\n            A screen of ``None`` indicates that a row should be returned for\n            each asset that existed each day.\n\n        See Also\n        --------\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_pipeline`\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_chunked_pipeline`\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 11
+                  },
+                  "text": "\"\"\"\n        Compute a pipeline.\n\n        Parameters\n        ----------\n        pipeline : zipline.pipeline.Pipeline\n            The pipeline to run.\n        start_date : pd.Timestamp\n            Start date of the computed matrix.\n        end_date : pd.Timestamp\n            End date of the computed matrix.\n\n        Returns\n        -------\n        result : pd.DataFrame\n            A frame of computed results.\n\n            The ``result`` columns correspond to the entries of\n            `pipeline.columns`, which should be a dictionary mapping strings to\n            instances of :class:`zipline.pipeline.term.Term`.\n\n            For each date between ``start_date`` and ``end_date``, ``result``\n            will contain a row for each asset that passed `pipeline.screen`.\n            A screen of ``None`` indicates that a row should be returned for\n            each asset that existed each day.\n\n        See Also\n        --------\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_pipeline`\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_chunked_pipeline`\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "text": "\n        Compute a pipeline.\n\n        Parameters\n        ----------\n        pipeline : zipline.pipeline.Pipeline\n            The pipeline to run.\n        start_date : pd.Timestamp\n            Start date of the computed matrix.\n        end_date : pd.Timestamp\n            End date of the computed matrix.\n\n        Returns\n        -------\n        result : pd.DataFrame\n            A frame of computed results.\n\n            The ``result`` columns correspond to the entries of\n            `pipeline.columns`, which should be a dictionary mapping strings to\n            instances of :class:`zipline.pipeline.term.Term`.\n\n            For each date between ``start_date`` and ``end_date``, ``result``\n            will contain a row for each asset that passed `pipeline.screen`.\n            A screen of ``None`` indicates that a row should be returned for\n            each asset that existed each day.\n\n        See Also\n        --------\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_pipeline`\n        :meth:`zipline.pipeline.engine.PipelineEngine.run_chunked_pipeline`\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 32,
+                "column": 8
+              },
+              "end": {
+                "row": 32,
+                "column": 70
+              },
+              "text": "# See notes at the top of this module for a description of the"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 33,
+                "column": 8
+              },
+              "end": {
+                "row": 33,
+                "column": 37
+              },
+              "text": "# algorithm implemented here."
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 34,
+                "column": 8
+              },
+              "end": {
+                "row": 39,
+                "column": 13
+              },
+              "text": "if end_date < start_date:\n            raise ValueError(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 34,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 34,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 32
+                  },
+                  "text": "end_date < start_date",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 34,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 19
+                      },
+                      "text": "end_date"
+                    },
+                    {
+                      "type": "<",
+                      "start": {
+                        "row": 34,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 21
+                      },
+                      "text": "<"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 34,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 32
+                      },
+                      "text": "start_date"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 34,
+                    "column": 32
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 33
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 35,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 13
+                  },
+                  "text": "raise ValueError(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 35,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 13
+                      },
+                      "text": "raise ValueError(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 35,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 17
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 35,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 13
+                          },
+                          "text": "ValueError(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 35,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 28
+                              },
+                              "text": "ValueError"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 35,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 13
+                              },
+                              "text": "(\n                \"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)\n\n            )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 29
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "binary_operator",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 69
+                                  },
+                                  "text": "\"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\" % (start_date, end_date)",
+                                  "children": [
+                                    {
+                                      "type": "concatenated_string",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 44
+                                      },
+                                      "text": "\"start_date must be before or equal to end_date \\n\"\n                \"start_date=%s, end_date=%s\"",
+                                      "children": [
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 67
+                                          },
+                                          "text": "\"start_date must be before or equal to end_date \\n\"",
+                                          "children": [
+                                            {
+                                              "type": "string_start",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 17
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 66
+                                              },
+                                              "text": "start_date must be before or equal to end_date \\n",
+                                              "children": [
+                                                {
+                                                  "type": "escape_sequence",
+                                                  "start": {
+                                                    "row": 36,
+                                                    "column": 64
+                                                  },
+                                                  "end": {
+                                                    "row": 36,
+                                                    "column": 66
+                                                  },
+                                                  "text": "\\n"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "string_end",
+                                              "start": {
+                                                "row": 36,
+                                                "column": 66
+                                              },
+                                              "end": {
+                                                "row": 36,
+                                                "column": 67
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 44
+                                          },
+                                          "text": "\"start_date=%s, end_date=%s\"",
+                                          "children": [
+                                            {
+                                              "type": "string_start",
+                                              "start": {
+                                                "row": 37,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 37,
+                                                "column": 17
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 37,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 37,
+                                                "column": 43
+                                              },
+                                              "text": "start_date=%s, end_date=%s"
+                                            },
+                                            {
+                                              "type": "string_end",
+                                              "start": {
+                                                "row": 37,
+                                                "column": 43
+                                              },
+                                              "end": {
+                                                "row": 37,
+                                                "column": 44
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "%",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 46
+                                      },
+                                      "text": "%"
+                                    },
+                                    {
+                                      "type": "tuple",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 69
+                                      },
+                                      "text": "(start_date, end_date)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 48
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 58
+                                          },
+                                          "text": "start_date"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 58
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 59
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 60
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 68
+                                          },
+                                          "text": "end_date"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 68
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 69
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 13
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 41,
+                "column": 8
+              },
+              "end": {
+                "row": 41,
+                "column": 46
+              },
+              "text": "domain = self.resolve_domain(pipeline)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 41,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 41,
+                    "column": 46
+                  },
+                  "text": "domain = self.resolve_domain(pipeline)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 41,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 14
+                      },
+                      "text": "domain"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 41,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 16
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 41,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 46
+                      },
+                      "text": "self.resolve_domain(pipeline)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 41,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 36
+                          },
+                          "text": "self.resolve_domain",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 41,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 21
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 41,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 22
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 41,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 36
+                              },
+                              "text": "resolve_domain"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 41,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 46
+                          },
+                          "text": "(pipeline)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 41,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 37
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 41,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 45
+                              },
+                              "text": "pipeline"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 41,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 46
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 43,
+                "column": 8
+              },
+              "end": {
+                "row": 45,
+                "column": 9
+              },
+              "text": "graph = pipeline.to_execution_plan(\n            domain, self._root_mask_term, start_date, end_date,\n        )",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 43,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 45,
+                    "column": 9
+                  },
+                  "text": "graph = pipeline.to_execution_plan(\n            domain, self._root_mask_term, start_date, end_date,\n        )",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 43,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 13
+                      },
+                      "text": "graph"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 43,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 43,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 9
+                      },
+                      "text": "pipeline.to_execution_plan(\n            domain, self._root_mask_term, start_date, end_date,\n        )",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 43,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 42
+                          },
+                          "text": "pipeline.to_execution_plan",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 43,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 24
+                              },
+                              "text": "pipeline"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 43,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 25
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 43,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 42
+                              },
+                              "text": "to_execution_plan"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 43,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 9
+                          },
+                          "text": "(\n            domain, self._root_mask_term, start_date, end_date,\n        )",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 43,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 43
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 18
+                              },
+                              "text": "domain"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 44,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 19
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 44,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 40
+                              },
+                              "text": "self._root_mask_term",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 24
+                                  },
+                                  "text": "self"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 25
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 40
+                                  },
+                                  "text": "_root_mask_term"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 44,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 41
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 52
+                              },
+                              "text": "start_date"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 44,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 53
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 54
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 62
+                              },
+                              "text": "end_date"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 44,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 63
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 45,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 9
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 46,
+                "column": 8
+              },
+              "end": {
+                "row": 46,
+                "column": 59
+              },
+              "text": "extra_rows = graph.extra_rows[self._root_mask_term]",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 46,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 59
+                  },
+                  "text": "extra_rows = graph.extra_rows[self._root_mask_term]",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 46,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 18
+                      },
+                      "text": "extra_rows"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 46,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 20
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "subscript",
+                      "start": {
+                        "row": 46,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 59
+                      },
+                      "text": "graph.extra_rows[self._root_mask_term]",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 46,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 37
+                          },
+                          "text": "graph.extra_rows",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 26
+                              },
+                              "text": "graph"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 46,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 27
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 37
+                              },
+                              "text": "extra_rows"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 46,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 38
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 46,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 58
+                          },
+                          "text": "self._root_mask_term",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 42
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 46,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 43
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 58
+                              },
+                              "text": "_root_mask_term"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 46,
+                            "column": 58
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 59
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 47,
+                "column": 8
+              },
+              "end": {
+                "row": 49,
+                "column": 9
+              },
+              "text": "root_mask = self._compute_root_mask(\n            domain, start_date, end_date, extra_rows,\n        )",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 47,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 9
+                  },
+                  "text": "root_mask = self._compute_root_mask(\n            domain, start_date, end_date, extra_rows,\n        )",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 47,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 17
+                      },
+                      "text": "root_mask"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 47,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 19
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 47,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 49,
+                        "column": 9
+                      },
+                      "text": "self._compute_root_mask(\n            domain, start_date, end_date, extra_rows,\n        )",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 47,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 43
+                          },
+                          "text": "self._compute_root_mask",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 47,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 24
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 47,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 25
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 47,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 43
+                              },
+                              "text": "_compute_root_mask"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 47,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 9
+                          },
+                          "text": "(\n            domain, start_date, end_date, extra_rows,\n        )",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 47,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 44
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 48,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 18
+                              },
+                              "text": "domain"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 48,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 19
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 48,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 30
+                              },
+                              "text": "start_date"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 48,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 31
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 48,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 40
+                              },
+                              "text": "end_date"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 48,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 41
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 48,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 52
+                              },
+                              "text": "extra_rows"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 48,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 53
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 49,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 49,
+                                "column": 9
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 50,
+                "column": 8
+              },
+              "end": {
+                "row": 50,
+                "column": 60
+              },
+              "text": "dates, assets, root_mask_values = explode(root_mask)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 50,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 60
+                  },
+                  "text": "dates, assets, root_mask_values = explode(root_mask)",
+                  "children": [
+                    {
+                      "type": "pattern_list",
+                      "start": {
+                        "row": 50,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 39
+                      },
+                      "text": "dates, assets, root_mask_values",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 13
+                          },
+                          "text": "dates"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 50,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 14
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 21
+                          },
+                          "text": "assets"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 50,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 22
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 39
+                          },
+                          "text": "root_mask_values"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 50,
+                        "column": 40
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 41
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 50,
+                        "column": 42
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 60
+                      },
+                      "text": "explode(root_mask)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 49
+                          },
+                          "text": "explode"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 50,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 60
+                          },
+                          "text": "(root_mask)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 50,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 50
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 50,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 59
+                              },
+                              "text": "root_mask"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 50,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 60
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 52,
+                "column": 8
+              },
+              "end": {
+                "row": 61,
+                "column": 9
+              },
+              "text": "initial_workspace = self._populate_initial_workspace(\n            {\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            },\n            self._root_mask_term,\n            graph,\n            dates,\n            assets,\n        )",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 52,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 61,
+                    "column": 9
+                  },
+                  "text": "initial_workspace = self._populate_initial_workspace(\n            {\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            },\n            self._root_mask_term,\n            graph,\n            dates,\n            assets,\n        )",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 52,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 25
+                      },
+                      "text": "initial_workspace"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 52,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 27
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 52,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 61,
+                        "column": 9
+                      },
+                      "text": "self._populate_initial_workspace(\n            {\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            },\n            self._root_mask_term,\n            graph,\n            dates,\n            assets,\n        )",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 52,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 60
+                          },
+                          "text": "self._populate_initial_workspace",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 52,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 32
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 52,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 33
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 52,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 60
+                              },
+                              "text": "_populate_initial_workspace"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 52,
+                            "column": 60
+                          },
+                          "end": {
+                            "row": 61,
+                            "column": 9
+                          },
+                          "text": "(\n            {\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            },\n            self._root_mask_term,\n            graph,\n            dates,\n            assets,\n        )",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 52,
+                                "column": 60
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 61
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "dictionary",
+                              "start": {
+                                "row": 53,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 13
+                              },
+                              "text": "{\n                self._root_mask_term: root_mask_values,\n                self._root_mask_dates_term: as_column(dates.values)\n            }",
+                              "children": [
+                                {
+                                  "type": "{",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 13
+                                  },
+                                  "text": "{"
+                                },
+                                {
+                                  "type": "pair",
+                                  "start": {
+                                    "row": 54,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 54
+                                  },
+                                  "text": "self._root_mask_term: root_mask_values",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 36
+                                      },
+                                      "text": "self._root_mask_term",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 54,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 54,
+                                            "column": 20
+                                          },
+                                          "text": "self"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 54,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 54,
+                                            "column": 21
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 54,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 54,
+                                            "column": 36
+                                          },
+                                          "text": "_root_mask_term"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 37
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 54,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 54,
+                                        "column": 54
+                                      },
+                                      "text": "root_mask_values"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 54,
+                                    "column": 54
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 55
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "pair",
+                                  "start": {
+                                    "row": 55,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 55,
+                                    "column": 67
+                                  },
+                                  "text": "self._root_mask_dates_term: as_column(dates.values)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 55,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 55,
+                                        "column": 42
+                                      },
+                                      "text": "self._root_mask_dates_term",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 55,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 55,
+                                            "column": 20
+                                          },
+                                          "text": "self"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 55,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 55,
+                                            "column": 21
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 55,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 55,
+                                            "column": 42
+                                          },
+                                          "text": "_root_mask_dates_term"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 55,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 55,
+                                        "column": 43
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 55,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 55,
+                                        "column": 67
+                                      },
+                                      "text": "as_column(dates.values)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 55,
+                                            "column": 44
+                                          },
+                                          "end": {
+                                            "row": 55,
+                                            "column": 53
+                                          },
+                                          "text": "as_column"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 55,
+                                            "column": 53
+                                          },
+                                          "end": {
+                                            "row": 55,
+                                            "column": 67
+                                          },
+                                          "text": "(dates.values)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 55,
+                                                "column": 53
+                                              },
+                                              "end": {
+                                                "row": 55,
+                                                "column": 54
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 55,
+                                                "column": 54
+                                              },
+                                              "end": {
+                                                "row": 55,
+                                                "column": 66
+                                              },
+                                              "text": "dates.values",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 55,
+                                                    "column": 54
+                                                  },
+                                                  "end": {
+                                                    "row": 55,
+                                                    "column": 59
+                                                  },
+                                                  "text": "dates"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 55,
+                                                    "column": 59
+                                                  },
+                                                  "end": {
+                                                    "row": 55,
+                                                    "column": 60
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 55,
+                                                    "column": 60
+                                                  },
+                                                  "end": {
+                                                    "row": 55,
+                                                    "column": 66
+                                                  },
+                                                  "text": "values"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 55,
+                                                "column": 66
+                                              },
+                                              "end": {
+                                                "row": 55,
+                                                "column": 67
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 56,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 56,
+                                    "column": 13
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 56,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 14
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 57,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 32
+                              },
+                              "text": "self._root_mask_term",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 16
+                                  },
+                                  "text": "self"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 17
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 32
+                                  },
+                                  "text": "_root_mask_term"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 57,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 33
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 58,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 17
+                              },
+                              "text": "graph"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 58,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 18
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 59,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 59,
+                                "column": 17
+                              },
+                              "text": "dates"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 59,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 59,
+                                "column": 18
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 60,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 60,
+                                "column": 18
+                              },
+                              "text": "assets"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 60,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 60,
+                                "column": 19
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 61,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 61,
+                                "column": 9
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 63,
+                "column": 8
+              },
+              "end": {
+                "row": 63,
+                "column": 77
+              },
+              "text": "results = self.compute_chunk(graph, dates, assets, initial_workspace)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 63,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 63,
+                    "column": 77
+                  },
+                  "text": "results = self.compute_chunk(graph, dates, assets, initial_workspace)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 63,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 63,
+                        "column": 15
+                      },
+                      "text": "results"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 63,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 63,
+                        "column": 17
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 63,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 63,
+                        "column": 77
+                      },
+                      "text": "self.compute_chunk(graph, dates, assets, initial_workspace)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 63,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 63,
+                            "column": 36
+                          },
+                          "text": "self.compute_chunk",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 63,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 22
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 63,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 23
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 63,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 36
+                              },
+                              "text": "compute_chunk"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 63,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 63,
+                            "column": 77
+                          },
+                          "text": "(graph, dates, assets, initial_workspace)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 63,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 37
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 63,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 42
+                              },
+                              "text": "graph"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 63,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 43
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 63,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 49
+                              },
+                              "text": "dates"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 63,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 50
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 63,
+                                "column": 51
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 57
+                              },
+                              "text": "assets"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 63,
+                                "column": 57
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 58
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 63,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 76
+                              },
+                              "text": "initial_workspace"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 63,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 63,
+                                "column": 77
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 65,
+                "column": 8
+              },
+              "end": {
+                "row": 71,
+                "column": 9
+              },
+              "text": "return self._to_narrow(\n            graph.outputs,\n            results,\n            results.pop(graph.screen_name),\n            dates[extra_rows:],\n            assets,\n        )",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 65,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 65,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 65,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 71,
+                    "column": 9
+                  },
+                  "text": "self._to_narrow(\n            graph.outputs,\n            results,\n            results.pop(graph.screen_name),\n            dates[extra_rows:],\n            assets,\n        )",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 65,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 65,
+                        "column": 30
+                      },
+                      "text": "self._to_narrow",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 65,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 19
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 65,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 20
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 65,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 30
+                          },
+                          "text": "_to_narrow"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 65,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 71,
+                        "column": 9
+                      },
+                      "text": "(\n            graph.outputs,\n            results,\n            results.pop(graph.screen_name),\n            dates[extra_rows:],\n            assets,\n        )",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 65,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 31
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 66,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 66,
+                            "column": 25
+                          },
+                          "text": "graph.outputs",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 66,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 17
+                              },
+                              "text": "graph"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 66,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 18
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 66,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 66,
+                                "column": 25
+                              },
+                              "text": "outputs"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 66,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 66,
+                            "column": 26
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 67,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 19
+                          },
+                          "text": "results"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 67,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 20
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 68,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 68,
+                            "column": 42
+                          },
+                          "text": "results.pop(graph.screen_name)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 68,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 68,
+                                "column": 23
+                              },
+                              "text": "results.pop",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 68,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 68,
+                                    "column": 19
+                                  },
+                                  "text": "results"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 68,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 68,
+                                    "column": 20
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 68,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 68,
+                                    "column": 23
+                                  },
+                                  "text": "pop"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 68,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 68,
+                                "column": 42
+                              },
+                              "text": "(graph.screen_name)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 68,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 68,
+                                    "column": 24
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 68,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 68,
+                                    "column": 41
+                                  },
+                                  "text": "graph.screen_name",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 68,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 68,
+                                        "column": 29
+                                      },
+                                      "text": "graph"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 68,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 68,
+                                        "column": 30
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 68,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 68,
+                                        "column": 41
+                                      },
+                                      "text": "screen_name"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 68,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 68,
+                                    "column": 42
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 68,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 68,
+                            "column": 43
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "subscript",
+                          "start": {
+                            "row": 69,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 69,
+                            "column": 30
+                          },
+                          "text": "dates[extra_rows:]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 69,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 17
+                              },
+                              "text": "dates"
+                            },
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 69,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 18
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "slice",
+                              "start": {
+                                "row": 69,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 29
+                              },
+                              "text": "extra_rows:",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 69,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 69,
+                                    "column": 28
+                                  },
+                                  "text": "extra_rows"
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 69,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 69,
+                                    "column": 29
+                                  },
+                                  "text": ":"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 69,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 69,
+                                "column": 30
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 69,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 69,
+                            "column": 31
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 70,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 70,
+                            "column": 18
+                          },
+                          "text": "assets"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 70,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 70,
+                            "column": 19
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 71,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 71,
+                            "column": 9
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

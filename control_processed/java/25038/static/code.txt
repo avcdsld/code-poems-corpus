@@ -1,0 +1,5 @@
+public void completeExceptionally(Throwable ex) {
+        setExceptionalCompletion((ex instanceof RuntimeException) ||
+                                 (ex instanceof Error) ? ex :
+                                 new RuntimeException(ex));
+    }

@@ -1,0 +1,3 @@
+public static <E> BeanHandler<E> create(Class<E> beanType) {
+		return new BeanHandler<E>(beanType);
+	}

@@ -1,0 +1,4 @@
+def _column_resized(self, col, old_width, new_width):
+        """Update the column width."""
+        self.dataTable.setColumnWidth(col, new_width)
+        self._update_layout()

@@ -1,0 +1,14 @@
+public static String complateUrl(String baseUrl, String relativePath) {
+		baseUrl = normalize(baseUrl, false);
+		if (StrUtil.isBlank(baseUrl)) {
+			return null;
+		}
+
+		try {
+			final URL absoluteUrl = new URL(baseUrl);
+			final URL parseUrl = new URL(absoluteUrl, relativePath);
+			return parseUrl.toString();
+		} catch (MalformedURLException e) {
+			throw new UtilException(e);
+		}
+	}

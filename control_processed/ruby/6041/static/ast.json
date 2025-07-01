@@ -1,0 +1,4298 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 30,
+    "column": 7
+  },
+  "text": "def get_async_common(request)\n      fail ValidationError, 'Request cannot be nil' if request.nil?\n\n      request.middlewares = [[MsRest::RetryPolicyMiddleware, times: 3, retry: 0.02], [:cookie_jar]]\n      request.headers.merge!({'x-ms-client-request-id' => SecureRandom.uuid}) unless request.headers.key?('x-ms-client-request-id')\n      request.headers.merge!({'Content-Type' => 'application/json'}) unless request.headers.key?('Content-Type')\n\n      # Send Request\n      http_response = request.run_promise do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end.execute.value!\n\n      status_code = http_response.status\n\n      if status_code != 200 && status_code != 201 && status_code != 202 && status_code != 204\n        json_error_data = JSON.load(http_response.body)\n        error_data = CloudErrorData.deserialize_object(json_error_data)\n\n        fail AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"\n      end\n\n      result = MsRest::HttpOperationResponse.new(request, http_response, http_response.body)\n\n      begin\n        result.body = JSON.load(http_response.body) unless http_response.body.to_s.empty?\n      rescue Exception => e\n        fail MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)\n      end\n\n      result\n    end",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 30,
+        "column": 7
+      },
+      "text": "def get_async_common(request)\n      fail ValidationError, 'Request cannot be nil' if request.nil?\n\n      request.middlewares = [[MsRest::RetryPolicyMiddleware, times: 3, retry: 0.02], [:cookie_jar]]\n      request.headers.merge!({'x-ms-client-request-id' => SecureRandom.uuid}) unless request.headers.key?('x-ms-client-request-id')\n      request.headers.merge!({'Content-Type' => 'application/json'}) unless request.headers.key?('Content-Type')\n\n      # Send Request\n      http_response = request.run_promise do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end.execute.value!\n\n      status_code = http_response.status\n\n      if status_code != 200 && status_code != 201 && status_code != 202 && status_code != 204\n        json_error_data = JSON.load(http_response.body)\n        error_data = CloudErrorData.deserialize_object(json_error_data)\n\n        fail AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"\n      end\n\n      result = MsRest::HttpOperationResponse.new(request, http_response, http_response.body)\n\n      begin\n        result.body = JSON.load(http_response.body) unless http_response.body.to_s.empty?\n      rescue Exception => e\n        fail MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)\n      end\n\n      result\n    end",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 20
+          },
+          "text": "get_async_common"
+        },
+        {
+          "type": "method_parameters",
+          "start": {
+            "row": 0,
+            "column": 20
+          },
+          "end": {
+            "row": 0,
+            "column": 29
+          },
+          "text": "(request)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 21
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 21
+              },
+              "end": {
+                "row": 0,
+                "column": 28
+              },
+              "text": "request"
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 28
+              },
+              "end": {
+                "row": 0,
+                "column": 29
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 29,
+            "column": 12
+          },
+          "text": "fail ValidationError, 'Request cannot be nil' if request.nil?\n\n      request.middlewares = [[MsRest::RetryPolicyMiddleware, times: 3, retry: 0.02], [:cookie_jar]]\n      request.headers.merge!({'x-ms-client-request-id' => SecureRandom.uuid}) unless request.headers.key?('x-ms-client-request-id')\n      request.headers.merge!({'Content-Type' => 'application/json'}) unless request.headers.key?('Content-Type')\n\n      # Send Request\n      http_response = request.run_promise do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end.execute.value!\n\n      status_code = http_response.status\n\n      if status_code != 200 && status_code != 201 && status_code != 202 && status_code != 204\n        json_error_data = JSON.load(http_response.body)\n        error_data = CloudErrorData.deserialize_object(json_error_data)\n\n        fail AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"\n      end\n\n      result = MsRest::HttpOperationResponse.new(request, http_response, http_response.body)\n\n      begin\n        result.body = JSON.load(http_response.body) unless http_response.body.to_s.empty?\n      rescue Exception => e\n        fail MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)\n      end\n\n      result",
+          "children": [
+            {
+              "type": "if_modifier",
+              "start": {
+                "row": 1,
+                "column": 6
+              },
+              "end": {
+                "row": 1,
+                "column": 67
+              },
+              "text": "fail ValidationError, 'Request cannot be nil' if request.nil?",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 1,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 51
+                  },
+                  "text": "fail ValidationError, 'Request cannot be nil'",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 10
+                      },
+                      "text": "fail"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 51
+                      },
+                      "text": "ValidationError, 'Request cannot be nil'",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 1,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 26
+                          },
+                          "text": "ValidationError"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 1,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 27
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 1,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 51
+                          },
+                          "text": "'Request cannot be nil'",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 1,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 29
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 1,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 50
+                              },
+                              "text": "Request cannot be nil"
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 1,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 51
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 1,
+                    "column": 52
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 54
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 1,
+                    "column": 55
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 67
+                  },
+                  "text": "request.nil?",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 55
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 62
+                      },
+                      "text": "request"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 1,
+                        "column": 62
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 63
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 63
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 67
+                      },
+                      "text": "nil?"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 3,
+                "column": 6
+              },
+              "end": {
+                "row": 3,
+                "column": 99
+              },
+              "text": "request.middlewares = [[MsRest::RetryPolicyMiddleware, times: 3, retry: 0.02], [:cookie_jar]]",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 3,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 25
+                  },
+                  "text": "request.middlewares",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 3,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 13
+                      },
+                      "text": "request"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 3,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 14
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 3,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 25
+                      },
+                      "text": "middlewares"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 3,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 27
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "array",
+                  "start": {
+                    "row": 3,
+                    "column": 28
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 99
+                  },
+                  "text": "[[MsRest::RetryPolicyMiddleware, times: 3, retry: 0.02], [:cookie_jar]]",
+                  "children": [
+                    {
+                      "type": "[",
+                      "start": {
+                        "row": 3,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 29
+                      },
+                      "text": "["
+                    },
+                    {
+                      "type": "array",
+                      "start": {
+                        "row": 3,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 83
+                      },
+                      "text": "[MsRest::RetryPolicyMiddleware, times: 3, retry: 0.02]",
+                      "children": [
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 3,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 30
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "scope_resolution",
+                          "start": {
+                            "row": 3,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 59
+                          },
+                          "text": "MsRest::RetryPolicyMiddleware",
+                          "children": [
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 3,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 36
+                              },
+                              "text": "MsRest"
+                            },
+                            {
+                              "type": "::",
+                              "start": {
+                                "row": 3,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 38
+                              },
+                              "text": "::"
+                            },
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 3,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 59
+                              },
+                              "text": "RetryPolicyMiddleware"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 3,
+                            "column": 59
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 60
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 3,
+                            "column": 61
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 69
+                          },
+                          "text": "times: 3",
+                          "children": [
+                            {
+                              "type": "hash_key_symbol",
+                              "start": {
+                                "row": 3,
+                                "column": 61
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 66
+                              },
+                              "text": "times"
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 3,
+                                "column": 66
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 67
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 3,
+                                "column": 68
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 69
+                              },
+                              "text": "3"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 3,
+                            "column": 69
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 70
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 3,
+                            "column": 71
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 82
+                          },
+                          "text": "retry: 0.02",
+                          "children": [
+                            {
+                              "type": "hash_key_symbol",
+                              "start": {
+                                "row": 3,
+                                "column": 71
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 76
+                              },
+                              "text": "retry"
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 3,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 77
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "float",
+                              "start": {
+                                "row": 3,
+                                "column": 78
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 82
+                              },
+                              "text": "0.02"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 3,
+                            "column": 82
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 83
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ",",
+                      "start": {
+                        "row": 3,
+                        "column": 83
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 84
+                      },
+                      "text": ","
+                    },
+                    {
+                      "type": "array",
+                      "start": {
+                        "row": 3,
+                        "column": 85
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 98
+                      },
+                      "text": "[:cookie_jar]",
+                      "children": [
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 3,
+                            "column": 85
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 86
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "simple_symbol",
+                          "start": {
+                            "row": 3,
+                            "column": 86
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 97
+                          },
+                          "text": ":cookie_jar"
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 3,
+                            "column": 97
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 98
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "]",
+                      "start": {
+                        "row": 3,
+                        "column": 98
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 99
+                      },
+                      "text": "]"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "unless_modifier",
+              "start": {
+                "row": 4,
+                "column": 6
+              },
+              "end": {
+                "row": 4,
+                "column": 131
+              },
+              "text": "request.headers.merge!({'x-ms-client-request-id' => SecureRandom.uuid}) unless request.headers.key?('x-ms-client-request-id')",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 4,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 77
+                  },
+                  "text": "request.headers.merge!({'x-ms-client-request-id' => SecureRandom.uuid})",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 4,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 21
+                      },
+                      "text": "request.headers",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 13
+                          },
+                          "text": "request"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 4,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 14
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 21
+                          },
+                          "text": "headers"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 4,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 22
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 4,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 28
+                      },
+                      "text": "merge!"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 4,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 77
+                      },
+                      "text": "({'x-ms-client-request-id' => SecureRandom.uuid})",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 4,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 29
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "hash",
+                          "start": {
+                            "row": 4,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 76
+                          },
+                          "text": "{'x-ms-client-request-id' => SecureRandom.uuid}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 4,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 30
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 4,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 75
+                              },
+                              "text": "'x-ms-client-request-id' => SecureRandom.uuid",
+                              "children": [
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 54
+                                  },
+                                  "text": "'x-ms-client-request-id'",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 31
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 53
+                                      },
+                                      "text": "x-ms-client-request-id"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 54
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "=>",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 57
+                                  },
+                                  "text": "=>"
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 75
+                                  },
+                                  "text": "SecureRandom.uuid",
+                                  "children": [
+                                    {
+                                      "type": "constant",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 70
+                                      },
+                                      "text": "SecureRandom"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 70
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 71
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 71
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 75
+                                      },
+                                      "text": "uuid"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 4,
+                                "column": 75
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 76
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 4,
+                            "column": 76
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 77
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "unless",
+                  "start": {
+                    "row": 4,
+                    "column": 78
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 84
+                  },
+                  "text": "unless"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 4,
+                    "column": 85
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 131
+                  },
+                  "text": "request.headers.key?('x-ms-client-request-id')",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 4,
+                        "column": 85
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 100
+                      },
+                      "text": "request.headers",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 85
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 92
+                          },
+                          "text": "request"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 4,
+                            "column": 92
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 93
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 93
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 100
+                          },
+                          "text": "headers"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 4,
+                        "column": 100
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 101
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 4,
+                        "column": 101
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 105
+                      },
+                      "text": "key?"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 4,
+                        "column": 105
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 131
+                      },
+                      "text": "('x-ms-client-request-id')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 4,
+                            "column": 105
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 106
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 4,
+                            "column": 106
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 130
+                          },
+                          "text": "'x-ms-client-request-id'",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 4,
+                                "column": 106
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 107
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 4,
+                                "column": 107
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 129
+                              },
+                              "text": "x-ms-client-request-id"
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 4,
+                                "column": 129
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 130
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 4,
+                            "column": 130
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 131
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "unless_modifier",
+              "start": {
+                "row": 5,
+                "column": 6
+              },
+              "end": {
+                "row": 5,
+                "column": 112
+              },
+              "text": "request.headers.merge!({'Content-Type' => 'application/json'}) unless request.headers.key?('Content-Type')",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 5,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 68
+                  },
+                  "text": "request.headers.merge!({'Content-Type' => 'application/json'})",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 5,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 21
+                      },
+                      "text": "request.headers",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 5,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 13
+                          },
+                          "text": "request"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 5,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 14
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 5,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 21
+                          },
+                          "text": "headers"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 5,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 22
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 28
+                      },
+                      "text": "merge!"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 5,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 68
+                      },
+                      "text": "({'Content-Type' => 'application/json'})",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 5,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 29
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "hash",
+                          "start": {
+                            "row": 5,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 67
+                          },
+                          "text": "{'Content-Type' => 'application/json'}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 5,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 30
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 5,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 66
+                              },
+                              "text": "'Content-Type' => 'application/json'",
+                              "children": [
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 44
+                                  },
+                                  "text": "'Content-Type'",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 31
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 43
+                                      },
+                                      "text": "Content-Type"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 44
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "=>",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 45
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 47
+                                  },
+                                  "text": "=>"
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 66
+                                  },
+                                  "text": "'application/json'",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 49
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 65
+                                      },
+                                      "text": "application/json"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 65
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 66
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 5,
+                                "column": 66
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 67
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 5,
+                            "column": 67
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 68
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "unless",
+                  "start": {
+                    "row": 5,
+                    "column": 69
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 75
+                  },
+                  "text": "unless"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 5,
+                    "column": 76
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 112
+                  },
+                  "text": "request.headers.key?('Content-Type')",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 5,
+                        "column": 76
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 91
+                      },
+                      "text": "request.headers",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 5,
+                            "column": 76
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 83
+                          },
+                          "text": "request"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 5,
+                            "column": 83
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 84
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 5,
+                            "column": 84
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 91
+                          },
+                          "text": "headers"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 5,
+                        "column": 91
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 92
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 92
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 96
+                      },
+                      "text": "key?"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 5,
+                        "column": 96
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 112
+                      },
+                      "text": "('Content-Type')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 5,
+                            "column": 96
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 97
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 5,
+                            "column": 97
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 111
+                          },
+                          "text": "'Content-Type'",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 5,
+                                "column": 97
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 98
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 5,
+                                "column": 98
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 110
+                              },
+                              "text": "Content-Type"
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 5,
+                                "column": 110
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 111
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 5,
+                            "column": 111
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 112
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 7,
+                "column": 6
+              },
+              "end": {
+                "row": 7,
+                "column": 20
+              },
+              "text": "# Send Request"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 8,
+                "column": 6
+              },
+              "end": {
+                "row": 10,
+                "column": 24
+              },
+              "text": "http_response = request.run_promise do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end.execute.value!",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 8,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 19
+                  },
+                  "text": "http_response"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 8,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 21
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 8,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 24
+                  },
+                  "text": "request.run_promise do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end.execute.value!",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 8,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 17
+                      },
+                      "text": "request.run_promise do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end.execute",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 8,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 9
+                          },
+                          "text": "request.run_promise do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 29
+                              },
+                              "text": "request"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 8,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 30
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 41
+                              },
+                              "text": "run_promise"
+                            },
+                            {
+                              "type": "do_block",
+                              "start": {
+                                "row": 8,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 9
+                              },
+                              "text": "do |req|\n        @credentials.sign_request(req) unless @credentials.nil?\n      end",
+                              "children": [
+                                {
+                                  "type": "do",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 44
+                                  },
+                                  "text": "do"
+                                },
+                                {
+                                  "type": "block_parameters",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 45
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 50
+                                  },
+                                  "text": "|req|",
+                                  "children": [
+                                    {
+                                      "type": "|",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 46
+                                      },
+                                      "text": "|"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 49
+                                      },
+                                      "text": "req"
+                                    },
+                                    {
+                                      "type": "|",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 50
+                                      },
+                                      "text": "|"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "body_statement",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 63
+                                  },
+                                  "text": "@credentials.sign_request(req) unless @credentials.nil?",
+                                  "children": [
+                                    {
+                                      "type": "unless_modifier",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 63
+                                      },
+                                      "text": "@credentials.sign_request(req) unless @credentials.nil?",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 38
+                                          },
+                                          "text": "@credentials.sign_request(req)",
+                                          "children": [
+                                            {
+                                              "type": "instance_variable",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 20
+                                              },
+                                              "text": "@credentials"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 20
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 21
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 33
+                                              },
+                                              "text": "sign_request"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 38
+                                              },
+                                              "text": "(req)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 9,
+                                                    "column": 33
+                                                  },
+                                                  "end": {
+                                                    "row": 9,
+                                                    "column": 34
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 9,
+                                                    "column": 34
+                                                  },
+                                                  "end": {
+                                                    "row": 9,
+                                                    "column": 37
+                                                  },
+                                                  "text": "req"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 9,
+                                                    "column": 37
+                                                  },
+                                                  "end": {
+                                                    "row": 9,
+                                                    "column": 38
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "unless",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 39
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 45
+                                          },
+                                          "text": "unless"
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 63
+                                          },
+                                          "text": "@credentials.nil?",
+                                          "children": [
+                                            {
+                                              "type": "instance_variable",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 58
+                                              },
+                                              "text": "@credentials"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 58
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 59
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 59
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 63
+                                              },
+                                              "text": "nil?"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "end",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 9
+                                  },
+                                  "text": "end"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 10,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 10
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 10,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 17
+                          },
+                          "text": "execute"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 10,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 18
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 10,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 24
+                      },
+                      "text": "value!"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 12,
+                "column": 6
+              },
+              "end": {
+                "row": 12,
+                "column": 40
+              },
+              "text": "status_code = http_response.status",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 12,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 17
+                  },
+                  "text": "status_code"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 12,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 19
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 12,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 40
+                  },
+                  "text": "http_response.status",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 12,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 33
+                      },
+                      "text": "http_response"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 12,
+                        "column": 33
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 34
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 12,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 40
+                      },
+                      "text": "status"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if",
+              "start": {
+                "row": 14,
+                "column": 6
+              },
+              "end": {
+                "row": 19,
+                "column": 9
+              },
+              "text": "if status_code != 200 && status_code != 201 && status_code != 202 && status_code != 204\n        json_error_data = JSON.load(http_response.body)\n        error_data = CloudErrorData.deserialize_object(json_error_data)\n\n        fail AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"\n      end",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 14,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 8
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "binary",
+                  "start": {
+                    "row": 14,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 93
+                  },
+                  "text": "status_code != 200 && status_code != 201 && status_code != 202 && status_code != 204",
+                  "children": [
+                    {
+                      "type": "binary",
+                      "start": {
+                        "row": 14,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 71
+                      },
+                      "text": "status_code != 200 && status_code != 201 && status_code != 202",
+                      "children": [
+                        {
+                          "type": "binary",
+                          "start": {
+                            "row": 14,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 49
+                          },
+                          "text": "status_code != 200 && status_code != 201",
+                          "children": [
+                            {
+                              "type": "binary",
+                              "start": {
+                                "row": 14,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 27
+                              },
+                              "text": "status_code != 200",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 9
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 20
+                                  },
+                                  "text": "status_code"
+                                },
+                                {
+                                  "type": "!=",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 23
+                                  },
+                                  "text": "!="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 27
+                                  },
+                                  "text": "200"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "&&",
+                              "start": {
+                                "row": 14,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 30
+                              },
+                              "text": "&&"
+                            },
+                            {
+                              "type": "binary",
+                              "start": {
+                                "row": 14,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 49
+                              },
+                              "text": "status_code != 201",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 42
+                                  },
+                                  "text": "status_code"
+                                },
+                                {
+                                  "type": "!=",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 45
+                                  },
+                                  "text": "!="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 49
+                                  },
+                                  "text": "201"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "&&",
+                          "start": {
+                            "row": 14,
+                            "column": 50
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 52
+                          },
+                          "text": "&&"
+                        },
+                        {
+                          "type": "binary",
+                          "start": {
+                            "row": 14,
+                            "column": 53
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 71
+                          },
+                          "text": "status_code != 202",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 14,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 64
+                              },
+                              "text": "status_code"
+                            },
+                            {
+                              "type": "!=",
+                              "start": {
+                                "row": 14,
+                                "column": 65
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 67
+                              },
+                              "text": "!="
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 14,
+                                "column": 68
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 71
+                              },
+                              "text": "202"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "&&",
+                      "start": {
+                        "row": 14,
+                        "column": 72
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 74
+                      },
+                      "text": "&&"
+                    },
+                    {
+                      "type": "binary",
+                      "start": {
+                        "row": 14,
+                        "column": 75
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 93
+                      },
+                      "text": "status_code != 204",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 75
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 86
+                          },
+                          "text": "status_code"
+                        },
+                        {
+                          "type": "!=",
+                          "start": {
+                            "row": 14,
+                            "column": 87
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 89
+                          },
+                          "text": "!="
+                        },
+                        {
+                          "type": "integer",
+                          "start": {
+                            "row": 14,
+                            "column": 90
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 93
+                          },
+                          "text": "204"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "then",
+                  "start": {
+                    "row": 14,
+                    "column": 93
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 131
+                  },
+                  "text": "\n        json_error_data = JSON.load(http_response.body)\n        error_data = CloudErrorData.deserialize_object(json_error_data)\n\n        fail AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"",
+                  "children": [
+                    {
+                      "type": "assignment",
+                      "start": {
+                        "row": 15,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 55
+                      },
+                      "text": "json_error_data = JSON.load(http_response.body)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 15,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 23
+                          },
+                          "text": "json_error_data"
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 15,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 25
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 15,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 55
+                          },
+                          "text": "JSON.load(http_response.body)",
+                          "children": [
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 15,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 30
+                              },
+                              "text": "JSON"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 15,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 31
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 35
+                              },
+                              "text": "load"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 15,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 55
+                              },
+                              "text": "(http_response.body)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 36
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 54
+                                  },
+                                  "text": "http_response.body",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 49
+                                      },
+                                      "text": "http_response"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 50
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 54
+                                      },
+                                      "text": "body"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 54
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 55
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "assignment",
+                      "start": {
+                        "row": 16,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 71
+                      },
+                      "text": "error_data = CloudErrorData.deserialize_object(json_error_data)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 16,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 18
+                          },
+                          "text": "error_data"
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 16,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 20
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 16,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 71
+                          },
+                          "text": "CloudErrorData.deserialize_object(json_error_data)",
+                          "children": [
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 16,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 35
+                              },
+                              "text": "CloudErrorData"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 16,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 36
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 16,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 54
+                              },
+                              "text": "deserialize_object"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 16,
+                                "column": 54
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 71
+                              },
+                              "text": "(json_error_data)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 54
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 55
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 70
+                                  },
+                                  "text": "json_error_data"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 70
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 71
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 18,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 131
+                      },
+                      "text": "fail AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 12
+                          },
+                          "text": "fail"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 18,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 131
+                          },
+                          "text": "AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 18,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 131
+                              },
+                              "text": "AzureOperationError.new request, http_response, error_data, \"Long running operation failed with status #{status_code}\"",
+                              "children": [
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 32
+                                  },
+                                  "text": "AzureOperationError"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 33
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 36
+                                  },
+                                  "text": "new"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 131
+                                  },
+                                  "text": "request, http_response, error_data, \"Long running operation failed with status #{status_code}\"",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 44
+                                      },
+                                      "text": "request"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 45
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 59
+                                      },
+                                      "text": "http_response"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 59
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 60
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 71
+                                      },
+                                      "text": "error_data"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 71
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 72
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 73
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 131
+                                      },
+                                      "text": "\"Long running operation failed with status #{status_code}\"",
+                                      "children": [
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 73
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 74
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 74
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 116
+                                          },
+                                          "text": "Long running operation failed with status "
+                                        },
+                                        {
+                                          "type": "interpolation",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 116
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 130
+                                          },
+                                          "text": "#{status_code}",
+                                          "children": [
+                                            {
+                                              "type": "#{",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 116
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 118
+                                              },
+                                              "text": "#{"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 118
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 129
+                                              },
+                                              "text": "status_code"
+                                            },
+                                            {
+                                              "type": "}",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 129
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 130
+                                              },
+                                              "text": "}"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 130
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 131
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "end",
+                  "start": {
+                    "row": 19,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 9
+                  },
+                  "text": "end"
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 21,
+                "column": 6
+              },
+              "end": {
+                "row": 21,
+                "column": 92
+              },
+              "text": "result = MsRest::HttpOperationResponse.new(request, http_response, http_response.body)",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 21,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 12
+                  },
+                  "text": "result"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 21,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 14
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 21,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 92
+                  },
+                  "text": "MsRest::HttpOperationResponse.new(request, http_response, http_response.body)",
+                  "children": [
+                    {
+                      "type": "scope_resolution",
+                      "start": {
+                        "row": 21,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 44
+                      },
+                      "text": "MsRest::HttpOperationResponse",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 21,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 21
+                          },
+                          "text": "MsRest"
+                        },
+                        {
+                          "type": "::",
+                          "start": {
+                            "row": 21,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 23
+                          },
+                          "text": "::"
+                        },
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 21,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 44
+                          },
+                          "text": "HttpOperationResponse"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 21,
+                        "column": 44
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 45
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 21,
+                        "column": 45
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 48
+                      },
+                      "text": "new"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 21,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 92
+                      },
+                      "text": "(request, http_response, http_response.body)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 21,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 49
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 21,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 56
+                          },
+                          "text": "request"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 21,
+                            "column": 56
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 57
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 21,
+                            "column": 58
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 71
+                          },
+                          "text": "http_response"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 21,
+                            "column": 71
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 72
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 21,
+                            "column": 73
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 91
+                          },
+                          "text": "http_response.body",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 73
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 86
+                              },
+                              "text": "http_response"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 21,
+                                "column": 86
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 87
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 87
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 91
+                              },
+                              "text": "body"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 21,
+                            "column": 91
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 92
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "begin",
+              "start": {
+                "row": 23,
+                "column": 6
+              },
+              "end": {
+                "row": 27,
+                "column": 9
+              },
+              "text": "begin\n        result.body = JSON.load(http_response.body) unless http_response.body.to_s.empty?\n      rescue Exception => e\n        fail MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)\n      end",
+              "children": [
+                {
+                  "type": "begin",
+                  "start": {
+                    "row": 23,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 11
+                  },
+                  "text": "begin"
+                },
+                {
+                  "type": "unless_modifier",
+                  "start": {
+                    "row": 24,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 89
+                  },
+                  "text": "result.body = JSON.load(http_response.body) unless http_response.body.to_s.empty?",
+                  "children": [
+                    {
+                      "type": "assignment",
+                      "start": {
+                        "row": 24,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 51
+                      },
+                      "text": "result.body = JSON.load(http_response.body)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 24,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 19
+                          },
+                          "text": "result.body",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 14
+                              },
+                              "text": "result"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 24,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 15
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 19
+                              },
+                              "text": "body"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 24,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 21
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 24,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 51
+                          },
+                          "text": "JSON.load(http_response.body)",
+                          "children": [
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 24,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 26
+                              },
+                              "text": "JSON"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 24,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 27
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 31
+                              },
+                              "text": "load"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 24,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 51
+                              },
+                              "text": "(http_response.body)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 32
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 50
+                                  },
+                                  "text": "http_response.body",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 45
+                                      },
+                                      "text": "http_response"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 46
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 50
+                                      },
+                                      "text": "body"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 51
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "unless",
+                      "start": {
+                        "row": 24,
+                        "column": 52
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 58
+                      },
+                      "text": "unless"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 24,
+                        "column": 59
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 89
+                      },
+                      "text": "http_response.body.to_s.empty?",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 24,
+                            "column": 59
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 82
+                          },
+                          "text": "http_response.body.to_s",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 24,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 77
+                              },
+                              "text": "http_response.body",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 72
+                                  },
+                                  "text": "http_response"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 72
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 73
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 73
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 77
+                                  },
+                                  "text": "body"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 24,
+                                "column": 77
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 78
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 78
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 82
+                              },
+                              "text": "to_s"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 24,
+                            "column": 82
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 83
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 24,
+                            "column": 83
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 89
+                          },
+                          "text": "empty?"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rescue",
+                  "start": {
+                    "row": 25,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 124
+                  },
+                  "text": "rescue Exception => e\n        fail MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)",
+                  "children": [
+                    {
+                      "type": "rescue",
+                      "start": {
+                        "row": 25,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 12
+                      },
+                      "text": "rescue"
+                    },
+                    {
+                      "type": "exceptions",
+                      "start": {
+                        "row": 25,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 22
+                      },
+                      "text": "Exception",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 25,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 22
+                          },
+                          "text": "Exception"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "exception_variable",
+                      "start": {
+                        "row": 25,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 27
+                      },
+                      "text": "=> e",
+                      "children": [
+                        {
+                          "type": "=>",
+                          "start": {
+                            "row": 25,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 25
+                          },
+                          "text": "=>"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 25,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 27
+                          },
+                          "text": "e"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 25,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 124
+                      },
+                      "text": "\n        fail MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 26,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 124
+                          },
+                          "text": "fail MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 12
+                              },
+                              "text": "fail"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 26,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 124
+                              },
+                              "text": "MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 124
+                                  },
+                                  "text": "MsRest::DeserializationError.new(\"Error occured in deserializing the response\", e.message, e.backtrace, result)",
+                                  "children": [
+                                    {
+                                      "type": "scope_resolution",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 41
+                                      },
+                                      "text": "MsRest::DeserializationError",
+                                      "children": [
+                                        {
+                                          "type": "constant",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 19
+                                          },
+                                          "text": "MsRest"
+                                        },
+                                        {
+                                          "type": "::",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 21
+                                          },
+                                          "text": "::"
+                                        },
+                                        {
+                                          "type": "constant",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 41
+                                          },
+                                          "text": "DeserializationError"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 41
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 42
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 45
+                                      },
+                                      "text": "new"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 124
+                                      },
+                                      "text": "(\"Error occured in deserializing the response\", e.message, e.backtrace, result)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 46
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 91
+                                          },
+                                          "text": "\"Error occured in deserializing the response\"",
+                                          "children": [
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 47
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 90
+                                              },
+                                              "text": "Error occured in deserializing the response"
+                                            },
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 90
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 91
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 91
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 92
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 93
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 102
+                                          },
+                                          "text": "e.message",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 93
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 94
+                                              },
+                                              "text": "e"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 94
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 95
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 95
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 102
+                                              },
+                                              "text": "message"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 102
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 103
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 104
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 115
+                                          },
+                                          "text": "e.backtrace",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 104
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 105
+                                              },
+                                              "text": "e"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 105
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 106
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 106
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 115
+                                              },
+                                              "text": "backtrace"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 115
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 116
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 117
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 123
+                                          },
+                                          "text": "result"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 123
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 124
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "end",
+                  "start": {
+                    "row": 27,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 9
+                  },
+                  "text": "end"
+                }
+              ]
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 29,
+                "column": 6
+              },
+              "end": {
+                "row": 29,
+                "column": 12
+              },
+              "text": "result"
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 30,
+            "column": 4
+          },
+          "end": {
+            "row": 30,
+            "column": 7
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

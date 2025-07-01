@@ -1,0 +1,2812 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 45,
+    "column": 33
+  },
+  "text": "def _get_predicted_embedding_addition(self,\n                                          checklist_state: ChecklistStatelet,\n                                          action_ids: List[int],\n                                          action_embeddings: torch.Tensor) -> torch.Tensor:\n        \"\"\"\n        Gets the embeddings of desired terminal actions yet to be produced by the decoder, and\n        returns their sum for the decoder to add it to the predicted embedding to bias the\n        prediction towards missing actions.\n        \"\"\"\n        # Our basic approach here will be to figure out which actions we want to bias, by doing\n        # some fancy indexing work, then multiply the action embeddings by a mask for those\n        # actions, and return the sum of the result.\n\n        # Shape: (num_terminal_actions, 1).  This is 1 if we still want to predict something on the\n        # checklist, and 0 otherwise.\n        checklist_balance = checklist_state.get_balance().clamp(min=0)\n\n        # (num_terminal_actions, 1)\n        actions_in_agenda = checklist_state.terminal_actions\n        # (1, num_current_actions)\n        action_id_tensor = checklist_balance.new(action_ids).long().unsqueeze(0)\n        # Shape: (num_terminal_actions, num_current_actions).  Will have a value of 1 if the\n        # terminal action i is our current action j, and a value of 0 otherwise.  Because both sets\n        # of actions are free of duplicates, there will be at most one non-zero value per current\n        # action, and per terminal action.\n        current_agenda_actions = (actions_in_agenda == action_id_tensor).float()\n\n        # Shape: (num_current_actions,).  With the inner multiplication, we remove any current\n        # agenda actions that are not in our checklist balance, then we sum over the terminal\n        # action dimension, which will have a sum of at most one.  So this will be a 0/1 tensor,\n        # where a 1 means to encourage the current action in that position.\n        actions_to_encourage = torch.sum(current_agenda_actions * checklist_balance, dim=0)\n\n        # Shape: (action_embedding_dim,).  This is the sum of the action embeddings that we want\n        # the model to prefer.\n        embedding_addition = torch.sum(action_embeddings * actions_to_encourage.unsqueeze(1),\n                                       dim=0,\n                                       keepdim=False)\n\n        if self._add_action_bias:\n            # If we're adding an action bias, the last dimension of the action embedding is a bias\n            # weight.  We don't want this addition to affect the bias (TODO(mattg): or do we?), so\n            # we zero out that dimension here.\n            embedding_addition[-1] = 0\n\n        return embedding_addition",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 45,
+        "column": 33
+      },
+      "text": "def _get_predicted_embedding_addition(self,\n                                          checklist_state: ChecklistStatelet,\n                                          action_ids: List[int],\n                                          action_embeddings: torch.Tensor) -> torch.Tensor:\n        \"\"\"\n        Gets the embeddings of desired terminal actions yet to be produced by the decoder, and\n        returns their sum for the decoder to add it to the predicted embedding to bias the\n        prediction towards missing actions.\n        \"\"\"\n        # Our basic approach here will be to figure out which actions we want to bias, by doing\n        # some fancy indexing work, then multiply the action embeddings by a mask for those\n        # actions, and return the sum of the result.\n\n        # Shape: (num_terminal_actions, 1).  This is 1 if we still want to predict something on the\n        # checklist, and 0 otherwise.\n        checklist_balance = checklist_state.get_balance().clamp(min=0)\n\n        # (num_terminal_actions, 1)\n        actions_in_agenda = checklist_state.terminal_actions\n        # (1, num_current_actions)\n        action_id_tensor = checklist_balance.new(action_ids).long().unsqueeze(0)\n        # Shape: (num_terminal_actions, num_current_actions).  Will have a value of 1 if the\n        # terminal action i is our current action j, and a value of 0 otherwise.  Because both sets\n        # of actions are free of duplicates, there will be at most one non-zero value per current\n        # action, and per terminal action.\n        current_agenda_actions = (actions_in_agenda == action_id_tensor).float()\n\n        # Shape: (num_current_actions,).  With the inner multiplication, we remove any current\n        # agenda actions that are not in our checklist balance, then we sum over the terminal\n        # action dimension, which will have a sum of at most one.  So this will be a 0/1 tensor,\n        # where a 1 means to encourage the current action in that position.\n        actions_to_encourage = torch.sum(current_agenda_actions * checklist_balance, dim=0)\n\n        # Shape: (action_embedding_dim,).  This is the sum of the action embeddings that we want\n        # the model to prefer.\n        embedding_addition = torch.sum(action_embeddings * actions_to_encourage.unsqueeze(1),\n                                       dim=0,\n                                       keepdim=False)\n\n        if self._add_action_bias:\n            # If we're adding an action bias, the last dimension of the action embedding is a bias\n            # weight.  We don't want this addition to affect the bias (TODO(mattg): or do we?), so\n            # we zero out that dimension here.\n            embedding_addition[-1] = 0\n\n        return embedding_addition",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 37
+          },
+          "text": "_get_predicted_embedding_addition"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 37
+          },
+          "end": {
+            "row": 3,
+            "column": 74
+          },
+          "text": "(self,\n                                          checklist_state: ChecklistStatelet,\n                                          action_ids: List[int],\n                                          action_embeddings: torch.Tensor)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 37
+              },
+              "end": {
+                "row": 0,
+                "column": 38
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 38
+              },
+              "end": {
+                "row": 0,
+                "column": 42
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 42
+              },
+              "end": {
+                "row": 0,
+                "column": 43
+              },
+              "text": ","
+            },
+            {
+              "type": "typed_parameter",
+              "start": {
+                "row": 1,
+                "column": 42
+              },
+              "end": {
+                "row": 1,
+                "column": 76
+              },
+              "text": "checklist_state: ChecklistStatelet",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 57
+                  },
+                  "text": "checklist_state"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 1,
+                    "column": 57
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 58
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "type",
+                  "start": {
+                    "row": 1,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 76
+                  },
+                  "text": "ChecklistStatelet",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 59
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 76
+                      },
+                      "text": "ChecklistStatelet"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 76
+              },
+              "end": {
+                "row": 1,
+                "column": 77
+              },
+              "text": ","
+            },
+            {
+              "type": "typed_parameter",
+              "start": {
+                "row": 2,
+                "column": 42
+              },
+              "end": {
+                "row": 2,
+                "column": 63
+              },
+              "text": "action_ids: List[int]",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 2,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 52
+                  },
+                  "text": "action_ids"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 2,
+                    "column": 52
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 53
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "type",
+                  "start": {
+                    "row": 2,
+                    "column": 54
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 63
+                  },
+                  "text": "List[int]",
+                  "children": [
+                    {
+                      "type": "generic_type",
+                      "start": {
+                        "row": 2,
+                        "column": 54
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 63
+                      },
+                      "text": "List[int]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 2,
+                            "column": 54
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 58
+                          },
+                          "text": "List"
+                        },
+                        {
+                          "type": "type_parameter",
+                          "start": {
+                            "row": 2,
+                            "column": 58
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 63
+                          },
+                          "text": "[int]",
+                          "children": [
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 2,
+                                "column": 58
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 59
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "type",
+                              "start": {
+                                "row": 2,
+                                "column": 59
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 62
+                              },
+                              "text": "int",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 62
+                                  },
+                                  "text": "int"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 2,
+                                "column": 62
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 63
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 2,
+                "column": 63
+              },
+              "end": {
+                "row": 2,
+                "column": 64
+              },
+              "text": ","
+            },
+            {
+              "type": "typed_parameter",
+              "start": {
+                "row": 3,
+                "column": 42
+              },
+              "end": {
+                "row": 3,
+                "column": 73
+              },
+              "text": "action_embeddings: torch.Tensor",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 59
+                  },
+                  "text": "action_embeddings"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 3,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 60
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "type",
+                  "start": {
+                    "row": 3,
+                    "column": 61
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 73
+                  },
+                  "text": "torch.Tensor",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 3,
+                        "column": 61
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 73
+                      },
+                      "text": "torch.Tensor",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 3,
+                            "column": 61
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 66
+                          },
+                          "text": "torch"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 3,
+                            "column": 66
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 67
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 3,
+                            "column": 67
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 73
+                          },
+                          "text": "Tensor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 3,
+                "column": 73
+              },
+              "end": {
+                "row": 3,
+                "column": 74
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "->",
+          "start": {
+            "row": 3,
+            "column": 75
+          },
+          "end": {
+            "row": 3,
+            "column": 77
+          },
+          "text": "->"
+        },
+        {
+          "type": "type",
+          "start": {
+            "row": 3,
+            "column": 78
+          },
+          "end": {
+            "row": 3,
+            "column": 90
+          },
+          "text": "torch.Tensor",
+          "children": [
+            {
+              "type": "attribute",
+              "start": {
+                "row": 3,
+                "column": 78
+              },
+              "end": {
+                "row": 3,
+                "column": 90
+              },
+              "text": "torch.Tensor",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 78
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 83
+                  },
+                  "text": "torch"
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 3,
+                    "column": 83
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 84
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 3,
+                    "column": 84
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 90
+                  },
+                  "text": "Tensor"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 3,
+            "column": 90
+          },
+          "end": {
+            "row": 3,
+            "column": 91
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 4,
+            "column": 8
+          },
+          "end": {
+            "row": 45,
+            "column": 33
+          },
+          "text": "\"\"\"\n        Gets the embeddings of desired terminal actions yet to be produced by the decoder, and\n        returns their sum for the decoder to add it to the predicted embedding to bias the\n        prediction towards missing actions.\n        \"\"\"\n        # Our basic approach here will be to figure out which actions we want to bias, by doing\n        # some fancy indexing work, then multiply the action embeddings by a mask for those\n        # actions, and return the sum of the result.\n\n        # Shape: (num_terminal_actions, 1).  This is 1 if we still want to predict something on the\n        # checklist, and 0 otherwise.\n        checklist_balance = checklist_state.get_balance().clamp(min=0)\n\n        # (num_terminal_actions, 1)\n        actions_in_agenda = checklist_state.terminal_actions\n        # (1, num_current_actions)\n        action_id_tensor = checklist_balance.new(action_ids).long().unsqueeze(0)\n        # Shape: (num_terminal_actions, num_current_actions).  Will have a value of 1 if the\n        # terminal action i is our current action j, and a value of 0 otherwise.  Because both sets\n        # of actions are free of duplicates, there will be at most one non-zero value per current\n        # action, and per terminal action.\n        current_agenda_actions = (actions_in_agenda == action_id_tensor).float()\n\n        # Shape: (num_current_actions,).  With the inner multiplication, we remove any current\n        # agenda actions that are not in our checklist balance, then we sum over the terminal\n        # action dimension, which will have a sum of at most one.  So this will be a 0/1 tensor,\n        # where a 1 means to encourage the current action in that position.\n        actions_to_encourage = torch.sum(current_agenda_actions * checklist_balance, dim=0)\n\n        # Shape: (action_embedding_dim,).  This is the sum of the action embeddings that we want\n        # the model to prefer.\n        embedding_addition = torch.sum(action_embeddings * actions_to_encourage.unsqueeze(1),\n                                       dim=0,\n                                       keepdim=False)\n\n        if self._add_action_bias:\n            # If we're adding an action bias, the last dimension of the action embedding is a bias\n            # weight.  We don't want this addition to affect the bias (TODO(mattg): or do we?), so\n            # we zero out that dimension here.\n            embedding_addition[-1] = 0\n\n        return embedding_addition",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 4,
+                "column": 8
+              },
+              "end": {
+                "row": 8,
+                "column": 11
+              },
+              "text": "\"\"\"\n        Gets the embeddings of desired terminal actions yet to be produced by the decoder, and\n        returns their sum for the decoder to add it to the predicted embedding to bias the\n        prediction towards missing actions.\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 4,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 11
+                  },
+                  "text": "\"\"\"\n        Gets the embeddings of desired terminal actions yet to be produced by the decoder, and\n        returns their sum for the decoder to add it to the predicted embedding to bias the\n        prediction towards missing actions.\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 4,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 4,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "text": "\n        Gets the embeddings of desired terminal actions yet to be produced by the decoder, and\n        returns their sum for the decoder to add it to the predicted embedding to bias the\n        prediction towards missing actions.\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 9,
+                "column": 8
+              },
+              "end": {
+                "row": 9,
+                "column": 95
+              },
+              "text": "# Our basic approach here will be to figure out which actions we want to bias, by doing"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 10,
+                "column": 8
+              },
+              "end": {
+                "row": 10,
+                "column": 91
+              },
+              "text": "# some fancy indexing work, then multiply the action embeddings by a mask for those"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 11,
+                "column": 8
+              },
+              "end": {
+                "row": 11,
+                "column": 52
+              },
+              "text": "# actions, and return the sum of the result."
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 13,
+                "column": 8
+              },
+              "end": {
+                "row": 13,
+                "column": 99
+              },
+              "text": "# Shape: (num_terminal_actions, 1).  This is 1 if we still want to predict something on the"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 14,
+                "column": 8
+              },
+              "end": {
+                "row": 14,
+                "column": 37
+              },
+              "text": "# checklist, and 0 otherwise."
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 15,
+                "column": 8
+              },
+              "end": {
+                "row": 15,
+                "column": 70
+              },
+              "text": "checklist_balance = checklist_state.get_balance().clamp(min=0)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 15,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 70
+                  },
+                  "text": "checklist_balance = checklist_state.get_balance().clamp(min=0)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 15,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 25
+                      },
+                      "text": "checklist_balance"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 15,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 27
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 15,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 70
+                      },
+                      "text": "checklist_state.get_balance().clamp(min=0)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 15,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 63
+                          },
+                          "text": "checklist_state.get_balance().clamp",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 15,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 57
+                              },
+                              "text": "checklist_state.get_balance()",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 55
+                                  },
+                                  "text": "checklist_state.get_balance",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 43
+                                      },
+                                      "text": "checklist_state"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 44
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 55
+                                      },
+                                      "text": "get_balance"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 57
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 55
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 56
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 56
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 57
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 15,
+                                "column": 57
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 58
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 58
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 63
+                              },
+                              "text": "clamp"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 15,
+                            "column": 63
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 70
+                          },
+                          "text": "(min=0)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 15,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 64
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 15,
+                                "column": 64
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 69
+                              },
+                              "text": "min=0",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 64
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 67
+                                  },
+                                  "text": "min"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 67
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 68
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 68
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 69
+                                  },
+                                  "text": "0"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 15,
+                                "column": 69
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 70
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 17,
+                "column": 8
+              },
+              "end": {
+                "row": 17,
+                "column": 35
+              },
+              "text": "# (num_terminal_actions, 1)"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 18,
+                "column": 8
+              },
+              "end": {
+                "row": 18,
+                "column": 60
+              },
+              "text": "actions_in_agenda = checklist_state.terminal_actions",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 18,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 60
+                  },
+                  "text": "actions_in_agenda = checklist_state.terminal_actions",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 18,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 25
+                      },
+                      "text": "actions_in_agenda"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 18,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 27
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 18,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 60
+                      },
+                      "text": "checklist_state.terminal_actions",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 43
+                          },
+                          "text": "checklist_state"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 18,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 44
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 60
+                          },
+                          "text": "terminal_actions"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 19,
+                "column": 8
+              },
+              "end": {
+                "row": 19,
+                "column": 34
+              },
+              "text": "# (1, num_current_actions)"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 20,
+                "column": 8
+              },
+              "end": {
+                "row": 20,
+                "column": 80
+              },
+              "text": "action_id_tensor = checklist_balance.new(action_ids).long().unsqueeze(0)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 20,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 80
+                  },
+                  "text": "action_id_tensor = checklist_balance.new(action_ids).long().unsqueeze(0)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 20,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 24
+                      },
+                      "text": "action_id_tensor"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 20,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 26
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 20,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 80
+                      },
+                      "text": "checklist_balance.new(action_ids).long().unsqueeze(0)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 20,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 77
+                          },
+                          "text": "checklist_balance.new(action_ids).long().unsqueeze",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 20,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 67
+                              },
+                              "text": "checklist_balance.new(action_ids).long()",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 65
+                                  },
+                                  "text": "checklist_balance.new(action_ids).long",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 60
+                                      },
+                                      "text": "checklist_balance.new(action_ids)",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 48
+                                          },
+                                          "text": "checklist_balance.new",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 44
+                                              },
+                                              "text": "checklist_balance"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 44
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 45
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 48
+                                              },
+                                              "text": "new"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 60
+                                          },
+                                          "text": "(action_ids)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 49
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 49
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 59
+                                              },
+                                              "text": "action_ids"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 59
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 60
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 61
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 65
+                                      },
+                                      "text": "long"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 65
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 67
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 65
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 66
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 66
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 67
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 20,
+                                "column": 67
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 68
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 20,
+                                "column": 68
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 77
+                              },
+                              "text": "unsqueeze"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 20,
+                            "column": 77
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 80
+                          },
+                          "text": "(0)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 20,
+                                "column": 77
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 78
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 20,
+                                "column": 78
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 79
+                              },
+                              "text": "0"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 20,
+                                "column": 79
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 80
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 21,
+                "column": 8
+              },
+              "end": {
+                "row": 21,
+                "column": 92
+              },
+              "text": "# Shape: (num_terminal_actions, num_current_actions).  Will have a value of 1 if the"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 22,
+                "column": 8
+              },
+              "end": {
+                "row": 22,
+                "column": 99
+              },
+              "text": "# terminal action i is our current action j, and a value of 0 otherwise.  Because both sets"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 23,
+                "column": 8
+              },
+              "end": {
+                "row": 23,
+                "column": 97
+              },
+              "text": "# of actions are free of duplicates, there will be at most one non-zero value per current"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 24,
+                "column": 8
+              },
+              "end": {
+                "row": 24,
+                "column": 42
+              },
+              "text": "# action, and per terminal action."
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 25,
+                "column": 8
+              },
+              "end": {
+                "row": 25,
+                "column": 80
+              },
+              "text": "current_agenda_actions = (actions_in_agenda == action_id_tensor).float()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 25,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 80
+                  },
+                  "text": "current_agenda_actions = (actions_in_agenda == action_id_tensor).float()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 25,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 30
+                      },
+                      "text": "current_agenda_actions"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 25,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 32
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 25,
+                        "column": 33
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 80
+                      },
+                      "text": "(actions_in_agenda == action_id_tensor).float()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 25,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 78
+                          },
+                          "text": "(actions_in_agenda == action_id_tensor).float",
+                          "children": [
+                            {
+                              "type": "parenthesized_expression",
+                              "start": {
+                                "row": 25,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 72
+                              },
+                              "text": "(actions_in_agenda == action_id_tensor)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "comparison_operator",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 71
+                                  },
+                                  "text": "actions_in_agenda == action_id_tensor",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 51
+                                      },
+                                      "text": "actions_in_agenda"
+                                    },
+                                    {
+                                      "type": "==",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 54
+                                      },
+                                      "text": "=="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 55
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 71
+                                      },
+                                      "text": "action_id_tensor"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 71
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 72
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 25,
+                                "column": 72
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 73
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 25,
+                                "column": 73
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 78
+                              },
+                              "text": "float"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 25,
+                            "column": 78
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 80
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 25,
+                                "column": 78
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 79
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 25,
+                                "column": 79
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 80
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 27,
+                "column": 8
+              },
+              "end": {
+                "row": 27,
+                "column": 94
+              },
+              "text": "# Shape: (num_current_actions,).  With the inner multiplication, we remove any current"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 28,
+                "column": 8
+              },
+              "end": {
+                "row": 28,
+                "column": 93
+              },
+              "text": "# agenda actions that are not in our checklist balance, then we sum over the terminal"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 29,
+                "column": 8
+              },
+              "end": {
+                "row": 29,
+                "column": 96
+              },
+              "text": "# action dimension, which will have a sum of at most one.  So this will be a 0/1 tensor,"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 30,
+                "column": 8
+              },
+              "end": {
+                "row": 30,
+                "column": 75
+              },
+              "text": "# where a 1 means to encourage the current action in that position."
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 31,
+                "column": 8
+              },
+              "end": {
+                "row": 31,
+                "column": 91
+              },
+              "text": "actions_to_encourage = torch.sum(current_agenda_actions * checklist_balance, dim=0)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 31,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 91
+                  },
+                  "text": "actions_to_encourage = torch.sum(current_agenda_actions * checklist_balance, dim=0)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 28
+                      },
+                      "text": "actions_to_encourage"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 31,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 30
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 31,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 91
+                      },
+                      "text": "torch.sum(current_agenda_actions * checklist_balance, dim=0)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 31,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 40
+                          },
+                          "text": "torch.sum",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 31,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 36
+                              },
+                              "text": "torch"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 31,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 37
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 31,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 40
+                              },
+                              "text": "sum"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 31,
+                            "column": 40
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 91
+                          },
+                          "text": "(current_agenda_actions * checklist_balance, dim=0)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 31,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 41
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "binary_operator",
+                              "start": {
+                                "row": 31,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 83
+                              },
+                              "text": "current_agenda_actions * checklist_balance",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 63
+                                  },
+                                  "text": "current_agenda_actions"
+                                },
+                                {
+                                  "type": "*",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 64
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 65
+                                  },
+                                  "text": "*"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 83
+                                  },
+                                  "text": "checklist_balance"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 31,
+                                "column": 83
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 84
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 31,
+                                "column": 85
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 90
+                              },
+                              "text": "dim=0",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 85
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 88
+                                  },
+                                  "text": "dim"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 88
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 89
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 89
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 90
+                                  },
+                                  "text": "0"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 31,
+                                "column": 90
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 91
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 33,
+                "column": 8
+              },
+              "end": {
+                "row": 33,
+                "column": 96
+              },
+              "text": "# Shape: (action_embedding_dim,).  This is the sum of the action embeddings that we want"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 34,
+                "column": 8
+              },
+              "end": {
+                "row": 34,
+                "column": 30
+              },
+              "text": "# the model to prefer."
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 35,
+                "column": 8
+              },
+              "end": {
+                "row": 37,
+                "column": 53
+              },
+              "text": "embedding_addition = torch.sum(action_embeddings * actions_to_encourage.unsqueeze(1),\n                                       dim=0,\n                                       keepdim=False)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 35,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 53
+                  },
+                  "text": "embedding_addition = torch.sum(action_embeddings * actions_to_encourage.unsqueeze(1),\n                                       dim=0,\n                                       keepdim=False)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 35,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 26
+                      },
+                      "text": "embedding_addition"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 35,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 28
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 35,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 53
+                      },
+                      "text": "torch.sum(action_embeddings * actions_to_encourage.unsqueeze(1),\n                                       dim=0,\n                                       keepdim=False)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 35,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 38
+                          },
+                          "text": "torch.sum",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 35,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 34
+                              },
+                              "text": "torch"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 35,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 35
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 35,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 38
+                              },
+                              "text": "sum"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 35,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 53
+                          },
+                          "text": "(action_embeddings * actions_to_encourage.unsqueeze(1),\n                                       dim=0,\n                                       keepdim=False)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 35,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 39
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "binary_operator",
+                              "start": {
+                                "row": 35,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 92
+                              },
+                              "text": "action_embeddings * actions_to_encourage.unsqueeze(1)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 56
+                                  },
+                                  "text": "action_embeddings"
+                                },
+                                {
+                                  "type": "*",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 57
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 58
+                                  },
+                                  "text": "*"
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 92
+                                  },
+                                  "text": "actions_to_encourage.unsqueeze(1)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 59
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 89
+                                      },
+                                      "text": "actions_to_encourage.unsqueeze",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 59
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 79
+                                          },
+                                          "text": "actions_to_encourage"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 79
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 80
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 80
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 89
+                                          },
+                                          "text": "unsqueeze"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 89
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 92
+                                      },
+                                      "text": "(1)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 89
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 90
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "integer",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 90
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 91
+                                          },
+                                          "text": "1"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 91
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 92
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 35,
+                                "column": 92
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 93
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 36,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 44
+                              },
+                              "text": "dim=0",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 42
+                                  },
+                                  "text": "dim"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 43
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 44
+                                  },
+                                  "text": "0"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 36,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 45
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 37,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 52
+                              },
+                              "text": "keepdim=False",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 46
+                                  },
+                                  "text": "keepdim"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 47
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "false",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 52
+                                  },
+                                  "text": "False"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 37,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 53
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 39,
+                "column": 8
+              },
+              "end": {
+                "row": 43,
+                "column": 38
+              },
+              "text": "if self._add_action_bias:\n            # If we're adding an action bias, the last dimension of the action embedding is a bias\n            # weight.  We don't want this addition to affect the bias (TODO(mattg): or do we?), so\n            # we zero out that dimension here.\n            embedding_addition[-1] = 0",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 39,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "attribute",
+                  "start": {
+                    "row": 39,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 32
+                  },
+                  "text": "self._add_action_bias",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 39,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 15
+                      },
+                      "text": "self"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 39,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 16
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 39,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 32
+                      },
+                      "text": "_add_action_bias"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 39,
+                    "column": 32
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 33
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 40,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 40,
+                    "column": 98
+                  },
+                  "text": "# If we're adding an action bias, the last dimension of the action embedding is a bias"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 41,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 41,
+                    "column": 98
+                  },
+                  "text": "# weight.  We don't want this addition to affect the bias (TODO(mattg): or do we?), so"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 42,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 46
+                  },
+                  "text": "# we zero out that dimension here."
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 43,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 38
+                  },
+                  "text": "embedding_addition[-1] = 0",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 43,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 38
+                      },
+                      "text": "embedding_addition[-1] = 0",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 43,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 38
+                          },
+                          "text": "embedding_addition[-1] = 0",
+                          "children": [
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 43,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 34
+                              },
+                              "text": "embedding_addition[-1]",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 30
+                                  },
+                                  "text": "embedding_addition"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 31
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "unary_operator",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 33
+                                  },
+                                  "text": "-1",
+                                  "children": [
+                                    {
+                                      "type": "-",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 32
+                                      },
+                                      "text": "-"
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 33
+                                      },
+                                      "text": "1"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 34
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 43,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 36
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 43,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 38
+                              },
+                              "text": "0"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 45,
+                "column": 8
+              },
+              "end": {
+                "row": 45,
+                "column": 33
+              },
+              "text": "return embedding_addition",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 45,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 45,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 45,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 45,
+                    "column": 33
+                  },
+                  "text": "embedding_addition"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

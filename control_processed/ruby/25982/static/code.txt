@@ -1,0 +1,11 @@
+def print_linescore
+    	bs = get_boxscore
+    	output = ''
+    	if bs.linescore 
+      	output += self.visit_team_name + ' ' + bs.linescore.away_team_runs + ' ' + bs.linescore.away_team_hits + ' ' + bs.linescore.away_team_errors + "\n"
+      	output += self.home_team_name + ' ' + bs.linescore.home_team_runs + ' ' + bs.linescore.home_team_hits + ' ' + bs.linescore.home_team_errors
+      else
+      	output += 'No linescore available for ' + @visit_team_name + ' vs. ' + @home_team_name
+      end
+      output
+    end

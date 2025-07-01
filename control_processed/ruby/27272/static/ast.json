@@ -1,0 +1,4262 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 36,
+    "column": 7
+  },
+  "text": "def get_pom_from_heuristic(filename)\n      begin\n        log.debug(\"Attempting heuristic POM search for #{filename}\")\n        site = MavenWebsite.new\n        filename = cleanup_name(filename)\n        version_matcher = VersionMatcher.new\n        my_artifact_id, my_version = version_matcher.split_version(filename)\n        log.debug(\"Guessed artifact id: #{my_artifact_id}, version: #{my_version}\")\n\n        result = site.search_by_name(my_artifact_id).first\n        log.debug(\"Artifact id search result: #{result}\")\n        unless result.nil?\n          group_id, artifact_id, = site.get_maven_id_from result\n          results = site.search_by_group_id_and_artifact_id(group_id, artifact_id)\n          log.debug(\"All versions: #{results}\")\n          their_versions = results.map { |doc| doc[\"v\"] }\n          best_matched_version = (\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )\n          best_matched_result = (results.select { |r| r[\"v\"] == best_matched_version }).first\n\n          group_id, artifact_id, version = site.get_maven_id_from(best_matched_result)\n          log.warn(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )\n\n          return site.download_pom(group_id, artifact_id, version), :found_via_heuristic\n        end\n      rescue NotFoundOnMavenWebsiteError\n        log.warn(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")\n      end\n      nil\n    end",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 36,
+        "column": 7
+      },
+      "text": "def get_pom_from_heuristic(filename)\n      begin\n        log.debug(\"Attempting heuristic POM search for #{filename}\")\n        site = MavenWebsite.new\n        filename = cleanup_name(filename)\n        version_matcher = VersionMatcher.new\n        my_artifact_id, my_version = version_matcher.split_version(filename)\n        log.debug(\"Guessed artifact id: #{my_artifact_id}, version: #{my_version}\")\n\n        result = site.search_by_name(my_artifact_id).first\n        log.debug(\"Artifact id search result: #{result}\")\n        unless result.nil?\n          group_id, artifact_id, = site.get_maven_id_from result\n          results = site.search_by_group_id_and_artifact_id(group_id, artifact_id)\n          log.debug(\"All versions: #{results}\")\n          their_versions = results.map { |doc| doc[\"v\"] }\n          best_matched_version = (\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )\n          best_matched_result = (results.select { |r| r[\"v\"] == best_matched_version }).first\n\n          group_id, artifact_id, version = site.get_maven_id_from(best_matched_result)\n          log.warn(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )\n\n          return site.download_pom(group_id, artifact_id, version), :found_via_heuristic\n        end\n      rescue NotFoundOnMavenWebsiteError\n        log.warn(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")\n      end\n      nil\n    end",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 26
+          },
+          "text": "get_pom_from_heuristic"
+        },
+        {
+          "type": "method_parameters",
+          "start": {
+            "row": 0,
+            "column": 26
+          },
+          "end": {
+            "row": 0,
+            "column": 36
+          },
+          "text": "(filename)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 26
+              },
+              "end": {
+                "row": 0,
+                "column": 27
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 27
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": "filename"
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 35
+              },
+              "end": {
+                "row": 0,
+                "column": 36
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 35,
+            "column": 9
+          },
+          "text": "begin\n        log.debug(\"Attempting heuristic POM search for #{filename}\")\n        site = MavenWebsite.new\n        filename = cleanup_name(filename)\n        version_matcher = VersionMatcher.new\n        my_artifact_id, my_version = version_matcher.split_version(filename)\n        log.debug(\"Guessed artifact id: #{my_artifact_id}, version: #{my_version}\")\n\n        result = site.search_by_name(my_artifact_id).first\n        log.debug(\"Artifact id search result: #{result}\")\n        unless result.nil?\n          group_id, artifact_id, = site.get_maven_id_from result\n          results = site.search_by_group_id_and_artifact_id(group_id, artifact_id)\n          log.debug(\"All versions: #{results}\")\n          their_versions = results.map { |doc| doc[\"v\"] }\n          best_matched_version = (\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )\n          best_matched_result = (results.select { |r| r[\"v\"] == best_matched_version }).first\n\n          group_id, artifact_id, version = site.get_maven_id_from(best_matched_result)\n          log.warn(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )\n\n          return site.download_pom(group_id, artifact_id, version), :found_via_heuristic\n        end\n      rescue NotFoundOnMavenWebsiteError\n        log.warn(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")\n      end\n      nil",
+          "children": [
+            {
+              "type": "begin",
+              "start": {
+                "row": 1,
+                "column": 6
+              },
+              "end": {
+                "row": 34,
+                "column": 9
+              },
+              "text": "begin\n        log.debug(\"Attempting heuristic POM search for #{filename}\")\n        site = MavenWebsite.new\n        filename = cleanup_name(filename)\n        version_matcher = VersionMatcher.new\n        my_artifact_id, my_version = version_matcher.split_version(filename)\n        log.debug(\"Guessed artifact id: #{my_artifact_id}, version: #{my_version}\")\n\n        result = site.search_by_name(my_artifact_id).first\n        log.debug(\"Artifact id search result: #{result}\")\n        unless result.nil?\n          group_id, artifact_id, = site.get_maven_id_from result\n          results = site.search_by_group_id_and_artifact_id(group_id, artifact_id)\n          log.debug(\"All versions: #{results}\")\n          their_versions = results.map { |doc| doc[\"v\"] }\n          best_matched_version = (\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )\n          best_matched_result = (results.select { |r| r[\"v\"] == best_matched_version }).first\n\n          group_id, artifact_id, version = site.get_maven_id_from(best_matched_result)\n          log.warn(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )\n\n          return site.download_pom(group_id, artifact_id, version), :found_via_heuristic\n        end\n      rescue NotFoundOnMavenWebsiteError\n        log.warn(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")\n      end",
+              "children": [
+                {
+                  "type": "begin",
+                  "start": {
+                    "row": 1,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 11
+                  },
+                  "text": "begin"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 2,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 68
+                  },
+                  "text": "log.debug(\"Attempting heuristic POM search for #{filename}\")",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 2,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 11
+                      },
+                      "text": "log"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 2,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 12
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 2,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 17
+                      },
+                      "text": "debug"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 2,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 68
+                      },
+                      "text": "(\"Attempting heuristic POM search for #{filename}\")",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 2,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 18
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 2,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 67
+                          },
+                          "text": "\"Attempting heuristic POM search for #{filename}\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 2,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 19
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 2,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 55
+                              },
+                              "text": "Attempting heuristic POM search for "
+                            },
+                            {
+                              "type": "interpolation",
+                              "start": {
+                                "row": 2,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 66
+                              },
+                              "text": "#{filename}",
+                              "children": [
+                                {
+                                  "type": "#{",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 57
+                                  },
+                                  "text": "#{"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 57
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 65
+                                  },
+                                  "text": "filename"
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 65
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 66
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 2,
+                                "column": 66
+                              },
+                              "end": {
+                                "row": 2,
+                                "column": 67
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 2,
+                            "column": 67
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 68
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 3,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 31
+                  },
+                  "text": "site = MavenWebsite.new",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 3,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 12
+                      },
+                      "text": "site"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 3,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 14
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 3,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 31
+                      },
+                      "text": "MavenWebsite.new",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 3,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 27
+                          },
+                          "text": "MavenWebsite"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 3,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 28
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 3,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 31
+                          },
+                          "text": "new"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 4,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 41
+                  },
+                  "text": "filename = cleanup_name(filename)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 4,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 16
+                      },
+                      "text": "filename"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 4,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 18
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 4,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 41
+                      },
+                      "text": "cleanup_name(filename)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 31
+                          },
+                          "text": "cleanup_name"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 4,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 41
+                          },
+                          "text": "(filename)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 4,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 32
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 4,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 40
+                              },
+                              "text": "filename"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 4,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 41
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 5,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 44
+                  },
+                  "text": "version_matcher = VersionMatcher.new",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 23
+                      },
+                      "text": "version_matcher"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 5,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 25
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 5,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 44
+                      },
+                      "text": "VersionMatcher.new",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 5,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 40
+                          },
+                          "text": "VersionMatcher"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 5,
+                            "column": 40
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 41
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 5,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 44
+                          },
+                          "text": "new"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 6,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 76
+                  },
+                  "text": "my_artifact_id, my_version = version_matcher.split_version(filename)",
+                  "children": [
+                    {
+                      "type": "left_assignment_list",
+                      "start": {
+                        "row": 6,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 34
+                      },
+                      "text": "my_artifact_id, my_version",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 22
+                          },
+                          "text": "my_artifact_id"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 6,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 23
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 34
+                          },
+                          "text": "my_version"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 6,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 36
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 6,
+                        "column": 37
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 76
+                      },
+                      "text": "version_matcher.split_version(filename)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 52
+                          },
+                          "text": "version_matcher"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 6,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 53
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 53
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 66
+                          },
+                          "text": "split_version"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 6,
+                            "column": 66
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 76
+                          },
+                          "text": "(filename)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 6,
+                                "column": 66
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 67
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 6,
+                                "column": 67
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 75
+                              },
+                              "text": "filename"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 6,
+                                "column": 75
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 76
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 7,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 83
+                  },
+                  "text": "log.debug(\"Guessed artifact id: #{my_artifact_id}, version: #{my_version}\")",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 7,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 11
+                      },
+                      "text": "log"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 7,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 12
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 7,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 17
+                      },
+                      "text": "debug"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 7,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 83
+                      },
+                      "text": "(\"Guessed artifact id: #{my_artifact_id}, version: #{my_version}\")",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 7,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 18
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 7,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 82
+                          },
+                          "text": "\"Guessed artifact id: #{my_artifact_id}, version: #{my_version}\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 7,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 19
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 7,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 40
+                              },
+                              "text": "Guessed artifact id: "
+                            },
+                            {
+                              "type": "interpolation",
+                              "start": {
+                                "row": 7,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 57
+                              },
+                              "text": "#{my_artifact_id}",
+                              "children": [
+                                {
+                                  "type": "#{",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 42
+                                  },
+                                  "text": "#{"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 56
+                                  },
+                                  "text": "my_artifact_id"
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 56
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 57
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 7,
+                                "column": 57
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 68
+                              },
+                              "text": ", version: "
+                            },
+                            {
+                              "type": "interpolation",
+                              "start": {
+                                "row": 7,
+                                "column": 68
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 81
+                              },
+                              "text": "#{my_version}",
+                              "children": [
+                                {
+                                  "type": "#{",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 68
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 70
+                                  },
+                                  "text": "#{"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 70
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 80
+                                  },
+                                  "text": "my_version"
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 80
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 81
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 7,
+                                "column": 81
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 82
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 7,
+                            "column": 82
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 83
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 9,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 58
+                  },
+                  "text": "result = site.search_by_name(my_artifact_id).first",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 14
+                      },
+                      "text": "result"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 9,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 16
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 9,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 58
+                      },
+                      "text": "site.search_by_name(my_artifact_id).first",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 9,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 52
+                          },
+                          "text": "site.search_by_name(my_artifact_id)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 21
+                              },
+                              "text": "site"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 9,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 22
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 36
+                              },
+                              "text": "search_by_name"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 9,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 52
+                              },
+                              "text": "(my_artifact_id)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 37
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 51
+                                  },
+                                  "text": "my_artifact_id"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 52
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 9,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 53
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 9,
+                            "column": 53
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 58
+                          },
+                          "text": "first"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 10,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 57
+                  },
+                  "text": "log.debug(\"Artifact id search result: #{result}\")",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 10,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 11
+                      },
+                      "text": "log"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 10,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 12
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 10,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 17
+                      },
+                      "text": "debug"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 10,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 57
+                      },
+                      "text": "(\"Artifact id search result: #{result}\")",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 10,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 18
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 10,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 56
+                          },
+                          "text": "\"Artifact id search result: #{result}\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 10,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 19
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 10,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 46
+                              },
+                              "text": "Artifact id search result: "
+                            },
+                            {
+                              "type": "interpolation",
+                              "start": {
+                                "row": 10,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 55
+                              },
+                              "text": "#{result}",
+                              "children": [
+                                {
+                                  "type": "#{",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 48
+                                  },
+                                  "text": "#{"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 54
+                                  },
+                                  "text": "result"
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 54
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 55
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 10,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 56
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 10,
+                            "column": 56
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 57
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "unless",
+                  "start": {
+                    "row": 11,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 11
+                  },
+                  "text": "unless result.nil?\n          group_id, artifact_id, = site.get_maven_id_from result\n          results = site.search_by_group_id_and_artifact_id(group_id, artifact_id)\n          log.debug(\"All versions: #{results}\")\n          their_versions = results.map { |doc| doc[\"v\"] }\n          best_matched_version = (\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )\n          best_matched_result = (results.select { |r| r[\"v\"] == best_matched_version }).first\n\n          group_id, artifact_id, version = site.get_maven_id_from(best_matched_result)\n          log.warn(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )\n\n          return site.download_pom(group_id, artifact_id, version), :found_via_heuristic\n        end",
+                  "children": [
+                    {
+                      "type": "unless",
+                      "start": {
+                        "row": 11,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 14
+                      },
+                      "text": "unless"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 11,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 26
+                      },
+                      "text": "result.nil?",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 11,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 21
+                          },
+                          "text": "result"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 11,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 22
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 11,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 26
+                          },
+                          "text": "nil?"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 11,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 88
+                      },
+                      "text": "\n          group_id, artifact_id, = site.get_maven_id_from result\n          results = site.search_by_group_id_and_artifact_id(group_id, artifact_id)\n          log.debug(\"All versions: #{results}\")\n          their_versions = results.map { |doc| doc[\"v\"] }\n          best_matched_version = (\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )\n          best_matched_result = (results.select { |r| r[\"v\"] == best_matched_version }).first\n\n          group_id, artifact_id, version = site.get_maven_id_from(best_matched_result)\n          log.warn(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )\n\n          return site.download_pom(group_id, artifact_id, version), :found_via_heuristic",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 12,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 64
+                          },
+                          "text": "group_id, artifact_id, = site.get_maven_id_from result",
+                          "children": [
+                            {
+                              "type": "left_assignment_list",
+                              "start": {
+                                "row": 12,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 32
+                              },
+                              "text": "group_id, artifact_id,",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 18
+                                  },
+                                  "text": "group_id"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 19
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 31
+                                  },
+                                  "text": "artifact_id"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 32
+                                  },
+                                  "text": ","
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 12,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 34
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 12,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 64
+                              },
+                              "text": "site.get_maven_id_from result",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 39
+                                  },
+                                  "text": "site"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 40
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 57
+                                  },
+                                  "text": "get_maven_id_from"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 64
+                                  },
+                                  "text": "result",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 12,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 64
+                                      },
+                                      "text": "result"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 13,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 82
+                          },
+                          "text": "results = site.search_by_group_id_and_artifact_id(group_id, artifact_id)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 13,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 17
+                              },
+                              "text": "results"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 13,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 19
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 13,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 82
+                              },
+                              "text": "site.search_by_group_id_and_artifact_id(group_id, artifact_id)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 24
+                                  },
+                                  "text": "site"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 25
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 59
+                                  },
+                                  "text": "search_by_group_id_and_artifact_id"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 82
+                                  },
+                                  "text": "(group_id, artifact_id)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 59
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 60
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 68
+                                      },
+                                      "text": "group_id"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 68
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 69
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 70
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 81
+                                      },
+                                      "text": "artifact_id"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 81
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 82
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 14,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 47
+                          },
+                          "text": "log.debug(\"All versions: #{results}\")",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 14,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 13
+                              },
+                              "text": "log"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 14,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 14
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 14,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 19
+                              },
+                              "text": "debug"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 14,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 47
+                              },
+                              "text": "(\"All versions: #{results}\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 20
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 46
+                                  },
+                                  "text": "\"All versions: #{results}\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 21
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 35
+                                      },
+                                      "text": "All versions: "
+                                    },
+                                    {
+                                      "type": "interpolation",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 45
+                                      },
+                                      "text": "#{results}",
+                                      "children": [
+                                        {
+                                          "type": "#{",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 37
+                                          },
+                                          "text": "#{"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 37
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 44
+                                          },
+                                          "text": "results"
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 44
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 45
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 46
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 47
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 15,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 57
+                          },
+                          "text": "their_versions = results.map { |doc| doc[\"v\"] }",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 15,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 24
+                              },
+                              "text": "their_versions"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 15,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 26
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 15,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 57
+                              },
+                              "text": "results.map { |doc| doc[\"v\"] }",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 34
+                                  },
+                                  "text": "results"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 35
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 38
+                                  },
+                                  "text": "map"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 57
+                                  },
+                                  "text": "{ |doc| doc[\"v\"] }",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 40
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "block_parameters",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 41
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 46
+                                      },
+                                      "text": "|doc|",
+                                      "children": [
+                                        {
+                                          "type": "|",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 42
+                                          },
+                                          "text": "|"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 45
+                                          },
+                                          "text": "doc"
+                                        },
+                                        {
+                                          "type": "|",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 46
+                                          },
+                                          "text": "|"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "block_body",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 55
+                                      },
+                                      "text": "doc[\"v\"]",
+                                      "children": [
+                                        {
+                                          "type": "element_reference",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 55
+                                          },
+                                          "text": "doc[\"v\"]",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 50
+                                              },
+                                              "text": "doc"
+                                            },
+                                            {
+                                              "type": "[",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 50
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 51
+                                              },
+                                              "text": "["
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 51
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 54
+                                              },
+                                              "text": "\"v\"",
+                                              "children": [
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 15,
+                                                    "column": 51
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 52
+                                                  },
+                                                  "text": "\""
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 15,
+                                                    "column": 52
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 53
+                                                  },
+                                                  "text": "v"
+                                                },
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 15,
+                                                    "column": 53
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 54
+                                                  },
+                                                  "text": "\""
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "]",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 54
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 55
+                                              },
+                                              "text": "]"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 56
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 57
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 16,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 11
+                          },
+                          "text": "best_matched_version = (\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 16,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 30
+                              },
+                              "text": "best_matched_version"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 16,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 32
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "parenthesized_statements",
+                              "start": {
+                                "row": 16,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 11
+                              },
+                              "text": "(\n            if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end\n          )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "if",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 15
+                                  },
+                                  "text": "if !my_version.nil?\n              version_matcher.best_match(my_version, their_versions)\n            else\n              their_versions.max\n            end",
+                                  "children": [
+                                    {
+                                      "type": "if",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 14
+                                      },
+                                      "text": "if"
+                                    },
+                                    {
+                                      "type": "unary",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 31
+                                      },
+                                      "text": "!my_version.nil?",
+                                      "children": [
+                                        {
+                                          "type": "!",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 16
+                                          },
+                                          "text": "!"
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 31
+                                          },
+                                          "text": "my_version.nil?",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 26
+                                              },
+                                              "text": "my_version"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 27
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 31
+                                              },
+                                              "text": "nil?"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "then",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 68
+                                      },
+                                      "text": "\n              version_matcher.best_match(my_version, their_versions)",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 68
+                                          },
+                                          "text": "version_matcher.best_match(my_version, their_versions)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 29
+                                              },
+                                              "text": "version_matcher"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 30
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 30
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 40
+                                              },
+                                              "text": "best_match"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 68
+                                              },
+                                              "text": "(my_version, their_versions)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 40
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 41
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 41
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 51
+                                                  },
+                                                  "text": "my_version"
+                                                },
+                                                {
+                                                  "type": ",",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 51
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 52
+                                                  },
+                                                  "text": ","
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 53
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 67
+                                                  },
+                                                  "text": "their_versions"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 67
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 68
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "else",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 32
+                                      },
+                                      "text": "else\n              their_versions.max",
+                                      "children": [
+                                        {
+                                          "type": "else",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 16
+                                          },
+                                          "text": "else"
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 32
+                                          },
+                                          "text": "their_versions.max",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 28
+                                              },
+                                              "text": "their_versions"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 29
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 32
+                                              },
+                                              "text": "max"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "end",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 15
+                                      },
+                                      "text": "end"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 11
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 23,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 93
+                          },
+                          "text": "best_matched_result = (results.select { |r| r[\"v\"] == best_matched_version }).first",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 29
+                              },
+                              "text": "best_matched_result"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 23,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 31
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 23,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 93
+                              },
+                              "text": "(results.select { |r| r[\"v\"] == best_matched_version }).first",
+                              "children": [
+                                {
+                                  "type": "parenthesized_statements",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 87
+                                  },
+                                  "text": "(results.select { |r| r[\"v\"] == best_matched_version })",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 33
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 86
+                                      },
+                                      "text": "results.select { |r| r[\"v\"] == best_matched_version }",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 33
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 40
+                                          },
+                                          "text": "results"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 41
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 47
+                                          },
+                                          "text": "select"
+                                        },
+                                        {
+                                          "type": "block",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 86
+                                          },
+                                          "text": "{ |r| r[\"v\"] == best_matched_version }",
+                                          "children": [
+                                            {
+                                              "type": "{",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 49
+                                              },
+                                              "text": "{"
+                                            },
+                                            {
+                                              "type": "block_parameters",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 50
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 53
+                                              },
+                                              "text": "|r|",
+                                              "children": [
+                                                {
+                                                  "type": "|",
+                                                  "start": {
+                                                    "row": 23,
+                                                    "column": 50
+                                                  },
+                                                  "end": {
+                                                    "row": 23,
+                                                    "column": 51
+                                                  },
+                                                  "text": "|"
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 23,
+                                                    "column": 51
+                                                  },
+                                                  "end": {
+                                                    "row": 23,
+                                                    "column": 52
+                                                  },
+                                                  "text": "r"
+                                                },
+                                                {
+                                                  "type": "|",
+                                                  "start": {
+                                                    "row": 23,
+                                                    "column": 52
+                                                  },
+                                                  "end": {
+                                                    "row": 23,
+                                                    "column": 53
+                                                  },
+                                                  "text": "|"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "block_body",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 54
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 84
+                                              },
+                                              "text": "r[\"v\"] == best_matched_version",
+                                              "children": [
+                                                {
+                                                  "type": "binary",
+                                                  "start": {
+                                                    "row": 23,
+                                                    "column": 54
+                                                  },
+                                                  "end": {
+                                                    "row": 23,
+                                                    "column": 84
+                                                  },
+                                                  "text": "r[\"v\"] == best_matched_version",
+                                                  "children": [
+                                                    {
+                                                      "type": "element_reference",
+                                                      "start": {
+                                                        "row": 23,
+                                                        "column": 54
+                                                      },
+                                                      "end": {
+                                                        "row": 23,
+                                                        "column": 60
+                                                      },
+                                                      "text": "r[\"v\"]",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 23,
+                                                            "column": 54
+                                                          },
+                                                          "end": {
+                                                            "row": 23,
+                                                            "column": 55
+                                                          },
+                                                          "text": "r"
+                                                        },
+                                                        {
+                                                          "type": "[",
+                                                          "start": {
+                                                            "row": 23,
+                                                            "column": 55
+                                                          },
+                                                          "end": {
+                                                            "row": 23,
+                                                            "column": 56
+                                                          },
+                                                          "text": "["
+                                                        },
+                                                        {
+                                                          "type": "string",
+                                                          "start": {
+                                                            "row": 23,
+                                                            "column": 56
+                                                          },
+                                                          "end": {
+                                                            "row": 23,
+                                                            "column": 59
+                                                          },
+                                                          "text": "\"v\"",
+                                                          "children": [
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 23,
+                                                                "column": 56
+                                                              },
+                                                              "end": {
+                                                                "row": 23,
+                                                                "column": 57
+                                                              },
+                                                              "text": "\""
+                                                            },
+                                                            {
+                                                              "type": "string_content",
+                                                              "start": {
+                                                                "row": 23,
+                                                                "column": 57
+                                                              },
+                                                              "end": {
+                                                                "row": 23,
+                                                                "column": 58
+                                                              },
+                                                              "text": "v"
+                                                            },
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 23,
+                                                                "column": 58
+                                                              },
+                                                              "end": {
+                                                                "row": 23,
+                                                                "column": 59
+                                                              },
+                                                              "text": "\""
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "]",
+                                                          "start": {
+                                                            "row": 23,
+                                                            "column": 59
+                                                          },
+                                                          "end": {
+                                                            "row": 23,
+                                                            "column": 60
+                                                          },
+                                                          "text": "]"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "==",
+                                                      "start": {
+                                                        "row": 23,
+                                                        "column": 61
+                                                      },
+                                                      "end": {
+                                                        "row": 23,
+                                                        "column": 63
+                                                      },
+                                                      "text": "=="
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 23,
+                                                        "column": 64
+                                                      },
+                                                      "end": {
+                                                        "row": 23,
+                                                        "column": 84
+                                                      },
+                                                      "text": "best_matched_version"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "}",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 85
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 86
+                                              },
+                                              "text": "}"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 86
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 87
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 87
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 88
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 88
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 93
+                                  },
+                                  "text": "first"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 25,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 86
+                          },
+                          "text": "group_id, artifact_id, version = site.get_maven_id_from(best_matched_result)",
+                          "children": [
+                            {
+                              "type": "left_assignment_list",
+                              "start": {
+                                "row": 25,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 40
+                              },
+                              "text": "group_id, artifact_id, version",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 18
+                                  },
+                                  "text": "group_id"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 19
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 31
+                                  },
+                                  "text": "artifact_id"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 32
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 40
+                                  },
+                                  "text": "version"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 25,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 42
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 25,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 86
+                              },
+                              "text": "site.get_maven_id_from(best_matched_result)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 47
+                                  },
+                                  "text": "site"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 48
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 65
+                                  },
+                                  "text": "get_maven_id_from"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 65
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 86
+                                  },
+                                  "text": "(best_matched_result)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 65
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 66
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 66
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 85
+                                      },
+                                      "text": "best_matched_result"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 85
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 86
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 26,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 19
+                          },
+                          "text": "log.warn(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 13
+                              },
+                              "text": "log"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 26,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 14
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 18
+                              },
+                              "text": "warn"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 26,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 19
+                              },
+                              "text": "(\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"\n                  )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 19
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 52
+                                  },
+                                  "text": "\"pom.xml for #{filename} found on search.maven.org with heuristic search\\\n            (#{group_id}:#{artifact_id}:#{version})\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 20
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 32
+                                      },
+                                      "text": "pom.xml for "
+                                    },
+                                    {
+                                      "type": "interpolation",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 43
+                                      },
+                                      "text": "#{filename}",
+                                      "children": [
+                                        {
+                                          "type": "#{",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 34
+                                          },
+                                          "text": "#{"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 42
+                                          },
+                                          "text": "filename"
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 43
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 91
+                                      },
+                                      "text": " found on search.maven.org with heuristic search"
+                                    },
+                                    {
+                                      "type": "escape_sequence",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 91
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 0
+                                      },
+                                      "text": "\\\n"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 0
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 13
+                                      },
+                                      "text": "            ("
+                                    },
+                                    {
+                                      "type": "interpolation",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 24
+                                      },
+                                      "text": "#{group_id}",
+                                      "children": [
+                                        {
+                                          "type": "#{",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 15
+                                          },
+                                          "text": "#{"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 23
+                                          },
+                                          "text": "group_id"
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 24
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 25
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "interpolation",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 39
+                                      },
+                                      "text": "#{artifact_id}",
+                                      "children": [
+                                        {
+                                          "type": "#{",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 27
+                                          },
+                                          "text": "#{"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 38
+                                          },
+                                          "text": "artifact_id"
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 39
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 40
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "interpolation",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 50
+                                      },
+                                      "text": "#{version}",
+                                      "children": [
+                                        {
+                                          "type": "#{",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 42
+                                          },
+                                          "text": "#{"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 49
+                                          },
+                                          "text": "version"
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 50
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 51
+                                      },
+                                      "text": ")"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 52
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 19
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 30,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 88
+                          },
+                          "text": "return site.download_pom(group_id, artifact_id, version), :found_via_heuristic",
+                          "children": [
+                            {
+                              "type": "return",
+                              "start": {
+                                "row": 30,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 16
+                              },
+                              "text": "return"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 30,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 88
+                              },
+                              "text": "site.download_pom(group_id, artifact_id, version), :found_via_heuristic",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 66
+                                  },
+                                  "text": "site.download_pom(group_id, artifact_id, version)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 21
+                                      },
+                                      "text": "site"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 22
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 34
+                                      },
+                                      "text": "download_pom"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 66
+                                      },
+                                      "text": "(group_id, artifact_id, version)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 35
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 43
+                                          },
+                                          "text": "group_id"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 44
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 56
+                                          },
+                                          "text": "artifact_id"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 56
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 57
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 58
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 65
+                                          },
+                                          "text": "version"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 65
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 66
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 67
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "simple_symbol",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 68
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 88
+                                  },
+                                  "text": ":found_via_heuristic"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "end",
+                      "start": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 11
+                      },
+                      "text": "end"
+                    }
+                  ]
+                },
+                {
+                  "type": "rescue",
+                  "start": {
+                    "row": 32,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 33,
+                    "column": 99
+                  },
+                  "text": "rescue NotFoundOnMavenWebsiteError\n        log.warn(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")",
+                  "children": [
+                    {
+                      "type": "rescue",
+                      "start": {
+                        "row": 32,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 12
+                      },
+                      "text": "rescue"
+                    },
+                    {
+                      "type": "exceptions",
+                      "start": {
+                        "row": 32,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 40
+                      },
+                      "text": "NotFoundOnMavenWebsiteError",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 32,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 40
+                          },
+                          "text": "NotFoundOnMavenWebsiteError"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 32,
+                        "column": 40
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 99
+                      },
+                      "text": "\n        log.warn(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 33,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 99
+                          },
+                          "text": "log.warn(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 11
+                              },
+                              "text": "log"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 33,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 12
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 16
+                              },
+                              "text": "warn"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 33,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 99
+                              },
+                              "text": "(\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 17
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 98
+                                  },
+                                  "text": "\"Got a 404 error while looking for #{filename} heuristically in search.maven.org\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 18
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 52
+                                      },
+                                      "text": "Got a 404 error while looking for "
+                                    },
+                                    {
+                                      "type": "interpolation",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 63
+                                      },
+                                      "text": "#{filename}",
+                                      "children": [
+                                        {
+                                          "type": "#{",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 54
+                                          },
+                                          "text": "#{"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 54
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 62
+                                          },
+                                          "text": "filename"
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 62
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 63
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 63
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 97
+                                      },
+                                      "text": " heuristically in search.maven.org"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 97
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 98
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 98
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 99
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "end",
+                  "start": {
+                    "row": 34,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 9
+                  },
+                  "text": "end"
+                }
+              ]
+            },
+            {
+              "type": "nil",
+              "start": {
+                "row": 35,
+                "column": 6
+              },
+              "end": {
+                "row": 35,
+                "column": 9
+              },
+              "text": "nil",
+              "children": [
+                {
+                  "type": "nil",
+                  "start": {
+                    "row": 35,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 9
+                  },
+                  "text": "nil"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 36,
+            "column": 4
+          },
+          "end": {
+            "row": 36,
+            "column": 7
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

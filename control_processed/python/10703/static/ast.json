@@ -1,0 +1,2966 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 110,
+    "column": 5
+  },
+  "text": "def run_algorithm(start,\n                  end,\n                  initialize,\n                  capital_base,\n                  handle_data=None,\n                  before_trading_start=None,\n                  analyze=None,\n                  data_frequency='daily',\n                  bundle='quantopian-quandl',\n                  bundle_timestamp=None,\n                  trading_calendar=None,\n                  metrics_set='default',\n                  benchmark_returns=None,\n                  default_extension=True,\n                  extensions=(),\n                  strict_extensions=True,\n                  environ=os.environ,\n                  blotter='default'):\n    \"\"\"\n    Run a trading algorithm.\n\n    Parameters\n    ----------\n    start : datetime\n        The start date of the backtest.\n    end : datetime\n        The end date of the backtest..\n    initialize : callable[context -> None]\n        The initialize function to use for the algorithm. This is called once\n        at the very begining of the backtest and should be used to set up\n        any state needed by the algorithm.\n    capital_base : float\n        The starting capital for the backtest.\n    handle_data : callable[(context, BarData) -> None], optional\n        The handle_data function to use for the algorithm. This is called\n        every minute when ``data_frequency == 'minute'`` or every day\n        when ``data_frequency == 'daily'``.\n    before_trading_start : callable[(context, BarData) -> None], optional\n        The before_trading_start function for the algorithm. This is called\n        once before each trading day (after initialize on the first day).\n    analyze : callable[(context, pd.DataFrame) -> None], optional\n        The analyze function to use for the algorithm. This function is called\n        once at the end of the backtest and is passed the context and the\n        performance data.\n    data_frequency : {'daily', 'minute'}, optional\n        The data frequency to run the algorithm at.\n    bundle : str, optional\n        The name of the data bundle to use to load the data to run the backtest\n        with. This defaults to 'quantopian-quandl'.\n    bundle_timestamp : datetime, optional\n        The datetime to lookup the bundle data for. This defaults to the\n        current time.\n    trading_calendar : TradingCalendar, optional\n        The trading calendar to use for your backtest.\n    metrics_set : iterable[Metric] or str, optional\n        The set of metrics to compute in the simulation. If a string is passed,\n        resolve the set with :func:`zipline.finance.metrics.load`.\n    default_extension : bool, optional\n        Should the default zipline extension be loaded. This is found at\n        ``$ZIPLINE_ROOT/extension.py``\n    extensions : iterable[str], optional\n        The names of any other extensions to load. Each element may either be\n        a dotted module path like ``a.b.c`` or a path to a python file ending\n        in ``.py`` like ``a/b/c.py``.\n    strict_extensions : bool, optional\n        Should the run fail if any extensions fail to load. If this is false,\n        a warning will be raised instead.\n    environ : mapping[str -> str], optional\n        The os environment to use. Many extensions use this to get parameters.\n        This defaults to ``os.environ``.\n    blotter : str or zipline.finance.blotter.Blotter, optional\n        Blotter to use with this algorithm. If passed as a string, we look for\n        a blotter construction function registered with\n        ``zipline.extensions.register`` and call it with no parameters.\n        Default is a :class:`zipline.finance.blotter.SimulationBlotter` that\n        never cancels orders.\n\n    Returns\n    -------\n    perf : pd.DataFrame\n        The daily performance of the algorithm.\n\n    See Also\n    --------\n    zipline.data.bundles.bundles : The available data bundles.\n    \"\"\"\n    load_extensions(default_extension, extensions, strict_extensions, environ)\n\n    return _run(\n        handle_data=handle_data,\n        initialize=initialize,\n        before_trading_start=before_trading_start,\n        analyze=analyze,\n        algofile=None,\n        algotext=None,\n        defines=(),\n        data_frequency=data_frequency,\n        capital_base=capital_base,\n        bundle=bundle,\n        bundle_timestamp=bundle_timestamp,\n        start=start,\n        end=end,\n        output=os.devnull,\n        trading_calendar=trading_calendar,\n        print_algo=False,\n        metrics_set=metrics_set,\n        local_namespace=False,\n        environ=environ,\n        blotter=blotter,\n        benchmark_returns=benchmark_returns,\n    )",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 110,
+        "column": 5
+      },
+      "text": "def run_algorithm(start,\n                  end,\n                  initialize,\n                  capital_base,\n                  handle_data=None,\n                  before_trading_start=None,\n                  analyze=None,\n                  data_frequency='daily',\n                  bundle='quantopian-quandl',\n                  bundle_timestamp=None,\n                  trading_calendar=None,\n                  metrics_set='default',\n                  benchmark_returns=None,\n                  default_extension=True,\n                  extensions=(),\n                  strict_extensions=True,\n                  environ=os.environ,\n                  blotter='default'):\n    \"\"\"\n    Run a trading algorithm.\n\n    Parameters\n    ----------\n    start : datetime\n        The start date of the backtest.\n    end : datetime\n        The end date of the backtest..\n    initialize : callable[context -> None]\n        The initialize function to use for the algorithm. This is called once\n        at the very begining of the backtest and should be used to set up\n        any state needed by the algorithm.\n    capital_base : float\n        The starting capital for the backtest.\n    handle_data : callable[(context, BarData) -> None], optional\n        The handle_data function to use for the algorithm. This is called\n        every minute when ``data_frequency == 'minute'`` or every day\n        when ``data_frequency == 'daily'``.\n    before_trading_start : callable[(context, BarData) -> None], optional\n        The before_trading_start function for the algorithm. This is called\n        once before each trading day (after initialize on the first day).\n    analyze : callable[(context, pd.DataFrame) -> None], optional\n        The analyze function to use for the algorithm. This function is called\n        once at the end of the backtest and is passed the context and the\n        performance data.\n    data_frequency : {'daily', 'minute'}, optional\n        The data frequency to run the algorithm at.\n    bundle : str, optional\n        The name of the data bundle to use to load the data to run the backtest\n        with. This defaults to 'quantopian-quandl'.\n    bundle_timestamp : datetime, optional\n        The datetime to lookup the bundle data for. This defaults to the\n        current time.\n    trading_calendar : TradingCalendar, optional\n        The trading calendar to use for your backtest.\n    metrics_set : iterable[Metric] or str, optional\n        The set of metrics to compute in the simulation. If a string is passed,\n        resolve the set with :func:`zipline.finance.metrics.load`.\n    default_extension : bool, optional\n        Should the default zipline extension be loaded. This is found at\n        ``$ZIPLINE_ROOT/extension.py``\n    extensions : iterable[str], optional\n        The names of any other extensions to load. Each element may either be\n        a dotted module path like ``a.b.c`` or a path to a python file ending\n        in ``.py`` like ``a/b/c.py``.\n    strict_extensions : bool, optional\n        Should the run fail if any extensions fail to load. If this is false,\n        a warning will be raised instead.\n    environ : mapping[str -> str], optional\n        The os environment to use. Many extensions use this to get parameters.\n        This defaults to ``os.environ``.\n    blotter : str or zipline.finance.blotter.Blotter, optional\n        Blotter to use with this algorithm. If passed as a string, we look for\n        a blotter construction function registered with\n        ``zipline.extensions.register`` and call it with no parameters.\n        Default is a :class:`zipline.finance.blotter.SimulationBlotter` that\n        never cancels orders.\n\n    Returns\n    -------\n    perf : pd.DataFrame\n        The daily performance of the algorithm.\n\n    See Also\n    --------\n    zipline.data.bundles.bundles : The available data bundles.\n    \"\"\"\n    load_extensions(default_extension, extensions, strict_extensions, environ)\n\n    return _run(\n        handle_data=handle_data,\n        initialize=initialize,\n        before_trading_start=before_trading_start,\n        analyze=analyze,\n        algofile=None,\n        algotext=None,\n        defines=(),\n        data_frequency=data_frequency,\n        capital_base=capital_base,\n        bundle=bundle,\n        bundle_timestamp=bundle_timestamp,\n        start=start,\n        end=end,\n        output=os.devnull,\n        trading_calendar=trading_calendar,\n        print_algo=False,\n        metrics_set=metrics_set,\n        local_namespace=False,\n        environ=environ,\n        blotter=blotter,\n        benchmark_returns=benchmark_returns,\n    )",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 17
+          },
+          "text": "run_algorithm"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 17
+          },
+          "end": {
+            "row": 17,
+            "column": 36
+          },
+          "text": "(start,\n                  end,\n                  initialize,\n                  capital_base,\n                  handle_data=None,\n                  before_trading_start=None,\n                  analyze=None,\n                  data_frequency='daily',\n                  bundle='quantopian-quandl',\n                  bundle_timestamp=None,\n                  trading_calendar=None,\n                  metrics_set='default',\n                  benchmark_returns=None,\n                  default_extension=True,\n                  extensions=(),\n                  strict_extensions=True,\n                  environ=os.environ,\n                  blotter='default')",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 17
+              },
+              "end": {
+                "row": 0,
+                "column": 18
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 18
+              },
+              "end": {
+                "row": 0,
+                "column": 23
+              },
+              "text": "start"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 23
+              },
+              "end": {
+                "row": 0,
+                "column": 24
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 1,
+                "column": 18
+              },
+              "end": {
+                "row": 1,
+                "column": 21
+              },
+              "text": "end"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 21
+              },
+              "end": {
+                "row": 1,
+                "column": 22
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 2,
+                "column": 18
+              },
+              "end": {
+                "row": 2,
+                "column": 28
+              },
+              "text": "initialize"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 2,
+                "column": 28
+              },
+              "end": {
+                "row": 2,
+                "column": 29
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 3,
+                "column": 18
+              },
+              "end": {
+                "row": 3,
+                "column": 30
+              },
+              "text": "capital_base"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 3,
+                "column": 30
+              },
+              "end": {
+                "row": 3,
+                "column": 31
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 4,
+                "column": 18
+              },
+              "end": {
+                "row": 4,
+                "column": 34
+              },
+              "text": "handle_data=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 29
+                  },
+                  "text": "handle_data"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 4,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 30
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 4,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 34
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 4,
+                "column": 34
+              },
+              "end": {
+                "row": 4,
+                "column": 35
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 5,
+                "column": 18
+              },
+              "end": {
+                "row": 5,
+                "column": 43
+              },
+              "text": "before_trading_start=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 5,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 38
+                  },
+                  "text": "before_trading_start"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 5,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 39
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 5,
+                    "column": 39
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 43
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 5,
+                "column": 43
+              },
+              "end": {
+                "row": 5,
+                "column": 44
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 6,
+                "column": 18
+              },
+              "end": {
+                "row": 6,
+                "column": 30
+              },
+              "text": "analyze=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 6,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 25
+                  },
+                  "text": "analyze"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 6,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 26
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 6,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 30
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 6,
+                "column": 30
+              },
+              "end": {
+                "row": 6,
+                "column": 31
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 7,
+                "column": 18
+              },
+              "end": {
+                "row": 7,
+                "column": 40
+              },
+              "text": "data_frequency='daily'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 7,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 32
+                  },
+                  "text": "data_frequency"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 7,
+                    "column": 32
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 33
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 7,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 40
+                  },
+                  "text": "'daily'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 7,
+                        "column": 33
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 34
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 7,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 39
+                      },
+                      "text": "daily"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 7,
+                        "column": 39
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 40
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 7,
+                "column": 40
+              },
+              "end": {
+                "row": 7,
+                "column": 41
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 8,
+                "column": 18
+              },
+              "end": {
+                "row": 8,
+                "column": 44
+              },
+              "text": "bundle='quantopian-quandl'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 8,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 24
+                  },
+                  "text": "bundle"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 8,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 25
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 8,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 44
+                  },
+                  "text": "'quantopian-quandl'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 8,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 26
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 8,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 43
+                      },
+                      "text": "quantopian-quandl"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 8,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 44
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 8,
+                "column": 44
+              },
+              "end": {
+                "row": 8,
+                "column": 45
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 9,
+                "column": 18
+              },
+              "end": {
+                "row": 9,
+                "column": 39
+              },
+              "text": "bundle_timestamp=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 9,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 34
+                  },
+                  "text": "bundle_timestamp"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 9,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 35
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 9,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 39
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 9,
+                "column": 39
+              },
+              "end": {
+                "row": 9,
+                "column": 40
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 10,
+                "column": 18
+              },
+              "end": {
+                "row": 10,
+                "column": 39
+              },
+              "text": "trading_calendar=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 10,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 34
+                  },
+                  "text": "trading_calendar"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 10,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 35
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 10,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 39
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 10,
+                "column": 39
+              },
+              "end": {
+                "row": 10,
+                "column": 40
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 11,
+                "column": 18
+              },
+              "end": {
+                "row": 11,
+                "column": 39
+              },
+              "text": "metrics_set='default'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 11,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 29
+                  },
+                  "text": "metrics_set"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 11,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 30
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 11,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 39
+                  },
+                  "text": "'default'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 11,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 31
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 11,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 38
+                      },
+                      "text": "default"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 11,
+                        "column": 38
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 39
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 11,
+                "column": 39
+              },
+              "end": {
+                "row": 11,
+                "column": 40
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 12,
+                "column": 18
+              },
+              "end": {
+                "row": 12,
+                "column": 40
+              },
+              "text": "benchmark_returns=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 12,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 35
+                  },
+                  "text": "benchmark_returns"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 12,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 36
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 12,
+                    "column": 36
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 40
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 12,
+                "column": 40
+              },
+              "end": {
+                "row": 12,
+                "column": 41
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 13,
+                "column": 18
+              },
+              "end": {
+                "row": 13,
+                "column": 40
+              },
+              "text": "default_extension=True",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 13,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 13,
+                    "column": 35
+                  },
+                  "text": "default_extension"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 13,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 13,
+                    "column": 36
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "true",
+                  "start": {
+                    "row": 13,
+                    "column": 36
+                  },
+                  "end": {
+                    "row": 13,
+                    "column": 40
+                  },
+                  "text": "True"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 13,
+                "column": 40
+              },
+              "end": {
+                "row": 13,
+                "column": 41
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 14,
+                "column": 18
+              },
+              "end": {
+                "row": 14,
+                "column": 31
+              },
+              "text": "extensions=()",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 14,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 28
+                  },
+                  "text": "extensions"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 14,
+                    "column": 28
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 29
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "tuple",
+                  "start": {
+                    "row": 14,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 31
+                  },
+                  "text": "()",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 14,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 30
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 14,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 31
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 14,
+                "column": 31
+              },
+              "end": {
+                "row": 14,
+                "column": 32
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 15,
+                "column": 18
+              },
+              "end": {
+                "row": 15,
+                "column": 40
+              },
+              "text": "strict_extensions=True",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 15,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 35
+                  },
+                  "text": "strict_extensions"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 15,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 36
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "true",
+                  "start": {
+                    "row": 15,
+                    "column": 36
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 40
+                  },
+                  "text": "True"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 15,
+                "column": 40
+              },
+              "end": {
+                "row": 15,
+                "column": 41
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 16,
+                "column": 18
+              },
+              "end": {
+                "row": 16,
+                "column": 36
+              },
+              "text": "environ=os.environ",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 16,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 25
+                  },
+                  "text": "environ"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 16,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 26
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "attribute",
+                  "start": {
+                    "row": 16,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 36
+                  },
+                  "text": "os.environ",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 16,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 28
+                      },
+                      "text": "os"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 16,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 29
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 16,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 36
+                      },
+                      "text": "environ"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 16,
+                "column": 36
+              },
+              "end": {
+                "row": 16,
+                "column": 37
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 17,
+                "column": 18
+              },
+              "end": {
+                "row": 17,
+                "column": 35
+              },
+              "text": "blotter='default'",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 17,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 25
+                  },
+                  "text": "blotter"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 17,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 26
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 17,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 35
+                  },
+                  "text": "'default'",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 17,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 27
+                      },
+                      "text": "'"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 17,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 34
+                      },
+                      "text": "default"
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 17,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 35
+                      },
+                      "text": "'"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 17,
+                "column": 35
+              },
+              "end": {
+                "row": 17,
+                "column": 36
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 17,
+            "column": 36
+          },
+          "end": {
+            "row": 17,
+            "column": 37
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 18,
+            "column": 4
+          },
+          "end": {
+            "row": 110,
+            "column": 5
+          },
+          "text": "\"\"\"\n    Run a trading algorithm.\n\n    Parameters\n    ----------\n    start : datetime\n        The start date of the backtest.\n    end : datetime\n        The end date of the backtest..\n    initialize : callable[context -> None]\n        The initialize function to use for the algorithm. This is called once\n        at the very begining of the backtest and should be used to set up\n        any state needed by the algorithm.\n    capital_base : float\n        The starting capital for the backtest.\n    handle_data : callable[(context, BarData) -> None], optional\n        The handle_data function to use for the algorithm. This is called\n        every minute when ``data_frequency == 'minute'`` or every day\n        when ``data_frequency == 'daily'``.\n    before_trading_start : callable[(context, BarData) -> None], optional\n        The before_trading_start function for the algorithm. This is called\n        once before each trading day (after initialize on the first day).\n    analyze : callable[(context, pd.DataFrame) -> None], optional\n        The analyze function to use for the algorithm. This function is called\n        once at the end of the backtest and is passed the context and the\n        performance data.\n    data_frequency : {'daily', 'minute'}, optional\n        The data frequency to run the algorithm at.\n    bundle : str, optional\n        The name of the data bundle to use to load the data to run the backtest\n        with. This defaults to 'quantopian-quandl'.\n    bundle_timestamp : datetime, optional\n        The datetime to lookup the bundle data for. This defaults to the\n        current time.\n    trading_calendar : TradingCalendar, optional\n        The trading calendar to use for your backtest.\n    metrics_set : iterable[Metric] or str, optional\n        The set of metrics to compute in the simulation. If a string is passed,\n        resolve the set with :func:`zipline.finance.metrics.load`.\n    default_extension : bool, optional\n        Should the default zipline extension be loaded. This is found at\n        ``$ZIPLINE_ROOT/extension.py``\n    extensions : iterable[str], optional\n        The names of any other extensions to load. Each element may either be\n        a dotted module path like ``a.b.c`` or a path to a python file ending\n        in ``.py`` like ``a/b/c.py``.\n    strict_extensions : bool, optional\n        Should the run fail if any extensions fail to load. If this is false,\n        a warning will be raised instead.\n    environ : mapping[str -> str], optional\n        The os environment to use. Many extensions use this to get parameters.\n        This defaults to ``os.environ``.\n    blotter : str or zipline.finance.blotter.Blotter, optional\n        Blotter to use with this algorithm. If passed as a string, we look for\n        a blotter construction function registered with\n        ``zipline.extensions.register`` and call it with no parameters.\n        Default is a :class:`zipline.finance.blotter.SimulationBlotter` that\n        never cancels orders.\n\n    Returns\n    -------\n    perf : pd.DataFrame\n        The daily performance of the algorithm.\n\n    See Also\n    --------\n    zipline.data.bundles.bundles : The available data bundles.\n    \"\"\"\n    load_extensions(default_extension, extensions, strict_extensions, environ)\n\n    return _run(\n        handle_data=handle_data,\n        initialize=initialize,\n        before_trading_start=before_trading_start,\n        analyze=analyze,\n        algofile=None,\n        algotext=None,\n        defines=(),\n        data_frequency=data_frequency,\n        capital_base=capital_base,\n        bundle=bundle,\n        bundle_timestamp=bundle_timestamp,\n        start=start,\n        end=end,\n        output=os.devnull,\n        trading_calendar=trading_calendar,\n        print_algo=False,\n        metrics_set=metrics_set,\n        local_namespace=False,\n        environ=environ,\n        blotter=blotter,\n        benchmark_returns=benchmark_returns,\n    )",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 18,
+                "column": 4
+              },
+              "end": {
+                "row": 85,
+                "column": 7
+              },
+              "text": "\"\"\"\n    Run a trading algorithm.\n\n    Parameters\n    ----------\n    start : datetime\n        The start date of the backtest.\n    end : datetime\n        The end date of the backtest..\n    initialize : callable[context -> None]\n        The initialize function to use for the algorithm. This is called once\n        at the very begining of the backtest and should be used to set up\n        any state needed by the algorithm.\n    capital_base : float\n        The starting capital for the backtest.\n    handle_data : callable[(context, BarData) -> None], optional\n        The handle_data function to use for the algorithm. This is called\n        every minute when ``data_frequency == 'minute'`` or every day\n        when ``data_frequency == 'daily'``.\n    before_trading_start : callable[(context, BarData) -> None], optional\n        The before_trading_start function for the algorithm. This is called\n        once before each trading day (after initialize on the first day).\n    analyze : callable[(context, pd.DataFrame) -> None], optional\n        The analyze function to use for the algorithm. This function is called\n        once at the end of the backtest and is passed the context and the\n        performance data.\n    data_frequency : {'daily', 'minute'}, optional\n        The data frequency to run the algorithm at.\n    bundle : str, optional\n        The name of the data bundle to use to load the data to run the backtest\n        with. This defaults to 'quantopian-quandl'.\n    bundle_timestamp : datetime, optional\n        The datetime to lookup the bundle data for. This defaults to the\n        current time.\n    trading_calendar : TradingCalendar, optional\n        The trading calendar to use for your backtest.\n    metrics_set : iterable[Metric] or str, optional\n        The set of metrics to compute in the simulation. If a string is passed,\n        resolve the set with :func:`zipline.finance.metrics.load`.\n    default_extension : bool, optional\n        Should the default zipline extension be loaded. This is found at\n        ``$ZIPLINE_ROOT/extension.py``\n    extensions : iterable[str], optional\n        The names of any other extensions to load. Each element may either be\n        a dotted module path like ``a.b.c`` or a path to a python file ending\n        in ``.py`` like ``a/b/c.py``.\n    strict_extensions : bool, optional\n        Should the run fail if any extensions fail to load. If this is false,\n        a warning will be raised instead.\n    environ : mapping[str -> str], optional\n        The os environment to use. Many extensions use this to get parameters.\n        This defaults to ``os.environ``.\n    blotter : str or zipline.finance.blotter.Blotter, optional\n        Blotter to use with this algorithm. If passed as a string, we look for\n        a blotter construction function registered with\n        ``zipline.extensions.register`` and call it with no parameters.\n        Default is a :class:`zipline.finance.blotter.SimulationBlotter` that\n        never cancels orders.\n\n    Returns\n    -------\n    perf : pd.DataFrame\n        The daily performance of the algorithm.\n\n    See Also\n    --------\n    zipline.data.bundles.bundles : The available data bundles.\n    \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 18,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 85,
+                    "column": 7
+                  },
+                  "text": "\"\"\"\n    Run a trading algorithm.\n\n    Parameters\n    ----------\n    start : datetime\n        The start date of the backtest.\n    end : datetime\n        The end date of the backtest..\n    initialize : callable[context -> None]\n        The initialize function to use for the algorithm. This is called once\n        at the very begining of the backtest and should be used to set up\n        any state needed by the algorithm.\n    capital_base : float\n        The starting capital for the backtest.\n    handle_data : callable[(context, BarData) -> None], optional\n        The handle_data function to use for the algorithm. This is called\n        every minute when ``data_frequency == 'minute'`` or every day\n        when ``data_frequency == 'daily'``.\n    before_trading_start : callable[(context, BarData) -> None], optional\n        The before_trading_start function for the algorithm. This is called\n        once before each trading day (after initialize on the first day).\n    analyze : callable[(context, pd.DataFrame) -> None], optional\n        The analyze function to use for the algorithm. This function is called\n        once at the end of the backtest and is passed the context and the\n        performance data.\n    data_frequency : {'daily', 'minute'}, optional\n        The data frequency to run the algorithm at.\n    bundle : str, optional\n        The name of the data bundle to use to load the data to run the backtest\n        with. This defaults to 'quantopian-quandl'.\n    bundle_timestamp : datetime, optional\n        The datetime to lookup the bundle data for. This defaults to the\n        current time.\n    trading_calendar : TradingCalendar, optional\n        The trading calendar to use for your backtest.\n    metrics_set : iterable[Metric] or str, optional\n        The set of metrics to compute in the simulation. If a string is passed,\n        resolve the set with :func:`zipline.finance.metrics.load`.\n    default_extension : bool, optional\n        Should the default zipline extension be loaded. This is found at\n        ``$ZIPLINE_ROOT/extension.py``\n    extensions : iterable[str], optional\n        The names of any other extensions to load. Each element may either be\n        a dotted module path like ``a.b.c`` or a path to a python file ending\n        in ``.py`` like ``a/b/c.py``.\n    strict_extensions : bool, optional\n        Should the run fail if any extensions fail to load. If this is false,\n        a warning will be raised instead.\n    environ : mapping[str -> str], optional\n        The os environment to use. Many extensions use this to get parameters.\n        This defaults to ``os.environ``.\n    blotter : str or zipline.finance.blotter.Blotter, optional\n        Blotter to use with this algorithm. If passed as a string, we look for\n        a blotter construction function registered with\n        ``zipline.extensions.register`` and call it with no parameters.\n        Default is a :class:`zipline.finance.blotter.SimulationBlotter` that\n        never cancels orders.\n\n    Returns\n    -------\n    perf : pd.DataFrame\n        The daily performance of the algorithm.\n\n    See Also\n    --------\n    zipline.data.bundles.bundles : The available data bundles.\n    \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 18,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 18,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 85,
+                        "column": 4
+                      },
+                      "text": "\n    Run a trading algorithm.\n\n    Parameters\n    ----------\n    start : datetime\n        The start date of the backtest.\n    end : datetime\n        The end date of the backtest..\n    initialize : callable[context -> None]\n        The initialize function to use for the algorithm. This is called once\n        at the very begining of the backtest and should be used to set up\n        any state needed by the algorithm.\n    capital_base : float\n        The starting capital for the backtest.\n    handle_data : callable[(context, BarData) -> None], optional\n        The handle_data function to use for the algorithm. This is called\n        every minute when ``data_frequency == 'minute'`` or every day\n        when ``data_frequency == 'daily'``.\n    before_trading_start : callable[(context, BarData) -> None], optional\n        The before_trading_start function for the algorithm. This is called\n        once before each trading day (after initialize on the first day).\n    analyze : callable[(context, pd.DataFrame) -> None], optional\n        The analyze function to use for the algorithm. This function is called\n        once at the end of the backtest and is passed the context and the\n        performance data.\n    data_frequency : {'daily', 'minute'}, optional\n        The data frequency to run the algorithm at.\n    bundle : str, optional\n        The name of the data bundle to use to load the data to run the backtest\n        with. This defaults to 'quantopian-quandl'.\n    bundle_timestamp : datetime, optional\n        The datetime to lookup the bundle data for. This defaults to the\n        current time.\n    trading_calendar : TradingCalendar, optional\n        The trading calendar to use for your backtest.\n    metrics_set : iterable[Metric] or str, optional\n        The set of metrics to compute in the simulation. If a string is passed,\n        resolve the set with :func:`zipline.finance.metrics.load`.\n    default_extension : bool, optional\n        Should the default zipline extension be loaded. This is found at\n        ``$ZIPLINE_ROOT/extension.py``\n    extensions : iterable[str], optional\n        The names of any other extensions to load. Each element may either be\n        a dotted module path like ``a.b.c`` or a path to a python file ending\n        in ``.py`` like ``a/b/c.py``.\n    strict_extensions : bool, optional\n        Should the run fail if any extensions fail to load. If this is false,\n        a warning will be raised instead.\n    environ : mapping[str -> str], optional\n        The os environment to use. Many extensions use this to get parameters.\n        This defaults to ``os.environ``.\n    blotter : str or zipline.finance.blotter.Blotter, optional\n        Blotter to use with this algorithm. If passed as a string, we look for\n        a blotter construction function registered with\n        ``zipline.extensions.register`` and call it with no parameters.\n        Default is a :class:`zipline.finance.blotter.SimulationBlotter` that\n        never cancels orders.\n\n    Returns\n    -------\n    perf : pd.DataFrame\n        The daily performance of the algorithm.\n\n    See Also\n    --------\n    zipline.data.bundles.bundles : The available data bundles.\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 85,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 85,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 86,
+                "column": 4
+              },
+              "end": {
+                "row": 86,
+                "column": 78
+              },
+              "text": "load_extensions(default_extension, extensions, strict_extensions, environ)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 86,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 86,
+                    "column": 78
+                  },
+                  "text": "load_extensions(default_extension, extensions, strict_extensions, environ)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 86,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 86,
+                        "column": 19
+                      },
+                      "text": "load_extensions"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 86,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 86,
+                        "column": 78
+                      },
+                      "text": "(default_extension, extensions, strict_extensions, environ)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 86,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 20
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 86,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 37
+                          },
+                          "text": "default_extension"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 86,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 38
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 86,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 49
+                          },
+                          "text": "extensions"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 86,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 50
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 86,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 68
+                          },
+                          "text": "strict_extensions"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 86,
+                            "column": 68
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 69
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 86,
+                            "column": 70
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 77
+                          },
+                          "text": "environ"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 86,
+                            "column": 77
+                          },
+                          "end": {
+                            "row": 86,
+                            "column": 78
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 88,
+                "column": 4
+              },
+              "end": {
+                "row": 110,
+                "column": 5
+              },
+              "text": "return _run(\n        handle_data=handle_data,\n        initialize=initialize,\n        before_trading_start=before_trading_start,\n        analyze=analyze,\n        algofile=None,\n        algotext=None,\n        defines=(),\n        data_frequency=data_frequency,\n        capital_base=capital_base,\n        bundle=bundle,\n        bundle_timestamp=bundle_timestamp,\n        start=start,\n        end=end,\n        output=os.devnull,\n        trading_calendar=trading_calendar,\n        print_algo=False,\n        metrics_set=metrics_set,\n        local_namespace=False,\n        environ=environ,\n        blotter=blotter,\n        benchmark_returns=benchmark_returns,\n    )",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 88,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 88,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 88,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 110,
+                    "column": 5
+                  },
+                  "text": "_run(\n        handle_data=handle_data,\n        initialize=initialize,\n        before_trading_start=before_trading_start,\n        analyze=analyze,\n        algofile=None,\n        algotext=None,\n        defines=(),\n        data_frequency=data_frequency,\n        capital_base=capital_base,\n        bundle=bundle,\n        bundle_timestamp=bundle_timestamp,\n        start=start,\n        end=end,\n        output=os.devnull,\n        trading_calendar=trading_calendar,\n        print_algo=False,\n        metrics_set=metrics_set,\n        local_namespace=False,\n        environ=environ,\n        blotter=blotter,\n        benchmark_returns=benchmark_returns,\n    )",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 88,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 88,
+                        "column": 15
+                      },
+                      "text": "_run"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 88,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 110,
+                        "column": 5
+                      },
+                      "text": "(\n        handle_data=handle_data,\n        initialize=initialize,\n        before_trading_start=before_trading_start,\n        analyze=analyze,\n        algofile=None,\n        algotext=None,\n        defines=(),\n        data_frequency=data_frequency,\n        capital_base=capital_base,\n        bundle=bundle,\n        bundle_timestamp=bundle_timestamp,\n        start=start,\n        end=end,\n        output=os.devnull,\n        trading_calendar=trading_calendar,\n        print_algo=False,\n        metrics_set=metrics_set,\n        local_namespace=False,\n        environ=environ,\n        blotter=blotter,\n        benchmark_returns=benchmark_returns,\n    )",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 88,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 88,
+                            "column": 16
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 89,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 31
+                          },
+                          "text": "handle_data=handle_data",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 89,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 19
+                              },
+                              "text": "handle_data"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 89,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 89,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 31
+                              },
+                              "text": "handle_data"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 89,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 32
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 90,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 90,
+                            "column": 29
+                          },
+                          "text": "initialize=initialize",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 90,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 90,
+                                "column": 18
+                              },
+                              "text": "initialize"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 90,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 90,
+                                "column": 19
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 90,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 90,
+                                "column": 29
+                              },
+                              "text": "initialize"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 90,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 90,
+                            "column": 30
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 91,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 91,
+                            "column": 49
+                          },
+                          "text": "before_trading_start=before_trading_start",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 91,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 91,
+                                "column": 28
+                              },
+                              "text": "before_trading_start"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 91,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 91,
+                                "column": 29
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 91,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 91,
+                                "column": 49
+                              },
+                              "text": "before_trading_start"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 91,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 91,
+                            "column": 50
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 92,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 92,
+                            "column": 23
+                          },
+                          "text": "analyze=analyze",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 92,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 92,
+                                "column": 15
+                              },
+                              "text": "analyze"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 92,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 92,
+                                "column": 16
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 92,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 92,
+                                "column": 23
+                              },
+                              "text": "analyze"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 92,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 92,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 93,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 93,
+                            "column": 21
+                          },
+                          "text": "algofile=None",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 93,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 93,
+                                "column": 16
+                              },
+                              "text": "algofile"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 93,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 93,
+                                "column": 17
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "none",
+                              "start": {
+                                "row": 93,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 93,
+                                "column": 21
+                              },
+                              "text": "None"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 93,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 93,
+                            "column": 22
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 94,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 94,
+                            "column": 21
+                          },
+                          "text": "algotext=None",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 94,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 94,
+                                "column": 16
+                              },
+                              "text": "algotext"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 94,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 94,
+                                "column": 17
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "none",
+                              "start": {
+                                "row": 94,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 94,
+                                "column": 21
+                              },
+                              "text": "None"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 94,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 94,
+                            "column": 22
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 95,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 95,
+                            "column": 18
+                          },
+                          "text": "defines=()",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 95,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 95,
+                                "column": 15
+                              },
+                              "text": "defines"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 95,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 95,
+                                "column": 16
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "tuple",
+                              "start": {
+                                "row": 95,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 95,
+                                "column": 18
+                              },
+                              "text": "()",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 95,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 95,
+                                    "column": 17
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 95,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 95,
+                                    "column": 18
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 95,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 95,
+                            "column": 19
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 96,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 96,
+                            "column": 37
+                          },
+                          "text": "data_frequency=data_frequency",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 96,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 96,
+                                "column": 22
+                              },
+                              "text": "data_frequency"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 96,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 96,
+                                "column": 23
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 96,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 96,
+                                "column": 37
+                              },
+                              "text": "data_frequency"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 96,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 96,
+                            "column": 38
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 97,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 97,
+                            "column": 33
+                          },
+                          "text": "capital_base=capital_base",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 97,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 97,
+                                "column": 20
+                              },
+                              "text": "capital_base"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 97,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 97,
+                                "column": 21
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 97,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 97,
+                                "column": 33
+                              },
+                              "text": "capital_base"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 97,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 97,
+                            "column": 34
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 98,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 98,
+                            "column": 21
+                          },
+                          "text": "bundle=bundle",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 98,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 98,
+                                "column": 14
+                              },
+                              "text": "bundle"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 98,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 98,
+                                "column": 15
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 98,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 98,
+                                "column": 21
+                              },
+                              "text": "bundle"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 98,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 98,
+                            "column": 22
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 99,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 99,
+                            "column": 41
+                          },
+                          "text": "bundle_timestamp=bundle_timestamp",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 99,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 99,
+                                "column": 24
+                              },
+                              "text": "bundle_timestamp"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 99,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 99,
+                                "column": 25
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 99,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 99,
+                                "column": 41
+                              },
+                              "text": "bundle_timestamp"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 99,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 99,
+                            "column": 42
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 100,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 100,
+                            "column": 19
+                          },
+                          "text": "start=start",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 100,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 100,
+                                "column": 13
+                              },
+                              "text": "start"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 100,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 100,
+                                "column": 14
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 100,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 100,
+                                "column": 19
+                              },
+                              "text": "start"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 100,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 100,
+                            "column": 20
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 101,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 101,
+                            "column": 15
+                          },
+                          "text": "end=end",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 101,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 101,
+                                "column": 11
+                              },
+                              "text": "end"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 101,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 101,
+                                "column": 12
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 101,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 101,
+                                "column": 15
+                              },
+                              "text": "end"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 101,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 101,
+                            "column": 16
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 102,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 102,
+                            "column": 25
+                          },
+                          "text": "output=os.devnull",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 102,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 102,
+                                "column": 14
+                              },
+                              "text": "output"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 102,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 102,
+                                "column": 15
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 102,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 102,
+                                "column": 25
+                              },
+                              "text": "os.devnull",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 102,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 102,
+                                    "column": 17
+                                  },
+                                  "text": "os"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 102,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 102,
+                                    "column": 18
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 102,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 102,
+                                    "column": 25
+                                  },
+                                  "text": "devnull"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 102,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 102,
+                            "column": 26
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 103,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 103,
+                            "column": 41
+                          },
+                          "text": "trading_calendar=trading_calendar",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 103,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 103,
+                                "column": 24
+                              },
+                              "text": "trading_calendar"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 103,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 103,
+                                "column": 25
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 103,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 103,
+                                "column": 41
+                              },
+                              "text": "trading_calendar"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 103,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 103,
+                            "column": 42
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 104,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 104,
+                            "column": 24
+                          },
+                          "text": "print_algo=False",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 104,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 104,
+                                "column": 18
+                              },
+                              "text": "print_algo"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 104,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 104,
+                                "column": 19
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "false",
+                              "start": {
+                                "row": 104,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 104,
+                                "column": 24
+                              },
+                              "text": "False"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 104,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 104,
+                            "column": 25
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 105,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 105,
+                            "column": 31
+                          },
+                          "text": "metrics_set=metrics_set",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 105,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 105,
+                                "column": 19
+                              },
+                              "text": "metrics_set"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 105,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 105,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 105,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 105,
+                                "column": 31
+                              },
+                              "text": "metrics_set"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 105,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 105,
+                            "column": 32
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 106,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 106,
+                            "column": 29
+                          },
+                          "text": "local_namespace=False",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 106,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 106,
+                                "column": 23
+                              },
+                              "text": "local_namespace"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 106,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 106,
+                                "column": 24
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "false",
+                              "start": {
+                                "row": 106,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 106,
+                                "column": 29
+                              },
+                              "text": "False"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 106,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 106,
+                            "column": 30
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 107,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 107,
+                            "column": 23
+                          },
+                          "text": "environ=environ",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 107,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 107,
+                                "column": 15
+                              },
+                              "text": "environ"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 107,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 107,
+                                "column": 16
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 107,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 107,
+                                "column": 23
+                              },
+                              "text": "environ"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 107,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 107,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 108,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 108,
+                            "column": 23
+                          },
+                          "text": "blotter=blotter",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 108,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 108,
+                                "column": 15
+                              },
+                              "text": "blotter"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 108,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 108,
+                                "column": 16
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 108,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 108,
+                                "column": 23
+                              },
+                              "text": "blotter"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 108,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 108,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "keyword_argument",
+                          "start": {
+                            "row": 109,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 109,
+                            "column": 43
+                          },
+                          "text": "benchmark_returns=benchmark_returns",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 109,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 109,
+                                "column": 25
+                              },
+                              "text": "benchmark_returns"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 109,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 109,
+                                "column": 26
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 109,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 109,
+                                "column": 43
+                              },
+                              "text": "benchmark_returns"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 109,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 109,
+                            "column": 44
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 110,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 110,
+                            "column": 5
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

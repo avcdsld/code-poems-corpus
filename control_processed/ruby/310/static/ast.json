@@ -1,0 +1,3788 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 44,
+    "column": 7
+  },
+  "text": "def read_loop(set_input_stream_done, is_client: true)\n      return enum_for(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client) unless block_given?\n      GRPC.logger.debug('bidi-read-loop: starting')\n      begin\n        count = 0\n        # queue the initial read before beginning the loop\n        loop do\n          GRPC.logger.debug(\"bidi-read-loop: #{count}\")\n          count += 1\n          batch_result = read_using_run_batch\n\n          # handle the next message\n          if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end\n\n          res = @unmarshal.call(batch_result.message)\n          yield res\n        end\n      rescue StandardError => e\n        GRPC.logger.warn('bidi: read-loop failed')\n        GRPC.logger.warn(e)\n        raise e\n      ensure\n        set_input_stream_done.call\n      end\n      GRPC.logger.debug('bidi-read-loop: finished')\n      # Make sure that the write loop is done before finishing the call.\n      # Note that blocking is ok at this point because we've already received\n      # a status\n      @enq_th.join if is_client\n    end",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 44,
+        "column": 7
+      },
+      "text": "def read_loop(set_input_stream_done, is_client: true)\n      return enum_for(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client) unless block_given?\n      GRPC.logger.debug('bidi-read-loop: starting')\n      begin\n        count = 0\n        # queue the initial read before beginning the loop\n        loop do\n          GRPC.logger.debug(\"bidi-read-loop: #{count}\")\n          count += 1\n          batch_result = read_using_run_batch\n\n          # handle the next message\n          if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end\n\n          res = @unmarshal.call(batch_result.message)\n          yield res\n        end\n      rescue StandardError => e\n        GRPC.logger.warn('bidi: read-loop failed')\n        GRPC.logger.warn(e)\n        raise e\n      ensure\n        set_input_stream_done.call\n      end\n      GRPC.logger.debug('bidi-read-loop: finished')\n      # Make sure that the write loop is done before finishing the call.\n      # Note that blocking is ok at this point because we've already received\n      # a status\n      @enq_th.join if is_client\n    end",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 13
+          },
+          "text": "read_loop"
+        },
+        {
+          "type": "method_parameters",
+          "start": {
+            "row": 0,
+            "column": 13
+          },
+          "end": {
+            "row": 0,
+            "column": 53
+          },
+          "text": "(set_input_stream_done, is_client: true)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 13
+              },
+              "end": {
+                "row": 0,
+                "column": 14
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 14
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": "set_input_stream_done"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 35
+              },
+              "end": {
+                "row": 0,
+                "column": 36
+              },
+              "text": ","
+            },
+            {
+              "type": "keyword_parameter",
+              "start": {
+                "row": 0,
+                "column": 37
+              },
+              "end": {
+                "row": 0,
+                "column": 52
+              },
+              "text": "is_client: true",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 37
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 46
+                  },
+                  "text": "is_client"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 0,
+                    "column": 46
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 47
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "true",
+                  "start": {
+                    "row": 0,
+                    "column": 48
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 52
+                  },
+                  "text": "true"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 52
+              },
+              "end": {
+                "row": 0,
+                "column": 53
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 43,
+            "column": 31
+          },
+          "text": "return enum_for(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client) unless block_given?\n      GRPC.logger.debug('bidi-read-loop: starting')\n      begin\n        count = 0\n        # queue the initial read before beginning the loop\n        loop do\n          GRPC.logger.debug(\"bidi-read-loop: #{count}\")\n          count += 1\n          batch_result = read_using_run_batch\n\n          # handle the next message\n          if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end\n\n          res = @unmarshal.call(batch_result.message)\n          yield res\n        end\n      rescue StandardError => e\n        GRPC.logger.warn('bidi: read-loop failed')\n        GRPC.logger.warn(e)\n        raise e\n      ensure\n        set_input_stream_done.call\n      end\n      GRPC.logger.debug('bidi-read-loop: finished')\n      # Make sure that the write loop is done before finishing the call.\n      # Note that blocking is ok at this point because we've already received\n      # a status\n      @enq_th.join if is_client",
+          "children": [
+            {
+              "type": "unless_modifier",
+              "start": {
+                "row": 1,
+                "column": 6
+              },
+              "end": {
+                "row": 3,
+                "column": 63
+              },
+              "text": "return enum_for(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client) unless block_given?",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 1,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 43
+                  },
+                  "text": "return enum_for(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client)",
+                  "children": [
+                    {
+                      "type": "return",
+                      "start": {
+                        "row": 1,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 12
+                      },
+                      "text": "return"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 1,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 43
+                      },
+                      "text": "enum_for(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 1,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 43
+                          },
+                          "text": "enum_for(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 1,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 21
+                              },
+                              "text": "enum_for"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 1,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 43
+                              },
+                              "text": "(:read_loop,\n                      set_input_stream_done,\n                      is_client: is_client)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 22
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "simple_symbol",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 32
+                                  },
+                                  "text": ":read_loop"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 33
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 43
+                                  },
+                                  "text": "set_input_stream_done"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 2,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 2,
+                                    "column": 44
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "pair",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 42
+                                  },
+                                  "text": "is_client: is_client",
+                                  "children": [
+                                    {
+                                      "type": "hash_key_symbol",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 31
+                                      },
+                                      "text": "is_client"
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 32
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 42
+                                      },
+                                      "text": "is_client"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 43
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "unless",
+                  "start": {
+                    "row": 3,
+                    "column": 44
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 50
+                  },
+                  "text": "unless"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 3,
+                    "column": 51
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 63
+                  },
+                  "text": "block_given?",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 3,
+                        "column": 51
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 63
+                      },
+                      "text": "block_given?"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 4,
+                "column": 6
+              },
+              "end": {
+                "row": 4,
+                "column": 51
+              },
+              "text": "GRPC.logger.debug('bidi-read-loop: starting')",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 4,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 17
+                  },
+                  "text": "GRPC.logger",
+                  "children": [
+                    {
+                      "type": "constant",
+                      "start": {
+                        "row": 4,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 10
+                      },
+                      "text": "GRPC"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 4,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 11
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 4,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 17
+                      },
+                      "text": "logger"
+                    }
+                  ]
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 4,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 18
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 23
+                  },
+                  "text": "debug"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 4,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 51
+                  },
+                  "text": "('bidi-read-loop: starting')",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 4,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 24
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "string",
+                      "start": {
+                        "row": 4,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 50
+                      },
+                      "text": "'bidi-read-loop: starting'",
+                      "children": [
+                        {
+                          "type": "\"",
+                          "start": {
+                            "row": 4,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 25
+                          },
+                          "text": "'"
+                        },
+                        {
+                          "type": "string_content",
+                          "start": {
+                            "row": 4,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 49
+                          },
+                          "text": "bidi-read-loop: starting"
+                        },
+                        {
+                          "type": "\"",
+                          "start": {
+                            "row": 4,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 50
+                          },
+                          "text": "'"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 4,
+                        "column": 50
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 51
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "begin",
+              "start": {
+                "row": 5,
+                "column": 6
+              },
+              "end": {
+                "row": 38,
+                "column": 9
+              },
+              "text": "begin\n        count = 0\n        # queue the initial read before beginning the loop\n        loop do\n          GRPC.logger.debug(\"bidi-read-loop: #{count}\")\n          count += 1\n          batch_result = read_using_run_batch\n\n          # handle the next message\n          if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end\n\n          res = @unmarshal.call(batch_result.message)\n          yield res\n        end\n      rescue StandardError => e\n        GRPC.logger.warn('bidi: read-loop failed')\n        GRPC.logger.warn(e)\n        raise e\n      ensure\n        set_input_stream_done.call\n      end",
+              "children": [
+                {
+                  "type": "begin",
+                  "start": {
+                    "row": 5,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 11
+                  },
+                  "text": "begin"
+                },
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 6,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 17
+                  },
+                  "text": "count = 0",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 6,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 13
+                      },
+                      "text": "count"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 6,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "integer",
+                      "start": {
+                        "row": 6,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 17
+                      },
+                      "text": "0"
+                    }
+                  ]
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 7,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 58
+                  },
+                  "text": "# queue the initial read before beginning the loop"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 8,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 11
+                  },
+                  "text": "loop do\n          GRPC.logger.debug(\"bidi-read-loop: #{count}\")\n          count += 1\n          batch_result = read_using_run_batch\n\n          # handle the next message\n          if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end\n\n          res = @unmarshal.call(batch_result.message)\n          yield res\n        end",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 12
+                      },
+                      "text": "loop"
+                    },
+                    {
+                      "type": "do_block",
+                      "start": {
+                        "row": 8,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 11
+                      },
+                      "text": "do\n          GRPC.logger.debug(\"bidi-read-loop: #{count}\")\n          count += 1\n          batch_result = read_using_run_batch\n\n          # handle the next message\n          if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end\n\n          res = @unmarshal.call(batch_result.message)\n          yield res\n        end",
+                      "children": [
+                        {
+                          "type": "do",
+                          "start": {
+                            "row": 8,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 15
+                          },
+                          "text": "do"
+                        },
+                        {
+                          "type": "body_statement",
+                          "start": {
+                            "row": 9,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 19
+                          },
+                          "text": "GRPC.logger.debug(\"bidi-read-loop: #{count}\")\n          count += 1\n          batch_result = read_using_run_batch\n\n          # handle the next message\n          if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end\n\n          res = @unmarshal.call(batch_result.message)\n          yield res",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 9,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 55
+                              },
+                              "text": "GRPC.logger.debug(\"bidi-read-loop: #{count}\")",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 21
+                                  },
+                                  "text": "GRPC.logger",
+                                  "children": [
+                                    {
+                                      "type": "constant",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 14
+                                      },
+                                      "text": "GRPC"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 15
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 21
+                                      },
+                                      "text": "logger"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 22
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 27
+                                  },
+                                  "text": "debug"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 55
+                                  },
+                                  "text": "(\"bidi-read-loop: #{count}\")",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 28
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 54
+                                      },
+                                      "text": "\"bidi-read-loop: #{count}\"",
+                                      "children": [
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 29
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 45
+                                          },
+                                          "text": "bidi-read-loop: "
+                                        },
+                                        {
+                                          "type": "interpolation",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 53
+                                          },
+                                          "text": "#{count}",
+                                          "children": [
+                                            {
+                                              "type": "#{",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 47
+                                              },
+                                              "text": "#{"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 52
+                                              },
+                                              "text": "count"
+                                            },
+                                            {
+                                              "type": "}",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 52
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 53
+                                              },
+                                              "text": "}"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 53
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 54
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 54
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 55
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "operator_assignment",
+                              "start": {
+                                "row": 10,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 20
+                              },
+                              "text": "count += 1",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 15
+                                  },
+                                  "text": "count"
+                                },
+                                {
+                                  "type": "+=",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 18
+                                  },
+                                  "text": "+="
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 20
+                                  },
+                                  "text": "1"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 11,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 45
+                              },
+                              "text": "batch_result = read_using_run_batch",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 22
+                                  },
+                                  "text": "batch_result"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 24
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 45
+                                  },
+                                  "text": "read_using_run_batch"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "comment",
+                              "start": {
+                                "row": 13,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 35
+                              },
+                              "text": "# handle the next message"
+                            },
+                            {
+                              "type": "if",
+                              "start": {
+                                "row": 14,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 13
+                              },
+                              "text": "if batch_result.nil? || batch_result.message.nil?\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break\n          end",
+                              "children": [
+                                {
+                                  "type": "if",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 12
+                                  },
+                                  "text": "if"
+                                },
+                                {
+                                  "type": "binary",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 59
+                                  },
+                                  "text": "batch_result.nil? || batch_result.message.nil?",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 30
+                                      },
+                                      "text": "batch_result.nil?",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 25
+                                          },
+                                          "text": "batch_result"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 26
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 30
+                                          },
+                                          "text": "nil?"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "||",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 33
+                                      },
+                                      "text": "||"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 59
+                                      },
+                                      "text": "batch_result.message.nil?",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 54
+                                          },
+                                          "text": "batch_result.message",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 34
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 46
+                                              },
+                                              "text": "batch_result"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 47
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 54
+                                              },
+                                              "text": "message"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 54
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 55
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 55
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 59
+                                          },
+                                          "text": "nil?"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "then",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 17
+                                  },
+                                  "text": "\n            GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")\n\n            if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end\n\n            GRPC.logger.debug('bidi-read-loop: done reading!')\n            break",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 75
+                                      },
+                                      "text": "GRPC.logger.debug(\"bidi-read-loop: null batch #{batch_result}\")",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 23
+                                          },
+                                          "text": "GRPC.logger",
+                                          "children": [
+                                            {
+                                              "type": "constant",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 12
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 16
+                                              },
+                                              "text": "GRPC"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 17
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 23
+                                              },
+                                              "text": "logger"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 24
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 29
+                                          },
+                                          "text": "debug"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 75
+                                          },
+                                          "text": "(\"bidi-read-loop: null batch #{batch_result}\")",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 30
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 30
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 74
+                                              },
+                                              "text": "\"bidi-read-loop: null batch #{batch_result}\"",
+                                              "children": [
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 15,
+                                                    "column": 30
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 31
+                                                  },
+                                                  "text": "\""
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 15,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 58
+                                                  },
+                                                  "text": "bidi-read-loop: null batch "
+                                                },
+                                                {
+                                                  "type": "interpolation",
+                                                  "start": {
+                                                    "row": 15,
+                                                    "column": 58
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 73
+                                                  },
+                                                  "text": "#{batch_result}",
+                                                  "children": [
+                                                    {
+                                                      "type": "#{",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 58
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 60
+                                                      },
+                                                      "text": "#{"
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 60
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 72
+                                                      },
+                                                      "text": "batch_result"
+                                                    },
+                                                    {
+                                                      "type": "}",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 72
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 73
+                                                      },
+                                                      "text": "}"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 15,
+                                                    "column": 73
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 74
+                                                  },
+                                                  "text": "\""
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 15,
+                                                "column": 74
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 75
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "if",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 15
+                                      },
+                                      "text": "if is_client\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status\n            end",
+                                      "children": [
+                                        {
+                                          "type": "if",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 14
+                                          },
+                                          "text": "if"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 24
+                                          },
+                                          "text": "is_client"
+                                        },
+                                        {
+                                          "type": "then",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 39
+                                          },
+                                          "text": "\n              batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)\n              @call.status = batch_result.status\n              @call.trailing_metadata = @call.status.metadata if @call.status\n              GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")\n              batch_result.check_status",
+                                          "children": [
+                                            {
+                                              "type": "assignment",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 74
+                                              },
+                                              "text": "batch_result = @call.run_batch(RECV_STATUS_ON_CLIENT => nil)",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 26
+                                                  },
+                                                  "text": "batch_result"
+                                                },
+                                                {
+                                                  "type": "=",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 28
+                                                  },
+                                                  "text": "="
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 29
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 74
+                                                  },
+                                                  "text": "@call.run_batch(RECV_STATUS_ON_CLIENT => nil)",
+                                                  "children": [
+                                                    {
+                                                      "type": "instance_variable",
+                                                      "start": {
+                                                        "row": 18,
+                                                        "column": 29
+                                                      },
+                                                      "end": {
+                                                        "row": 18,
+                                                        "column": 34
+                                                      },
+                                                      "text": "@call"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 18,
+                                                        "column": 34
+                                                      },
+                                                      "end": {
+                                                        "row": 18,
+                                                        "column": 35
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 18,
+                                                        "column": 35
+                                                      },
+                                                      "end": {
+                                                        "row": 18,
+                                                        "column": 44
+                                                      },
+                                                      "text": "run_batch"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 18,
+                                                        "column": 44
+                                                      },
+                                                      "end": {
+                                                        "row": 18,
+                                                        "column": 74
+                                                      },
+                                                      "text": "(RECV_STATUS_ON_CLIENT => nil)",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 18,
+                                                            "column": 44
+                                                          },
+                                                          "end": {
+                                                            "row": 18,
+                                                            "column": 45
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": "pair",
+                                                          "start": {
+                                                            "row": 18,
+                                                            "column": 45
+                                                          },
+                                                          "end": {
+                                                            "row": 18,
+                                                            "column": 73
+                                                          },
+                                                          "text": "RECV_STATUS_ON_CLIENT => nil",
+                                                          "children": [
+                                                            {
+                                                              "type": "constant",
+                                                              "start": {
+                                                                "row": 18,
+                                                                "column": 45
+                                                              },
+                                                              "end": {
+                                                                "row": 18,
+                                                                "column": 66
+                                                              },
+                                                              "text": "RECV_STATUS_ON_CLIENT"
+                                                            },
+                                                            {
+                                                              "type": "=>",
+                                                              "start": {
+                                                                "row": 18,
+                                                                "column": 67
+                                                              },
+                                                              "end": {
+                                                                "row": 18,
+                                                                "column": 69
+                                                              },
+                                                              "text": "=>"
+                                                            },
+                                                            {
+                                                              "type": "nil",
+                                                              "start": {
+                                                                "row": 18,
+                                                                "column": 70
+                                                              },
+                                                              "end": {
+                                                                "row": 18,
+                                                                "column": 73
+                                                              },
+                                                              "text": "nil",
+                                                              "children": [
+                                                                {
+                                                                  "type": "nil",
+                                                                  "start": {
+                                                                    "row": 18,
+                                                                    "column": 70
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 18,
+                                                                    "column": 73
+                                                                  },
+                                                                  "text": "nil"
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 18,
+                                                            "column": 73
+                                                          },
+                                                          "end": {
+                                                            "row": 18,
+                                                            "column": 74
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "assignment",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 48
+                                              },
+                                              "text": "@call.status = batch_result.status",
+                                              "children": [
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 26
+                                                  },
+                                                  "text": "@call.status",
+                                                  "children": [
+                                                    {
+                                                      "type": "instance_variable",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 14
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 19
+                                                      },
+                                                      "text": "@call"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 19
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 20
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 26
+                                                      },
+                                                      "text": "status"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "=",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 28
+                                                  },
+                                                  "text": "="
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 29
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 48
+                                                  },
+                                                  "text": "batch_result.status",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 29
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 41
+                                                      },
+                                                      "text": "batch_result"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 41
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 42
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 42
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 48
+                                                      },
+                                                      "text": "status"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "if_modifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 77
+                                              },
+                                              "text": "@call.trailing_metadata = @call.status.metadata if @call.status",
+                                              "children": [
+                                                {
+                                                  "type": "assignment",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 61
+                                                  },
+                                                  "text": "@call.trailing_metadata = @call.status.metadata",
+                                                  "children": [
+                                                    {
+                                                      "type": "call",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 14
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 37
+                                                      },
+                                                      "text": "@call.trailing_metadata",
+                                                      "children": [
+                                                        {
+                                                          "type": "instance_variable",
+                                                          "start": {
+                                                            "row": 20,
+                                                            "column": 14
+                                                          },
+                                                          "end": {
+                                                            "row": 20,
+                                                            "column": 19
+                                                          },
+                                                          "text": "@call"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 20,
+                                                            "column": 19
+                                                          },
+                                                          "end": {
+                                                            "row": 20,
+                                                            "column": 20
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 20,
+                                                            "column": 20
+                                                          },
+                                                          "end": {
+                                                            "row": 20,
+                                                            "column": 37
+                                                          },
+                                                          "text": "trailing_metadata"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "=",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 38
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 39
+                                                      },
+                                                      "text": "="
+                                                    },
+                                                    {
+                                                      "type": "call",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 40
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 61
+                                                      },
+                                                      "text": "@call.status.metadata",
+                                                      "children": [
+                                                        {
+                                                          "type": "call",
+                                                          "start": {
+                                                            "row": 20,
+                                                            "column": 40
+                                                          },
+                                                          "end": {
+                                                            "row": 20,
+                                                            "column": 52
+                                                          },
+                                                          "text": "@call.status",
+                                                          "children": [
+                                                            {
+                                                              "type": "instance_variable",
+                                                              "start": {
+                                                                "row": 20,
+                                                                "column": 40
+                                                              },
+                                                              "end": {
+                                                                "row": 20,
+                                                                "column": 45
+                                                              },
+                                                              "text": "@call"
+                                                            },
+                                                            {
+                                                              "type": ".",
+                                                              "start": {
+                                                                "row": 20,
+                                                                "column": 45
+                                                              },
+                                                              "end": {
+                                                                "row": 20,
+                                                                "column": 46
+                                                              },
+                                                              "text": "."
+                                                            },
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 20,
+                                                                "column": 46
+                                                              },
+                                                              "end": {
+                                                                "row": 20,
+                                                                "column": 52
+                                                              },
+                                                              "text": "status"
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 20,
+                                                            "column": 52
+                                                          },
+                                                          "end": {
+                                                            "row": 20,
+                                                            "column": 53
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 20,
+                                                            "column": 53
+                                                          },
+                                                          "end": {
+                                                            "row": 20,
+                                                            "column": 61
+                                                          },
+                                                          "text": "metadata"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "if",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 62
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 64
+                                                  },
+                                                  "text": "if"
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 65
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 77
+                                                  },
+                                                  "text": "@call.status",
+                                                  "children": [
+                                                    {
+                                                      "type": "instance_variable",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 65
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 70
+                                                      },
+                                                      "text": "@call"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 70
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 71
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 71
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 77
+                                                      },
+                                                      "text": "status"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "call",
+                                              "start": {
+                                                "row": 21,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 21,
+                                                "column": 78
+                                              },
+                                              "text": "GRPC.logger.debug(\"bidi-read-loop: done status #{@call.status}\")",
+                                              "children": [
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 25
+                                                  },
+                                                  "text": "GRPC.logger",
+                                                  "children": [
+                                                    {
+                                                      "type": "constant",
+                                                      "start": {
+                                                        "row": 21,
+                                                        "column": 14
+                                                      },
+                                                      "end": {
+                                                        "row": 21,
+                                                        "column": 18
+                                                      },
+                                                      "text": "GRPC"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 21,
+                                                        "column": 18
+                                                      },
+                                                      "end": {
+                                                        "row": 21,
+                                                        "column": 19
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 21,
+                                                        "column": 19
+                                                      },
+                                                      "end": {
+                                                        "row": 21,
+                                                        "column": 25
+                                                      },
+                                                      "text": "logger"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 25
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 26
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 31
+                                                  },
+                                                  "text": "debug"
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 21,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 21,
+                                                    "column": 78
+                                                  },
+                                                  "text": "(\"bidi-read-loop: done status #{@call.status}\")",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 21,
+                                                        "column": 31
+                                                      },
+                                                      "end": {
+                                                        "row": 21,
+                                                        "column": 32
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "string",
+                                                      "start": {
+                                                        "row": 21,
+                                                        "column": 32
+                                                      },
+                                                      "end": {
+                                                        "row": 21,
+                                                        "column": 77
+                                                      },
+                                                      "text": "\"bidi-read-loop: done status #{@call.status}\"",
+                                                      "children": [
+                                                        {
+                                                          "type": "\"",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 32
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 33
+                                                          },
+                                                          "text": "\""
+                                                        },
+                                                        {
+                                                          "type": "string_content",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 33
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 61
+                                                          },
+                                                          "text": "bidi-read-loop: done status "
+                                                        },
+                                                        {
+                                                          "type": "interpolation",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 61
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 76
+                                                          },
+                                                          "text": "#{@call.status}",
+                                                          "children": [
+                                                            {
+                                                              "type": "#{",
+                                                              "start": {
+                                                                "row": 21,
+                                                                "column": 61
+                                                              },
+                                                              "end": {
+                                                                "row": 21,
+                                                                "column": 63
+                                                              },
+                                                              "text": "#{"
+                                                            },
+                                                            {
+                                                              "type": "call",
+                                                              "start": {
+                                                                "row": 21,
+                                                                "column": 63
+                                                              },
+                                                              "end": {
+                                                                "row": 21,
+                                                                "column": 75
+                                                              },
+                                                              "text": "@call.status",
+                                                              "children": [
+                                                                {
+                                                                  "type": "instance_variable",
+                                                                  "start": {
+                                                                    "row": 21,
+                                                                    "column": 63
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 21,
+                                                                    "column": 68
+                                                                  },
+                                                                  "text": "@call"
+                                                                },
+                                                                {
+                                                                  "type": ".",
+                                                                  "start": {
+                                                                    "row": 21,
+                                                                    "column": 68
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 21,
+                                                                    "column": 69
+                                                                  },
+                                                                  "text": "."
+                                                                },
+                                                                {
+                                                                  "type": "identifier",
+                                                                  "start": {
+                                                                    "row": 21,
+                                                                    "column": 69
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 21,
+                                                                    "column": 75
+                                                                  },
+                                                                  "text": "status"
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": "}",
+                                                              "start": {
+                                                                "row": 21,
+                                                                "column": 75
+                                                              },
+                                                              "end": {
+                                                                "row": 21,
+                                                                "column": 76
+                                                              },
+                                                              "text": "}"
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "\"",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 76
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 77
+                                                          },
+                                                          "text": "\""
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 21,
+                                                        "column": 77
+                                                      },
+                                                      "end": {
+                                                        "row": 21,
+                                                        "column": 78
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "call",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 39
+                                              },
+                                              "text": "batch_result.check_status",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 14
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 26
+                                                  },
+                                                  "text": "batch_result"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 27
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 39
+                                                  },
+                                                  "text": "check_status"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "end",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 15
+                                          },
+                                          "text": "end"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 62
+                                      },
+                                      "text": "GRPC.logger.debug('bidi-read-loop: done reading!')",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 23
+                                          },
+                                          "text": "GRPC.logger",
+                                          "children": [
+                                            {
+                                              "type": "constant",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 12
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 16
+                                              },
+                                              "text": "GRPC"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 17
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 23
+                                              },
+                                              "text": "logger"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 24
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 29
+                                          },
+                                          "text": "debug"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 62
+                                          },
+                                          "text": "('bidi-read-loop: done reading!')",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 30
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 30
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 61
+                                              },
+                                              "text": "'bidi-read-loop: done reading!'",
+                                              "children": [
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 30
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 31
+                                                  },
+                                                  "text": "'"
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 60
+                                                  },
+                                                  "text": "bidi-read-loop: done reading!"
+                                                },
+                                                {
+                                                  "type": "\"",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 60
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 61
+                                                  },
+                                                  "text": "'"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 61
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 62
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "break",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 17
+                                      },
+                                      "text": "break",
+                                      "children": [
+                                        {
+                                          "type": "break",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 17
+                                          },
+                                          "text": "break"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "end",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 13
+                                  },
+                                  "text": "end"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 29,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 53
+                              },
+                              "text": "res = @unmarshal.call(batch_result.message)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 13
+                                  },
+                                  "text": "res"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 15
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 53
+                                  },
+                                  "text": "@unmarshal.call(batch_result.message)",
+                                  "children": [
+                                    {
+                                      "type": "instance_variable",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 26
+                                      },
+                                      "text": "@unmarshal"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 27
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 31
+                                      },
+                                      "text": "call"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 53
+                                      },
+                                      "text": "(batch_result.message)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 32
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 52
+                                          },
+                                          "text": "batch_result.message",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 32
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 44
+                                              },
+                                              "text": "batch_result"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 44
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 45
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 52
+                                              },
+                                              "text": "message"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 53
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "yield",
+                              "start": {
+                                "row": 30,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 19
+                              },
+                              "text": "yield res",
+                              "children": [
+                                {
+                                  "type": "yield",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 15
+                                  },
+                                  "text": "yield"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 19
+                                  },
+                                  "text": "res",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 19
+                                      },
+                                      "text": "res"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "end",
+                          "start": {
+                            "row": 31,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 11
+                          },
+                          "text": "end"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "rescue",
+                  "start": {
+                    "row": 32,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 35,
+                    "column": 15
+                  },
+                  "text": "rescue StandardError => e\n        GRPC.logger.warn('bidi: read-loop failed')\n        GRPC.logger.warn(e)\n        raise e",
+                  "children": [
+                    {
+                      "type": "rescue",
+                      "start": {
+                        "row": 32,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 12
+                      },
+                      "text": "rescue"
+                    },
+                    {
+                      "type": "exceptions",
+                      "start": {
+                        "row": 32,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 26
+                      },
+                      "text": "StandardError",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 32,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 26
+                          },
+                          "text": "StandardError"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "exception_variable",
+                      "start": {
+                        "row": 32,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 31
+                      },
+                      "text": "=> e",
+                      "children": [
+                        {
+                          "type": "=>",
+                          "start": {
+                            "row": 32,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 29
+                          },
+                          "text": "=>"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 32,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 31
+                          },
+                          "text": "e"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "then",
+                      "start": {
+                        "row": 32,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 15
+                      },
+                      "text": "\n        GRPC.logger.warn('bidi: read-loop failed')\n        GRPC.logger.warn(e)\n        raise e",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 33,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 50
+                          },
+                          "text": "GRPC.logger.warn('bidi: read-loop failed')",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 33,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 19
+                              },
+                              "text": "GRPC.logger",
+                              "children": [
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 12
+                                  },
+                                  "text": "GRPC"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 13
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 19
+                                  },
+                                  "text": "logger"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 33,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 20
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 24
+                              },
+                              "text": "warn"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 33,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 50
+                              },
+                              "text": "('bidi: read-loop failed')",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 25
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 49
+                                  },
+                                  "text": "'bidi: read-loop failed'",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 26
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 48
+                                      },
+                                      "text": "bidi: read-loop failed"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 49
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 49
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 50
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 34,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 27
+                          },
+                          "text": "GRPC.logger.warn(e)",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 34,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 19
+                              },
+                              "text": "GRPC.logger",
+                              "children": [
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 12
+                                  },
+                                  "text": "GRPC"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 13
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 19
+                                  },
+                                  "text": "logger"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 34,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 20
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 34,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 24
+                              },
+                              "text": "warn"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 34,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 27
+                              },
+                              "text": "(e)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 25
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 26
+                                  },
+                                  "text": "e"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 27
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 35,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 15
+                          },
+                          "text": "raise e",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 35,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 13
+                              },
+                              "text": "raise"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 35,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 15
+                              },
+                              "text": "e",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 15
+                                  },
+                                  "text": "e"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ensure",
+                  "start": {
+                    "row": 36,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 34
+                  },
+                  "text": "ensure\n        set_input_stream_done.call",
+                  "children": [
+                    {
+                      "type": "ensure",
+                      "start": {
+                        "row": 36,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 12
+                      },
+                      "text": "ensure"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 37,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 34
+                      },
+                      "text": "set_input_stream_done.call",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 37,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 29
+                          },
+                          "text": "set_input_stream_done"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 37,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 30
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 37,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 34
+                          },
+                          "text": "call"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "end",
+                  "start": {
+                    "row": 38,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 38,
+                    "column": 9
+                  },
+                  "text": "end"
+                }
+              ]
+            },
+            {
+              "type": "call",
+              "start": {
+                "row": 39,
+                "column": 6
+              },
+              "end": {
+                "row": 39,
+                "column": 51
+              },
+              "text": "GRPC.logger.debug('bidi-read-loop: finished')",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 39,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 17
+                  },
+                  "text": "GRPC.logger",
+                  "children": [
+                    {
+                      "type": "constant",
+                      "start": {
+                        "row": 39,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 10
+                      },
+                      "text": "GRPC"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 39,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 11
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 39,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 17
+                      },
+                      "text": "logger"
+                    }
+                  ]
+                },
+                {
+                  "type": ".",
+                  "start": {
+                    "row": 39,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 18
+                  },
+                  "text": "."
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 39,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 23
+                  },
+                  "text": "debug"
+                },
+                {
+                  "type": "argument_list",
+                  "start": {
+                    "row": 39,
+                    "column": 23
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 51
+                  },
+                  "text": "('bidi-read-loop: finished')",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 39,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 24
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "string",
+                      "start": {
+                        "row": 39,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 50
+                      },
+                      "text": "'bidi-read-loop: finished'",
+                      "children": [
+                        {
+                          "type": "\"",
+                          "start": {
+                            "row": 39,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 25
+                          },
+                          "text": "'"
+                        },
+                        {
+                          "type": "string_content",
+                          "start": {
+                            "row": 39,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 49
+                          },
+                          "text": "bidi-read-loop: finished"
+                        },
+                        {
+                          "type": "\"",
+                          "start": {
+                            "row": 39,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 50
+                          },
+                          "text": "'"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 39,
+                        "column": 50
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 51
+                      },
+                      "text": ")"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 40,
+                "column": 6
+              },
+              "end": {
+                "row": 40,
+                "column": 72
+              },
+              "text": "# Make sure that the write loop is done before finishing the call."
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 41,
+                "column": 6
+              },
+              "end": {
+                "row": 41,
+                "column": 77
+              },
+              "text": "# Note that blocking is ok at this point because we've already received"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 42,
+                "column": 6
+              },
+              "end": {
+                "row": 42,
+                "column": 16
+              },
+              "text": "# a status"
+            },
+            {
+              "type": "if_modifier",
+              "start": {
+                "row": 43,
+                "column": 6
+              },
+              "end": {
+                "row": 43,
+                "column": 31
+              },
+              "text": "@enq_th.join if is_client",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 43,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 18
+                  },
+                  "text": "@enq_th.join",
+                  "children": [
+                    {
+                      "type": "instance_variable",
+                      "start": {
+                        "row": 43,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 13
+                      },
+                      "text": "@enq_th"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 43,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 14
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 43,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 18
+                      },
+                      "text": "join"
+                    }
+                  ]
+                },
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 43,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 21
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 43,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 31
+                  },
+                  "text": "is_client"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 44,
+            "column": 4
+          },
+          "end": {
+            "row": 44,
+            "column": 7
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3084 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 31,
+    "column": 5
+  },
+  "text": "public void addNode(final @Nonnull Node node) throws IOException {\n        Node oldNode = nodes.get(node.getNodeName());\n        if (node != oldNode) {\n            // TODO we should not need to lock the queue for adding nodes but until we have a way to update the\n            // computer list for just the new node\n            Queue.withLock(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            });\n            // TODO there is a theoretical race whereby the node instance is updated/removed after lock release\n            try {\n                persistNode(node);\n            } catch (IOException | RuntimeException e) {\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }\n            NodeListener.fireOnCreated(node);\n        }\n    }",
+  "children": [
+    {
+      "type": "method_declaration",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 31,
+        "column": 5
+      },
+      "text": "public void addNode(final @Nonnull Node node) throws IOException {\n        Node oldNode = nodes.get(node.getNodeName());\n        if (node != oldNode) {\n            // TODO we should not need to lock the queue for adding nodes but until we have a way to update the\n            // computer list for just the new node\n            Queue.withLock(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            });\n            // TODO there is a theoretical race whereby the node instance is updated/removed after lock release\n            try {\n                persistNode(node);\n            } catch (IOException | RuntimeException e) {\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }\n            NodeListener.fireOnCreated(node);\n        }\n    }",
+      "children": [
+        {
+          "type": "modifiers",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 6
+          },
+          "text": "public",
+          "children": [
+            {
+              "type": "public",
+              "start": {
+                "row": 0,
+                "column": 0
+              },
+              "end": {
+                "row": 0,
+                "column": 6
+              },
+              "text": "public"
+            }
+          ]
+        },
+        {
+          "type": "void_type",
+          "start": {
+            "row": 0,
+            "column": 7
+          },
+          "end": {
+            "row": 0,
+            "column": 11
+          },
+          "text": "void"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 12
+          },
+          "end": {
+            "row": 0,
+            "column": 19
+          },
+          "text": "addNode"
+        },
+        {
+          "type": "formal_parameters",
+          "start": {
+            "row": 0,
+            "column": 19
+          },
+          "end": {
+            "row": 0,
+            "column": 45
+          },
+          "text": "(final @Nonnull Node node)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 19
+              },
+              "end": {
+                "row": 0,
+                "column": 20
+              },
+              "text": "("
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 44
+              },
+              "text": "final @Nonnull Node node",
+              "children": [
+                {
+                  "type": "modifiers",
+                  "start": {
+                    "row": 0,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "text": "final @Nonnull",
+                  "children": [
+                    {
+                      "type": "final",
+                      "start": {
+                        "row": 0,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 25
+                      },
+                      "text": "final"
+                    },
+                    {
+                      "type": "marker_annotation",
+                      "start": {
+                        "row": 0,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 34
+                      },
+                      "text": "@Nonnull",
+                      "children": [
+                        {
+                          "type": "@",
+                          "start": {
+                            "row": 0,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 0,
+                            "column": 27
+                          },
+                          "text": "@"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 0,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 0,
+                            "column": 34
+                          },
+                          "text": "Nonnull"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 39
+                  },
+                  "text": "Node"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 44
+                  },
+                  "text": "node"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 44
+              },
+              "end": {
+                "row": 0,
+                "column": 45
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "throws",
+          "start": {
+            "row": 0,
+            "column": 46
+          },
+          "end": {
+            "row": 0,
+            "column": 64
+          },
+          "text": "throws IOException",
+          "children": [
+            {
+              "type": "throws",
+              "start": {
+                "row": 0,
+                "column": 46
+              },
+              "end": {
+                "row": 0,
+                "column": 52
+              },
+              "text": "throws"
+            },
+            {
+              "type": "type_identifier",
+              "start": {
+                "row": 0,
+                "column": 53
+              },
+              "end": {
+                "row": 0,
+                "column": 64
+              },
+              "text": "IOException"
+            }
+          ]
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 0,
+            "column": 65
+          },
+          "end": {
+            "row": 31,
+            "column": 5
+          },
+          "text": "{\n        Node oldNode = nodes.get(node.getNodeName());\n        if (node != oldNode) {\n            // TODO we should not need to lock the queue for adding nodes but until we have a way to update the\n            // computer list for just the new node\n            Queue.withLock(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            });\n            // TODO there is a theoretical race whereby the node instance is updated/removed after lock release\n            try {\n                persistNode(node);\n            } catch (IOException | RuntimeException e) {\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }\n            NodeListener.fireOnCreated(node);\n        }\n    }",
+          "children": [
+            {
+              "type": "{",
+              "start": {
+                "row": 0,
+                "column": 65
+              },
+              "end": {
+                "row": 0,
+                "column": 66
+              },
+              "text": "{"
+            },
+            {
+              "type": "local_variable_declaration",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 1,
+                "column": 53
+              },
+              "text": "Node oldNode = nodes.get(node.getNodeName());",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 12
+                  },
+                  "text": "Node"
+                },
+                {
+                  "type": "variable_declarator",
+                  "start": {
+                    "row": 1,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 52
+                  },
+                  "text": "oldNode = nodes.get(node.getNodeName())",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 20
+                      },
+                      "text": "oldNode"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 1,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 22
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "method_invocation",
+                      "start": {
+                        "row": 1,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 52
+                      },
+                      "text": "nodes.get(node.getNodeName())",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 1,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 28
+                          },
+                          "text": "nodes"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 1,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 29
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 1,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 32
+                          },
+                          "text": "get"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 1,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 52
+                          },
+                          "text": "(node.getNodeName())",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 1,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 33
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "method_invocation",
+                              "start": {
+                                "row": 1,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 51
+                              },
+                              "text": "node.getNodeName()",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 37
+                                  },
+                                  "text": "node"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 38
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 49
+                                  },
+                                  "text": "getNodeName"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 1,
+                                    "column": 49
+                                  },
+                                  "end": {
+                                    "row": 1,
+                                    "column": 51
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 1,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 1,
+                                        "column": 50
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 1,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 1,
+                                        "column": 51
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 1,
+                                "column": 51
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 52
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 1,
+                    "column": 52
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 53
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 2,
+                "column": 8
+              },
+              "end": {
+                "row": 30,
+                "column": 9
+              },
+              "text": "if (node != oldNode) {\n            // TODO we should not need to lock the queue for adding nodes but until we have a way to update the\n            // computer list for just the new node\n            Queue.withLock(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            });\n            // TODO there is a theoretical race whereby the node instance is updated/removed after lock release\n            try {\n                persistNode(node);\n            } catch (IOException | RuntimeException e) {\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }\n            NodeListener.fireOnCreated(node);\n        }",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 2,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "condition",
+                  "start": {
+                    "row": 2,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 28
+                  },
+                  "text": "(node != oldNode)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 2,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 12
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "binary_expression",
+                      "start": {
+                        "row": 2,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 27
+                      },
+                      "text": "node != oldNode",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 2,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 16
+                          },
+                          "text": "node"
+                        },
+                        {
+                          "type": "!=",
+                          "start": {
+                            "row": 2,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 19
+                          },
+                          "text": "!="
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 2,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 27
+                          },
+                          "text": "oldNode"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 2,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 28
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 2,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 9
+                  },
+                  "text": "{\n            // TODO we should not need to lock the queue for adding nodes but until we have a way to update the\n            // computer list for just the new node\n            Queue.withLock(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            });\n            // TODO there is a theoretical race whereby the node instance is updated/removed after lock release\n            try {\n                persistNode(node);\n            } catch (IOException | RuntimeException e) {\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }\n            NodeListener.fireOnCreated(node);\n        }",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 2,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 30
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "line_comment",
+                      "start": {
+                        "row": 3,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 111
+                      },
+                      "text": "// TODO we should not need to lock the queue for adding nodes but until we have a way to update the"
+                    },
+                    {
+                      "type": "line_comment",
+                      "start": {
+                        "row": 4,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 50
+                      },
+                      "text": "// computer list for just the new node"
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 5,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 15
+                      },
+                      "text": "Queue.withLock(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            });",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 5,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 14
+                          },
+                          "text": "Queue.withLock(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            })",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 5,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 17
+                              },
+                              "text": "Queue"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 5,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 18
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 5,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 26
+                              },
+                              "text": "withLock"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 5,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 12,
+                                "column": 14
+                              },
+                              "text": "(new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            })",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 27
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "object_creation_expression",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 13
+                                  },
+                                  "text": "new Runnable() {\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            }",
+                                  "children": [
+                                    {
+                                      "type": "new",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 30
+                                      },
+                                      "text": "new"
+                                    },
+                                    {
+                                      "type": "type_identifier",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 39
+                                      },
+                                      "text": "Runnable"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 5,
+                                        "column": 41
+                                      },
+                                      "text": "()",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 5,
+                                            "column": 39
+                                          },
+                                          "end": {
+                                            "row": 5,
+                                            "column": 40
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 5,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 5,
+                                            "column": 41
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "class_body",
+                                      "start": {
+                                        "row": 5,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 12,
+                                        "column": 13
+                                      },
+                                      "text": "{\n                @Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }\n            }",
+                                      "children": [
+                                        {
+                                          "type": "{",
+                                          "start": {
+                                            "row": 5,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 5,
+                                            "column": 43
+                                          },
+                                          "text": "{"
+                                        },
+                                        {
+                                          "type": "method_declaration",
+                                          "start": {
+                                            "row": 6,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 17
+                                          },
+                                          "text": "@Override\n                public void run() {\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }",
+                                          "children": [
+                                            {
+                                              "type": "modifiers",
+                                              "start": {
+                                                "row": 6,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 7,
+                                                "column": 22
+                                              },
+                                              "text": "@Override\n                public",
+                                              "children": [
+                                                {
+                                                  "type": "marker_annotation",
+                                                  "start": {
+                                                    "row": 6,
+                                                    "column": 16
+                                                  },
+                                                  "end": {
+                                                    "row": 6,
+                                                    "column": 25
+                                                  },
+                                                  "text": "@Override",
+                                                  "children": [
+                                                    {
+                                                      "type": "@",
+                                                      "start": {
+                                                        "row": 6,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 6,
+                                                        "column": 17
+                                                      },
+                                                      "text": "@"
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 6,
+                                                        "column": 17
+                                                      },
+                                                      "end": {
+                                                        "row": 6,
+                                                        "column": 25
+                                                      },
+                                                      "text": "Override"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "public",
+                                                  "start": {
+                                                    "row": 7,
+                                                    "column": 16
+                                                  },
+                                                  "end": {
+                                                    "row": 7,
+                                                    "column": 22
+                                                  },
+                                                  "text": "public"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "void_type",
+                                              "start": {
+                                                "row": 7,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 7,
+                                                "column": 27
+                                              },
+                                              "text": "void"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 7,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 7,
+                                                "column": 31
+                                              },
+                                              "text": "run"
+                                            },
+                                            {
+                                              "type": "formal_parameters",
+                                              "start": {
+                                                "row": 7,
+                                                "column": 31
+                                              },
+                                              "end": {
+                                                "row": 7,
+                                                "column": 33
+                                              },
+                                              "text": "()",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 7,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 7,
+                                                    "column": 32
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 7,
+                                                    "column": 32
+                                                  },
+                                                  "end": {
+                                                    "row": 7,
+                                                    "column": 33
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "block",
+                                              "start": {
+                                                "row": 7,
+                                                "column": 34
+                                              },
+                                              "end": {
+                                                "row": 11,
+                                                "column": 17
+                                              },
+                                              "text": "{\n                    nodes.put(node.getNodeName(), node);\n                    jenkins.updateComputerList();\n                    jenkins.trimLabels();\n                }",
+                                              "children": [
+                                                {
+                                                  "type": "{",
+                                                  "start": {
+                                                    "row": 7,
+                                                    "column": 34
+                                                  },
+                                                  "end": {
+                                                    "row": 7,
+                                                    "column": 35
+                                                  },
+                                                  "text": "{"
+                                                },
+                                                {
+                                                  "type": "expression_statement",
+                                                  "start": {
+                                                    "row": 8,
+                                                    "column": 20
+                                                  },
+                                                  "end": {
+                                                    "row": 8,
+                                                    "column": 56
+                                                  },
+                                                  "text": "nodes.put(node.getNodeName(), node);",
+                                                  "children": [
+                                                    {
+                                                      "type": "method_invocation",
+                                                      "start": {
+                                                        "row": 8,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 8,
+                                                        "column": 55
+                                                      },
+                                                      "text": "nodes.put(node.getNodeName(), node)",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 8,
+                                                            "column": 20
+                                                          },
+                                                          "end": {
+                                                            "row": 8,
+                                                            "column": 25
+                                                          },
+                                                          "text": "nodes"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 8,
+                                                            "column": 25
+                                                          },
+                                                          "end": {
+                                                            "row": 8,
+                                                            "column": 26
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 8,
+                                                            "column": 26
+                                                          },
+                                                          "end": {
+                                                            "row": 8,
+                                                            "column": 29
+                                                          },
+                                                          "text": "put"
+                                                        },
+                                                        {
+                                                          "type": "argument_list",
+                                                          "start": {
+                                                            "row": 8,
+                                                            "column": 29
+                                                          },
+                                                          "end": {
+                                                            "row": 8,
+                                                            "column": 55
+                                                          },
+                                                          "text": "(node.getNodeName(), node)",
+                                                          "children": [
+                                                            {
+                                                              "type": "(",
+                                                              "start": {
+                                                                "row": 8,
+                                                                "column": 29
+                                                              },
+                                                              "end": {
+                                                                "row": 8,
+                                                                "column": 30
+                                                              },
+                                                              "text": "("
+                                                            },
+                                                            {
+                                                              "type": "method_invocation",
+                                                              "start": {
+                                                                "row": 8,
+                                                                "column": 30
+                                                              },
+                                                              "end": {
+                                                                "row": 8,
+                                                                "column": 48
+                                                              },
+                                                              "text": "node.getNodeName()",
+                                                              "children": [
+                                                                {
+                                                                  "type": "identifier",
+                                                                  "start": {
+                                                                    "row": 8,
+                                                                    "column": 30
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 8,
+                                                                    "column": 34
+                                                                  },
+                                                                  "text": "node"
+                                                                },
+                                                                {
+                                                                  "type": ".",
+                                                                  "start": {
+                                                                    "row": 8,
+                                                                    "column": 34
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 8,
+                                                                    "column": 35
+                                                                  },
+                                                                  "text": "."
+                                                                },
+                                                                {
+                                                                  "type": "identifier",
+                                                                  "start": {
+                                                                    "row": 8,
+                                                                    "column": 35
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 8,
+                                                                    "column": 46
+                                                                  },
+                                                                  "text": "getNodeName"
+                                                                },
+                                                                {
+                                                                  "type": "argument_list",
+                                                                  "start": {
+                                                                    "row": 8,
+                                                                    "column": 46
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 8,
+                                                                    "column": 48
+                                                                  },
+                                                                  "text": "()",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "(",
+                                                                      "start": {
+                                                                        "row": 8,
+                                                                        "column": 46
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 8,
+                                                                        "column": 47
+                                                                      },
+                                                                      "text": "("
+                                                                    },
+                                                                    {
+                                                                      "type": ")",
+                                                                      "start": {
+                                                                        "row": 8,
+                                                                        "column": 47
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 8,
+                                                                        "column": 48
+                                                                      },
+                                                                      "text": ")"
+                                                                    }
+                                                                  ]
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": ",",
+                                                              "start": {
+                                                                "row": 8,
+                                                                "column": 48
+                                                              },
+                                                              "end": {
+                                                                "row": 8,
+                                                                "column": 49
+                                                              },
+                                                              "text": ","
+                                                            },
+                                                            {
+                                                              "type": "identifier",
+                                                              "start": {
+                                                                "row": 8,
+                                                                "column": 50
+                                                              },
+                                                              "end": {
+                                                                "row": 8,
+                                                                "column": 54
+                                                              },
+                                                              "text": "node"
+                                                            },
+                                                            {
+                                                              "type": ")",
+                                                              "start": {
+                                                                "row": 8,
+                                                                "column": 54
+                                                              },
+                                                              "end": {
+                                                                "row": 8,
+                                                                "column": 55
+                                                              },
+                                                              "text": ")"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ";",
+                                                      "start": {
+                                                        "row": 8,
+                                                        "column": 55
+                                                      },
+                                                      "end": {
+                                                        "row": 8,
+                                                        "column": 56
+                                                      },
+                                                      "text": ";"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "expression_statement",
+                                                  "start": {
+                                                    "row": 9,
+                                                    "column": 20
+                                                  },
+                                                  "end": {
+                                                    "row": 9,
+                                                    "column": 49
+                                                  },
+                                                  "text": "jenkins.updateComputerList();",
+                                                  "children": [
+                                                    {
+                                                      "type": "method_invocation",
+                                                      "start": {
+                                                        "row": 9,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 9,
+                                                        "column": 48
+                                                      },
+                                                      "text": "jenkins.updateComputerList()",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 9,
+                                                            "column": 20
+                                                          },
+                                                          "end": {
+                                                            "row": 9,
+                                                            "column": 27
+                                                          },
+                                                          "text": "jenkins"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 9,
+                                                            "column": 27
+                                                          },
+                                                          "end": {
+                                                            "row": 9,
+                                                            "column": 28
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 9,
+                                                            "column": 28
+                                                          },
+                                                          "end": {
+                                                            "row": 9,
+                                                            "column": 46
+                                                          },
+                                                          "text": "updateComputerList"
+                                                        },
+                                                        {
+                                                          "type": "argument_list",
+                                                          "start": {
+                                                            "row": 9,
+                                                            "column": 46
+                                                          },
+                                                          "end": {
+                                                            "row": 9,
+                                                            "column": 48
+                                                          },
+                                                          "text": "()",
+                                                          "children": [
+                                                            {
+                                                              "type": "(",
+                                                              "start": {
+                                                                "row": 9,
+                                                                "column": 46
+                                                              },
+                                                              "end": {
+                                                                "row": 9,
+                                                                "column": 47
+                                                              },
+                                                              "text": "("
+                                                            },
+                                                            {
+                                                              "type": ")",
+                                                              "start": {
+                                                                "row": 9,
+                                                                "column": 47
+                                                              },
+                                                              "end": {
+                                                                "row": 9,
+                                                                "column": 48
+                                                              },
+                                                              "text": ")"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ";",
+                                                      "start": {
+                                                        "row": 9,
+                                                        "column": 48
+                                                      },
+                                                      "end": {
+                                                        "row": 9,
+                                                        "column": 49
+                                                      },
+                                                      "text": ";"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "expression_statement",
+                                                  "start": {
+                                                    "row": 10,
+                                                    "column": 20
+                                                  },
+                                                  "end": {
+                                                    "row": 10,
+                                                    "column": 41
+                                                  },
+                                                  "text": "jenkins.trimLabels();",
+                                                  "children": [
+                                                    {
+                                                      "type": "method_invocation",
+                                                      "start": {
+                                                        "row": 10,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 10,
+                                                        "column": 40
+                                                      },
+                                                      "text": "jenkins.trimLabels()",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 10,
+                                                            "column": 20
+                                                          },
+                                                          "end": {
+                                                            "row": 10,
+                                                            "column": 27
+                                                          },
+                                                          "text": "jenkins"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 10,
+                                                            "column": 27
+                                                          },
+                                                          "end": {
+                                                            "row": 10,
+                                                            "column": 28
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 10,
+                                                            "column": 28
+                                                          },
+                                                          "end": {
+                                                            "row": 10,
+                                                            "column": 38
+                                                          },
+                                                          "text": "trimLabels"
+                                                        },
+                                                        {
+                                                          "type": "argument_list",
+                                                          "start": {
+                                                            "row": 10,
+                                                            "column": 38
+                                                          },
+                                                          "end": {
+                                                            "row": 10,
+                                                            "column": 40
+                                                          },
+                                                          "text": "()",
+                                                          "children": [
+                                                            {
+                                                              "type": "(",
+                                                              "start": {
+                                                                "row": 10,
+                                                                "column": 38
+                                                              },
+                                                              "end": {
+                                                                "row": 10,
+                                                                "column": 39
+                                                              },
+                                                              "text": "("
+                                                            },
+                                                            {
+                                                              "type": ")",
+                                                              "start": {
+                                                                "row": 10,
+                                                                "column": 39
+                                                              },
+                                                              "end": {
+                                                                "row": 10,
+                                                                "column": 40
+                                                              },
+                                                              "text": ")"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ";",
+                                                      "start": {
+                                                        "row": 10,
+                                                        "column": 40
+                                                      },
+                                                      "end": {
+                                                        "row": 10,
+                                                        "column": 41
+                                                      },
+                                                      "text": ";"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "}",
+                                                  "start": {
+                                                    "row": 11,
+                                                    "column": 16
+                                                  },
+                                                  "end": {
+                                                    "row": 11,
+                                                    "column": 17
+                                                  },
+                                                  "text": "}"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 12,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 12,
+                                            "column": 13
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 12,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 12,
+                                    "column": 14
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 12,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 15
+                          },
+                          "text": ";"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "line_comment",
+                      "start": {
+                        "row": 13,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 13,
+                        "column": 111
+                      },
+                      "text": "// TODO there is a theoretical race whereby the node instance is updated/removed after lock release"
+                    },
+                    {
+                      "type": "try_statement",
+                      "start": {
+                        "row": 14,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 13
+                      },
+                      "text": "try {\n                persistNode(node);\n            } catch (IOException | RuntimeException e) {\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }",
+                      "children": [
+                        {
+                          "type": "try",
+                          "start": {
+                            "row": 14,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 15
+                          },
+                          "text": "try"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 14,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 13
+                          },
+                          "text": "{\n                persistNode(node);\n            }",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 14,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 17
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 15,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 34
+                              },
+                              "text": "persistNode(node);",
+                              "children": [
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 33
+                                  },
+                                  "text": "persistNode(node)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 27
+                                      },
+                                      "text": "persistNode"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 15,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 33
+                                      },
+                                      "text": "(node)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 28
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 32
+                                          },
+                                          "text": "node"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 33
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 34
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 16,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 13
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "catch_clause",
+                          "start": {
+                            "row": 16,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 13
+                          },
+                          "text": "catch (IOException | RuntimeException e) {\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }",
+                          "children": [
+                            {
+                              "type": "catch",
+                              "start": {
+                                "row": 16,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 19
+                              },
+                              "text": "catch"
+                            },
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 16,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 21
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "catch_formal_parameter",
+                              "start": {
+                                "row": 16,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 53
+                              },
+                              "text": "IOException | RuntimeException e",
+                              "children": [
+                                {
+                                  "type": "catch_type",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 51
+                                  },
+                                  "text": "IOException | RuntimeException",
+                                  "children": [
+                                    {
+                                      "type": "type_identifier",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 32
+                                      },
+                                      "text": "IOException"
+                                    },
+                                    {
+                                      "type": "|",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 34
+                                      },
+                                      "text": "|"
+                                    },
+                                    {
+                                      "type": "type_identifier",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 51
+                                      },
+                                      "text": "RuntimeException"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 53
+                                  },
+                                  "text": "e"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 16,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 54
+                              },
+                              "text": ")"
+                            },
+                            {
+                              "type": "block",
+                              "start": {
+                                "row": 16,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 13
+                              },
+                              "text": "{\n                // JENKINS-50599: If persisting the node throws an exception, we need to remove the node from\n                // memory before propagating the exception.\n                Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });\n                throw e;\n            }",
+                              "children": [
+                                {
+                                  "type": "{",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 56
+                                  },
+                                  "text": "{"
+                                },
+                                {
+                                  "type": "line_comment",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 109
+                                  },
+                                  "text": "// JENKINS-50599: If persisting the node throws an exception, we need to remove the node from"
+                                },
+                                {
+                                  "type": "line_comment",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 59
+                                  },
+                                  "text": "// memory before propagating the exception."
+                                },
+                                {
+                                  "type": "expression_statement",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 19
+                                  },
+                                  "text": "Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                });",
+                                  "children": [
+                                    {
+                                      "type": "method_invocation",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 18
+                                      },
+                                      "text": "Queue.withLock(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                })",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 21
+                                          },
+                                          "text": "Queue"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 22
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 30
+                                          },
+                                          "text": "withLock"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 18
+                                          },
+                                          "text": "(new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                })",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 30
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 31
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "object_creation_expression",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 31
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 17
+                                              },
+                                              "text": "new Runnable() {\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                }",
+                                              "children": [
+                                                {
+                                                  "type": "new",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 34
+                                                  },
+                                                  "text": "new"
+                                                },
+                                                {
+                                                  "type": "type_identifier",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 35
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 43
+                                                  },
+                                                  "text": "Runnable"
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 43
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 45
+                                                  },
+                                                  "text": "()",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 43
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 44
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 44
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 45
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "class_body",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 46
+                                                  },
+                                                  "end": {
+                                                    "row": 26,
+                                                    "column": 17
+                                                  },
+                                                  "text": "{\n                    @Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }\n                }",
+                                                  "children": [
+                                                    {
+                                                      "type": "{",
+                                                      "start": {
+                                                        "row": 19,
+                                                        "column": 46
+                                                      },
+                                                      "end": {
+                                                        "row": 19,
+                                                        "column": 47
+                                                      },
+                                                      "text": "{"
+                                                    },
+                                                    {
+                                                      "type": "method_declaration",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 25,
+                                                        "column": 21
+                                                      },
+                                                      "text": "@Override\n                    public void run() {\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }",
+                                                      "children": [
+                                                        {
+                                                          "type": "modifiers",
+                                                          "start": {
+                                                            "row": 20,
+                                                            "column": 20
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 26
+                                                          },
+                                                          "text": "@Override\n                    public",
+                                                          "children": [
+                                                            {
+                                                              "type": "marker_annotation",
+                                                              "start": {
+                                                                "row": 20,
+                                                                "column": 20
+                                                              },
+                                                              "end": {
+                                                                "row": 20,
+                                                                "column": 29
+                                                              },
+                                                              "text": "@Override",
+                                                              "children": [
+                                                                {
+                                                                  "type": "@",
+                                                                  "start": {
+                                                                    "row": 20,
+                                                                    "column": 20
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 20,
+                                                                    "column": 21
+                                                                  },
+                                                                  "text": "@"
+                                                                },
+                                                                {
+                                                                  "type": "identifier",
+                                                                  "start": {
+                                                                    "row": 20,
+                                                                    "column": 21
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 20,
+                                                                    "column": 29
+                                                                  },
+                                                                  "text": "Override"
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": "public",
+                                                              "start": {
+                                                                "row": 21,
+                                                                "column": 20
+                                                              },
+                                                              "end": {
+                                                                "row": 21,
+                                                                "column": 26
+                                                              },
+                                                              "text": "public"
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "void_type",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 27
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 31
+                                                          },
+                                                          "text": "void"
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 32
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 35
+                                                          },
+                                                          "text": "run"
+                                                        },
+                                                        {
+                                                          "type": "formal_parameters",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 35
+                                                          },
+                                                          "end": {
+                                                            "row": 21,
+                                                            "column": 37
+                                                          },
+                                                          "text": "()",
+                                                          "children": [
+                                                            {
+                                                              "type": "(",
+                                                              "start": {
+                                                                "row": 21,
+                                                                "column": 35
+                                                              },
+                                                              "end": {
+                                                                "row": 21,
+                                                                "column": 36
+                                                              },
+                                                              "text": "("
+                                                            },
+                                                            {
+                                                              "type": ")",
+                                                              "start": {
+                                                                "row": 21,
+                                                                "column": 36
+                                                              },
+                                                              "end": {
+                                                                "row": 21,
+                                                                "column": 37
+                                                              },
+                                                              "text": ")"
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "block",
+                                                          "start": {
+                                                            "row": 21,
+                                                            "column": 38
+                                                          },
+                                                          "end": {
+                                                            "row": 25,
+                                                            "column": 21
+                                                          },
+                                                          "text": "{\n                        nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);\n                        jenkins.updateComputerList();\n                        jenkins.trimLabels();\n                    }",
+                                                          "children": [
+                                                            {
+                                                              "type": "{",
+                                                              "start": {
+                                                                "row": 21,
+                                                                "column": 38
+                                                              },
+                                                              "end": {
+                                                                "row": 21,
+                                                                "column": 39
+                                                              },
+                                                              "text": "{"
+                                                            },
+                                                            {
+                                                              "type": "expression_statement",
+                                                              "start": {
+                                                                "row": 22,
+                                                                "column": 24
+                                                              },
+                                                              "end": {
+                                                                "row": 22,
+                                                                "column": 101
+                                                              },
+                                                              "text": "nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode);",
+                                                              "children": [
+                                                                {
+                                                                  "type": "method_invocation",
+                                                                  "start": {
+                                                                    "row": 22,
+                                                                    "column": 24
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 22,
+                                                                    "column": 100
+                                                                  },
+                                                                  "text": "nodes.compute(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode)",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 22,
+                                                                        "column": 24
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 22,
+                                                                        "column": 29
+                                                                      },
+                                                                      "text": "nodes"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 22,
+                                                                        "column": 29
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 22,
+                                                                        "column": 30
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 22,
+                                                                        "column": 30
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 22,
+                                                                        "column": 37
+                                                                      },
+                                                                      "text": "compute"
+                                                                    },
+                                                                    {
+                                                                      "type": "argument_list",
+                                                                      "start": {
+                                                                        "row": 22,
+                                                                        "column": 37
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 22,
+                                                                        "column": 100
+                                                                      },
+                                                                      "text": "(node.getNodeName(), (ignoredNodeName, ignoredNode) -> oldNode)",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "(",
+                                                                          "start": {
+                                                                            "row": 22,
+                                                                            "column": 37
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 22,
+                                                                            "column": 38
+                                                                          },
+                                                                          "text": "("
+                                                                        },
+                                                                        {
+                                                                          "type": "method_invocation",
+                                                                          "start": {
+                                                                            "row": 22,
+                                                                            "column": 38
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 22,
+                                                                            "column": 56
+                                                                          },
+                                                                          "text": "node.getNodeName()",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "identifier",
+                                                                              "start": {
+                                                                                "row": 22,
+                                                                                "column": 38
+                                                                              },
+                                                                              "end": {
+                                                                                "row": 22,
+                                                                                "column": 42
+                                                                              },
+                                                                              "text": "node"
+                                                                            },
+                                                                            {
+                                                                              "type": ".",
+                                                                              "start": {
+                                                                                "row": 22,
+                                                                                "column": 42
+                                                                              },
+                                                                              "end": {
+                                                                                "row": 22,
+                                                                                "column": 43
+                                                                              },
+                                                                              "text": "."
+                                                                            },
+                                                                            {
+                                                                              "type": "identifier",
+                                                                              "start": {
+                                                                                "row": 22,
+                                                                                "column": 43
+                                                                              },
+                                                                              "end": {
+                                                                                "row": 22,
+                                                                                "column": 54
+                                                                              },
+                                                                              "text": "getNodeName"
+                                                                            },
+                                                                            {
+                                                                              "type": "argument_list",
+                                                                              "start": {
+                                                                                "row": 22,
+                                                                                "column": 54
+                                                                              },
+                                                                              "end": {
+                                                                                "row": 22,
+                                                                                "column": 56
+                                                                              },
+                                                                              "text": "()",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "(",
+                                                                                  "start": {
+                                                                                    "row": 22,
+                                                                                    "column": 54
+                                                                                  },
+                                                                                  "end": {
+                                                                                    "row": 22,
+                                                                                    "column": 55
+                                                                                  },
+                                                                                  "text": "("
+                                                                                },
+                                                                                {
+                                                                                  "type": ")",
+                                                                                  "start": {
+                                                                                    "row": 22,
+                                                                                    "column": 55
+                                                                                  },
+                                                                                  "end": {
+                                                                                    "row": 22,
+                                                                                    "column": 56
+                                                                                  },
+                                                                                  "text": ")"
+                                                                                }
+                                                                              ]
+                                                                            }
+                                                                          ]
+                                                                        },
+                                                                        {
+                                                                          "type": ",",
+                                                                          "start": {
+                                                                            "row": 22,
+                                                                            "column": 56
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 22,
+                                                                            "column": 57
+                                                                          },
+                                                                          "text": ","
+                                                                        },
+                                                                        {
+                                                                          "type": "lambda_expression",
+                                                                          "start": {
+                                                                            "row": 22,
+                                                                            "column": 58
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 22,
+                                                                            "column": 99
+                                                                          },
+                                                                          "text": "(ignoredNodeName, ignoredNode) -> oldNode",
+                                                                          "children": [
+                                                                            {
+                                                                              "type": "inferred_parameters",
+                                                                              "start": {
+                                                                                "row": 22,
+                                                                                "column": 58
+                                                                              },
+                                                                              "end": {
+                                                                                "row": 22,
+                                                                                "column": 88
+                                                                              },
+                                                                              "text": "(ignoredNodeName, ignoredNode)",
+                                                                              "children": [
+                                                                                {
+                                                                                  "type": "(",
+                                                                                  "start": {
+                                                                                    "row": 22,
+                                                                                    "column": 58
+                                                                                  },
+                                                                                  "end": {
+                                                                                    "row": 22,
+                                                                                    "column": 59
+                                                                                  },
+                                                                                  "text": "("
+                                                                                },
+                                                                                {
+                                                                                  "type": "identifier",
+                                                                                  "start": {
+                                                                                    "row": 22,
+                                                                                    "column": 59
+                                                                                  },
+                                                                                  "end": {
+                                                                                    "row": 22,
+                                                                                    "column": 74
+                                                                                  },
+                                                                                  "text": "ignoredNodeName"
+                                                                                },
+                                                                                {
+                                                                                  "type": ",",
+                                                                                  "start": {
+                                                                                    "row": 22,
+                                                                                    "column": 74
+                                                                                  },
+                                                                                  "end": {
+                                                                                    "row": 22,
+                                                                                    "column": 75
+                                                                                  },
+                                                                                  "text": ","
+                                                                                },
+                                                                                {
+                                                                                  "type": "identifier",
+                                                                                  "start": {
+                                                                                    "row": 22,
+                                                                                    "column": 76
+                                                                                  },
+                                                                                  "end": {
+                                                                                    "row": 22,
+                                                                                    "column": 87
+                                                                                  },
+                                                                                  "text": "ignoredNode"
+                                                                                },
+                                                                                {
+                                                                                  "type": ")",
+                                                                                  "start": {
+                                                                                    "row": 22,
+                                                                                    "column": 87
+                                                                                  },
+                                                                                  "end": {
+                                                                                    "row": 22,
+                                                                                    "column": 88
+                                                                                  },
+                                                                                  "text": ")"
+                                                                                }
+                                                                              ]
+                                                                            },
+                                                                            {
+                                                                              "type": "->",
+                                                                              "start": {
+                                                                                "row": 22,
+                                                                                "column": 89
+                                                                              },
+                                                                              "end": {
+                                                                                "row": 22,
+                                                                                "column": 91
+                                                                              },
+                                                                              "text": "->"
+                                                                            },
+                                                                            {
+                                                                              "type": "identifier",
+                                                                              "start": {
+                                                                                "row": 22,
+                                                                                "column": 92
+                                                                              },
+                                                                              "end": {
+                                                                                "row": 22,
+                                                                                "column": 99
+                                                                              },
+                                                                              "text": "oldNode"
+                                                                            }
+                                                                          ]
+                                                                        },
+                                                                        {
+                                                                          "type": ")",
+                                                                          "start": {
+                                                                            "row": 22,
+                                                                            "column": 99
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 22,
+                                                                            "column": 100
+                                                                          },
+                                                                          "text": ")"
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ";",
+                                                                  "start": {
+                                                                    "row": 22,
+                                                                    "column": 100
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 22,
+                                                                    "column": 101
+                                                                  },
+                                                                  "text": ";"
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": "expression_statement",
+                                                              "start": {
+                                                                "row": 23,
+                                                                "column": 24
+                                                              },
+                                                              "end": {
+                                                                "row": 23,
+                                                                "column": 53
+                                                              },
+                                                              "text": "jenkins.updateComputerList();",
+                                                              "children": [
+                                                                {
+                                                                  "type": "method_invocation",
+                                                                  "start": {
+                                                                    "row": 23,
+                                                                    "column": 24
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 23,
+                                                                    "column": 52
+                                                                  },
+                                                                  "text": "jenkins.updateComputerList()",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 23,
+                                                                        "column": 24
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 23,
+                                                                        "column": 31
+                                                                      },
+                                                                      "text": "jenkins"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 23,
+                                                                        "column": 31
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 23,
+                                                                        "column": 32
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 23,
+                                                                        "column": 32
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 23,
+                                                                        "column": 50
+                                                                      },
+                                                                      "text": "updateComputerList"
+                                                                    },
+                                                                    {
+                                                                      "type": "argument_list",
+                                                                      "start": {
+                                                                        "row": 23,
+                                                                        "column": 50
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 23,
+                                                                        "column": 52
+                                                                      },
+                                                                      "text": "()",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "(",
+                                                                          "start": {
+                                                                            "row": 23,
+                                                                            "column": 50
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 23,
+                                                                            "column": 51
+                                                                          },
+                                                                          "text": "("
+                                                                        },
+                                                                        {
+                                                                          "type": ")",
+                                                                          "start": {
+                                                                            "row": 23,
+                                                                            "column": 51
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 23,
+                                                                            "column": 52
+                                                                          },
+                                                                          "text": ")"
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ";",
+                                                                  "start": {
+                                                                    "row": 23,
+                                                                    "column": 52
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 23,
+                                                                    "column": 53
+                                                                  },
+                                                                  "text": ";"
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": "expression_statement",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 24
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 45
+                                                              },
+                                                              "text": "jenkins.trimLabels();",
+                                                              "children": [
+                                                                {
+                                                                  "type": "method_invocation",
+                                                                  "start": {
+                                                                    "row": 24,
+                                                                    "column": 24
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 24,
+                                                                    "column": 44
+                                                                  },
+                                                                  "text": "jenkins.trimLabels()",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 24
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 31
+                                                                      },
+                                                                      "text": "jenkins"
+                                                                    },
+                                                                    {
+                                                                      "type": ".",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 31
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 32
+                                                                      },
+                                                                      "text": "."
+                                                                    },
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 32
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 42
+                                                                      },
+                                                                      "text": "trimLabels"
+                                                                    },
+                                                                    {
+                                                                      "type": "argument_list",
+                                                                      "start": {
+                                                                        "row": 24,
+                                                                        "column": 42
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 24,
+                                                                        "column": 44
+                                                                      },
+                                                                      "text": "()",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "(",
+                                                                          "start": {
+                                                                            "row": 24,
+                                                                            "column": 42
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 24,
+                                                                            "column": 43
+                                                                          },
+                                                                          "text": "("
+                                                                        },
+                                                                        {
+                                                                          "type": ")",
+                                                                          "start": {
+                                                                            "row": 24,
+                                                                            "column": 43
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 24,
+                                                                            "column": 44
+                                                                          },
+                                                                          "text": ")"
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ";",
+                                                                  "start": {
+                                                                    "row": 24,
+                                                                    "column": 44
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 24,
+                                                                    "column": 45
+                                                                  },
+                                                                  "text": ";"
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": "}",
+                                                              "start": {
+                                                                "row": 25,
+                                                                "column": 20
+                                                              },
+                                                              "end": {
+                                                                "row": 25,
+                                                                "column": 21
+                                                              },
+                                                              "text": "}"
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "}",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 17
+                                                      },
+                                                      "text": "}"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 18
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ";",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 19
+                                      },
+                                      "text": ";"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "throw_statement",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 24
+                                  },
+                                  "text": "throw e;",
+                                  "children": [
+                                    {
+                                      "type": "throw",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 21
+                                      },
+                                      "text": "throw"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 23
+                                      },
+                                      "text": "e"
+                                    },
+                                    {
+                                      "type": ";",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 24
+                                      },
+                                      "text": ";"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 13
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 29,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 45
+                      },
+                      "text": "NodeListener.fireOnCreated(node);",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 29,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 44
+                          },
+                          "text": "NodeListener.fireOnCreated(node)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 29,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 24
+                              },
+                              "text": "NodeListener"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 29,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 25
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 29,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 38
+                              },
+                              "text": "fireOnCreated"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 29,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 44
+                              },
+                              "text": "(node)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 39
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 43
+                                  },
+                                  "text": "node"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 44
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 29,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 45
+                          },
+                          "text": ";"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 30,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 9
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "}",
+              "start": {
+                "row": 31,
+                "column": 4
+              },
+              "end": {
+                "row": 31,
+                "column": 5
+              },
+              "text": "}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

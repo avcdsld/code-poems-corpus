@@ -1,0 +1,3004 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 45,
+    "column": 2
+  },
+  "text": "@Override\n\tvoid requestSubpartition(int subpartitionIndex) throws IOException, InterruptedException {\n\n\t\tboolean retriggerRequest = false;\n\n\t\t// The lock is required to request only once in the presence of retriggered requests.\n\t\tsynchronized (requestLock) {\n\t\t\tcheckState(!isReleased, \"LocalInputChannel has been released already\");\n\n\t\t\tif (subpartitionView == null) {\n\t\t\t\tLOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);\n\n\t\t\t\ttry {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\t// Do this outside of the lock scope as this might lead to a\n\t\t// deadlock with a concurrent release of the channel via the\n\t\t// input gate.\n\t\tif (retriggerRequest) {\n\t\t\tinputGate.retriggerPartitionRequest(partitionId.getPartitionId());\n\t\t}\n\t}",
+  "children": [
+    {
+      "type": "method_declaration",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 45,
+        "column": 2
+      },
+      "text": "@Override\n\tvoid requestSubpartition(int subpartitionIndex) throws IOException, InterruptedException {\n\n\t\tboolean retriggerRequest = false;\n\n\t\t// The lock is required to request only once in the presence of retriggered requests.\n\t\tsynchronized (requestLock) {\n\t\t\tcheckState(!isReleased, \"LocalInputChannel has been released already\");\n\n\t\t\tif (subpartitionView == null) {\n\t\t\t\tLOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);\n\n\t\t\t\ttry {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\t// Do this outside of the lock scope as this might lead to a\n\t\t// deadlock with a concurrent release of the channel via the\n\t\t// input gate.\n\t\tif (retriggerRequest) {\n\t\t\tinputGate.retriggerPartitionRequest(partitionId.getPartitionId());\n\t\t}\n\t}",
+      "children": [
+        {
+          "type": "modifiers",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 9
+          },
+          "text": "@Override",
+          "children": [
+            {
+              "type": "marker_annotation",
+              "start": {
+                "row": 0,
+                "column": 0
+              },
+              "end": {
+                "row": 0,
+                "column": 9
+              },
+              "text": "@Override",
+              "children": [
+                {
+                  "type": "@",
+                  "start": {
+                    "row": 0,
+                    "column": 0
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 1
+                  },
+                  "text": "@"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 1
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 9
+                  },
+                  "text": "Override"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "void_type",
+          "start": {
+            "row": 1,
+            "column": 1
+          },
+          "end": {
+            "row": 1,
+            "column": 5
+          },
+          "text": "void"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 1,
+            "column": 25
+          },
+          "text": "requestSubpartition"
+        },
+        {
+          "type": "formal_parameters",
+          "start": {
+            "row": 1,
+            "column": 25
+          },
+          "end": {
+            "row": 1,
+            "column": 48
+          },
+          "text": "(int subpartitionIndex)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 1,
+                "column": 25
+              },
+              "end": {
+                "row": 1,
+                "column": 26
+              },
+              "text": "("
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 1,
+                "column": 26
+              },
+              "end": {
+                "row": 1,
+                "column": 47
+              },
+              "text": "int subpartitionIndex",
+              "children": [
+                {
+                  "type": "integral_type",
+                  "start": {
+                    "row": 1,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 29
+                  },
+                  "text": "int",
+                  "children": [
+                    {
+                      "type": "int",
+                      "start": {
+                        "row": 1,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 29
+                      },
+                      "text": "int"
+                    }
+                  ]
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 30
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 47
+                  },
+                  "text": "subpartitionIndex"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 1,
+                "column": 47
+              },
+              "end": {
+                "row": 1,
+                "column": 48
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "throws",
+          "start": {
+            "row": 1,
+            "column": 49
+          },
+          "end": {
+            "row": 1,
+            "column": 89
+          },
+          "text": "throws IOException, InterruptedException",
+          "children": [
+            {
+              "type": "throws",
+              "start": {
+                "row": 1,
+                "column": 49
+              },
+              "end": {
+                "row": 1,
+                "column": 55
+              },
+              "text": "throws"
+            },
+            {
+              "type": "type_identifier",
+              "start": {
+                "row": 1,
+                "column": 56
+              },
+              "end": {
+                "row": 1,
+                "column": 67
+              },
+              "text": "IOException"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 67
+              },
+              "end": {
+                "row": 1,
+                "column": 68
+              },
+              "text": ","
+            },
+            {
+              "type": "type_identifier",
+              "start": {
+                "row": 1,
+                "column": 69
+              },
+              "end": {
+                "row": 1,
+                "column": 89
+              },
+              "text": "InterruptedException"
+            }
+          ]
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 90
+          },
+          "end": {
+            "row": 45,
+            "column": 2
+          },
+          "text": "{\n\n\t\tboolean retriggerRequest = false;\n\n\t\t// The lock is required to request only once in the presence of retriggered requests.\n\t\tsynchronized (requestLock) {\n\t\t\tcheckState(!isReleased, \"LocalInputChannel has been released already\");\n\n\t\t\tif (subpartitionView == null) {\n\t\t\t\tLOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);\n\n\t\t\t\ttry {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\t// Do this outside of the lock scope as this might lead to a\n\t\t// deadlock with a concurrent release of the channel via the\n\t\t// input gate.\n\t\tif (retriggerRequest) {\n\t\t\tinputGate.retriggerPartitionRequest(partitionId.getPartitionId());\n\t\t}\n\t}",
+          "children": [
+            {
+              "type": "{",
+              "start": {
+                "row": 1,
+                "column": 90
+              },
+              "end": {
+                "row": 1,
+                "column": 91
+              },
+              "text": "{"
+            },
+            {
+              "type": "local_variable_declaration",
+              "start": {
+                "row": 3,
+                "column": 2
+              },
+              "end": {
+                "row": 3,
+                "column": 35
+              },
+              "text": "boolean retriggerRequest = false;",
+              "children": [
+                {
+                  "type": "boolean_type",
+                  "start": {
+                    "row": 3,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 9
+                  },
+                  "text": "boolean"
+                },
+                {
+                  "type": "variable_declarator",
+                  "start": {
+                    "row": 3,
+                    "column": 10
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 34
+                  },
+                  "text": "retriggerRequest = false",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 3,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 26
+                      },
+                      "text": "retriggerRequest"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 3,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 28
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "false",
+                      "start": {
+                        "row": 3,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 34
+                      },
+                      "text": "false"
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 3,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 35
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 5,
+                "column": 2
+              },
+              "end": {
+                "row": 5,
+                "column": 87
+              },
+              "text": "// The lock is required to request only once in the presence of retriggered requests."
+            },
+            {
+              "type": "synchronized_statement",
+              "start": {
+                "row": 6,
+                "column": 2
+              },
+              "end": {
+                "row": 37,
+                "column": 3
+              },
+              "text": "synchronized (requestLock) {\n\t\t\tcheckState(!isReleased, \"LocalInputChannel has been released already\");\n\n\t\t\tif (subpartitionView == null) {\n\t\t\t\tLOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);\n\n\t\t\t\ttry {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}",
+              "children": [
+                {
+                  "type": "synchronized",
+                  "start": {
+                    "row": 6,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 14
+                  },
+                  "text": "synchronized"
+                },
+                {
+                  "type": "parenthesized_expression",
+                  "start": {
+                    "row": 6,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 28
+                  },
+                  "text": "(requestLock)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 6,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 16
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 6,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 27
+                      },
+                      "text": "requestLock"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 6,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 28
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 6,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 3
+                  },
+                  "text": "{\n\t\t\tcheckState(!isReleased, \"LocalInputChannel has been released already\");\n\n\t\t\tif (subpartitionView == null) {\n\t\t\t\tLOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);\n\n\t\t\t\ttry {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 6,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 30
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 7,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 74
+                      },
+                      "text": "checkState(!isReleased, \"LocalInputChannel has been released already\");",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 7,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 73
+                          },
+                          "text": "checkState(!isReleased, \"LocalInputChannel has been released already\")",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 7,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 13
+                              },
+                              "text": "checkState"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 7,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 73
+                              },
+                              "text": "(!isReleased, \"LocalInputChannel has been released already\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 14
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "unary_expression",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 25
+                                  },
+                                  "text": "!isReleased",
+                                  "children": [
+                                    {
+                                      "type": "!",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 15
+                                      },
+                                      "text": "!"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 25
+                                      },
+                                      "text": "isReleased"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 26
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "string_literal",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 72
+                                  },
+                                  "text": "\"LocalInputChannel has been released already\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 28
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_fragment",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 71
+                                      },
+                                      "text": "LocalInputChannel has been released already"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 7,
+                                        "column": 71
+                                      },
+                                      "end": {
+                                        "row": 7,
+                                        "column": 72
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 7,
+                                    "column": 72
+                                  },
+                                  "end": {
+                                    "row": 7,
+                                    "column": 73
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 7,
+                            "column": 73
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 74
+                          },
+                          "text": ";"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 9,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 4
+                      },
+                      "text": "if (subpartitionView == null) {\n\t\t\t\tLOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);\n\n\t\t\t\ttry {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 9,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 5
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "condition",
+                          "start": {
+                            "row": 9,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 32
+                          },
+                          "text": "(subpartitionView == null)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 9,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 7
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "binary_expression",
+                              "start": {
+                                "row": 9,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 31
+                              },
+                              "text": "subpartitionView == null",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 7
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 23
+                                  },
+                                  "text": "subpartitionView"
+                                },
+                                {
+                                  "type": "==",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 26
+                                  },
+                                  "text": "=="
+                                },
+                                {
+                                  "type": "null_literal",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 31
+                                  },
+                                  "text": "null"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 9,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 32
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 9,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 4
+                          },
+                          "text": "{\n\t\t\t\tLOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);\n\n\t\t\t\ttry {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 9,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 34
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 10,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 43
+                              },
+                              "text": "LOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId);",
+                              "children": [
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 42
+                                  },
+                                  "text": "LOG.debug(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 10,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 10,
+                                        "column": 7
+                                      },
+                                      "text": "LOG"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 10,
+                                        "column": 7
+                                      },
+                                      "end": {
+                                        "row": 10,
+                                        "column": 8
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 10,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 10,
+                                        "column": 13
+                                      },
+                                      "text": "debug"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 10,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 42
+                                      },
+                                      "text": "(\"{}: Requesting LOCAL subpartition {} of partition {}.\",\n\t\t\t\t\tthis, subpartitionIndex, partitionId)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 14
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "string_literal",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 69
+                                          },
+                                          "text": "\"{}: Requesting LOCAL subpartition {} of partition {}.\"",
+                                          "children": [
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 10,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 10,
+                                                "column": 15
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "string_fragment",
+                                              "start": {
+                                                "row": 10,
+                                                "column": 15
+                                              },
+                                              "end": {
+                                                "row": 10,
+                                                "column": 68
+                                              },
+                                              "text": "{}: Requesting LOCAL subpartition {} of partition {}."
+                                            },
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 10,
+                                                "column": 68
+                                              },
+                                              "end": {
+                                                "row": 10,
+                                                "column": 69
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 69
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 70
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "this",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 9
+                                          },
+                                          "text": "this"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 9
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 10
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 11
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 28
+                                          },
+                                          "text": "subpartitionIndex"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 29
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 41
+                                          },
+                                          "text": "partitionId"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 42
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 43
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "try_statement",
+                              "start": {
+                                "row": 13,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 5
+                              },
+                              "text": "try {\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t} catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}",
+                              "children": [
+                                {
+                                  "type": "try",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 7
+                                  },
+                                  "text": "try"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 29,
+                                    "column": 5
+                                  },
+                                  "text": "{\n\t\t\t\t\tResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);\n\n\t\t\t\t\tif (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}\n\n\t\t\t\t\t// make the subpartition view visible\n\t\t\t\t\tthis.subpartitionView = subpartitionView;\n\n\t\t\t\t\t// check if the channel was released in the meantime\n\t\t\t\t\tif (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}\n\t\t\t\t}",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 9
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "local_variable_declaration",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 15,
+                                        "column": 44
+                                      },
+                                      "text": "ResultSubpartitionView subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this);",
+                                      "children": [
+                                        {
+                                          "type": "type_identifier",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 27
+                                          },
+                                          "text": "ResultSubpartitionView"
+                                        },
+                                        {
+                                          "type": "variable_declarator",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 43
+                                          },
+                                          "text": "subpartitionView = partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 44
+                                              },
+                                              "text": "subpartitionView"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 46
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "method_invocation",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 15,
+                                                "column": 43
+                                              },
+                                              "text": "partitionManager.createSubpartitionView(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this)",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 14,
+                                                    "column": 47
+                                                  },
+                                                  "end": {
+                                                    "row": 14,
+                                                    "column": 63
+                                                  },
+                                                  "text": "partitionManager"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 14,
+                                                    "column": 63
+                                                  },
+                                                  "end": {
+                                                    "row": 14,
+                                                    "column": 64
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 14,
+                                                    "column": 64
+                                                  },
+                                                  "end": {
+                                                    "row": 14,
+                                                    "column": 86
+                                                  },
+                                                  "text": "createSubpartitionView"
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 14,
+                                                    "column": 86
+                                                  },
+                                                  "end": {
+                                                    "row": 15,
+                                                    "column": 43
+                                                  },
+                                                  "text": "(\n\t\t\t\t\t\tpartitionId, subpartitionIndex, this)",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 14,
+                                                        "column": 86
+                                                      },
+                                                      "end": {
+                                                        "row": 14,
+                                                        "column": 87
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 6
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 17
+                                                      },
+                                                      "text": "partitionId"
+                                                    },
+                                                    {
+                                                      "type": ",",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 17
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 18
+                                                      },
+                                                      "text": ","
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 19
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 36
+                                                      },
+                                                      "text": "subpartitionIndex"
+                                                    },
+                                                    {
+                                                      "type": ",",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 36
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 37
+                                                      },
+                                                      "text": ","
+                                                    },
+                                                    {
+                                                      "type": "this",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 38
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 42
+                                                      },
+                                                      "text": "this"
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 15,
+                                                        "column": 42
+                                                      },
+                                                      "end": {
+                                                        "row": 15,
+                                                        "column": 43
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ";",
+                                          "start": {
+                                            "row": 15,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 15,
+                                            "column": 44
+                                          },
+                                          "text": ";"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "if_statement",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 6
+                                      },
+                                      "text": "if (subpartitionView == null) {\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}",
+                                      "children": [
+                                        {
+                                          "type": "if",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 7
+                                          },
+                                          "text": "if"
+                                        },
+                                        {
+                                          "type": "condition",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 34
+                                          },
+                                          "text": "(subpartitionView == null)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 9
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "binary_expression",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 9
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 33
+                                              },
+                                              "text": "subpartitionView == null",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 9
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 25
+                                                  },
+                                                  "text": "subpartitionView"
+                                                },
+                                                {
+                                                  "type": "==",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 28
+                                                  },
+                                                  "text": "=="
+                                                },
+                                                {
+                                                  "type": "null_literal",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 29
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 33
+                                                  },
+                                                  "text": "null"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 34
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "block",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 6
+                                          },
+                                          "text": "{\n\t\t\t\t\t\tthrow new IOException(\"Error requesting subpartition.\");\n\t\t\t\t\t}",
+                                          "children": [
+                                            {
+                                              "type": "{",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 36
+                                              },
+                                              "text": "{"
+                                            },
+                                            {
+                                              "type": "throw_statement",
+                                              "start": {
+                                                "row": 18,
+                                                "column": 6
+                                              },
+                                              "end": {
+                                                "row": 18,
+                                                "column": 62
+                                              },
+                                              "text": "throw new IOException(\"Error requesting subpartition.\");",
+                                              "children": [
+                                                {
+                                                  "type": "throw",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 6
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 11
+                                                  },
+                                                  "text": "throw"
+                                                },
+                                                {
+                                                  "type": "object_creation_expression",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 12
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 61
+                                                  },
+                                                  "text": "new IOException(\"Error requesting subpartition.\")",
+                                                  "children": [
+                                                    {
+                                                      "type": "new",
+                                                      "start": {
+                                                        "row": 18,
+                                                        "column": 12
+                                                      },
+                                                      "end": {
+                                                        "row": 18,
+                                                        "column": 15
+                                                      },
+                                                      "text": "new"
+                                                    },
+                                                    {
+                                                      "type": "type_identifier",
+                                                      "start": {
+                                                        "row": 18,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 18,
+                                                        "column": 27
+                                                      },
+                                                      "text": "IOException"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 18,
+                                                        "column": 27
+                                                      },
+                                                      "end": {
+                                                        "row": 18,
+                                                        "column": 61
+                                                      },
+                                                      "text": "(\"Error requesting subpartition.\")",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 18,
+                                                            "column": 27
+                                                          },
+                                                          "end": {
+                                                            "row": 18,
+                                                            "column": 28
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": "string_literal",
+                                                          "start": {
+                                                            "row": 18,
+                                                            "column": 28
+                                                          },
+                                                          "end": {
+                                                            "row": 18,
+                                                            "column": 60
+                                                          },
+                                                          "text": "\"Error requesting subpartition.\"",
+                                                          "children": [
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 18,
+                                                                "column": 28
+                                                              },
+                                                              "end": {
+                                                                "row": 18,
+                                                                "column": 29
+                                                              },
+                                                              "text": "\""
+                                                            },
+                                                            {
+                                                              "type": "string_fragment",
+                                                              "start": {
+                                                                "row": 18,
+                                                                "column": 29
+                                                              },
+                                                              "end": {
+                                                                "row": 18,
+                                                                "column": 59
+                                                              },
+                                                              "text": "Error requesting subpartition."
+                                                            },
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 18,
+                                                                "column": 59
+                                                              },
+                                                              "end": {
+                                                                "row": 18,
+                                                                "column": 60
+                                                              },
+                                                              "text": "\""
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 18,
+                                                            "column": 60
+                                                          },
+                                                          "end": {
+                                                            "row": 18,
+                                                            "column": 61
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ";",
+                                                  "start": {
+                                                    "row": 18,
+                                                    "column": 61
+                                                  },
+                                                  "end": {
+                                                    "row": 18,
+                                                    "column": 62
+                                                  },
+                                                  "text": ";"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "}",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 5
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 6
+                                              },
+                                              "text": "}"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "line_comment",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 42
+                                      },
+                                      "text": "// make the subpartition view visible"
+                                    },
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 46
+                                      },
+                                      "text": "this.subpartitionView = subpartitionView;",
+                                      "children": [
+                                        {
+                                          "type": "assignment_expression",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 45
+                                          },
+                                          "text": "this.subpartitionView = subpartitionView",
+                                          "children": [
+                                            {
+                                              "type": "field_access",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 5
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 26
+                                              },
+                                              "text": "this.subpartitionView",
+                                              "children": [
+                                                {
+                                                  "type": "this",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 5
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 9
+                                                  },
+                                                  "text": "this"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 9
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 10
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 10
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 26
+                                                  },
+                                                  "text": "subpartitionView"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 28
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 45
+                                              },
+                                              "text": "subpartitionView"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ";",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 46
+                                          },
+                                          "text": ";"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "line_comment",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 57
+                                      },
+                                      "text": "// check if the channel was released in the meantime"
+                                    },
+                                    {
+                                      "type": "if_statement",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 6
+                                      },
+                                      "text": "if (isReleased) {\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}",
+                                      "children": [
+                                        {
+                                          "type": "if",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 7
+                                          },
+                                          "text": "if"
+                                        },
+                                        {
+                                          "type": "condition",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 20
+                                          },
+                                          "text": "(isReleased)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 9
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 9
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 19
+                                              },
+                                              "text": "isReleased"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 19
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 20
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "block",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 6
+                                          },
+                                          "text": "{\n\t\t\t\t\t\tsubpartitionView.releaseAllResources();\n\t\t\t\t\t\tthis.subpartitionView = null;\n\t\t\t\t\t}",
+                                          "children": [
+                                            {
+                                              "type": "{",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 22
+                                              },
+                                              "text": "{"
+                                            },
+                                            {
+                                              "type": "expression_statement",
+                                              "start": {
+                                                "row": 26,
+                                                "column": 6
+                                              },
+                                              "end": {
+                                                "row": 26,
+                                                "column": 45
+                                              },
+                                              "text": "subpartitionView.releaseAllResources();",
+                                              "children": [
+                                                {
+                                                  "type": "method_invocation",
+                                                  "start": {
+                                                    "row": 26,
+                                                    "column": 6
+                                                  },
+                                                  "end": {
+                                                    "row": 26,
+                                                    "column": 44
+                                                  },
+                                                  "text": "subpartitionView.releaseAllResources()",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 6
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 22
+                                                      },
+                                                      "text": "subpartitionView"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 22
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 23
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 23
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 42
+                                                      },
+                                                      "text": "releaseAllResources"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 26,
+                                                        "column": 42
+                                                      },
+                                                      "end": {
+                                                        "row": 26,
+                                                        "column": 44
+                                                      },
+                                                      "text": "()",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 42
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 43
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 26,
+                                                            "column": 43
+                                                          },
+                                                          "end": {
+                                                            "row": 26,
+                                                            "column": 44
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ";",
+                                                  "start": {
+                                                    "row": 26,
+                                                    "column": 44
+                                                  },
+                                                  "end": {
+                                                    "row": 26,
+                                                    "column": 45
+                                                  },
+                                                  "text": ";"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "expression_statement",
+                                              "start": {
+                                                "row": 27,
+                                                "column": 6
+                                              },
+                                              "end": {
+                                                "row": 27,
+                                                "column": 35
+                                              },
+                                              "text": "this.subpartitionView = null;",
+                                              "children": [
+                                                {
+                                                  "type": "assignment_expression",
+                                                  "start": {
+                                                    "row": 27,
+                                                    "column": 6
+                                                  },
+                                                  "end": {
+                                                    "row": 27,
+                                                    "column": 34
+                                                  },
+                                                  "text": "this.subpartitionView = null",
+                                                  "children": [
+                                                    {
+                                                      "type": "field_access",
+                                                      "start": {
+                                                        "row": 27,
+                                                        "column": 6
+                                                      },
+                                                      "end": {
+                                                        "row": 27,
+                                                        "column": 27
+                                                      },
+                                                      "text": "this.subpartitionView",
+                                                      "children": [
+                                                        {
+                                                          "type": "this",
+                                                          "start": {
+                                                            "row": 27,
+                                                            "column": 6
+                                                          },
+                                                          "end": {
+                                                            "row": 27,
+                                                            "column": 10
+                                                          },
+                                                          "text": "this"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 27,
+                                                            "column": 10
+                                                          },
+                                                          "end": {
+                                                            "row": 27,
+                                                            "column": 11
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 27,
+                                                            "column": 11
+                                                          },
+                                                          "end": {
+                                                            "row": 27,
+                                                            "column": 27
+                                                          },
+                                                          "text": "subpartitionView"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "=",
+                                                      "start": {
+                                                        "row": 27,
+                                                        "column": 28
+                                                      },
+                                                      "end": {
+                                                        "row": 27,
+                                                        "column": 29
+                                                      },
+                                                      "text": "="
+                                                    },
+                                                    {
+                                                      "type": "null_literal",
+                                                      "start": {
+                                                        "row": 27,
+                                                        "column": 30
+                                                      },
+                                                      "end": {
+                                                        "row": 27,
+                                                        "column": 34
+                                                      },
+                                                      "text": "null"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ";",
+                                                  "start": {
+                                                    "row": 27,
+                                                    "column": 34
+                                                  },
+                                                  "end": {
+                                                    "row": 27,
+                                                    "column": 35
+                                                  },
+                                                  "text": ";"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "}",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 5
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 6
+                                              },
+                                              "text": "}"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 5
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "catch_clause",
+                                  "start": {
+                                    "row": 29,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 5
+                                  },
+                                  "text": "catch (PartitionNotFoundException notFound) {\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}",
+                                  "children": [
+                                    {
+                                      "type": "catch",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 11
+                                      },
+                                      "text": "catch"
+                                    },
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 13
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "catch_formal_parameter",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 48
+                                      },
+                                      "text": "PartitionNotFoundException notFound",
+                                      "children": [
+                                        {
+                                          "type": "catch_type",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 39
+                                          },
+                                          "text": "PartitionNotFoundException",
+                                          "children": [
+                                            {
+                                              "type": "type_identifier",
+                                              "start": {
+                                                "row": 29,
+                                                "column": 13
+                                              },
+                                              "end": {
+                                                "row": 29,
+                                                "column": 39
+                                              },
+                                              "text": "PartitionNotFoundException"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 48
+                                          },
+                                          "text": "notFound"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 29,
+                                        "column": 49
+                                      },
+                                      "text": ")"
+                                    },
+                                    {
+                                      "type": "block",
+                                      "start": {
+                                        "row": 29,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 5
+                                      },
+                                      "text": "{\n\t\t\t\t\tif (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}\n\t\t\t\t}",
+                                      "children": [
+                                        {
+                                          "type": "{",
+                                          "start": {
+                                            "row": 29,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 29,
+                                            "column": 51
+                                          },
+                                          "text": "{"
+                                        },
+                                        {
+                                          "type": "if_statement",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 6
+                                          },
+                                          "text": "if (increaseBackoff()) {\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}",
+                                          "children": [
+                                            {
+                                              "type": "if",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 5
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 7
+                                              },
+                                              "text": "if"
+                                            },
+                                            {
+                                              "type": "condition",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 27
+                                              },
+                                              "text": "(increaseBackoff())",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 8
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 9
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "method_invocation",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 9
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 26
+                                                  },
+                                                  "text": "increaseBackoff()",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 30,
+                                                        "column": 9
+                                                      },
+                                                      "end": {
+                                                        "row": 30,
+                                                        "column": 24
+                                                      },
+                                                      "text": "increaseBackoff"
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 30,
+                                                        "column": 24
+                                                      },
+                                                      "end": {
+                                                        "row": 30,
+                                                        "column": 26
+                                                      },
+                                                      "text": "()",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 30,
+                                                            "column": 24
+                                                          },
+                                                          "end": {
+                                                            "row": 30,
+                                                            "column": 25
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 30,
+                                                            "column": 25
+                                                          },
+                                                          "end": {
+                                                            "row": 30,
+                                                            "column": 26
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 27
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "block",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 32,
+                                                "column": 6
+                                              },
+                                              "text": "{\n\t\t\t\t\t\tretriggerRequest = true;\n\t\t\t\t\t}",
+                                              "children": [
+                                                {
+                                                  "type": "{",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 28
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 29
+                                                  },
+                                                  "text": "{"
+                                                },
+                                                {
+                                                  "type": "expression_statement",
+                                                  "start": {
+                                                    "row": 31,
+                                                    "column": 6
+                                                  },
+                                                  "end": {
+                                                    "row": 31,
+                                                    "column": 30
+                                                  },
+                                                  "text": "retriggerRequest = true;",
+                                                  "children": [
+                                                    {
+                                                      "type": "assignment_expression",
+                                                      "start": {
+                                                        "row": 31,
+                                                        "column": 6
+                                                      },
+                                                      "end": {
+                                                        "row": 31,
+                                                        "column": 29
+                                                      },
+                                                      "text": "retriggerRequest = true",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 31,
+                                                            "column": 6
+                                                          },
+                                                          "end": {
+                                                            "row": 31,
+                                                            "column": 22
+                                                          },
+                                                          "text": "retriggerRequest"
+                                                        },
+                                                        {
+                                                          "type": "=",
+                                                          "start": {
+                                                            "row": 31,
+                                                            "column": 23
+                                                          },
+                                                          "end": {
+                                                            "row": 31,
+                                                            "column": 24
+                                                          },
+                                                          "text": "="
+                                                        },
+                                                        {
+                                                          "type": "true",
+                                                          "start": {
+                                                            "row": 31,
+                                                            "column": 25
+                                                          },
+                                                          "end": {
+                                                            "row": 31,
+                                                            "column": 29
+                                                          },
+                                                          "text": "true"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ";",
+                                                      "start": {
+                                                        "row": 31,
+                                                        "column": 29
+                                                      },
+                                                      "end": {
+                                                        "row": 31,
+                                                        "column": 30
+                                                      },
+                                                      "text": ";"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "}",
+                                                  "start": {
+                                                    "row": 32,
+                                                    "column": 5
+                                                  },
+                                                  "end": {
+                                                    "row": 32,
+                                                    "column": 6
+                                                  },
+                                                  "text": "}"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "else",
+                                              "start": {
+                                                "row": 32,
+                                                "column": 7
+                                              },
+                                              "end": {
+                                                "row": 32,
+                                                "column": 11
+                                              },
+                                              "text": "else"
+                                            },
+                                            {
+                                              "type": "block",
+                                              "start": {
+                                                "row": 32,
+                                                "column": 12
+                                              },
+                                              "end": {
+                                                "row": 34,
+                                                "column": 6
+                                              },
+                                              "text": "{\n\t\t\t\t\t\tthrow notFound;\n\t\t\t\t\t}",
+                                              "children": [
+                                                {
+                                                  "type": "{",
+                                                  "start": {
+                                                    "row": 32,
+                                                    "column": 12
+                                                  },
+                                                  "end": {
+                                                    "row": 32,
+                                                    "column": 13
+                                                  },
+                                                  "text": "{"
+                                                },
+                                                {
+                                                  "type": "throw_statement",
+                                                  "start": {
+                                                    "row": 33,
+                                                    "column": 6
+                                                  },
+                                                  "end": {
+                                                    "row": 33,
+                                                    "column": 21
+                                                  },
+                                                  "text": "throw notFound;",
+                                                  "children": [
+                                                    {
+                                                      "type": "throw",
+                                                      "start": {
+                                                        "row": 33,
+                                                        "column": 6
+                                                      },
+                                                      "end": {
+                                                        "row": 33,
+                                                        "column": 11
+                                                      },
+                                                      "text": "throw"
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 33,
+                                                        "column": 12
+                                                      },
+                                                      "end": {
+                                                        "row": 33,
+                                                        "column": 20
+                                                      },
+                                                      "text": "notFound"
+                                                    },
+                                                    {
+                                                      "type": ";",
+                                                      "start": {
+                                                        "row": 33,
+                                                        "column": 20
+                                                      },
+                                                      "end": {
+                                                        "row": 33,
+                                                        "column": 21
+                                                      },
+                                                      "text": ";"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "}",
+                                                  "start": {
+                                                    "row": 34,
+                                                    "column": 5
+                                                  },
+                                                  "end": {
+                                                    "row": 34,
+                                                    "column": 6
+                                                  },
+                                                  "text": "}"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 4
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 5
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 36,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 4
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 37,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 3
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 39,
+                "column": 2
+              },
+              "end": {
+                "row": 39,
+                "column": 62
+              },
+              "text": "// Do this outside of the lock scope as this might lead to a"
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 40,
+                "column": 2
+              },
+              "end": {
+                "row": 40,
+                "column": 62
+              },
+              "text": "// deadlock with a concurrent release of the channel via the"
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 41,
+                "column": 2
+              },
+              "end": {
+                "row": 41,
+                "column": 16
+              },
+              "text": "// input gate."
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 42,
+                "column": 2
+              },
+              "end": {
+                "row": 44,
+                "column": 3
+              },
+              "text": "if (retriggerRequest) {\n\t\t\tinputGate.retriggerPartitionRequest(partitionId.getPartitionId());\n\t\t}",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 42,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 4
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "condition",
+                  "start": {
+                    "row": 42,
+                    "column": 5
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 23
+                  },
+                  "text": "(retriggerRequest)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 42,
+                        "column": 5
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 6
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 42,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 22
+                      },
+                      "text": "retriggerRequest"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 42,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 23
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 42,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 3
+                  },
+                  "text": "{\n\t\t\tinputGate.retriggerPartitionRequest(partitionId.getPartitionId());\n\t\t}",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 42,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 25
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 43,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 69
+                      },
+                      "text": "inputGate.retriggerPartitionRequest(partitionId.getPartitionId());",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 43,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 68
+                          },
+                          "text": "inputGate.retriggerPartitionRequest(partitionId.getPartitionId())",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 43,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 12
+                              },
+                              "text": "inputGate"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 43,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 13
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 43,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 38
+                              },
+                              "text": "retriggerPartitionRequest"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 43,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 68
+                              },
+                              "text": "(partitionId.getPartitionId())",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 38
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 39
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 67
+                                  },
+                                  "text": "partitionId.getPartitionId()",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 50
+                                      },
+                                      "text": "partitionId"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 51
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 65
+                                      },
+                                      "text": "getPartitionId"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 65
+                                      },
+                                      "end": {
+                                        "row": 43,
+                                        "column": 67
+                                      },
+                                      "text": "()",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 65
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 66
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 66
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 67
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 67
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 68
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 43,
+                            "column": 68
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 69
+                          },
+                          "text": ";"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 44,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 3
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "}",
+              "start": {
+                "row": 45,
+                "column": 1
+              },
+              "end": {
+                "row": 45,
+                "column": 2
+              },
+              "text": "}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

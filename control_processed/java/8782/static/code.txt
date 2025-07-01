@@ -1,0 +1,10 @@
+public static String formatCellContent(String value, int numFmtIndex, String numFmtString) {
+		if (null != numFmtString) {
+			try {
+				value = new DataFormatter().formatRawCellContents(Double.parseDouble(value), numFmtIndex, numFmtString);
+			} catch (NumberFormatException e) {
+				// ignore
+			}
+		}
+		return value;
+	}

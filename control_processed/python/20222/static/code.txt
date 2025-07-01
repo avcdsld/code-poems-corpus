@@ -1,0 +1,18 @@
+def highlightBlock(self, text):
+        """
+        Highlights a block of text. Please do not override, this method.
+        Instead you should implement
+        :func:`spyder.utils.syntaxhighplighters.SyntaxHighlighter.highlight_block`.
+
+        :param text: text to highlight.
+        """
+        self.highlight_block(text)
+
+        # Process blocks for fold detection
+        current_block = self.currentBlock()
+        previous_block = self._find_prev_non_blank_block(current_block)
+        if self.editor:
+            if self.fold_detector is not None:
+                self.fold_detector._editor = weakref.ref(self.editor)
+                self.fold_detector.process_block(
+                    current_block, previous_block, text)

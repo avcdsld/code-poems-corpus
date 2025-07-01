@@ -1,0 +1,4808 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 56,
+    "column": 28
+  },
+  "text": "def save_function_tuple(self, func):\n        \"\"\"  Pickles an actual func object.\n\n        A func comprises: code, globals, defaults, closure, and dict.  We\n        extract and save these, injecting reducing functions at certain points\n        to recreate the func object.  Keep in mind that some of these pieces\n        can contain a ref to the func itself.  Thus, a naive save on these\n        pieces could trigger an infinite loop of save's.  To get around that,\n        we first create a skeleton func object using just the code (this is\n        safe, since this won't contain a ref to the func), and memoize it as\n        soon as it's created.  The other stuff can then be filled in later.\n        \"\"\"\n        if is_tornado_coroutine(func):\n            self.save_reduce(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)\n            return\n\n        save = self.save\n        write = self.write\n\n        code, f_globals, defaults, closure_values, dct, base_globals = self.extract_func_data(func)\n\n        save(_fill_function)  # skeleton function updater\n        write(pickle.MARK)    # beginning of tuple that _fill_function expects\n\n        self._save_subimports(\n            code,\n            itertools.chain(f_globals.values(), closure_values or ()),\n        )\n\n        # create a skeleton function object and memoize it\n        save(_make_skel_func)\n        save((\n            code,\n            len(closure_values) if closure_values is not None else -1,\n            base_globals,\n        ))\n        write(pickle.REDUCE)\n        self.memoize(func)\n\n        # save the rest of the func data needed by _fill_function\n        state = {\n            'globals': f_globals,\n            'defaults': defaults,\n            'dict': dct,\n            'closure_values': closure_values,\n            'module': func.__module__,\n            'name': func.__name__,\n            'doc': func.__doc__,\n        }\n        if hasattr(func, '__annotations__') and sys.version_info >= (3, 7):\n            state['annotations'] = func.__annotations__\n        if hasattr(func, '__qualname__'):\n            state['qualname'] = func.__qualname__\n        save(state)\n        write(pickle.TUPLE)\n        write(pickle.REDUCE)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 56,
+        "column": 28
+      },
+      "text": "def save_function_tuple(self, func):\n        \"\"\"  Pickles an actual func object.\n\n        A func comprises: code, globals, defaults, closure, and dict.  We\n        extract and save these, injecting reducing functions at certain points\n        to recreate the func object.  Keep in mind that some of these pieces\n        can contain a ref to the func itself.  Thus, a naive save on these\n        pieces could trigger an infinite loop of save's.  To get around that,\n        we first create a skeleton func object using just the code (this is\n        safe, since this won't contain a ref to the func), and memoize it as\n        soon as it's created.  The other stuff can then be filled in later.\n        \"\"\"\n        if is_tornado_coroutine(func):\n            self.save_reduce(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)\n            return\n\n        save = self.save\n        write = self.write\n\n        code, f_globals, defaults, closure_values, dct, base_globals = self.extract_func_data(func)\n\n        save(_fill_function)  # skeleton function updater\n        write(pickle.MARK)    # beginning of tuple that _fill_function expects\n\n        self._save_subimports(\n            code,\n            itertools.chain(f_globals.values(), closure_values or ()),\n        )\n\n        # create a skeleton function object and memoize it\n        save(_make_skel_func)\n        save((\n            code,\n            len(closure_values) if closure_values is not None else -1,\n            base_globals,\n        ))\n        write(pickle.REDUCE)\n        self.memoize(func)\n\n        # save the rest of the func data needed by _fill_function\n        state = {\n            'globals': f_globals,\n            'defaults': defaults,\n            'dict': dct,\n            'closure_values': closure_values,\n            'module': func.__module__,\n            'name': func.__name__,\n            'doc': func.__doc__,\n        }\n        if hasattr(func, '__annotations__') and sys.version_info >= (3, 7):\n            state['annotations'] = func.__annotations__\n        if hasattr(func, '__qualname__'):\n            state['qualname'] = func.__qualname__\n        save(state)\n        write(pickle.TUPLE)\n        write(pickle.REDUCE)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 23
+          },
+          "text": "save_function_tuple"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 23
+          },
+          "end": {
+            "row": 0,
+            "column": 35
+          },
+          "text": "(self, func)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 23
+              },
+              "end": {
+                "row": 0,
+                "column": 24
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 24
+              },
+              "end": {
+                "row": 0,
+                "column": 28
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 28
+              },
+              "end": {
+                "row": 0,
+                "column": 29
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 30
+              },
+              "end": {
+                "row": 0,
+                "column": 34
+              },
+              "text": "func"
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 34
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 35
+          },
+          "end": {
+            "row": 0,
+            "column": 36
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 8
+          },
+          "end": {
+            "row": 56,
+            "column": 28
+          },
+          "text": "\"\"\"  Pickles an actual func object.\n\n        A func comprises: code, globals, defaults, closure, and dict.  We\n        extract and save these, injecting reducing functions at certain points\n        to recreate the func object.  Keep in mind that some of these pieces\n        can contain a ref to the func itself.  Thus, a naive save on these\n        pieces could trigger an infinite loop of save's.  To get around that,\n        we first create a skeleton func object using just the code (this is\n        safe, since this won't contain a ref to the func), and memoize it as\n        soon as it's created.  The other stuff can then be filled in later.\n        \"\"\"\n        if is_tornado_coroutine(func):\n            self.save_reduce(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)\n            return\n\n        save = self.save\n        write = self.write\n\n        code, f_globals, defaults, closure_values, dct, base_globals = self.extract_func_data(func)\n\n        save(_fill_function)  # skeleton function updater\n        write(pickle.MARK)    # beginning of tuple that _fill_function expects\n\n        self._save_subimports(\n            code,\n            itertools.chain(f_globals.values(), closure_values or ()),\n        )\n\n        # create a skeleton function object and memoize it\n        save(_make_skel_func)\n        save((\n            code,\n            len(closure_values) if closure_values is not None else -1,\n            base_globals,\n        ))\n        write(pickle.REDUCE)\n        self.memoize(func)\n\n        # save the rest of the func data needed by _fill_function\n        state = {\n            'globals': f_globals,\n            'defaults': defaults,\n            'dict': dct,\n            'closure_values': closure_values,\n            'module': func.__module__,\n            'name': func.__name__,\n            'doc': func.__doc__,\n        }\n        if hasattr(func, '__annotations__') and sys.version_info >= (3, 7):\n            state['annotations'] = func.__annotations__\n        if hasattr(func, '__qualname__'):\n            state['qualname'] = func.__qualname__\n        save(state)\n        write(pickle.TUPLE)\n        write(pickle.REDUCE)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 11,
+                "column": 11
+              },
+              "text": "\"\"\"  Pickles an actual func object.\n\n        A func comprises: code, globals, defaults, closure, and dict.  We\n        extract and save these, injecting reducing functions at certain points\n        to recreate the func object.  Keep in mind that some of these pieces\n        can contain a ref to the func itself.  Thus, a naive save on these\n        pieces could trigger an infinite loop of save's.  To get around that,\n        we first create a skeleton func object using just the code (this is\n        safe, since this won't contain a ref to the func), and memoize it as\n        soon as it's created.  The other stuff can then be filled in later.\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 11
+                  },
+                  "text": "\"\"\"  Pickles an actual func object.\n\n        A func comprises: code, globals, defaults, closure, and dict.  We\n        extract and save these, injecting reducing functions at certain points\n        to recreate the func object.  Keep in mind that some of these pieces\n        can contain a ref to the func itself.  Thus, a naive save on these\n        pieces could trigger an infinite loop of save's.  To get around that,\n        we first create a skeleton func object using just the code (this is\n        safe, since this won't contain a ref to the func), and memoize it as\n        soon as it's created.  The other stuff can then be filled in later.\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 8
+                      },
+                      "text": "  Pickles an actual func object.\n\n        A func comprises: code, globals, defaults, closure, and dict.  We\n        extract and save these, injecting reducing functions at certain points\n        to recreate the func object.  Keep in mind that some of these pieces\n        can contain a ref to the func itself.  Thus, a naive save on these\n        pieces could trigger an infinite loop of save's.  To get around that,\n        we first create a skeleton func object using just the code (this is\n        safe, since this won't contain a ref to the func), and memoize it as\n        soon as it's created.  The other stuff can then be filled in later.\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 11,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 12,
+                "column": 8
+              },
+              "end": {
+                "row": 15,
+                "column": 18
+              },
+              "text": "if is_tornado_coroutine(func):\n            self.save_reduce(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)\n            return",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 12,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 12,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 37
+                  },
+                  "text": "is_tornado_coroutine(func)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 12,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 31
+                      },
+                      "text": "is_tornado_coroutine"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 12,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 37
+                      },
+                      "text": "(func)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 12,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 32
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 12,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 36
+                          },
+                          "text": "func"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 12,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 12,
+                            "column": 37
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 12,
+                    "column": 37
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 38
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 13,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 18
+                  },
+                  "text": "self.save_reduce(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)\n            return",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 13,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 38
+                      },
+                      "text": "self.save_reduce(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 13,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 38
+                          },
+                          "text": "self.save_reduce(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 13,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 28
+                              },
+                              "text": "self.save_reduce",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 16
+                                  },
+                                  "text": "self"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 17
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 28
+                                  },
+                                  "text": "save_reduce"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 13,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 38
+                              },
+                              "text": "(_rebuild_tornado_coroutine, (func.__wrapped__,),\n                             obj=func)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 29
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 55
+                                  },
+                                  "text": "_rebuild_tornado_coroutine"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 56
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "tuple",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 57
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 76
+                                  },
+                                  "text": "(func.__wrapped__,)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 57
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 58
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 74
+                                      },
+                                      "text": "func.__wrapped__",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 13,
+                                            "column": 58
+                                          },
+                                          "end": {
+                                            "row": 13,
+                                            "column": 62
+                                          },
+                                          "text": "func"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 13,
+                                            "column": 62
+                                          },
+                                          "end": {
+                                            "row": 13,
+                                            "column": 63
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 13,
+                                            "column": 63
+                                          },
+                                          "end": {
+                                            "row": 13,
+                                            "column": 74
+                                          },
+                                          "text": "__wrapped__"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 74
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 75
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 75
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 76
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 76
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 77
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "keyword_argument",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 37
+                                  },
+                                  "text": "obj=func",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 32
+                                      },
+                                      "text": "obj"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 33
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 37
+                                      },
+                                      "text": "func"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 38
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 15,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 18
+                      },
+                      "text": "return",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 15,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 18
+                          },
+                          "text": "return"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 17,
+                "column": 8
+              },
+              "end": {
+                "row": 17,
+                "column": 24
+              },
+              "text": "save = self.save",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 17,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 24
+                  },
+                  "text": "save = self.save",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 17,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 12
+                      },
+                      "text": "save"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 17,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 14
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 17,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 24
+                      },
+                      "text": "self.save",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 19
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 17,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 20
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 24
+                          },
+                          "text": "save"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 18,
+                "column": 8
+              },
+              "end": {
+                "row": 18,
+                "column": 26
+              },
+              "text": "write = self.write",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 18,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 26
+                  },
+                  "text": "write = self.write",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 18,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 13
+                      },
+                      "text": "write"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 18,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 18,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 26
+                      },
+                      "text": "self.write",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 20
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 18,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 21
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 18,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 26
+                          },
+                          "text": "write"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 20,
+                "column": 8
+              },
+              "end": {
+                "row": 20,
+                "column": 99
+              },
+              "text": "code, f_globals, defaults, closure_values, dct, base_globals = self.extract_func_data(func)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 20,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 99
+                  },
+                  "text": "code, f_globals, defaults, closure_values, dct, base_globals = self.extract_func_data(func)",
+                  "children": [
+                    {
+                      "type": "pattern_list",
+                      "start": {
+                        "row": 20,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 68
+                      },
+                      "text": "code, f_globals, defaults, closure_values, dct, base_globals",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 12
+                          },
+                          "text": "code"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 13
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 23
+                          },
+                          "text": "f_globals"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 33
+                          },
+                          "text": "defaults"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 34
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 49
+                          },
+                          "text": "closure_values"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 50
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 54
+                          },
+                          "text": "dct"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 20,
+                            "column": 54
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 55
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 56
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 68
+                          },
+                          "text": "base_globals"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 20,
+                        "column": 69
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 70
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 20,
+                        "column": 71
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 99
+                      },
+                      "text": "self.extract_func_data(func)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 20,
+                            "column": 71
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 93
+                          },
+                          "text": "self.extract_func_data",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 20,
+                                "column": 71
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 75
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 20,
+                                "column": 75
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 76
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 20,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 93
+                              },
+                              "text": "extract_func_data"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 20,
+                            "column": 93
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 99
+                          },
+                          "text": "(func)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 20,
+                                "column": 93
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 94
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 20,
+                                "column": 94
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 98
+                              },
+                              "text": "func"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 20,
+                                "column": 98
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 99
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 22,
+                "column": 8
+              },
+              "end": {
+                "row": 22,
+                "column": 28
+              },
+              "text": "save(_fill_function)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 22,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 28
+                  },
+                  "text": "save(_fill_function)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 22,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 12
+                      },
+                      "text": "save"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 22,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 28
+                      },
+                      "text": "(_fill_function)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 22,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 13
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 22,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 27
+                          },
+                          "text": "_fill_function"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 22,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 28
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 22,
+                "column": 30
+              },
+              "end": {
+                "row": 22,
+                "column": 57
+              },
+              "text": "# skeleton function updater"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 23,
+                "column": 8
+              },
+              "end": {
+                "row": 23,
+                "column": 26
+              },
+              "text": "write(pickle.MARK)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 23,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 26
+                  },
+                  "text": "write(pickle.MARK)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 23,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 13
+                      },
+                      "text": "write"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 23,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 26
+                      },
+                      "text": "(pickle.MARK)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 23,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 23,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 25
+                          },
+                          "text": "pickle.MARK",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 20
+                              },
+                              "text": "pickle"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 23,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 21
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 25
+                              },
+                              "text": "MARK"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 23,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 26
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 23,
+                "column": 30
+              },
+              "end": {
+                "row": 23,
+                "column": 78
+              },
+              "text": "# beginning of tuple that _fill_function expects"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 25,
+                "column": 8
+              },
+              "end": {
+                "row": 28,
+                "column": 9
+              },
+              "text": "self._save_subimports(\n            code,\n            itertools.chain(f_globals.values(), closure_values or ()),\n        )",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 25,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 9
+                  },
+                  "text": "self._save_subimports(\n            code,\n            itertools.chain(f_globals.values(), closure_values or ()),\n        )",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 25,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 29
+                      },
+                      "text": "self._save_subimports",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 25,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 12
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 25,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 13
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 25,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 29
+                          },
+                          "text": "_save_subimports"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 25,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 9
+                      },
+                      "text": "(\n            code,\n            itertools.chain(f_globals.values(), closure_values or ()),\n        )",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 25,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 30
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 26,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 16
+                          },
+                          "text": "code"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 26,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 17
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 27,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 69
+                          },
+                          "text": "itertools.chain(f_globals.values(), closure_values or ())",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 27,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 27
+                              },
+                              "text": "itertools.chain",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 21
+                                  },
+                                  "text": "itertools"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 22
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 27
+                                  },
+                                  "text": "chain"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 27,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 69
+                              },
+                              "text": "(f_globals.values(), closure_values or ())",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 28
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 46
+                                  },
+                                  "text": "f_globals.values()",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 44
+                                      },
+                                      "text": "f_globals.values",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 37
+                                          },
+                                          "text": "f_globals"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 37
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 38
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 44
+                                          },
+                                          "text": "values"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 46
+                                      },
+                                      "text": "()",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 44
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 45
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 46
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 47
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "boolean_operator",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 68
+                                  },
+                                  "text": "closure_values or ()",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 62
+                                      },
+                                      "text": "closure_values"
+                                    },
+                                    {
+                                      "type": "or",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 63
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 65
+                                      },
+                                      "text": "or"
+                                    },
+                                    {
+                                      "type": "tuple",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 66
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 68
+                                      },
+                                      "text": "()",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 66
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 67
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 67
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 68
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 68
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 69
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 27,
+                            "column": 69
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 70
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 28,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 9
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 30,
+                "column": 8
+              },
+              "end": {
+                "row": 30,
+                "column": 58
+              },
+              "text": "# create a skeleton function object and memoize it"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 31,
+                "column": 8
+              },
+              "end": {
+                "row": 31,
+                "column": 29
+              },
+              "text": "save(_make_skel_func)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 31,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 29
+                  },
+                  "text": "save(_make_skel_func)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 12
+                      },
+                      "text": "save"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 31,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 29
+                      },
+                      "text": "(_make_skel_func)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 31,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 13
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 31,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 28
+                          },
+                          "text": "_make_skel_func"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 31,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 29
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 32,
+                "column": 8
+              },
+              "end": {
+                "row": 36,
+                "column": 10
+              },
+              "text": "save((\n            code,\n            len(closure_values) if closure_values is not None else -1,\n            base_globals,\n        ))",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 32,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 10
+                  },
+                  "text": "save((\n            code,\n            len(closure_values) if closure_values is not None else -1,\n            base_globals,\n        ))",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 32,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 12
+                      },
+                      "text": "save"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 32,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 10
+                      },
+                      "text": "((\n            code,\n            len(closure_values) if closure_values is not None else -1,\n            base_globals,\n        ))",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 32,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 13
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "tuple",
+                          "start": {
+                            "row": 32,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 9
+                          },
+                          "text": "(\n            code,\n            len(closure_values) if closure_values is not None else -1,\n            base_globals,\n        )",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 32,
+                                "column": 13
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 14
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 16
+                              },
+                              "text": "code"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 33,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 17
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "conditional_expression",
+                              "start": {
+                                "row": 34,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 69
+                              },
+                              "text": "len(closure_values) if closure_values is not None else -1",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 31
+                                  },
+                                  "text": "len(closure_values)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 15
+                                      },
+                                      "text": "len"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 31
+                                      },
+                                      "text": "(closure_values)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 16
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 30
+                                          },
+                                          "text": "closure_values"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 31
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "if",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 34
+                                  },
+                                  "text": "if"
+                                },
+                                {
+                                  "type": "comparison_operator",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 61
+                                  },
+                                  "text": "closure_values is not None",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 49
+                                      },
+                                      "text": "closure_values"
+                                    },
+                                    {
+                                      "type": "is not",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 52
+                                      },
+                                      "text": "is"
+                                    },
+                                    {
+                                      "type": "is not",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 56
+                                      },
+                                      "text": "not"
+                                    },
+                                    {
+                                      "type": "none",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 57
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 61
+                                      },
+                                      "text": "None"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "else",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 62
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 66
+                                  },
+                                  "text": "else"
+                                },
+                                {
+                                  "type": "unary_operator",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 67
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 69
+                                  },
+                                  "text": "-1",
+                                  "children": [
+                                    {
+                                      "type": "-",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 67
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 68
+                                      },
+                                      "text": "-"
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 68
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 69
+                                      },
+                                      "text": "1"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 34,
+                                "column": 69
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 70
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 35,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 24
+                              },
+                              "text": "base_globals"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 35,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 25
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 36,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 9
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 36,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 10
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 37,
+                "column": 8
+              },
+              "end": {
+                "row": 37,
+                "column": 28
+              },
+              "text": "write(pickle.REDUCE)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 37,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 28
+                  },
+                  "text": "write(pickle.REDUCE)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 37,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 13
+                      },
+                      "text": "write"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 37,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 28
+                      },
+                      "text": "(pickle.REDUCE)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 37,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 37,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 27
+                          },
+                          "text": "pickle.REDUCE",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 20
+                              },
+                              "text": "pickle"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 37,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 21
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 27
+                              },
+                              "text": "REDUCE"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 37,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 28
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 38,
+                "column": 8
+              },
+              "end": {
+                "row": 38,
+                "column": 26
+              },
+              "text": "self.memoize(func)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 38,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 38,
+                    "column": 26
+                  },
+                  "text": "self.memoize(func)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 38,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 20
+                      },
+                      "text": "self.memoize",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 38,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 12
+                          },
+                          "text": "self"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 38,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 13
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 38,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 20
+                          },
+                          "text": "memoize"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 38,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 26
+                      },
+                      "text": "(func)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 38,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 21
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 38,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 25
+                          },
+                          "text": "func"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 38,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 26
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 40,
+                "column": 8
+              },
+              "end": {
+                "row": 40,
+                "column": 65
+              },
+              "text": "# save the rest of the func data needed by _fill_function"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 41,
+                "column": 8
+              },
+              "end": {
+                "row": 49,
+                "column": 9
+              },
+              "text": "state = {\n            'globals': f_globals,\n            'defaults': defaults,\n            'dict': dct,\n            'closure_values': closure_values,\n            'module': func.__module__,\n            'name': func.__name__,\n            'doc': func.__doc__,\n        }",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 41,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 9
+                  },
+                  "text": "state = {\n            'globals': f_globals,\n            'defaults': defaults,\n            'dict': dct,\n            'closure_values': closure_values,\n            'module': func.__module__,\n            'name': func.__name__,\n            'doc': func.__doc__,\n        }",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 41,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 13
+                      },
+                      "text": "state"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 41,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "dictionary",
+                      "start": {
+                        "row": 41,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 49,
+                        "column": 9
+                      },
+                      "text": "{\n            'globals': f_globals,\n            'defaults': defaults,\n            'dict': dct,\n            'closure_values': closure_values,\n            'module': func.__module__,\n            'name': func.__name__,\n            'doc': func.__doc__,\n        }",
+                      "children": [
+                        {
+                          "type": "{",
+                          "start": {
+                            "row": 41,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 17
+                          },
+                          "text": "{"
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 42,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 32
+                          },
+                          "text": "'globals': f_globals",
+                          "children": [
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 42,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 21
+                              },
+                              "text": "'globals'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 13
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 20
+                                  },
+                                  "text": "globals"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 21
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 42,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 22
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 42,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 32
+                              },
+                              "text": "f_globals"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 42,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 33
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 43,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 32
+                          },
+                          "text": "'defaults': defaults",
+                          "children": [
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 43,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 22
+                              },
+                              "text": "'defaults'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 13
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 21
+                                  },
+                                  "text": "defaults"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 22
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 43,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 23
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 43,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 32
+                              },
+                              "text": "defaults"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 43,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 33
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 44,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 23
+                          },
+                          "text": "'dict': dct",
+                          "children": [
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 44,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 18
+                              },
+                              "text": "'dict'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 13
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 17
+                                  },
+                                  "text": "dict"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 18
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 44,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 19
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 23
+                              },
+                              "text": "dct"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 44,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 45,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 44
+                          },
+                          "text": "'closure_values': closure_values",
+                          "children": [
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 45,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 28
+                              },
+                              "text": "'closure_values'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 13
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 27
+                                  },
+                                  "text": "closure_values"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 28
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 45,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 29
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 45,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 44
+                              },
+                              "text": "closure_values"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 45,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 45
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 46,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 37
+                          },
+                          "text": "'module': func.__module__",
+                          "children": [
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 46,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 20
+                              },
+                              "text": "'module'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 13
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 19
+                                  },
+                                  "text": "module"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 20
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 46,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 21
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 46,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 37
+                              },
+                              "text": "func.__module__",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 26
+                                  },
+                                  "text": "func"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 27
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 37
+                                  },
+                                  "text": "__module__"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 46,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 38
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 47,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 33
+                          },
+                          "text": "'name': func.__name__",
+                          "children": [
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 47,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 18
+                              },
+                              "text": "'name'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 13
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 17
+                                  },
+                                  "text": "name"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 18
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 47,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 19
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 47,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 33
+                              },
+                              "text": "func.__name__",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 24
+                                  },
+                                  "text": "func"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 25
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 33
+                                  },
+                                  "text": "__name__"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 47,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 34
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "pair",
+                          "start": {
+                            "row": 48,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 31
+                          },
+                          "text": "'doc': func.__doc__",
+                          "children": [
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 48,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 17
+                              },
+                              "text": "'doc'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 13
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 16
+                                  },
+                                  "text": "doc"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 17
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 48,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 18
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 48,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 31
+                              },
+                              "text": "func.__doc__",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 23
+                                  },
+                                  "text": "func"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 24
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 31
+                                  },
+                                  "text": "__doc__"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 48,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 32
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "}",
+                          "start": {
+                            "row": 49,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 9
+                          },
+                          "text": "}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 50,
+                "column": 8
+              },
+              "end": {
+                "row": 51,
+                "column": 55
+              },
+              "text": "if hasattr(func, '__annotations__') and sys.version_info >= (3, 7):\n            state['annotations'] = func.__annotations__",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 50,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "boolean_operator",
+                  "start": {
+                    "row": 50,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 74
+                  },
+                  "text": "hasattr(func, '__annotations__') and sys.version_info >= (3, 7)",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 50,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 43
+                      },
+                      "text": "hasattr(func, '__annotations__')",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 50,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 18
+                          },
+                          "text": "hasattr"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 50,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 43
+                          },
+                          "text": "(func, '__annotations__')",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 50,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 19
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 50,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 23
+                              },
+                              "text": "func"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 50,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 24
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 50,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 42
+                              },
+                              "text": "'__annotations__'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 50,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 50,
+                                    "column": 26
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 50,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 50,
+                                    "column": 41
+                                  },
+                                  "text": "__annotations__"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 50,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 50,
+                                    "column": 42
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 50,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 43
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "and",
+                      "start": {
+                        "row": 50,
+                        "column": 44
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 47
+                      },
+                      "text": "and"
+                    },
+                    {
+                      "type": "comparison_operator",
+                      "start": {
+                        "row": 50,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 74
+                      },
+                      "text": "sys.version_info >= (3, 7)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 50,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 64
+                          },
+                          "text": "sys.version_info",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 50,
+                                "column": 48
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 51
+                              },
+                              "text": "sys"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 50,
+                                "column": 51
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 52
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 50,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 64
+                              },
+                              "text": "version_info"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ">=",
+                          "start": {
+                            "row": 50,
+                            "column": 65
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 67
+                          },
+                          "text": ">="
+                        },
+                        {
+                          "type": "tuple",
+                          "start": {
+                            "row": 50,
+                            "column": 68
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 74
+                          },
+                          "text": "(3, 7)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 50,
+                                "column": 68
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 69
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 50,
+                                "column": 69
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 70
+                              },
+                              "text": "3"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 50,
+                                "column": 70
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 71
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 50,
+                                "column": 72
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 73
+                              },
+                              "text": "7"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 50,
+                                "column": 73
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 74
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 50,
+                    "column": 74
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 75
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 51,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 51,
+                    "column": 55
+                  },
+                  "text": "state['annotations'] = func.__annotations__",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 51,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 51,
+                        "column": 55
+                      },
+                      "text": "state['annotations'] = func.__annotations__",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 51,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 55
+                          },
+                          "text": "state['annotations'] = func.__annotations__",
+                          "children": [
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 51,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 32
+                              },
+                              "text": "state['annotations']",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 17
+                                  },
+                                  "text": "state"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 18
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 31
+                                  },
+                                  "text": "'annotations'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 51,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 51,
+                                        "column": 19
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 51,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 51,
+                                        "column": 30
+                                      },
+                                      "text": "annotations"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 51,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 51,
+                                        "column": 31
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 32
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 51,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 34
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 51,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 55
+                              },
+                              "text": "func.__annotations__",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 39
+                                  },
+                                  "text": "func"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 40
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 51,
+                                    "column": 55
+                                  },
+                                  "text": "__annotations__"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 52,
+                "column": 8
+              },
+              "end": {
+                "row": 53,
+                "column": 49
+              },
+              "text": "if hasattr(func, '__qualname__'):\n            state['qualname'] = func.__qualname__",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 52,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 52,
+                    "column": 10
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 52,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 52,
+                    "column": 40
+                  },
+                  "text": "hasattr(func, '__qualname__')",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 52,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 18
+                      },
+                      "text": "hasattr"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 52,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 40
+                      },
+                      "text": "(func, '__qualname__')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 52,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 19
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 52,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 23
+                          },
+                          "text": "func"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 52,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 52,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 39
+                          },
+                          "text": "'__qualname__'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 52,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 26
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 52,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 38
+                              },
+                              "text": "__qualname__"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 52,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 39
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 52,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 40
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 52,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 52,
+                    "column": 41
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 53,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 53,
+                    "column": 49
+                  },
+                  "text": "state['qualname'] = func.__qualname__",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 53,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 53,
+                        "column": 49
+                      },
+                      "text": "state['qualname'] = func.__qualname__",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 53,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 53,
+                            "column": 49
+                          },
+                          "text": "state['qualname'] = func.__qualname__",
+                          "children": [
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 53,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 29
+                              },
+                              "text": "state['qualname']",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 17
+                                  },
+                                  "text": "state"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 18
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 28
+                                  },
+                                  "text": "'qualname'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 19
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 27
+                                      },
+                                      "text": "qualname"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 28
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 29
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 53,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 31
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 53,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 49
+                              },
+                              "text": "func.__qualname__",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 36
+                                  },
+                                  "text": "func"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 37
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 49
+                                  },
+                                  "text": "__qualname__"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 54,
+                "column": 8
+              },
+              "end": {
+                "row": 54,
+                "column": 19
+              },
+              "text": "save(state)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 54,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 54,
+                    "column": 19
+                  },
+                  "text": "save(state)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 54,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 54,
+                        "column": 12
+                      },
+                      "text": "save"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 54,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 54,
+                        "column": 19
+                      },
+                      "text": "(state)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 54,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 54,
+                            "column": 13
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 54,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 54,
+                            "column": 18
+                          },
+                          "text": "state"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 54,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 54,
+                            "column": 19
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 55,
+                "column": 8
+              },
+              "end": {
+                "row": 55,
+                "column": 27
+              },
+              "text": "write(pickle.TUPLE)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 55,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 55,
+                    "column": 27
+                  },
+                  "text": "write(pickle.TUPLE)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 55,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 55,
+                        "column": 13
+                      },
+                      "text": "write"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 55,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 55,
+                        "column": 27
+                      },
+                      "text": "(pickle.TUPLE)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 55,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 55,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 55,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 55,
+                            "column": 26
+                          },
+                          "text": "pickle.TUPLE",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 55,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 55,
+                                "column": 20
+                              },
+                              "text": "pickle"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 55,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 55,
+                                "column": 21
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 55,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 55,
+                                "column": 26
+                              },
+                              "text": "TUPLE"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 55,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 55,
+                            "column": 27
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 56,
+                "column": 8
+              },
+              "end": {
+                "row": 56,
+                "column": 28
+              },
+              "text": "write(pickle.REDUCE)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 56,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 56,
+                    "column": 28
+                  },
+                  "text": "write(pickle.REDUCE)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 56,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 56,
+                        "column": 13
+                      },
+                      "text": "write"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 56,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 56,
+                        "column": 28
+                      },
+                      "text": "(pickle.REDUCE)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 56,
+                            "column": 13
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 14
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 56,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 27
+                          },
+                          "text": "pickle.REDUCE",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 56,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 20
+                              },
+                              "text": "pickle"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 56,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 21
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 56,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 27
+                              },
+                              "text": "REDUCE"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 56,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 28
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

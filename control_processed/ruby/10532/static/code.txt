@@ -1,0 +1,3 @@
+def search_with_http_info(query, accept_language:nil, user_agent:nil, client_id:nil, client_ip:nil, location:nil, country_code:nil, count:nil, freshness:nil, market:nil, offset:nil, original_image:nil, safe_search:nil, set_lang:nil, sort_by:nil, text_decorations:nil, text_format:nil, custom_headers:nil)
+      search_async(query, accept_language:accept_language, user_agent:user_agent, client_id:client_id, client_ip:client_ip, location:location, country_code:country_code, count:count, freshness:freshness, market:market, offset:offset, original_image:original_image, safe_search:safe_search, set_lang:set_lang, sort_by:sort_by, text_decorations:text_decorations, text_format:text_format, custom_headers:custom_headers).value!
+    end

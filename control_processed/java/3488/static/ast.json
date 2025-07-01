@@ -1,0 +1,3388 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 50,
+    "column": 2
+  },
+  "text": "private void executeAsyncCallRunnable(Runnable runnable, String callName, boolean blocking) {\n\t\t// make sure the executor is initialized. lock against concurrent calls to this function\n\t\tsynchronized (this) {\n\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\t// get ourselves a reference on the stack that cannot be concurrently modified\n\t\t\tBlockingCallMonitoringThreadPool executor = this.asyncCallDispatcher;\n\t\t\tif (executor == null) {\n\t\t\t\t// first time use, initialize\n\t\t\t\tcheckState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");\n\n\t\t\t\t// Under normal execution, we expect that one thread will suffice, this is why we\n\t\t\t\t// keep the core threads to 1. In the case of a synchronous savepoint, we will block\n\t\t\t\t// the checkpointing thread, so we need an additional thread to execute the\n\t\t\t\t// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)\n\t\t\t\t// idle thread so that we do not risk to have many idle thread on machines with multiple\n\t\t\t\t// tasks on them. Either way, only one of them can execute at a time due to the\n\t\t\t\t// checkpoint lock.\n\n\t\t\t\texecutor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));\n\t\t\t\tthis.asyncCallDispatcher = executor;\n\n\t\t\t\t// double-check for execution state, and make sure we clean up after ourselves\n\t\t\t\t// if we created the dispatcher while the task was concurrently canceled\n\t\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tLOG.debug(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask);\n\n\t\t\ttry {\n\t\t\t\texecutor.submit(runnable, blocking);\n\t\t\t}\n\t\t\tcatch (RejectedExecutionException e) {\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}",
+  "children": [
+    {
+      "type": "method_declaration",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 50,
+        "column": 2
+      },
+      "text": "private void executeAsyncCallRunnable(Runnable runnable, String callName, boolean blocking) {\n\t\t// make sure the executor is initialized. lock against concurrent calls to this function\n\t\tsynchronized (this) {\n\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\t// get ourselves a reference on the stack that cannot be concurrently modified\n\t\t\tBlockingCallMonitoringThreadPool executor = this.asyncCallDispatcher;\n\t\t\tif (executor == null) {\n\t\t\t\t// first time use, initialize\n\t\t\t\tcheckState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");\n\n\t\t\t\t// Under normal execution, we expect that one thread will suffice, this is why we\n\t\t\t\t// keep the core threads to 1. In the case of a synchronous savepoint, we will block\n\t\t\t\t// the checkpointing thread, so we need an additional thread to execute the\n\t\t\t\t// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)\n\t\t\t\t// idle thread so that we do not risk to have many idle thread on machines with multiple\n\t\t\t\t// tasks on them. Either way, only one of them can execute at a time due to the\n\t\t\t\t// checkpoint lock.\n\n\t\t\t\texecutor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));\n\t\t\t\tthis.asyncCallDispatcher = executor;\n\n\t\t\t\t// double-check for execution state, and make sure we clean up after ourselves\n\t\t\t\t// if we created the dispatcher while the task was concurrently canceled\n\t\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tLOG.debug(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask);\n\n\t\t\ttry {\n\t\t\t\texecutor.submit(runnable, blocking);\n\t\t\t}\n\t\t\tcatch (RejectedExecutionException e) {\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}",
+      "children": [
+        {
+          "type": "modifiers",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 7
+          },
+          "text": "private",
+          "children": [
+            {
+              "type": "private",
+              "start": {
+                "row": 0,
+                "column": 0
+              },
+              "end": {
+                "row": 0,
+                "column": 7
+              },
+              "text": "private"
+            }
+          ]
+        },
+        {
+          "type": "void_type",
+          "start": {
+            "row": 0,
+            "column": 8
+          },
+          "end": {
+            "row": 0,
+            "column": 12
+          },
+          "text": "void"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 13
+          },
+          "end": {
+            "row": 0,
+            "column": 37
+          },
+          "text": "executeAsyncCallRunnable"
+        },
+        {
+          "type": "formal_parameters",
+          "start": {
+            "row": 0,
+            "column": 37
+          },
+          "end": {
+            "row": 0,
+            "column": 91
+          },
+          "text": "(Runnable runnable, String callName, boolean blocking)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 37
+              },
+              "end": {
+                "row": 0,
+                "column": 38
+              },
+              "text": "("
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 38
+              },
+              "end": {
+                "row": 0,
+                "column": 55
+              },
+              "text": "Runnable runnable",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 46
+                  },
+                  "text": "Runnable"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 47
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 55
+                  },
+                  "text": "runnable"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 55
+              },
+              "end": {
+                "row": 0,
+                "column": 56
+              },
+              "text": ","
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 57
+              },
+              "end": {
+                "row": 0,
+                "column": 72
+              },
+              "text": "String callName",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 57
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 63
+                  },
+                  "text": "String"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 64
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 72
+                  },
+                  "text": "callName"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 72
+              },
+              "end": {
+                "row": 0,
+                "column": 73
+              },
+              "text": ","
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 74
+              },
+              "end": {
+                "row": 0,
+                "column": 90
+              },
+              "text": "boolean blocking",
+              "children": [
+                {
+                  "type": "boolean_type",
+                  "start": {
+                    "row": 0,
+                    "column": 74
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 81
+                  },
+                  "text": "boolean"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 82
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 90
+                  },
+                  "text": "blocking"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 90
+              },
+              "end": {
+                "row": 0,
+                "column": 91
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 0,
+            "column": 92
+          },
+          "end": {
+            "row": 50,
+            "column": 2
+          },
+          "text": "{\n\t\t// make sure the executor is initialized. lock against concurrent calls to this function\n\t\tsynchronized (this) {\n\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\t// get ourselves a reference on the stack that cannot be concurrently modified\n\t\t\tBlockingCallMonitoringThreadPool executor = this.asyncCallDispatcher;\n\t\t\tif (executor == null) {\n\t\t\t\t// first time use, initialize\n\t\t\t\tcheckState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");\n\n\t\t\t\t// Under normal execution, we expect that one thread will suffice, this is why we\n\t\t\t\t// keep the core threads to 1. In the case of a synchronous savepoint, we will block\n\t\t\t\t// the checkpointing thread, so we need an additional thread to execute the\n\t\t\t\t// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)\n\t\t\t\t// idle thread so that we do not risk to have many idle thread on machines with multiple\n\t\t\t\t// tasks on them. Either way, only one of them can execute at a time due to the\n\t\t\t\t// checkpoint lock.\n\n\t\t\t\texecutor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));\n\t\t\t\tthis.asyncCallDispatcher = executor;\n\n\t\t\t\t// double-check for execution state, and make sure we clean up after ourselves\n\t\t\t\t// if we created the dispatcher while the task was concurrently canceled\n\t\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tLOG.debug(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask);\n\n\t\t\ttry {\n\t\t\t\texecutor.submit(runnable, blocking);\n\t\t\t}\n\t\t\tcatch (RejectedExecutionException e) {\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}",
+          "children": [
+            {
+              "type": "{",
+              "start": {
+                "row": 0,
+                "column": 92
+              },
+              "end": {
+                "row": 0,
+                "column": 93
+              },
+              "text": "{"
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 1,
+                "column": 2
+              },
+              "end": {
+                "row": 1,
+                "column": 90
+              },
+              "text": "// make sure the executor is initialized. lock against concurrent calls to this function"
+            },
+            {
+              "type": "synchronized_statement",
+              "start": {
+                "row": 2,
+                "column": 2
+              },
+              "end": {
+                "row": 49,
+                "column": 3
+              },
+              "text": "synchronized (this) {\n\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\t// get ourselves a reference on the stack that cannot be concurrently modified\n\t\t\tBlockingCallMonitoringThreadPool executor = this.asyncCallDispatcher;\n\t\t\tif (executor == null) {\n\t\t\t\t// first time use, initialize\n\t\t\t\tcheckState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");\n\n\t\t\t\t// Under normal execution, we expect that one thread will suffice, this is why we\n\t\t\t\t// keep the core threads to 1. In the case of a synchronous savepoint, we will block\n\t\t\t\t// the checkpointing thread, so we need an additional thread to execute the\n\t\t\t\t// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)\n\t\t\t\t// idle thread so that we do not risk to have many idle thread on machines with multiple\n\t\t\t\t// tasks on them. Either way, only one of them can execute at a time due to the\n\t\t\t\t// checkpoint lock.\n\n\t\t\t\texecutor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));\n\t\t\t\tthis.asyncCallDispatcher = executor;\n\n\t\t\t\t// double-check for execution state, and make sure we clean up after ourselves\n\t\t\t\t// if we created the dispatcher while the task was concurrently canceled\n\t\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tLOG.debug(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask);\n\n\t\t\ttry {\n\t\t\t\texecutor.submit(runnable, blocking);\n\t\t\t}\n\t\t\tcatch (RejectedExecutionException e) {\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}\n\t\t}",
+              "children": [
+                {
+                  "type": "synchronized",
+                  "start": {
+                    "row": 2,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 14
+                  },
+                  "text": "synchronized"
+                },
+                {
+                  "type": "parenthesized_expression",
+                  "start": {
+                    "row": 2,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 21
+                  },
+                  "text": "(this)",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 2,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 16
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "this",
+                      "start": {
+                        "row": 2,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 20
+                      },
+                      "text": "this"
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 2,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 21
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 2,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 3
+                  },
+                  "text": "{\n\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\t// get ourselves a reference on the stack that cannot be concurrently modified\n\t\t\tBlockingCallMonitoringThreadPool executor = this.asyncCallDispatcher;\n\t\t\tif (executor == null) {\n\t\t\t\t// first time use, initialize\n\t\t\t\tcheckState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");\n\n\t\t\t\t// Under normal execution, we expect that one thread will suffice, this is why we\n\t\t\t\t// keep the core threads to 1. In the case of a synchronous savepoint, we will block\n\t\t\t\t// the checkpointing thread, so we need an additional thread to execute the\n\t\t\t\t// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)\n\t\t\t\t// idle thread so that we do not risk to have many idle thread on machines with multiple\n\t\t\t\t// tasks on them. Either way, only one of them can execute at a time due to the\n\t\t\t\t// checkpoint lock.\n\n\t\t\t\texecutor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));\n\t\t\t\tthis.asyncCallDispatcher = executor;\n\n\t\t\t\t// double-check for execution state, and make sure we clean up after ourselves\n\t\t\t\t// if we created the dispatcher while the task was concurrently canceled\n\t\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tLOG.debug(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask);\n\n\t\t\ttry {\n\t\t\t\texecutor.submit(runnable, blocking);\n\t\t\t}\n\t\t\tcatch (RejectedExecutionException e) {\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}\n\t\t}",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 2,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 23
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 3,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 4
+                      },
+                      "text": "if (executionState != ExecutionState.RUNNING) {\n\t\t\t\treturn;\n\t\t\t}",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 3,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 5
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "condition",
+                          "start": {
+                            "row": 3,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 48
+                          },
+                          "text": "(executionState != ExecutionState.RUNNING)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 3,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 7
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "binary_expression",
+                              "start": {
+                                "row": 3,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 47
+                              },
+                              "text": "executionState != ExecutionState.RUNNING",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 7
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 21
+                                  },
+                                  "text": "executionState"
+                                },
+                                {
+                                  "type": "!=",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 24
+                                  },
+                                  "text": "!="
+                                },
+                                {
+                                  "type": "field_access",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 47
+                                  },
+                                  "text": "ExecutionState.RUNNING",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 39
+                                      },
+                                      "text": "ExecutionState"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 40
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 3,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 3,
+                                        "column": 47
+                                      },
+                                      "text": "RUNNING"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 3,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 48
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 3,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 4
+                          },
+                          "text": "{\n\t\t\t\treturn;\n\t\t\t}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 3,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 50
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "return_statement",
+                              "start": {
+                                "row": 4,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 11
+                              },
+                              "text": "return;",
+                              "children": [
+                                {
+                                  "type": "return",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 10
+                                  },
+                                  "text": "return"
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 11
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 5,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 4
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "line_comment",
+                      "start": {
+                        "row": 7,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 81
+                      },
+                      "text": "// get ourselves a reference on the stack that cannot be concurrently modified"
+                    },
+                    {
+                      "type": "local_variable_declaration",
+                      "start": {
+                        "row": 8,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 72
+                      },
+                      "text": "BlockingCallMonitoringThreadPool executor = this.asyncCallDispatcher;",
+                      "children": [
+                        {
+                          "type": "type_identifier",
+                          "start": {
+                            "row": 8,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 35
+                          },
+                          "text": "BlockingCallMonitoringThreadPool"
+                        },
+                        {
+                          "type": "variable_declarator",
+                          "start": {
+                            "row": 8,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 71
+                          },
+                          "text": "executor = this.asyncCallDispatcher",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 44
+                              },
+                              "text": "executor"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 8,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 46
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "field_access",
+                              "start": {
+                                "row": 8,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 71
+                              },
+                              "text": "this.asyncCallDispatcher",
+                              "children": [
+                                {
+                                  "type": "this",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 51
+                                  },
+                                  "text": "this"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 52
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 71
+                                  },
+                                  "text": "asyncCallDispatcher"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 8,
+                            "column": 71
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 72
+                          },
+                          "text": ";"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 9,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 4
+                      },
+                      "text": "if (executor == null) {\n\t\t\t\t// first time use, initialize\n\t\t\t\tcheckState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");\n\n\t\t\t\t// Under normal execution, we expect that one thread will suffice, this is why we\n\t\t\t\t// keep the core threads to 1. In the case of a synchronous savepoint, we will block\n\t\t\t\t// the checkpointing thread, so we need an additional thread to execute the\n\t\t\t\t// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)\n\t\t\t\t// idle thread so that we do not risk to have many idle thread on machines with multiple\n\t\t\t\t// tasks on them. Either way, only one of them can execute at a time due to the\n\t\t\t\t// checkpoint lock.\n\n\t\t\t\texecutor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));\n\t\t\t\tthis.asyncCallDispatcher = executor;\n\n\t\t\t\t// double-check for execution state, and make sure we clean up after ourselves\n\t\t\t\t// if we created the dispatcher while the task was concurrently canceled\n\t\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t}",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 9,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 5
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "condition",
+                          "start": {
+                            "row": 9,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 24
+                          },
+                          "text": "(executor == null)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 9,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 7
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "binary_expression",
+                              "start": {
+                                "row": 9,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 23
+                              },
+                              "text": "executor == null",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 7
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 15
+                                  },
+                                  "text": "executor"
+                                },
+                                {
+                                  "type": "==",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 18
+                                  },
+                                  "text": "=="
+                                },
+                                {
+                                  "type": "null_literal",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 23
+                                  },
+                                  "text": "null"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 9,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 24
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 9,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 4
+                          },
+                          "text": "{\n\t\t\t\t// first time use, initialize\n\t\t\t\tcheckState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");\n\n\t\t\t\t// Under normal execution, we expect that one thread will suffice, this is why we\n\t\t\t\t// keep the core threads to 1. In the case of a synchronous savepoint, we will block\n\t\t\t\t// the checkpointing thread, so we need an additional thread to execute the\n\t\t\t\t// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)\n\t\t\t\t// idle thread so that we do not risk to have many idle thread on machines with multiple\n\t\t\t\t// tasks on them. Either way, only one of them can execute at a time due to the\n\t\t\t\t// checkpoint lock.\n\n\t\t\t\texecutor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));\n\t\t\t\tthis.asyncCallDispatcher = executor;\n\n\t\t\t\t// double-check for execution state, and make sure we clean up after ourselves\n\t\t\t\t// if we created the dispatcher while the task was concurrently canceled\n\t\t\t\tif (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 9,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 26
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 10,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 33
+                              },
+                              "text": "// first time use, initialize"
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 11,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 84
+                              },
+                              "text": "checkState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\");",
+                              "children": [
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 83
+                                  },
+                                  "text": "checkState(userCodeClassLoader != null, \"userCodeClassLoader must not be null\")",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 14
+                                      },
+                                      "text": "checkState"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 83
+                                      },
+                                      "text": "(userCodeClassLoader != null, \"userCodeClassLoader must not be null\")",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 15
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "binary_expression",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 42
+                                          },
+                                          "text": "userCodeClassLoader != null",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 11,
+                                                "column": 15
+                                              },
+                                              "end": {
+                                                "row": 11,
+                                                "column": 34
+                                              },
+                                              "text": "userCodeClassLoader"
+                                            },
+                                            {
+                                              "type": "!=",
+                                              "start": {
+                                                "row": 11,
+                                                "column": 35
+                                              },
+                                              "end": {
+                                                "row": 11,
+                                                "column": 37
+                                              },
+                                              "text": "!="
+                                            },
+                                            {
+                                              "type": "null_literal",
+                                              "start": {
+                                                "row": 11,
+                                                "column": 38
+                                              },
+                                              "end": {
+                                                "row": 11,
+                                                "column": 42
+                                              },
+                                              "text": "null"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 43
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "string_literal",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 44
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 82
+                                          },
+                                          "text": "\"userCodeClassLoader must not be null\"",
+                                          "children": [
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 11,
+                                                "column": 44
+                                              },
+                                              "end": {
+                                                "row": 11,
+                                                "column": 45
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "string_fragment",
+                                              "start": {
+                                                "row": 11,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 11,
+                                                "column": 81
+                                              },
+                                              "text": "userCodeClassLoader must not be null"
+                                            },
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 11,
+                                                "column": 81
+                                              },
+                                              "end": {
+                                                "row": 11,
+                                                "column": 82
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 82
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 83
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 83
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 84
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 13,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 85
+                              },
+                              "text": "// Under normal execution, we expect that one thread will suffice, this is why we"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 14,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 88
+                              },
+                              "text": "// keep the core threads to 1. In the case of a synchronous savepoint, we will block"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 15,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 79
+                              },
+                              "text": "// the checkpointing thread, so we need an additional thread to execute the"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 16,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 88
+                              },
+                              "text": "// notifyCheckpointComplete() callback. Finally, we aggressively purge (potentially)"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 17,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 92
+                              },
+                              "text": "// idle thread so that we do not risk to have many idle thread on machines with multiple"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 18,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 83
+                              },
+                              "text": "// tasks on them. Either way, only one of them can execute at a time due to the"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 19,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 23
+                              },
+                              "text": "// checkpoint lock."
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 21,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 29
+                              },
+                              "text": "executor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader));",
+                              "children": [
+                                {
+                                  "type": "assignment_expression",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 28
+                                  },
+                                  "text": "executor = new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader))",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 12
+                                      },
+                                      "text": "executor"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 21,
+                                        "column": 14
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "object_creation_expression",
+                                      "start": {
+                                        "row": 21,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 28
+                                      },
+                                      "text": "new BlockingCallMonitoringThreadPool(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader))",
+                                      "children": [
+                                        {
+                                          "type": "new",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 21,
+                                            "column": 18
+                                          },
+                                          "text": "new"
+                                        },
+                                        {
+                                          "type": "type_identifier",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 21,
+                                            "column": 51
+                                          },
+                                          "text": "BlockingCallMonitoringThreadPool"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 21,
+                                            "column": 51
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 28
+                                          },
+                                          "text": "(\n\t\t\t\t\t\tnew DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader))",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 21,
+                                                "column": 51
+                                              },
+                                              "end": {
+                                                "row": 21,
+                                                "column": 52
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "object_creation_expression",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 6
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 27
+                                              },
+                                              "text": "new DispatcherThreadFactory(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader)",
+                                              "children": [
+                                                {
+                                                  "type": "new",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 6
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 9
+                                                  },
+                                                  "text": "new"
+                                                },
+                                                {
+                                                  "type": "type_identifier",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 10
+                                                  },
+                                                  "end": {
+                                                    "row": 22,
+                                                    "column": 33
+                                                  },
+                                                  "text": "DispatcherThreadFactory"
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 22,
+                                                    "column": 33
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 27
+                                                  },
+                                                  "text": "(\n\t\t\t\t\t\t\tTASK_THREADS_GROUP,\n\t\t\t\t\t\t\t\"Async calls on \" + taskNameWithSubtask,\n\t\t\t\t\t\t\tuserCodeClassLoader)",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 22,
+                                                        "column": 33
+                                                      },
+                                                      "end": {
+                                                        "row": 22,
+                                                        "column": 34
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 23,
+                                                        "column": 7
+                                                      },
+                                                      "end": {
+                                                        "row": 23,
+                                                        "column": 25
+                                                      },
+                                                      "text": "TASK_THREADS_GROUP"
+                                                    },
+                                                    {
+                                                      "type": ",",
+                                                      "start": {
+                                                        "row": 23,
+                                                        "column": 25
+                                                      },
+                                                      "end": {
+                                                        "row": 23,
+                                                        "column": 26
+                                                      },
+                                                      "text": ","
+                                                    },
+                                                    {
+                                                      "type": "binary_expression",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 7
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 46
+                                                      },
+                                                      "text": "\"Async calls on \" + taskNameWithSubtask",
+                                                      "children": [
+                                                        {
+                                                          "type": "string_literal",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 7
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 24
+                                                          },
+                                                          "text": "\"Async calls on \"",
+                                                          "children": [
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 7
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 8
+                                                              },
+                                                              "text": "\""
+                                                            },
+                                                            {
+                                                              "type": "string_fragment",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 8
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 23
+                                                              },
+                                                              "text": "Async calls on "
+                                                            },
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 24,
+                                                                "column": 23
+                                                              },
+                                                              "end": {
+                                                                "row": 24,
+                                                                "column": 24
+                                                              },
+                                                              "text": "\""
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "+",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 25
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 26
+                                                          },
+                                                          "text": "+"
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 24,
+                                                            "column": 27
+                                                          },
+                                                          "end": {
+                                                            "row": 24,
+                                                            "column": 46
+                                                          },
+                                                          "text": "taskNameWithSubtask"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ",",
+                                                      "start": {
+                                                        "row": 24,
+                                                        "column": 46
+                                                      },
+                                                      "end": {
+                                                        "row": 24,
+                                                        "column": 47
+                                                      },
+                                                      "text": ","
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 25,
+                                                        "column": 7
+                                                      },
+                                                      "end": {
+                                                        "row": 25,
+                                                        "column": 26
+                                                      },
+                                                      "text": "userCodeClassLoader"
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 25,
+                                                        "column": 26
+                                                      },
+                                                      "end": {
+                                                        "row": 25,
+                                                        "column": 27
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 28
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 29
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 26,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 40
+                              },
+                              "text": "this.asyncCallDispatcher = executor;",
+                              "children": [
+                                {
+                                  "type": "assignment_expression",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 39
+                                  },
+                                  "text": "this.asyncCallDispatcher = executor",
+                                  "children": [
+                                    {
+                                      "type": "field_access",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 28
+                                      },
+                                      "text": "this.asyncCallDispatcher",
+                                      "children": [
+                                        {
+                                          "type": "this",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 4
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 8
+                                          },
+                                          "text": "this"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 9
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 26,
+                                            "column": 9
+                                          },
+                                          "end": {
+                                            "row": 26,
+                                            "column": 28
+                                          },
+                                          "text": "asyncCallDispatcher"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 30
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 39
+                                      },
+                                      "text": "executor"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 40
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 28,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 82
+                              },
+                              "text": "// double-check for execution state, and make sure we clean up after ourselves"
+                            },
+                            {
+                              "type": "line_comment",
+                              "start": {
+                                "row": 29,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 76
+                              },
+                              "text": "// if we created the dispatcher while the task was concurrently canceled"
+                            },
+                            {
+                              "type": "if_statement",
+                              "start": {
+                                "row": 30,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 5
+                              },
+                              "text": "if (executionState != ExecutionState.RUNNING) {\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}",
+                              "children": [
+                                {
+                                  "type": "if",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 6
+                                  },
+                                  "text": "if"
+                                },
+                                {
+                                  "type": "condition",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 7
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 49
+                                  },
+                                  "text": "(executionState != ExecutionState.RUNNING)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 7
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 8
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "binary_expression",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 48
+                                      },
+                                      "text": "executionState != ExecutionState.RUNNING",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 22
+                                          },
+                                          "text": "executionState"
+                                        },
+                                        {
+                                          "type": "!=",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 25
+                                          },
+                                          "text": "!="
+                                        },
+                                        {
+                                          "type": "field_access",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 48
+                                          },
+                                          "text": "ExecutionState.RUNNING",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 40
+                                              },
+                                              "text": "ExecutionState"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 41
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 48
+                                              },
+                                              "text": "RUNNING"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 49
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 5
+                                  },
+                                  "text": "{\n\t\t\t\t\texecutor.shutdown();\n\t\t\t\t\tasyncCallDispatcher = null;\n\t\t\t\t\treturn;\n\t\t\t\t}",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 51
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 31,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 25
+                                      },
+                                      "text": "executor.shutdown();",
+                                      "children": [
+                                        {
+                                          "type": "method_invocation",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 24
+                                          },
+                                          "text": "executor.shutdown()",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 5
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 13
+                                              },
+                                              "text": "executor"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 13
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 14
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 14
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 22
+                                              },
+                                              "text": "shutdown"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 31,
+                                                "column": 22
+                                              },
+                                              "end": {
+                                                "row": 31,
+                                                "column": 24
+                                              },
+                                              "text": "()",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 31,
+                                                    "column": 22
+                                                  },
+                                                  "end": {
+                                                    "row": 31,
+                                                    "column": 23
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 31,
+                                                    "column": 23
+                                                  },
+                                                  "end": {
+                                                    "row": 31,
+                                                    "column": 24
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ";",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 25
+                                          },
+                                          "text": ";"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 32,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 32,
+                                        "column": 32
+                                      },
+                                      "text": "asyncCallDispatcher = null;",
+                                      "children": [
+                                        {
+                                          "type": "assignment_expression",
+                                          "start": {
+                                            "row": 32,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 32,
+                                            "column": 31
+                                          },
+                                          "text": "asyncCallDispatcher = null",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 32,
+                                                "column": 5
+                                              },
+                                              "end": {
+                                                "row": 32,
+                                                "column": 24
+                                              },
+                                              "text": "asyncCallDispatcher"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 32,
+                                                "column": 25
+                                              },
+                                              "end": {
+                                                "row": 32,
+                                                "column": 26
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "null_literal",
+                                              "start": {
+                                                "row": 32,
+                                                "column": 27
+                                              },
+                                              "end": {
+                                                "row": 32,
+                                                "column": 31
+                                              },
+                                              "text": "null"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ";",
+                                          "start": {
+                                            "row": 32,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 32,
+                                            "column": 32
+                                          },
+                                          "text": ";"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "return_statement",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 5
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 12
+                                      },
+                                      "text": "return;",
+                                      "children": [
+                                        {
+                                          "type": "return",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 11
+                                          },
+                                          "text": "return"
+                                        },
+                                        {
+                                          "type": ";",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 11
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 12
+                                          },
+                                          "text": ";"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 5
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 35,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 4
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 37,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 81
+                      },
+                      "text": "LOG.debug(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask);",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 37,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 80
+                          },
+                          "text": "LOG.debug(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 6
+                              },
+                              "text": "LOG"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 37,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 12
+                              },
+                              "text": "debug"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 37,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 80
+                              },
+                              "text": "(\"Invoking async call {} on task {}\", callName, taskNameWithSubtask)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 13
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string_literal",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 48
+                                  },
+                                  "text": "\"Invoking async call {} on task {}\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 14
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_fragment",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 47
+                                      },
+                                      "text": "Invoking async call {} on task {}"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 48
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 49
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 58
+                                  },
+                                  "text": "callName"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 59
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 60
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 79
+                                  },
+                                  "text": "taskNameWithSubtask"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 79
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 80
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 37,
+                            "column": 80
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 81
+                          },
+                          "text": ";"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "try_statement",
+                      "start": {
+                        "row": 39,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 48,
+                        "column": 4
+                      },
+                      "text": "try {\n\t\t\t\texecutor.submit(runnable, blocking);\n\t\t\t}\n\t\t\tcatch (RejectedExecutionException e) {\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}",
+                      "children": [
+                        {
+                          "type": "try",
+                          "start": {
+                            "row": 39,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 6
+                          },
+                          "text": "try"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 39,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 4
+                          },
+                          "text": "{\n\t\t\t\texecutor.submit(runnable, blocking);\n\t\t\t}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 39,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 8
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 40,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 40
+                              },
+                              "text": "executor.submit(runnable, blocking);",
+                              "children": [
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 39
+                                  },
+                                  "text": "executor.submit(runnable, blocking)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 12
+                                      },
+                                      "text": "executor"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 13
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 19
+                                      },
+                                      "text": "submit"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 39
+                                      },
+                                      "text": "(runnable, blocking)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 20
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 28
+                                          },
+                                          "text": "runnable"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 29
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 38
+                                          },
+                                          "text": "blocking"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 39
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 40
+                                  },
+                                  "text": ";"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 41,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 4
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "catch_clause",
+                          "start": {
+                            "row": 42,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 48,
+                            "column": 4
+                          },
+                          "text": "catch (RejectedExecutionException e) {\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}",
+                          "children": [
+                            {
+                              "type": "catch",
+                              "start": {
+                                "row": 42,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 8
+                              },
+                              "text": "catch"
+                            },
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 42,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 10
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "catch_formal_parameter",
+                              "start": {
+                                "row": 42,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 38
+                              },
+                              "text": "RejectedExecutionException e",
+                              "children": [
+                                {
+                                  "type": "catch_type",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 36
+                                  },
+                                  "text": "RejectedExecutionException",
+                                  "children": [
+                                    {
+                                      "type": "type_identifier",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 36
+                                      },
+                                      "text": "RejectedExecutionException"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 37
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 38
+                                  },
+                                  "text": "e"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 42,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 39
+                              },
+                              "text": ")"
+                            },
+                            {
+                              "type": "block",
+                              "start": {
+                                "row": 42,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 48,
+                                "column": 4
+                              },
+                              "text": "{\n\t\t\t\t// may be that we are concurrently finished or canceled.\n\t\t\t\t// if not, report that something is fishy\n\t\t\t\tif (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}\n\t\t\t}",
+                              "children": [
+                                {
+                                  "type": "{",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 41
+                                  },
+                                  "text": "{"
+                                },
+                                {
+                                  "type": "line_comment",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 60
+                                  },
+                                  "text": "// may be that we are concurrently finished or canceled."
+                                },
+                                {
+                                  "type": "line_comment",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 45
+                                  },
+                                  "text": "// if not, report that something is fishy"
+                                },
+                                {
+                                  "type": "if_statement",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 4
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 5
+                                  },
+                                  "text": "if (executionState == ExecutionState.RUNNING) {\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}",
+                                  "children": [
+                                    {
+                                      "type": "if",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 4
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 6
+                                      },
+                                      "text": "if"
+                                    },
+                                    {
+                                      "type": "condition",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 7
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 49
+                                      },
+                                      "text": "(executionState == ExecutionState.RUNNING)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 7
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 8
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "binary_expression",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 48
+                                          },
+                                          "text": "executionState == ExecutionState.RUNNING",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 45,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 45,
+                                                "column": 22
+                                              },
+                                              "text": "executionState"
+                                            },
+                                            {
+                                              "type": "==",
+                                              "start": {
+                                                "row": 45,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 45,
+                                                "column": 25
+                                              },
+                                              "text": "=="
+                                            },
+                                            {
+                                              "type": "field_access",
+                                              "start": {
+                                                "row": 45,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 45,
+                                                "column": 48
+                                              },
+                                              "text": "ExecutionState.RUNNING",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 45,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 45,
+                                                    "column": 40
+                                                  },
+                                                  "text": "ExecutionState"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 45,
+                                                    "column": 40
+                                                  },
+                                                  "end": {
+                                                    "row": 45,
+                                                    "column": 41
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 45,
+                                                    "column": 41
+                                                  },
+                                                  "end": {
+                                                    "row": 45,
+                                                    "column": 48
+                                                  },
+                                                  "text": "RUNNING"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 49
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "block",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 5
+                                      },
+                                      "text": "{\n\t\t\t\t\tthrow new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);\n\t\t\t\t}",
+                                      "children": [
+                                        {
+                                          "type": "{",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 51
+                                          },
+                                          "text": "{"
+                                        },
+                                        {
+                                          "type": "throw_statement",
+                                          "start": {
+                                            "row": 46,
+                                            "column": 5
+                                          },
+                                          "end": {
+                                            "row": 46,
+                                            "column": 149
+                                          },
+                                          "text": "throw new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e);",
+                                          "children": [
+                                            {
+                                              "type": "throw",
+                                              "start": {
+                                                "row": 46,
+                                                "column": 5
+                                              },
+                                              "end": {
+                                                "row": 46,
+                                                "column": 10
+                                              },
+                                              "text": "throw"
+                                            },
+                                            {
+                                              "type": "object_creation_expression",
+                                              "start": {
+                                                "row": 46,
+                                                "column": 11
+                                              },
+                                              "end": {
+                                                "row": 46,
+                                                "column": 148
+                                              },
+                                              "text": "new RuntimeException(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e)",
+                                              "children": [
+                                                {
+                                                  "type": "new",
+                                                  "start": {
+                                                    "row": 46,
+                                                    "column": 11
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 14
+                                                  },
+                                                  "text": "new"
+                                                },
+                                                {
+                                                  "type": "type_identifier",
+                                                  "start": {
+                                                    "row": 46,
+                                                    "column": 15
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 31
+                                                  },
+                                                  "text": "RuntimeException"
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 46,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 46,
+                                                    "column": 148
+                                                  },
+                                                  "text": "(\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\", e)",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 31
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 32
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "binary_expression",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 32
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 144
+                                                      },
+                                                      "text": "\"Async call with a \" + (blocking ? \"\" : \"non-\") + \"blocking call was rejected, even though the task is running.\"",
+                                                      "children": [
+                                                        {
+                                                          "type": "binary_expression",
+                                                          "start": {
+                                                            "row": 46,
+                                                            "column": 32
+                                                          },
+                                                          "end": {
+                                                            "row": 46,
+                                                            "column": 79
+                                                          },
+                                                          "text": "\"Async call with a \" + (blocking ? \"\" : \"non-\")",
+                                                          "children": [
+                                                            {
+                                                              "type": "string_literal",
+                                                              "start": {
+                                                                "row": 46,
+                                                                "column": 32
+                                                              },
+                                                              "end": {
+                                                                "row": 46,
+                                                                "column": 52
+                                                              },
+                                                              "text": "\"Async call with a \"",
+                                                              "children": [
+                                                                {
+                                                                  "type": "\"",
+                                                                  "start": {
+                                                                    "row": 46,
+                                                                    "column": 32
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 46,
+                                                                    "column": 33
+                                                                  },
+                                                                  "text": "\""
+                                                                },
+                                                                {
+                                                                  "type": "string_fragment",
+                                                                  "start": {
+                                                                    "row": 46,
+                                                                    "column": 33
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 46,
+                                                                    "column": 51
+                                                                  },
+                                                                  "text": "Async call with a "
+                                                                },
+                                                                {
+                                                                  "type": "\"",
+                                                                  "start": {
+                                                                    "row": 46,
+                                                                    "column": 51
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 46,
+                                                                    "column": 52
+                                                                  },
+                                                                  "text": "\""
+                                                                }
+                                                              ]
+                                                            },
+                                                            {
+                                                              "type": "+",
+                                                              "start": {
+                                                                "row": 46,
+                                                                "column": 53
+                                                              },
+                                                              "end": {
+                                                                "row": 46,
+                                                                "column": 54
+                                                              },
+                                                              "text": "+"
+                                                            },
+                                                            {
+                                                              "type": "parenthesized_expression",
+                                                              "start": {
+                                                                "row": 46,
+                                                                "column": 55
+                                                              },
+                                                              "end": {
+                                                                "row": 46,
+                                                                "column": 79
+                                                              },
+                                                              "text": "(blocking ? \"\" : \"non-\")",
+                                                              "children": [
+                                                                {
+                                                                  "type": "(",
+                                                                  "start": {
+                                                                    "row": 46,
+                                                                    "column": 55
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 46,
+                                                                    "column": 56
+                                                                  },
+                                                                  "text": "("
+                                                                },
+                                                                {
+                                                                  "type": "ternary_expression",
+                                                                  "start": {
+                                                                    "row": 46,
+                                                                    "column": 56
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 46,
+                                                                    "column": 78
+                                                                  },
+                                                                  "text": "blocking ? \"\" : \"non-\"",
+                                                                  "children": [
+                                                                    {
+                                                                      "type": "identifier",
+                                                                      "start": {
+                                                                        "row": 46,
+                                                                        "column": 56
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 46,
+                                                                        "column": 64
+                                                                      },
+                                                                      "text": "blocking"
+                                                                    },
+                                                                    {
+                                                                      "type": "?",
+                                                                      "start": {
+                                                                        "row": 46,
+                                                                        "column": 65
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 46,
+                                                                        "column": 66
+                                                                      },
+                                                                      "text": "?"
+                                                                    },
+                                                                    {
+                                                                      "type": "string_literal",
+                                                                      "start": {
+                                                                        "row": 46,
+                                                                        "column": 67
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 46,
+                                                                        "column": 69
+                                                                      },
+                                                                      "text": "\"\"",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "\"",
+                                                                          "start": {
+                                                                            "row": 46,
+                                                                            "column": 67
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 46,
+                                                                            "column": 68
+                                                                          },
+                                                                          "text": "\""
+                                                                        },
+                                                                        {
+                                                                          "type": "\"",
+                                                                          "start": {
+                                                                            "row": 46,
+                                                                            "column": 68
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 46,
+                                                                            "column": 69
+                                                                          },
+                                                                          "text": "\""
+                                                                        }
+                                                                      ]
+                                                                    },
+                                                                    {
+                                                                      "type": ":",
+                                                                      "start": {
+                                                                        "row": 46,
+                                                                        "column": 70
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 46,
+                                                                        "column": 71
+                                                                      },
+                                                                      "text": ":"
+                                                                    },
+                                                                    {
+                                                                      "type": "string_literal",
+                                                                      "start": {
+                                                                        "row": 46,
+                                                                        "column": 72
+                                                                      },
+                                                                      "end": {
+                                                                        "row": 46,
+                                                                        "column": 78
+                                                                      },
+                                                                      "text": "\"non-\"",
+                                                                      "children": [
+                                                                        {
+                                                                          "type": "\"",
+                                                                          "start": {
+                                                                            "row": 46,
+                                                                            "column": 72
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 46,
+                                                                            "column": 73
+                                                                          },
+                                                                          "text": "\""
+                                                                        },
+                                                                        {
+                                                                          "type": "string_fragment",
+                                                                          "start": {
+                                                                            "row": 46,
+                                                                            "column": 73
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 46,
+                                                                            "column": 77
+                                                                          },
+                                                                          "text": "non-"
+                                                                        },
+                                                                        {
+                                                                          "type": "\"",
+                                                                          "start": {
+                                                                            "row": 46,
+                                                                            "column": 77
+                                                                          },
+                                                                          "end": {
+                                                                            "row": 46,
+                                                                            "column": 78
+                                                                          },
+                                                                          "text": "\""
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                  ]
+                                                                },
+                                                                {
+                                                                  "type": ")",
+                                                                  "start": {
+                                                                    "row": 46,
+                                                                    "column": 78
+                                                                  },
+                                                                  "end": {
+                                                                    "row": 46,
+                                                                    "column": 79
+                                                                  },
+                                                                  "text": ")"
+                                                                }
+                                                              ]
+                                                            }
+                                                          ]
+                                                        },
+                                                        {
+                                                          "type": "+",
+                                                          "start": {
+                                                            "row": 46,
+                                                            "column": 80
+                                                          },
+                                                          "end": {
+                                                            "row": 46,
+                                                            "column": 81
+                                                          },
+                                                          "text": "+"
+                                                        },
+                                                        {
+                                                          "type": "string_literal",
+                                                          "start": {
+                                                            "row": 46,
+                                                            "column": 82
+                                                          },
+                                                          "end": {
+                                                            "row": 46,
+                                                            "column": 144
+                                                          },
+                                                          "text": "\"blocking call was rejected, even though the task is running.\"",
+                                                          "children": [
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 46,
+                                                                "column": 82
+                                                              },
+                                                              "end": {
+                                                                "row": 46,
+                                                                "column": 83
+                                                              },
+                                                              "text": "\""
+                                                            },
+                                                            {
+                                                              "type": "string_fragment",
+                                                              "start": {
+                                                                "row": 46,
+                                                                "column": 83
+                                                              },
+                                                              "end": {
+                                                                "row": 46,
+                                                                "column": 143
+                                                              },
+                                                              "text": "blocking call was rejected, even though the task is running."
+                                                            },
+                                                            {
+                                                              "type": "\"",
+                                                              "start": {
+                                                                "row": 46,
+                                                                "column": 143
+                                                              },
+                                                              "end": {
+                                                                "row": 46,
+                                                                "column": 144
+                                                              },
+                                                              "text": "\""
+                                                            }
+                                                          ]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": ",",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 144
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 145
+                                                      },
+                                                      "text": ","
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 146
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 147
+                                                      },
+                                                      "text": "e"
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 46,
+                                                        "column": 147
+                                                      },
+                                                      "end": {
+                                                        "row": 46,
+                                                        "column": 148
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ";",
+                                              "start": {
+                                                "row": 46,
+                                                "column": 148
+                                              },
+                                              "end": {
+                                                "row": 46,
+                                                "column": 149
+                                              },
+                                              "text": ";"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 4
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 5
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 48,
+                                    "column": 3
+                                  },
+                                  "end": {
+                                    "row": 48,
+                                    "column": 4
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 49,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 49,
+                        "column": 3
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "}",
+              "start": {
+                "row": 50,
+                "column": 1
+              },
+              "end": {
+                "row": 50,
+                "column": 2
+              },
+              "text": "}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

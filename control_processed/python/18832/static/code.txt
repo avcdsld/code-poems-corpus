@@ -1,0 +1,4 @@
+def contextMenuEvent(self, event):
+        """Reimplement Qt method"""
+        self.menu.popup(event.globalPos())
+        event.accept()

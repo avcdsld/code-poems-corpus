@@ -1,0 +1,3 @@
+public static <T> T[] toArray(Iterable<T> iterable, Class<T> componentType) {
+		return toArray(CollectionUtil.toCollection(iterable), componentType);
+	}

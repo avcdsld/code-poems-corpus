@@ -1,0 +1,15 @@
+function (e) {
+    var posX = 0, posY = 0;
+    e = e || window.event;
+    if (typeof e.pageX !== "undefined") {
+      posX = e.pageX;
+      posY = e.pageY;
+    } else if (typeof e.clientX !== "undefined") { // MSIE
+      posX = e.clientX + scroll.x;
+      posY = e.clientY + scroll.y;
+    }
+    return {
+      left: posX,
+      top: posY
+    };
+  }

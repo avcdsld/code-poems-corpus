@@ -1,0 +1,7 @@
+def set_current_filename(self, filename, editorwindow=None, focus=True):
+        """Set focus to *filename* if this file has been opened.
+
+        Return the editor instance associated to *filename*.
+        """
+        editorstack = self.get_current_editorstack(editorwindow)
+        return editorstack.set_current_filename(filename, focus)

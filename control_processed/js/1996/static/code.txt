@@ -1,0 +1,27 @@
+function (elem)
+    {
+        var result = null;
+        try {
+            result = this.handler(elem);
+        } catch (e) {
+            if (e.sourceURL) {
+                Strophe.fatal("error: " + this.handler +
+                              " " + e.sourceURL + ":" +
+                              e.line + " - " + e.name + ": " + e.message);
+            } else if (e.fileName) {
+                if (typeof(console) != "undefined") {
+                    console.trace();
+                    console.error(this.handler, " - error - ", e, e.message);
+                }
+                Strophe.fatal("error: " + this.handler + " " +
+                              e.fileName + ":" + e.lineNumber + " - " +
+                              e.name + ": " + e.message);
+            } else {
+                Strophe.fatal("error: " + e.message + "\n" + e.stack);
+            }
+
+            throw e;
+        }
+
+        return result;
+    }

@@ -1,0 +1,652 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 89,
+    "column": 91
+  },
+  "text": "def createDataFrame(self, data, schema=None, samplingRatio=None, verifySchema=True):\n        \"\"\"\n        Creates a :class:`DataFrame` from an :class:`RDD`, a list or a :class:`pandas.DataFrame`.\n\n        When ``schema`` is a list of column names, the type of each column\n        will be inferred from ``data``.\n\n        When ``schema`` is ``None``, it will try to infer the schema (column names and types)\n        from ``data``, which should be an RDD of :class:`Row`,\n        or :class:`namedtuple`, or :class:`dict`.\n\n        When ``schema`` is :class:`pyspark.sql.types.DataType` or a datatype string it must match\n        the real data, or an exception will be thrown at runtime. If the given schema is not\n        :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n        :class:`pyspark.sql.types.StructType` as its only field, and the field name will be \"value\",\n        each record will also be wrapped into a tuple, which can be converted to row later.\n\n        If schema inference is needed, ``samplingRatio`` is used to determined the ratio of\n        rows used for schema inference. The first row will be used if ``samplingRatio`` is ``None``.\n\n        :param data: an RDD of any kind of SQL data representation(e.g. :class:`Row`,\n            :class:`tuple`, ``int``, ``boolean``, etc.), or :class:`list`, or\n            :class:`pandas.DataFrame`.\n        :param schema: a :class:`pyspark.sql.types.DataType` or a datatype string or a list of\n            column names, default is None.  The data type string format equals to\n            :class:`pyspark.sql.types.DataType.simpleString`, except that top level struct type can\n            omit the ``struct<>`` and atomic types use ``typeName()`` as their format, e.g. use\n            ``byte`` instead of ``tinyint`` for :class:`pyspark.sql.types.ByteType`.\n            We can also use ``int`` as a short name for :class:`pyspark.sql.types.IntegerType`.\n        :param samplingRatio: the sample ratio of rows used for inferring\n        :param verifySchema: verify data types of every row against schema.\n        :return: :class:`DataFrame`\n\n        .. versionchanged:: 2.0\n           The ``schema`` parameter can be a :class:`pyspark.sql.types.DataType` or a\n           datatype string after 2.0.\n           If it's not a :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n           :class:`pyspark.sql.types.StructType` and each record will also be wrapped into a tuple.\n\n        .. versionchanged:: 2.1\n           Added verifySchema.\n\n        >>> l = [('Alice', 1)]\n        >>> sqlContext.createDataFrame(l).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> sqlContext.createDataFrame(l, ['name', 'age']).collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> d = [{'name': 'Alice', 'age': 1}]\n        >>> sqlContext.createDataFrame(d).collect()\n        [Row(age=1, name=u'Alice')]\n\n        >>> rdd = sc.parallelize(l)\n        >>> sqlContext.createDataFrame(rdd).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> df = sqlContext.createDataFrame(rdd, ['name', 'age'])\n        >>> df.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql import Row\n        >>> Person = Row('name', 'age')\n        >>> person = rdd.map(lambda r: Person(*r))\n        >>> df2 = sqlContext.createDataFrame(person)\n        >>> df2.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql.types import *\n        >>> schema = StructType([\n        ...    StructField(\"name\", StringType(), True),\n        ...    StructField(\"age\", IntegerType(), True)])\n        >>> df3 = sqlContext.createDataFrame(rdd, schema)\n        >>> df3.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> sqlContext.createDataFrame(df.toPandas()).collect()  # doctest: +SKIP\n        [Row(name=u'Alice', age=1)]\n        >>> sqlContext.createDataFrame(pandas.DataFrame([[1, 2]])).collect()  # doctest: +SKIP\n        [Row(0=1, 1=2)]\n\n        >>> sqlContext.createDataFrame(rdd, \"a: string, b: int\").collect()\n        [Row(a=u'Alice', b=1)]\n        >>> rdd = rdd.map(lambda row: row[1])\n        >>> sqlContext.createDataFrame(rdd, \"int\").collect()\n        [Row(value=1)]\n        >>> sqlContext.createDataFrame(rdd, \"boolean\").collect() # doctest: +IGNORE_EXCEPTION_DETAIL\n        Traceback (most recent call last):\n            ...\n        Py4JJavaError: ...\n        \"\"\"\n        return self.sparkSession.createDataFrame(data, schema, samplingRatio, verifySchema)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 89,
+        "column": 91
+      },
+      "text": "def createDataFrame(self, data, schema=None, samplingRatio=None, verifySchema=True):\n        \"\"\"\n        Creates a :class:`DataFrame` from an :class:`RDD`, a list or a :class:`pandas.DataFrame`.\n\n        When ``schema`` is a list of column names, the type of each column\n        will be inferred from ``data``.\n\n        When ``schema`` is ``None``, it will try to infer the schema (column names and types)\n        from ``data``, which should be an RDD of :class:`Row`,\n        or :class:`namedtuple`, or :class:`dict`.\n\n        When ``schema`` is :class:`pyspark.sql.types.DataType` or a datatype string it must match\n        the real data, or an exception will be thrown at runtime. If the given schema is not\n        :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n        :class:`pyspark.sql.types.StructType` as its only field, and the field name will be \"value\",\n        each record will also be wrapped into a tuple, which can be converted to row later.\n\n        If schema inference is needed, ``samplingRatio`` is used to determined the ratio of\n        rows used for schema inference. The first row will be used if ``samplingRatio`` is ``None``.\n\n        :param data: an RDD of any kind of SQL data representation(e.g. :class:`Row`,\n            :class:`tuple`, ``int``, ``boolean``, etc.), or :class:`list`, or\n            :class:`pandas.DataFrame`.\n        :param schema: a :class:`pyspark.sql.types.DataType` or a datatype string or a list of\n            column names, default is None.  The data type string format equals to\n            :class:`pyspark.sql.types.DataType.simpleString`, except that top level struct type can\n            omit the ``struct<>`` and atomic types use ``typeName()`` as their format, e.g. use\n            ``byte`` instead of ``tinyint`` for :class:`pyspark.sql.types.ByteType`.\n            We can also use ``int`` as a short name for :class:`pyspark.sql.types.IntegerType`.\n        :param samplingRatio: the sample ratio of rows used for inferring\n        :param verifySchema: verify data types of every row against schema.\n        :return: :class:`DataFrame`\n\n        .. versionchanged:: 2.0\n           The ``schema`` parameter can be a :class:`pyspark.sql.types.DataType` or a\n           datatype string after 2.0.\n           If it's not a :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n           :class:`pyspark.sql.types.StructType` and each record will also be wrapped into a tuple.\n\n        .. versionchanged:: 2.1\n           Added verifySchema.\n\n        >>> l = [('Alice', 1)]\n        >>> sqlContext.createDataFrame(l).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> sqlContext.createDataFrame(l, ['name', 'age']).collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> d = [{'name': 'Alice', 'age': 1}]\n        >>> sqlContext.createDataFrame(d).collect()\n        [Row(age=1, name=u'Alice')]\n\n        >>> rdd = sc.parallelize(l)\n        >>> sqlContext.createDataFrame(rdd).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> df = sqlContext.createDataFrame(rdd, ['name', 'age'])\n        >>> df.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql import Row\n        >>> Person = Row('name', 'age')\n        >>> person = rdd.map(lambda r: Person(*r))\n        >>> df2 = sqlContext.createDataFrame(person)\n        >>> df2.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql.types import *\n        >>> schema = StructType([\n        ...    StructField(\"name\", StringType(), True),\n        ...    StructField(\"age\", IntegerType(), True)])\n        >>> df3 = sqlContext.createDataFrame(rdd, schema)\n        >>> df3.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> sqlContext.createDataFrame(df.toPandas()).collect()  # doctest: +SKIP\n        [Row(name=u'Alice', age=1)]\n        >>> sqlContext.createDataFrame(pandas.DataFrame([[1, 2]])).collect()  # doctest: +SKIP\n        [Row(0=1, 1=2)]\n\n        >>> sqlContext.createDataFrame(rdd, \"a: string, b: int\").collect()\n        [Row(a=u'Alice', b=1)]\n        >>> rdd = rdd.map(lambda row: row[1])\n        >>> sqlContext.createDataFrame(rdd, \"int\").collect()\n        [Row(value=1)]\n        >>> sqlContext.createDataFrame(rdd, \"boolean\").collect() # doctest: +IGNORE_EXCEPTION_DETAIL\n        Traceback (most recent call last):\n            ...\n        Py4JJavaError: ...\n        \"\"\"\n        return self.sparkSession.createDataFrame(data, schema, samplingRatio, verifySchema)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 19
+          },
+          "text": "createDataFrame"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 19
+          },
+          "end": {
+            "row": 0,
+            "column": 83
+          },
+          "text": "(self, data, schema=None, samplingRatio=None, verifySchema=True)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 19
+              },
+              "end": {
+                "row": 0,
+                "column": 20
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 24
+              },
+              "text": "self"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 24
+              },
+              "end": {
+                "row": 0,
+                "column": 25
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 26
+              },
+              "end": {
+                "row": 0,
+                "column": 30
+              },
+              "text": "data"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 30
+              },
+              "end": {
+                "row": 0,
+                "column": 31
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 32
+              },
+              "end": {
+                "row": 0,
+                "column": 43
+              },
+              "text": "schema=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 32
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "text": "schema"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 39
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 39
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 43
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 43
+              },
+              "end": {
+                "row": 0,
+                "column": 44
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 45
+              },
+              "end": {
+                "row": 0,
+                "column": 63
+              },
+              "text": "samplingRatio=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 45
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 58
+                  },
+                  "text": "samplingRatio"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 58
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 59
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 63
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 63
+              },
+              "end": {
+                "row": 0,
+                "column": 64
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 65
+              },
+              "end": {
+                "row": 0,
+                "column": 82
+              },
+              "text": "verifySchema=True",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 65
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 77
+                  },
+                  "text": "verifySchema"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 77
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 78
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "true",
+                  "start": {
+                    "row": 0,
+                    "column": 78
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 82
+                  },
+                  "text": "True"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 82
+              },
+              "end": {
+                "row": 0,
+                "column": 83
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 83
+          },
+          "end": {
+            "row": 0,
+            "column": 84
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 8
+          },
+          "end": {
+            "row": 89,
+            "column": 91
+          },
+          "text": "\"\"\"\n        Creates a :class:`DataFrame` from an :class:`RDD`, a list or a :class:`pandas.DataFrame`.\n\n        When ``schema`` is a list of column names, the type of each column\n        will be inferred from ``data``.\n\n        When ``schema`` is ``None``, it will try to infer the schema (column names and types)\n        from ``data``, which should be an RDD of :class:`Row`,\n        or :class:`namedtuple`, or :class:`dict`.\n\n        When ``schema`` is :class:`pyspark.sql.types.DataType` or a datatype string it must match\n        the real data, or an exception will be thrown at runtime. If the given schema is not\n        :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n        :class:`pyspark.sql.types.StructType` as its only field, and the field name will be \"value\",\n        each record will also be wrapped into a tuple, which can be converted to row later.\n\n        If schema inference is needed, ``samplingRatio`` is used to determined the ratio of\n        rows used for schema inference. The first row will be used if ``samplingRatio`` is ``None``.\n\n        :param data: an RDD of any kind of SQL data representation(e.g. :class:`Row`,\n            :class:`tuple`, ``int``, ``boolean``, etc.), or :class:`list`, or\n            :class:`pandas.DataFrame`.\n        :param schema: a :class:`pyspark.sql.types.DataType` or a datatype string or a list of\n            column names, default is None.  The data type string format equals to\n            :class:`pyspark.sql.types.DataType.simpleString`, except that top level struct type can\n            omit the ``struct<>`` and atomic types use ``typeName()`` as their format, e.g. use\n            ``byte`` instead of ``tinyint`` for :class:`pyspark.sql.types.ByteType`.\n            We can also use ``int`` as a short name for :class:`pyspark.sql.types.IntegerType`.\n        :param samplingRatio: the sample ratio of rows used for inferring\n        :param verifySchema: verify data types of every row against schema.\n        :return: :class:`DataFrame`\n\n        .. versionchanged:: 2.0\n           The ``schema`` parameter can be a :class:`pyspark.sql.types.DataType` or a\n           datatype string after 2.0.\n           If it's not a :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n           :class:`pyspark.sql.types.StructType` and each record will also be wrapped into a tuple.\n\n        .. versionchanged:: 2.1\n           Added verifySchema.\n\n        >>> l = [('Alice', 1)]\n        >>> sqlContext.createDataFrame(l).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> sqlContext.createDataFrame(l, ['name', 'age']).collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> d = [{'name': 'Alice', 'age': 1}]\n        >>> sqlContext.createDataFrame(d).collect()\n        [Row(age=1, name=u'Alice')]\n\n        >>> rdd = sc.parallelize(l)\n        >>> sqlContext.createDataFrame(rdd).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> df = sqlContext.createDataFrame(rdd, ['name', 'age'])\n        >>> df.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql import Row\n        >>> Person = Row('name', 'age')\n        >>> person = rdd.map(lambda r: Person(*r))\n        >>> df2 = sqlContext.createDataFrame(person)\n        >>> df2.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql.types import *\n        >>> schema = StructType([\n        ...    StructField(\"name\", StringType(), True),\n        ...    StructField(\"age\", IntegerType(), True)])\n        >>> df3 = sqlContext.createDataFrame(rdd, schema)\n        >>> df3.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> sqlContext.createDataFrame(df.toPandas()).collect()  # doctest: +SKIP\n        [Row(name=u'Alice', age=1)]\n        >>> sqlContext.createDataFrame(pandas.DataFrame([[1, 2]])).collect()  # doctest: +SKIP\n        [Row(0=1, 1=2)]\n\n        >>> sqlContext.createDataFrame(rdd, \"a: string, b: int\").collect()\n        [Row(a=u'Alice', b=1)]\n        >>> rdd = rdd.map(lambda row: row[1])\n        >>> sqlContext.createDataFrame(rdd, \"int\").collect()\n        [Row(value=1)]\n        >>> sqlContext.createDataFrame(rdd, \"boolean\").collect() # doctest: +IGNORE_EXCEPTION_DETAIL\n        Traceback (most recent call last):\n            ...\n        Py4JJavaError: ...\n        \"\"\"\n        return self.sparkSession.createDataFrame(data, schema, samplingRatio, verifySchema)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 88,
+                "column": 11
+              },
+              "text": "\"\"\"\n        Creates a :class:`DataFrame` from an :class:`RDD`, a list or a :class:`pandas.DataFrame`.\n\n        When ``schema`` is a list of column names, the type of each column\n        will be inferred from ``data``.\n\n        When ``schema`` is ``None``, it will try to infer the schema (column names and types)\n        from ``data``, which should be an RDD of :class:`Row`,\n        or :class:`namedtuple`, or :class:`dict`.\n\n        When ``schema`` is :class:`pyspark.sql.types.DataType` or a datatype string it must match\n        the real data, or an exception will be thrown at runtime. If the given schema is not\n        :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n        :class:`pyspark.sql.types.StructType` as its only field, and the field name will be \"value\",\n        each record will also be wrapped into a tuple, which can be converted to row later.\n\n        If schema inference is needed, ``samplingRatio`` is used to determined the ratio of\n        rows used for schema inference. The first row will be used if ``samplingRatio`` is ``None``.\n\n        :param data: an RDD of any kind of SQL data representation(e.g. :class:`Row`,\n            :class:`tuple`, ``int``, ``boolean``, etc.), or :class:`list`, or\n            :class:`pandas.DataFrame`.\n        :param schema: a :class:`pyspark.sql.types.DataType` or a datatype string or a list of\n            column names, default is None.  The data type string format equals to\n            :class:`pyspark.sql.types.DataType.simpleString`, except that top level struct type can\n            omit the ``struct<>`` and atomic types use ``typeName()`` as their format, e.g. use\n            ``byte`` instead of ``tinyint`` for :class:`pyspark.sql.types.ByteType`.\n            We can also use ``int`` as a short name for :class:`pyspark.sql.types.IntegerType`.\n        :param samplingRatio: the sample ratio of rows used for inferring\n        :param verifySchema: verify data types of every row against schema.\n        :return: :class:`DataFrame`\n\n        .. versionchanged:: 2.0\n           The ``schema`` parameter can be a :class:`pyspark.sql.types.DataType` or a\n           datatype string after 2.0.\n           If it's not a :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n           :class:`pyspark.sql.types.StructType` and each record will also be wrapped into a tuple.\n\n        .. versionchanged:: 2.1\n           Added verifySchema.\n\n        >>> l = [('Alice', 1)]\n        >>> sqlContext.createDataFrame(l).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> sqlContext.createDataFrame(l, ['name', 'age']).collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> d = [{'name': 'Alice', 'age': 1}]\n        >>> sqlContext.createDataFrame(d).collect()\n        [Row(age=1, name=u'Alice')]\n\n        >>> rdd = sc.parallelize(l)\n        >>> sqlContext.createDataFrame(rdd).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> df = sqlContext.createDataFrame(rdd, ['name', 'age'])\n        >>> df.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql import Row\n        >>> Person = Row('name', 'age')\n        >>> person = rdd.map(lambda r: Person(*r))\n        >>> df2 = sqlContext.createDataFrame(person)\n        >>> df2.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql.types import *\n        >>> schema = StructType([\n        ...    StructField(\"name\", StringType(), True),\n        ...    StructField(\"age\", IntegerType(), True)])\n        >>> df3 = sqlContext.createDataFrame(rdd, schema)\n        >>> df3.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> sqlContext.createDataFrame(df.toPandas()).collect()  # doctest: +SKIP\n        [Row(name=u'Alice', age=1)]\n        >>> sqlContext.createDataFrame(pandas.DataFrame([[1, 2]])).collect()  # doctest: +SKIP\n        [Row(0=1, 1=2)]\n\n        >>> sqlContext.createDataFrame(rdd, \"a: string, b: int\").collect()\n        [Row(a=u'Alice', b=1)]\n        >>> rdd = rdd.map(lambda row: row[1])\n        >>> sqlContext.createDataFrame(rdd, \"int\").collect()\n        [Row(value=1)]\n        >>> sqlContext.createDataFrame(rdd, \"boolean\").collect() # doctest: +IGNORE_EXCEPTION_DETAIL\n        Traceback (most recent call last):\n            ...\n        Py4JJavaError: ...\n        \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 88,
+                    "column": 11
+                  },
+                  "text": "\"\"\"\n        Creates a :class:`DataFrame` from an :class:`RDD`, a list or a :class:`pandas.DataFrame`.\n\n        When ``schema`` is a list of column names, the type of each column\n        will be inferred from ``data``.\n\n        When ``schema`` is ``None``, it will try to infer the schema (column names and types)\n        from ``data``, which should be an RDD of :class:`Row`,\n        or :class:`namedtuple`, or :class:`dict`.\n\n        When ``schema`` is :class:`pyspark.sql.types.DataType` or a datatype string it must match\n        the real data, or an exception will be thrown at runtime. If the given schema is not\n        :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n        :class:`pyspark.sql.types.StructType` as its only field, and the field name will be \"value\",\n        each record will also be wrapped into a tuple, which can be converted to row later.\n\n        If schema inference is needed, ``samplingRatio`` is used to determined the ratio of\n        rows used for schema inference. The first row will be used if ``samplingRatio`` is ``None``.\n\n        :param data: an RDD of any kind of SQL data representation(e.g. :class:`Row`,\n            :class:`tuple`, ``int``, ``boolean``, etc.), or :class:`list`, or\n            :class:`pandas.DataFrame`.\n        :param schema: a :class:`pyspark.sql.types.DataType` or a datatype string or a list of\n            column names, default is None.  The data type string format equals to\n            :class:`pyspark.sql.types.DataType.simpleString`, except that top level struct type can\n            omit the ``struct<>`` and atomic types use ``typeName()`` as their format, e.g. use\n            ``byte`` instead of ``tinyint`` for :class:`pyspark.sql.types.ByteType`.\n            We can also use ``int`` as a short name for :class:`pyspark.sql.types.IntegerType`.\n        :param samplingRatio: the sample ratio of rows used for inferring\n        :param verifySchema: verify data types of every row against schema.\n        :return: :class:`DataFrame`\n\n        .. versionchanged:: 2.0\n           The ``schema`` parameter can be a :class:`pyspark.sql.types.DataType` or a\n           datatype string after 2.0.\n           If it's not a :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n           :class:`pyspark.sql.types.StructType` and each record will also be wrapped into a tuple.\n\n        .. versionchanged:: 2.1\n           Added verifySchema.\n\n        >>> l = [('Alice', 1)]\n        >>> sqlContext.createDataFrame(l).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> sqlContext.createDataFrame(l, ['name', 'age']).collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> d = [{'name': 'Alice', 'age': 1}]\n        >>> sqlContext.createDataFrame(d).collect()\n        [Row(age=1, name=u'Alice')]\n\n        >>> rdd = sc.parallelize(l)\n        >>> sqlContext.createDataFrame(rdd).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> df = sqlContext.createDataFrame(rdd, ['name', 'age'])\n        >>> df.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql import Row\n        >>> Person = Row('name', 'age')\n        >>> person = rdd.map(lambda r: Person(*r))\n        >>> df2 = sqlContext.createDataFrame(person)\n        >>> df2.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql.types import *\n        >>> schema = StructType([\n        ...    StructField(\"name\", StringType(), True),\n        ...    StructField(\"age\", IntegerType(), True)])\n        >>> df3 = sqlContext.createDataFrame(rdd, schema)\n        >>> df3.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> sqlContext.createDataFrame(df.toPandas()).collect()  # doctest: +SKIP\n        [Row(name=u'Alice', age=1)]\n        >>> sqlContext.createDataFrame(pandas.DataFrame([[1, 2]])).collect()  # doctest: +SKIP\n        [Row(0=1, 1=2)]\n\n        >>> sqlContext.createDataFrame(rdd, \"a: string, b: int\").collect()\n        [Row(a=u'Alice', b=1)]\n        >>> rdd = rdd.map(lambda row: row[1])\n        >>> sqlContext.createDataFrame(rdd, \"int\").collect()\n        [Row(value=1)]\n        >>> sqlContext.createDataFrame(rdd, \"boolean\").collect() # doctest: +IGNORE_EXCEPTION_DETAIL\n        Traceback (most recent call last):\n            ...\n        Py4JJavaError: ...\n        \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 88,
+                        "column": 8
+                      },
+                      "text": "\n        Creates a :class:`DataFrame` from an :class:`RDD`, a list or a :class:`pandas.DataFrame`.\n\n        When ``schema`` is a list of column names, the type of each column\n        will be inferred from ``data``.\n\n        When ``schema`` is ``None``, it will try to infer the schema (column names and types)\n        from ``data``, which should be an RDD of :class:`Row`,\n        or :class:`namedtuple`, or :class:`dict`.\n\n        When ``schema`` is :class:`pyspark.sql.types.DataType` or a datatype string it must match\n        the real data, or an exception will be thrown at runtime. If the given schema is not\n        :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n        :class:`pyspark.sql.types.StructType` as its only field, and the field name will be \"value\",\n        each record will also be wrapped into a tuple, which can be converted to row later.\n\n        If schema inference is needed, ``samplingRatio`` is used to determined the ratio of\n        rows used for schema inference. The first row will be used if ``samplingRatio`` is ``None``.\n\n        :param data: an RDD of any kind of SQL data representation(e.g. :class:`Row`,\n            :class:`tuple`, ``int``, ``boolean``, etc.), or :class:`list`, or\n            :class:`pandas.DataFrame`.\n        :param schema: a :class:`pyspark.sql.types.DataType` or a datatype string or a list of\n            column names, default is None.  The data type string format equals to\n            :class:`pyspark.sql.types.DataType.simpleString`, except that top level struct type can\n            omit the ``struct<>`` and atomic types use ``typeName()`` as their format, e.g. use\n            ``byte`` instead of ``tinyint`` for :class:`pyspark.sql.types.ByteType`.\n            We can also use ``int`` as a short name for :class:`pyspark.sql.types.IntegerType`.\n        :param samplingRatio: the sample ratio of rows used for inferring\n        :param verifySchema: verify data types of every row against schema.\n        :return: :class:`DataFrame`\n\n        .. versionchanged:: 2.0\n           The ``schema`` parameter can be a :class:`pyspark.sql.types.DataType` or a\n           datatype string after 2.0.\n           If it's not a :class:`pyspark.sql.types.StructType`, it will be wrapped into a\n           :class:`pyspark.sql.types.StructType` and each record will also be wrapped into a tuple.\n\n        .. versionchanged:: 2.1\n           Added verifySchema.\n\n        >>> l = [('Alice', 1)]\n        >>> sqlContext.createDataFrame(l).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> sqlContext.createDataFrame(l, ['name', 'age']).collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> d = [{'name': 'Alice', 'age': 1}]\n        >>> sqlContext.createDataFrame(d).collect()\n        [Row(age=1, name=u'Alice')]\n\n        >>> rdd = sc.parallelize(l)\n        >>> sqlContext.createDataFrame(rdd).collect()\n        [Row(_1=u'Alice', _2=1)]\n        >>> df = sqlContext.createDataFrame(rdd, ['name', 'age'])\n        >>> df.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql import Row\n        >>> Person = Row('name', 'age')\n        >>> person = rdd.map(lambda r: Person(*r))\n        >>> df2 = sqlContext.createDataFrame(person)\n        >>> df2.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> from pyspark.sql.types import *\n        >>> schema = StructType([\n        ...    StructField(\"name\", StringType(), True),\n        ...    StructField(\"age\", IntegerType(), True)])\n        >>> df3 = sqlContext.createDataFrame(rdd, schema)\n        >>> df3.collect()\n        [Row(name=u'Alice', age=1)]\n\n        >>> sqlContext.createDataFrame(df.toPandas()).collect()  # doctest: +SKIP\n        [Row(name=u'Alice', age=1)]\n        >>> sqlContext.createDataFrame(pandas.DataFrame([[1, 2]])).collect()  # doctest: +SKIP\n        [Row(0=1, 1=2)]\n\n        >>> sqlContext.createDataFrame(rdd, \"a: string, b: int\").collect()\n        [Row(a=u'Alice', b=1)]\n        >>> rdd = rdd.map(lambda row: row[1])\n        >>> sqlContext.createDataFrame(rdd, \"int\").collect()\n        [Row(value=1)]\n        >>> sqlContext.createDataFrame(rdd, \"boolean\").collect() # doctest: +IGNORE_EXCEPTION_DETAIL\n        Traceback (most recent call last):\n            ...\n        Py4JJavaError: ...\n        "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 88,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 88,
+                        "column": 11
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 89,
+                "column": 8
+              },
+              "end": {
+                "row": 89,
+                "column": 91
+              },
+              "text": "return self.sparkSession.createDataFrame(data, schema, samplingRatio, verifySchema)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 89,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 89,
+                    "column": 14
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 89,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 89,
+                    "column": 91
+                  },
+                  "text": "self.sparkSession.createDataFrame(data, schema, samplingRatio, verifySchema)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 89,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 89,
+                        "column": 48
+                      },
+                      "text": "self.sparkSession.createDataFrame",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 89,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 32
+                          },
+                          "text": "self.sparkSession",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 89,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 19
+                              },
+                              "text": "self"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 89,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 20
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 89,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 89,
+                                "column": 32
+                              },
+                              "text": "sparkSession"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 89,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 33
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 89,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 48
+                          },
+                          "text": "createDataFrame"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 89,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 89,
+                        "column": 91
+                      },
+                      "text": "(data, schema, samplingRatio, verifySchema)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 89,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 49
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 89,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 53
+                          },
+                          "text": "data"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 89,
+                            "column": 53
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 54
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 89,
+                            "column": 55
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 61
+                          },
+                          "text": "schema"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 89,
+                            "column": 61
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 62
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 89,
+                            "column": 63
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 76
+                          },
+                          "text": "samplingRatio"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 89,
+                            "column": 76
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 77
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 89,
+                            "column": 78
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 90
+                          },
+                          "text": "verifySchema"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 89,
+                            "column": 90
+                          },
+                          "end": {
+                            "row": 89,
+                            "column": 91
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

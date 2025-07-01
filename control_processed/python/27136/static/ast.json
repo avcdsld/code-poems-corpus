@@ -1,0 +1,4462 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 67,
+    "column": 40
+  },
+  "text": "def shutdown_host(kwargs=None, call=None):\n    '''\n    Shut down the specified host system in this VMware environment\n\n    .. note::\n\n        If the host system is not in maintenance mode, it will not be shut down. If you\n        want to shut down the host system regardless of whether it is in maintenance mode,\n        set ``force=True``. Default is ``force=False``.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt-cloud -f shutdown_host my-vmware-config host=\"myHostSystemName\" [force=True]\n    '''\n    if call != 'function':\n        raise SaltCloudSystemExit(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )\n\n    host_name = kwargs.get('host') if kwargs and 'host' in kwargs else None\n    force = _str_to_bool(kwargs.get('force')) if kwargs and 'force' in kwargs else False\n\n    if not host_name:\n        raise SaltCloudSystemExit(\n            'You must specify name of the host system.'\n        )\n\n    # Get the service instance\n    si = _get_si()\n\n    host_ref = salt.utils.vmware.get_mor_by_property(si, vim.HostSystem, host_name)\n    if not host_ref:\n        raise SaltCloudSystemExit(\n            'Specified host system does not exist.'\n        )\n\n    if host_ref.runtime.connectionState == 'notResponding':\n        raise SaltCloudSystemExit(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )\n\n    if not host_ref.capability.rebootSupported:\n        raise SaltCloudSystemExit(\n            'Specified host system does not support shutdown.'\n        )\n\n    if not host_ref.runtime.inMaintenanceMode and not force:\n        raise SaltCloudSystemExit(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )\n\n    try:\n        host_ref.ShutdownHost_Task(force)\n    except Exception as exc:\n        log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )\n        return {host_name: 'failed to shut down host'}\n\n    return {host_name: 'shut down host'}",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 67,
+        "column": 40
+      },
+      "text": "def shutdown_host(kwargs=None, call=None):\n    '''\n    Shut down the specified host system in this VMware environment\n\n    .. note::\n\n        If the host system is not in maintenance mode, it will not be shut down. If you\n        want to shut down the host system regardless of whether it is in maintenance mode,\n        set ``force=True``. Default is ``force=False``.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt-cloud -f shutdown_host my-vmware-config host=\"myHostSystemName\" [force=True]\n    '''\n    if call != 'function':\n        raise SaltCloudSystemExit(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )\n\n    host_name = kwargs.get('host') if kwargs and 'host' in kwargs else None\n    force = _str_to_bool(kwargs.get('force')) if kwargs and 'force' in kwargs else False\n\n    if not host_name:\n        raise SaltCloudSystemExit(\n            'You must specify name of the host system.'\n        )\n\n    # Get the service instance\n    si = _get_si()\n\n    host_ref = salt.utils.vmware.get_mor_by_property(si, vim.HostSystem, host_name)\n    if not host_ref:\n        raise SaltCloudSystemExit(\n            'Specified host system does not exist.'\n        )\n\n    if host_ref.runtime.connectionState == 'notResponding':\n        raise SaltCloudSystemExit(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )\n\n    if not host_ref.capability.rebootSupported:\n        raise SaltCloudSystemExit(\n            'Specified host system does not support shutdown.'\n        )\n\n    if not host_ref.runtime.inMaintenanceMode and not force:\n        raise SaltCloudSystemExit(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )\n\n    try:\n        host_ref.ShutdownHost_Task(force)\n    except Exception as exc:\n        log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )\n        return {host_name: 'failed to shut down host'}\n\n    return {host_name: 'shut down host'}",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 17
+          },
+          "text": "shutdown_host"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 17
+          },
+          "end": {
+            "row": 0,
+            "column": 41
+          },
+          "text": "(kwargs=None, call=None)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 17
+              },
+              "end": {
+                "row": 0,
+                "column": 18
+              },
+              "text": "("
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 18
+              },
+              "end": {
+                "row": 0,
+                "column": 29
+              },
+              "text": "kwargs=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 24
+                  },
+                  "text": "kwargs"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 25
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 29
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 29
+              },
+              "end": {
+                "row": 0,
+                "column": 30
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 31
+              },
+              "end": {
+                "row": 0,
+                "column": 40
+              },
+              "text": "call=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 31
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 35
+                  },
+                  "text": "call"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 35
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 36
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 36
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 40
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 40
+              },
+              "end": {
+                "row": 0,
+                "column": 41
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 41
+          },
+          "end": {
+            "row": 0,
+            "column": 42
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 4
+          },
+          "end": {
+            "row": 67,
+            "column": 40
+          },
+          "text": "'''\n    Shut down the specified host system in this VMware environment\n\n    .. note::\n\n        If the host system is not in maintenance mode, it will not be shut down. If you\n        want to shut down the host system regardless of whether it is in maintenance mode,\n        set ``force=True``. Default is ``force=False``.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt-cloud -f shutdown_host my-vmware-config host=\"myHostSystemName\" [force=True]\n    '''\n    if call != 'function':\n        raise SaltCloudSystemExit(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )\n\n    host_name = kwargs.get('host') if kwargs and 'host' in kwargs else None\n    force = _str_to_bool(kwargs.get('force')) if kwargs and 'force' in kwargs else False\n\n    if not host_name:\n        raise SaltCloudSystemExit(\n            'You must specify name of the host system.'\n        )\n\n    # Get the service instance\n    si = _get_si()\n\n    host_ref = salt.utils.vmware.get_mor_by_property(si, vim.HostSystem, host_name)\n    if not host_ref:\n        raise SaltCloudSystemExit(\n            'Specified host system does not exist.'\n        )\n\n    if host_ref.runtime.connectionState == 'notResponding':\n        raise SaltCloudSystemExit(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )\n\n    if not host_ref.capability.rebootSupported:\n        raise SaltCloudSystemExit(\n            'Specified host system does not support shutdown.'\n        )\n\n    if not host_ref.runtime.inMaintenanceMode and not force:\n        raise SaltCloudSystemExit(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )\n\n    try:\n        host_ref.ShutdownHost_Task(force)\n    except Exception as exc:\n        log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )\n        return {host_name: 'failed to shut down host'}\n\n    return {host_name: 'shut down host'}",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 4
+              },
+              "end": {
+                "row": 15,
+                "column": 7
+              },
+              "text": "'''\n    Shut down the specified host system in this VMware environment\n\n    .. note::\n\n        If the host system is not in maintenance mode, it will not be shut down. If you\n        want to shut down the host system regardless of whether it is in maintenance mode,\n        set ``force=True``. Default is ``force=False``.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt-cloud -f shutdown_host my-vmware-config host=\"myHostSystemName\" [force=True]\n    '''",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 7
+                  },
+                  "text": "'''\n    Shut down the specified host system in this VMware environment\n\n    .. note::\n\n        If the host system is not in maintenance mode, it will not be shut down. If you\n        want to shut down the host system regardless of whether it is in maintenance mode,\n        set ``force=True``. Default is ``force=False``.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt-cloud -f shutdown_host my-vmware-config host=\"myHostSystemName\" [force=True]\n    '''",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 4
+                      },
+                      "text": "\n    Shut down the specified host system in this VMware environment\n\n    .. note::\n\n        If the host system is not in maintenance mode, it will not be shut down. If you\n        want to shut down the host system regardless of whether it is in maintenance mode,\n        set ``force=True``. Default is ``force=False``.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt-cloud -f shutdown_host my-vmware-config host=\"myHostSystemName\" [force=True]\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 15,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 16,
+                "column": 4
+              },
+              "end": {
+                "row": 20,
+                "column": 9
+              },
+              "text": "if call != 'function':\n        raise SaltCloudSystemExit(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 16,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 16,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 25
+                  },
+                  "text": "call != 'function'",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 16,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 11
+                      },
+                      "text": "call"
+                    },
+                    {
+                      "type": "!=",
+                      "start": {
+                        "row": 16,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 14
+                      },
+                      "text": "!="
+                    },
+                    {
+                      "type": "string",
+                      "start": {
+                        "row": 16,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 25
+                      },
+                      "text": "'function'",
+                      "children": [
+                        {
+                          "type": "string_start",
+                          "start": {
+                            "row": 16,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 16
+                          },
+                          "text": "'"
+                        },
+                        {
+                          "type": "string_content",
+                          "start": {
+                            "row": 16,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 24
+                          },
+                          "text": "function"
+                        },
+                        {
+                          "type": "string_end",
+                          "start": {
+                            "row": 16,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 25
+                          },
+                          "text": "'"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 16,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 26
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 17,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 9
+                  },
+                  "text": "raise SaltCloudSystemExit(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 17,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 9
+                      },
+                      "text": "raise SaltCloudSystemExit(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 17,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 17,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 9
+                          },
+                          "text": "SaltCloudSystemExit(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 17,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 33
+                              },
+                              "text": "SaltCloudSystemExit"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 17,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 9
+                              },
+                              "text": "(\n            'The shutdown_host function must be called with '\n            '-f or --function.'\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "concatenated_string",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 31
+                                  },
+                                  "text": "'The shutdown_host function must be called with '\n            '-f or --function.'",
+                                  "children": [
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 61
+                                      },
+                                      "text": "'The shutdown_host function must be called with '",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 13
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 60
+                                          },
+                                          "text": "The shutdown_host function must be called with "
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 60
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 61
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 31
+                                      },
+                                      "text": "'-f or --function.'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 13
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 30
+                                          },
+                                          "text": "-f or --function."
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 31
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 22,
+                "column": 4
+              },
+              "end": {
+                "row": 22,
+                "column": 75
+              },
+              "text": "host_name = kwargs.get('host') if kwargs and 'host' in kwargs else None",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 22,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 75
+                  },
+                  "text": "host_name = kwargs.get('host') if kwargs and 'host' in kwargs else None",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 22,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 13
+                      },
+                      "text": "host_name"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 22,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "conditional_expression",
+                      "start": {
+                        "row": 22,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 75
+                      },
+                      "text": "kwargs.get('host') if kwargs and 'host' in kwargs else None",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 22,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 34
+                          },
+                          "text": "kwargs.get('host')",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 22,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 26
+                              },
+                              "text": "kwargs.get",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 22
+                                  },
+                                  "text": "kwargs"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 23
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 26
+                                  },
+                                  "text": "get"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 22,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 34
+                              },
+                              "text": "('host')",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 27
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 33
+                                  },
+                                  "text": "'host'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 28
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 32
+                                      },
+                                      "text": "host"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 33
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 34
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 22,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 37
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "boolean_operator",
+                          "start": {
+                            "row": 22,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 65
+                          },
+                          "text": "kwargs and 'host' in kwargs",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 22,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 44
+                              },
+                              "text": "kwargs"
+                            },
+                            {
+                              "type": "and",
+                              "start": {
+                                "row": 22,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 48
+                              },
+                              "text": "and"
+                            },
+                            {
+                              "type": "comparison_operator",
+                              "start": {
+                                "row": 22,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 65
+                              },
+                              "text": "'host' in kwargs",
+                              "children": [
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 49
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 55
+                                  },
+                                  "text": "'host'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 50
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 54
+                                      },
+                                      "text": "host"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 54
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 55
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "in",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 56
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 58
+                                  },
+                                  "text": "in"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 59
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 65
+                                  },
+                                  "text": "kwargs"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else",
+                          "start": {
+                            "row": 22,
+                            "column": 66
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 70
+                          },
+                          "text": "else"
+                        },
+                        {
+                          "type": "none",
+                          "start": {
+                            "row": 22,
+                            "column": 71
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 75
+                          },
+                          "text": "None"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 23,
+                "column": 4
+              },
+              "end": {
+                "row": 23,
+                "column": 88
+              },
+              "text": "force = _str_to_bool(kwargs.get('force')) if kwargs and 'force' in kwargs else False",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 23,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 88
+                  },
+                  "text": "force = _str_to_bool(kwargs.get('force')) if kwargs and 'force' in kwargs else False",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 23,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 9
+                      },
+                      "text": "force"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 23,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 11
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "conditional_expression",
+                      "start": {
+                        "row": 23,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 88
+                      },
+                      "text": "_str_to_bool(kwargs.get('force')) if kwargs and 'force' in kwargs else False",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 23,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 45
+                          },
+                          "text": "_str_to_bool(kwargs.get('force'))",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 24
+                              },
+                              "text": "_str_to_bool"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 23,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 45
+                              },
+                              "text": "(kwargs.get('force'))",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 25
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 44
+                                  },
+                                  "text": "kwargs.get('force')",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 35
+                                      },
+                                      "text": "kwargs.get",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 31
+                                          },
+                                          "text": "kwargs"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 32
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 35
+                                          },
+                                          "text": "get"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 44
+                                      },
+                                      "text": "('force')",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 36
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 43
+                                          },
+                                          "text": "'force'",
+                                          "children": [
+                                            {
+                                              "type": "string_start",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 37
+                                              },
+                                              "text": "'"
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 42
+                                              },
+                                              "text": "force"
+                                            },
+                                            {
+                                              "type": "string_end",
+                                              "start": {
+                                                "row": 23,
+                                                "column": 42
+                                              },
+                                              "end": {
+                                                "row": 23,
+                                                "column": 43
+                                              },
+                                              "text": "'"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 44
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 45
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 23,
+                            "column": 46
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 48
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "boolean_operator",
+                          "start": {
+                            "row": 23,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 77
+                          },
+                          "text": "kwargs and 'force' in kwargs",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 55
+                              },
+                              "text": "kwargs"
+                            },
+                            {
+                              "type": "and",
+                              "start": {
+                                "row": 23,
+                                "column": 56
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 59
+                              },
+                              "text": "and"
+                            },
+                            {
+                              "type": "comparison_operator",
+                              "start": {
+                                "row": 23,
+                                "column": 60
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 77
+                              },
+                              "text": "'force' in kwargs",
+                              "children": [
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 60
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 67
+                                  },
+                                  "text": "'force'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 61
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 66
+                                      },
+                                      "text": "force"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 66
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 67
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "in",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 68
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 70
+                                  },
+                                  "text": "in"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 71
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 77
+                                  },
+                                  "text": "kwargs"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else",
+                          "start": {
+                            "row": 23,
+                            "column": 78
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 82
+                          },
+                          "text": "else"
+                        },
+                        {
+                          "type": "false",
+                          "start": {
+                            "row": 23,
+                            "column": 83
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 88
+                          },
+                          "text": "False"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 25,
+                "column": 4
+              },
+              "end": {
+                "row": 28,
+                "column": 9
+              },
+              "text": "if not host_name:\n        raise SaltCloudSystemExit(\n            'You must specify name of the host system.'\n        )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 25,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "not_operator",
+                  "start": {
+                    "row": 25,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 20
+                  },
+                  "text": "not host_name",
+                  "children": [
+                    {
+                      "type": "not",
+                      "start": {
+                        "row": 25,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 10
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 25,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 20
+                      },
+                      "text": "host_name"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 25,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 21
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 26,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 9
+                  },
+                  "text": "raise SaltCloudSystemExit(\n            'You must specify name of the host system.'\n        )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 26,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 9
+                      },
+                      "text": "raise SaltCloudSystemExit(\n            'You must specify name of the host system.'\n        )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 26,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 26,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 9
+                          },
+                          "text": "SaltCloudSystemExit(\n            'You must specify name of the host system.'\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 33
+                              },
+                              "text": "SaltCloudSystemExit"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 26,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 9
+                              },
+                              "text": "(\n            'You must specify name of the host system.'\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 55
+                                  },
+                                  "text": "'You must specify name of the host system.'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 13
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 54
+                                      },
+                                      "text": "You must specify name of the host system."
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 54
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 55
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 30,
+                "column": 4
+              },
+              "end": {
+                "row": 30,
+                "column": 30
+              },
+              "text": "# Get the service instance"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 31,
+                "column": 4
+              },
+              "end": {
+                "row": 31,
+                "column": 18
+              },
+              "text": "si = _get_si()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 31,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 18
+                  },
+                  "text": "si = _get_si()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 31,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 6
+                      },
+                      "text": "si"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 31,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 31,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 18
+                      },
+                      "text": "_get_si()",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 31,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 16
+                          },
+                          "text": "_get_si"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 31,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 18
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 31,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 17
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 31,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 18
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 33,
+                "column": 4
+              },
+              "end": {
+                "row": 33,
+                "column": 83
+              },
+              "text": "host_ref = salt.utils.vmware.get_mor_by_property(si, vim.HostSystem, host_name)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 33,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 33,
+                    "column": 83
+                  },
+                  "text": "host_ref = salt.utils.vmware.get_mor_by_property(si, vim.HostSystem, host_name)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 33,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 12
+                      },
+                      "text": "host_ref"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 33,
+                        "column": 13
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 14
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 33,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 83
+                      },
+                      "text": "salt.utils.vmware.get_mor_by_property(si, vim.HostSystem, host_name)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 33,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 52
+                          },
+                          "text": "salt.utils.vmware.get_mor_by_property",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 33,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 32
+                              },
+                              "text": "salt.utils.vmware",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 25
+                                  },
+                                  "text": "salt.utils",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 19
+                                      },
+                                      "text": "salt"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 20
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 25
+                                      },
+                                      "text": "utils"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 26
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 32
+                                  },
+                                  "text": "vmware"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 33,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 33
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 52
+                              },
+                              "text": "get_mor_by_property"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 33,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 83
+                          },
+                          "text": "(si, vim.HostSystem, host_name)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 33,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 53
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 53
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 55
+                              },
+                              "text": "si"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 33,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 56
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 33,
+                                "column": 57
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 71
+                              },
+                              "text": "vim.HostSystem",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 57
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 60
+                                  },
+                                  "text": "vim"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 60
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 61
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 71
+                                  },
+                                  "text": "HostSystem"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 33,
+                                "column": 71
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 72
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 73
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 82
+                              },
+                              "text": "host_name"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 33,
+                                "column": 82
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 83
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 34,
+                "column": 4
+              },
+              "end": {
+                "row": 37,
+                "column": 9
+              },
+              "text": "if not host_ref:\n        raise SaltCloudSystemExit(\n            'Specified host system does not exist.'\n        )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 34,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "not_operator",
+                  "start": {
+                    "row": 34,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 19
+                  },
+                  "text": "not host_ref",
+                  "children": [
+                    {
+                      "type": "not",
+                      "start": {
+                        "row": 34,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 10
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 34,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 19
+                      },
+                      "text": "host_ref"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 34,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 20
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 35,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 9
+                  },
+                  "text": "raise SaltCloudSystemExit(\n            'Specified host system does not exist.'\n        )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 35,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 9
+                      },
+                      "text": "raise SaltCloudSystemExit(\n            'Specified host system does not exist.'\n        )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 35,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 35,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 9
+                          },
+                          "text": "SaltCloudSystemExit(\n            'Specified host system does not exist.'\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 35,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 33
+                              },
+                              "text": "SaltCloudSystemExit"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 35,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 9
+                              },
+                              "text": "(\n            'Specified host system does not exist.'\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 51
+                                  },
+                                  "text": "'Specified host system does not exist.'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 13
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 50
+                                      },
+                                      "text": "Specified host system does not exist."
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 51
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 39,
+                "column": 4
+              },
+              "end": {
+                "row": 42,
+                "column": 9
+              },
+              "text": "if host_ref.runtime.connectionState == 'notResponding':\n        raise SaltCloudSystemExit(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 39,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 39,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 58
+                  },
+                  "text": "host_ref.runtime.connectionState == 'notResponding'",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 39,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 39
+                      },
+                      "text": "host_ref.runtime.connectionState",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 39,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 23
+                          },
+                          "text": "host_ref.runtime",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 39,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 15
+                              },
+                              "text": "host_ref"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 39,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 16
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 39,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 23
+                              },
+                              "text": "runtime"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 39,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 24
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 39,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 39
+                          },
+                          "text": "connectionState"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "==",
+                      "start": {
+                        "row": 39,
+                        "column": 40
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 42
+                      },
+                      "text": "=="
+                    },
+                    {
+                      "type": "string",
+                      "start": {
+                        "row": 39,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 58
+                      },
+                      "text": "'notResponding'",
+                      "children": [
+                        {
+                          "type": "string_start",
+                          "start": {
+                            "row": 39,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 44
+                          },
+                          "text": "'"
+                        },
+                        {
+                          "type": "string_content",
+                          "start": {
+                            "row": 39,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 57
+                          },
+                          "text": "notResponding"
+                        },
+                        {
+                          "type": "string_end",
+                          "start": {
+                            "row": 39,
+                            "column": 57
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 58
+                          },
+                          "text": "'"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 39,
+                    "column": 58
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 59
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 40,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 9
+                  },
+                  "text": "raise SaltCloudSystemExit(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 40,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 9
+                      },
+                      "text": "raise SaltCloudSystemExit(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 40,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 40,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 9
+                          },
+                          "text": "SaltCloudSystemExit(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 33
+                              },
+                              "text": "SaltCloudSystemExit"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 40,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 9
+                              },
+                              "text": "(\n            'Specified host system cannot be shut down in it\\'s current state (not responding).'\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 96
+                                  },
+                                  "text": "'Specified host system cannot be shut down in it\\'s current state (not responding).'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 41,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 41,
+                                        "column": 13
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 41,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 41,
+                                        "column": 95
+                                      },
+                                      "text": "Specified host system cannot be shut down in it\\'s current state (not responding).",
+                                      "children": [
+                                        {
+                                          "type": "escape_sequence",
+                                          "start": {
+                                            "row": 41,
+                                            "column": 60
+                                          },
+                                          "end": {
+                                            "row": 41,
+                                            "column": 62
+                                          },
+                                          "text": "\\'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 41,
+                                        "column": 95
+                                      },
+                                      "end": {
+                                        "row": 41,
+                                        "column": 96
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 44,
+                "column": 4
+              },
+              "end": {
+                "row": 47,
+                "column": 9
+              },
+              "text": "if not host_ref.capability.rebootSupported:\n        raise SaltCloudSystemExit(\n            'Specified host system does not support shutdown.'\n        )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 44,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "not_operator",
+                  "start": {
+                    "row": 44,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 46
+                  },
+                  "text": "not host_ref.capability.rebootSupported",
+                  "children": [
+                    {
+                      "type": "not",
+                      "start": {
+                        "row": 44,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 10
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 44,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 46
+                      },
+                      "text": "host_ref.capability.rebootSupported",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 44,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 30
+                          },
+                          "text": "host_ref.capability",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 19
+                              },
+                              "text": "host_ref"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 44,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 20
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 30
+                              },
+                              "text": "capability"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 44,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 31
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 44,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 46
+                          },
+                          "text": "rebootSupported"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 44,
+                    "column": 46
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 47
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 45,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 47,
+                    "column": 9
+                  },
+                  "text": "raise SaltCloudSystemExit(\n            'Specified host system does not support shutdown.'\n        )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 45,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 9
+                      },
+                      "text": "raise SaltCloudSystemExit(\n            'Specified host system does not support shutdown.'\n        )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 45,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 45,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 9
+                          },
+                          "text": "SaltCloudSystemExit(\n            'Specified host system does not support shutdown.'\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 45,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 33
+                              },
+                              "text": "SaltCloudSystemExit"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 45,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 9
+                              },
+                              "text": "(\n            'Specified host system does not support shutdown.'\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 62
+                                  },
+                                  "text": "'Specified host system does not support shutdown.'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 13
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 61
+                                      },
+                                      "text": "Specified host system does not support shutdown."
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 46,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 46,
+                                        "column": 62
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 49,
+                "column": 4
+              },
+              "end": {
+                "row": 54,
+                "column": 9
+              },
+              "text": "if not host_ref.runtime.inMaintenanceMode and not force:\n        raise SaltCloudSystemExit(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 49,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "boolean_operator",
+                  "start": {
+                    "row": 49,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 59
+                  },
+                  "text": "not host_ref.runtime.inMaintenanceMode and not force",
+                  "children": [
+                    {
+                      "type": "not_operator",
+                      "start": {
+                        "row": 49,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 49,
+                        "column": 45
+                      },
+                      "text": "not host_ref.runtime.inMaintenanceMode",
+                      "children": [
+                        {
+                          "type": "not",
+                          "start": {
+                            "row": 49,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 10
+                          },
+                          "text": "not"
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 49,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 45
+                          },
+                          "text": "host_ref.runtime.inMaintenanceMode",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 49,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 49,
+                                "column": 27
+                              },
+                              "text": "host_ref.runtime",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 49,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 49,
+                                    "column": 19
+                                  },
+                                  "text": "host_ref"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 49,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 49,
+                                    "column": 20
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 49,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 49,
+                                    "column": 27
+                                  },
+                                  "text": "runtime"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 49,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 49,
+                                "column": 28
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 49,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 49,
+                                "column": 45
+                              },
+                              "text": "inMaintenanceMode"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "and",
+                      "start": {
+                        "row": 49,
+                        "column": 46
+                      },
+                      "end": {
+                        "row": 49,
+                        "column": 49
+                      },
+                      "text": "and"
+                    },
+                    {
+                      "type": "not_operator",
+                      "start": {
+                        "row": 49,
+                        "column": 50
+                      },
+                      "end": {
+                        "row": 49,
+                        "column": 59
+                      },
+                      "text": "not force",
+                      "children": [
+                        {
+                          "type": "not",
+                          "start": {
+                            "row": 49,
+                            "column": 50
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 53
+                          },
+                          "text": "not"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 49,
+                            "column": 54
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 59
+                          },
+                          "text": "force"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 49,
+                    "column": 59
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 60
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 50,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 54,
+                    "column": 9
+                  },
+                  "text": "raise SaltCloudSystemExit(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 50,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 54,
+                        "column": 9
+                      },
+                      "text": "raise SaltCloudSystemExit(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 50,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 50,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 54,
+                            "column": 9
+                          },
+                          "text": "SaltCloudSystemExit(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 50,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 33
+                              },
+                              "text": "SaltCloudSystemExit"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 50,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 54,
+                                "column": 9
+                              },
+                              "text": "(\n            'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 50,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 50,
+                                    "column": 34
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "concatenated_string",
+                                  "start": {
+                                    "row": 51,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 26
+                                  },
+                                  "text": "'Specified host system is not in maintenance mode. Specify force=True to '\n            'force reboot even if there are virtual machines running or other operations '\n            'in progress.'",
+                                  "children": [
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 51,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 51,
+                                        "column": 86
+                                      },
+                                      "text": "'Specified host system is not in maintenance mode. Specify force=True to '",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 51,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 51,
+                                            "column": 13
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 51,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 51,
+                                            "column": 85
+                                          },
+                                          "text": "Specified host system is not in maintenance mode. Specify force=True to "
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 51,
+                                            "column": 85
+                                          },
+                                          "end": {
+                                            "row": 51,
+                                            "column": 86
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 52,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 52,
+                                        "column": 90
+                                      },
+                                      "text": "'force reboot even if there are virtual machines running or other operations '",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 52,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 52,
+                                            "column": 13
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 52,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 52,
+                                            "column": 89
+                                          },
+                                          "text": "force reboot even if there are virtual machines running or other operations "
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 52,
+                                            "column": 89
+                                          },
+                                          "end": {
+                                            "row": 52,
+                                            "column": 90
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 26
+                                      },
+                                      "text": "'in progress.'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 13
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 25
+                                          },
+                                          "text": "in progress."
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 53,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 53,
+                                            "column": 26
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 54,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 54,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "try_statement",
+              "start": {
+                "row": 56,
+                "column": 4
+              },
+              "end": {
+                "row": 65,
+                "column": 54
+              },
+              "text": "try:\n        host_ref.ShutdownHost_Task(force)\n    except Exception as exc:\n        log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )\n        return {host_name: 'failed to shut down host'}",
+              "children": [
+                {
+                  "type": "try",
+                  "start": {
+                    "row": 56,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 56,
+                    "column": 7
+                  },
+                  "text": "try"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 56,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 56,
+                    "column": 8
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 57,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 57,
+                    "column": 41
+                  },
+                  "text": "host_ref.ShutdownHost_Task(force)",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 57,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 57,
+                        "column": 41
+                      },
+                      "text": "host_ref.ShutdownHost_Task(force)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 57,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 57,
+                            "column": 41
+                          },
+                          "text": "host_ref.ShutdownHost_Task(force)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 57,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 34
+                              },
+                              "text": "host_ref.ShutdownHost_Task",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 16
+                                  },
+                                  "text": "host_ref"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 17
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 34
+                                  },
+                                  "text": "ShutdownHost_Task"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 57,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 57,
+                                "column": 41
+                              },
+                              "text": "(force)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 35
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 40
+                                  },
+                                  "text": "force"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 41
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "except_clause",
+                  "start": {
+                    "row": 58,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 65,
+                    "column": 54
+                  },
+                  "text": "except Exception as exc:\n        log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )\n        return {host_name: 'failed to shut down host'}",
+                  "children": [
+                    {
+                      "type": "except",
+                      "start": {
+                        "row": 58,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 10
+                      },
+                      "text": "except"
+                    },
+                    {
+                      "type": "as_pattern",
+                      "start": {
+                        "row": 58,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 27
+                      },
+                      "text": "Exception as exc",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 58,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 58,
+                            "column": 20
+                          },
+                          "text": "Exception"
+                        },
+                        {
+                          "type": "as",
+                          "start": {
+                            "row": 58,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 58,
+                            "column": 23
+                          },
+                          "text": "as"
+                        },
+                        {
+                          "type": "as_pattern_target",
+                          "start": {
+                            "row": 58,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 58,
+                            "column": 27
+                          },
+                          "text": "exc",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 58,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 58,
+                                "column": 27
+                              },
+                              "text": "exc"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 58,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 58,
+                        "column": 28
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 59,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 65,
+                        "column": 54
+                      },
+                      "text": "log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )\n        return {host_name: 'failed to shut down host'}",
+                      "children": [
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 59,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 64,
+                            "column": 9
+                          },
+                          "text": "log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 59,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 64,
+                                "column": 9
+                              },
+                              "text": "log.error(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 17
+                                  },
+                                  "text": "log.error",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 11
+                                      },
+                                      "text": "log"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 11
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 12
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 17
+                                      },
+                                      "text": "error"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 64,
+                                    "column": 9
+                                  },
+                                  "text": "(\n            'Error while shutting down host %s: %s',\n            host_name, exc,\n            # Show the traceback if the debug logging level is enabled\n            exc_info_on_loglevel=logging.DEBUG\n        )",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 59,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 59,
+                                        "column": 18
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 60,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 60,
+                                        "column": 51
+                                      },
+                                      "text": "'Error while shutting down host %s: %s'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 60,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 60,
+                                            "column": 13
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 60,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 60,
+                                            "column": 50
+                                          },
+                                          "text": "Error while shutting down host %s: %s"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 60,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 60,
+                                            "column": 51
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 60,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 60,
+                                        "column": 52
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 61,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 61,
+                                        "column": 21
+                                      },
+                                      "text": "host_name"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 61,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 61,
+                                        "column": 22
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 61,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 61,
+                                        "column": 26
+                                      },
+                                      "text": "exc"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 61,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 61,
+                                        "column": 27
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "comment",
+                                      "start": {
+                                        "row": 62,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 62,
+                                        "column": 70
+                                      },
+                                      "text": "# Show the traceback if the debug logging level is enabled"
+                                    },
+                                    {
+                                      "type": "keyword_argument",
+                                      "start": {
+                                        "row": 63,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 63,
+                                        "column": 46
+                                      },
+                                      "text": "exc_info_on_loglevel=logging.DEBUG",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 63,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 63,
+                                            "column": 32
+                                          },
+                                          "text": "exc_info_on_loglevel"
+                                        },
+                                        {
+                                          "type": "=",
+                                          "start": {
+                                            "row": 63,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 63,
+                                            "column": 33
+                                          },
+                                          "text": "="
+                                        },
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 63,
+                                            "column": 33
+                                          },
+                                          "end": {
+                                            "row": 63,
+                                            "column": 46
+                                          },
+                                          "text": "logging.DEBUG",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 63,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 63,
+                                                "column": 40
+                                              },
+                                              "text": "logging"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 63,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 63,
+                                                "column": 41
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 63,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 63,
+                                                "column": 46
+                                              },
+                                              "text": "DEBUG"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 64,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 64,
+                                        "column": 9
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "return_statement",
+                          "start": {
+                            "row": 65,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 65,
+                            "column": 54
+                          },
+                          "text": "return {host_name: 'failed to shut down host'}",
+                          "children": [
+                            {
+                              "type": "return",
+                              "start": {
+                                "row": 65,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 65,
+                                "column": 14
+                              },
+                              "text": "return"
+                            },
+                            {
+                              "type": "dictionary",
+                              "start": {
+                                "row": 65,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 65,
+                                "column": 54
+                              },
+                              "text": "{host_name: 'failed to shut down host'}",
+                              "children": [
+                                {
+                                  "type": "{",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 16
+                                  },
+                                  "text": "{"
+                                },
+                                {
+                                  "type": "pair",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 53
+                                  },
+                                  "text": "host_name: 'failed to shut down host'",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 25
+                                      },
+                                      "text": "host_name"
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 26
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 65,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 65,
+                                        "column": 53
+                                      },
+                                      "text": "'failed to shut down host'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 65,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 65,
+                                            "column": 28
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 65,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 65,
+                                            "column": 52
+                                          },
+                                          "text": "failed to shut down host"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 65,
+                                            "column": 52
+                                          },
+                                          "end": {
+                                            "row": 65,
+                                            "column": 53
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "}",
+                                  "start": {
+                                    "row": 65,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 65,
+                                    "column": 54
+                                  },
+                                  "text": "}"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 67,
+                "column": 4
+              },
+              "end": {
+                "row": 67,
+                "column": 40
+              },
+              "text": "return {host_name: 'shut down host'}",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 67,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 67,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "dictionary",
+                  "start": {
+                    "row": 67,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 67,
+                    "column": 40
+                  },
+                  "text": "{host_name: 'shut down host'}",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 67,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 67,
+                        "column": 12
+                      },
+                      "text": "{"
+                    },
+                    {
+                      "type": "pair",
+                      "start": {
+                        "row": 67,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 67,
+                        "column": 39
+                      },
+                      "text": "host_name: 'shut down host'",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 67,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 21
+                          },
+                          "text": "host_name"
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 67,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 22
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 67,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 67,
+                            "column": 39
+                          },
+                          "text": "'shut down host'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 67,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 24
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 67,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 38
+                              },
+                              "text": "shut down host"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 67,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 67,
+                                "column": 39
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 67,
+                        "column": 39
+                      },
+                      "end": {
+                        "row": 67,
+                        "column": 40
+                      },
+                      "text": "}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

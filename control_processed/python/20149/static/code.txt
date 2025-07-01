@@ -1,0 +1,5 @@
+def is_cursor_on_first_line(self):
+        """Return True if cursor is on the first line"""
+        cursor = self.textCursor()
+        cursor.movePosition(QTextCursor.StartOfBlock)
+        return cursor.atStart()

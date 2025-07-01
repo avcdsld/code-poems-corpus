@@ -1,0 +1,6 @@
+function getOtherOperand(node, value) {
+		if (node.left.type === "Literal" && node.left.value === value) {
+			return node.right;
+		}
+		return node.left;
+	}

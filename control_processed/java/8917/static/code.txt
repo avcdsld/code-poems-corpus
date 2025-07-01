@@ -1,0 +1,11 @@
+public static Checksum checksum(File file, Checksum checksum) throws IORuntimeException {
+		Assert.notNull(file, "File is null !");
+		if (file.isDirectory()) {
+			throw new IllegalArgumentException("Checksums can't be computed on directories");
+		}
+		try {
+			return IoUtil.checksum(new FileInputStream(file), checksum);
+		} catch (FileNotFoundException e) {
+			throw new IORuntimeException(e);
+		}
+	}

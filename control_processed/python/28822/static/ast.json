@@ -1,0 +1,4502 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 61,
+    "column": 14
+  },
+  "text": "def remove(name=None, pkgs=None, purge=False, **kwargs):\n    '''\n    Remove a single package with pkg_delete\n\n    Multiple Package Options:\n\n    pkgs\n        A list of packages to delete. Must be passed as a python list. The\n        ``name`` parameter will be ignored if this option is passed.\n\n    .. versionadded:: 0.16.0\n\n\n    Returns a dict containing the changes.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' pkg.remove <package name>\n        salt '*' pkg.remove <package1>,<package2>,<package3>\n        salt '*' pkg.remove pkgs='[\"foo\", \"bar\"]'\n    '''\n    try:\n        pkg_params = [x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]\n    except MinionError as exc:\n        raise CommandExecutionError(exc)\n\n    old = list_pkgs()\n    targets = [x for x in pkg_params if x in old]\n    if not targets:\n        return {}\n\n    cmd = ['pkg_delete', '-Ix', '-Ddependencies']\n\n    if purge:\n        cmd.append('-cqq')\n\n    cmd.extend(targets)\n\n    out = __salt__['cmd.run_all'](\n        cmd,\n        python_shell=False,\n        output_loglevel='trace'\n    )\n    if out['retcode'] != 0 and out['stderr']:\n        errors = [out['stderr']]\n    else:\n        errors = []\n\n    __context__.pop('pkg.list_pkgs', None)\n    new = list_pkgs()\n    ret = salt.utils.data.compare_dicts(old, new)\n\n    if errors:\n        raise CommandExecutionError(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )\n\n    return ret",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 61,
+        "column": 14
+      },
+      "text": "def remove(name=None, pkgs=None, purge=False, **kwargs):\n    '''\n    Remove a single package with pkg_delete\n\n    Multiple Package Options:\n\n    pkgs\n        A list of packages to delete. Must be passed as a python list. The\n        ``name`` parameter will be ignored if this option is passed.\n\n    .. versionadded:: 0.16.0\n\n\n    Returns a dict containing the changes.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' pkg.remove <package name>\n        salt '*' pkg.remove <package1>,<package2>,<package3>\n        salt '*' pkg.remove pkgs='[\"foo\", \"bar\"]'\n    '''\n    try:\n        pkg_params = [x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]\n    except MinionError as exc:\n        raise CommandExecutionError(exc)\n\n    old = list_pkgs()\n    targets = [x for x in pkg_params if x in old]\n    if not targets:\n        return {}\n\n    cmd = ['pkg_delete', '-Ix', '-Ddependencies']\n\n    if purge:\n        cmd.append('-cqq')\n\n    cmd.extend(targets)\n\n    out = __salt__['cmd.run_all'](\n        cmd,\n        python_shell=False,\n        output_loglevel='trace'\n    )\n    if out['retcode'] != 0 and out['stderr']:\n        errors = [out['stderr']]\n    else:\n        errors = []\n\n    __context__.pop('pkg.list_pkgs', None)\n    new = list_pkgs()\n    ret = salt.utils.data.compare_dicts(old, new)\n\n    if errors:\n        raise CommandExecutionError(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )\n\n    return ret",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 10
+          },
+          "text": "remove"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 10
+          },
+          "end": {
+            "row": 0,
+            "column": 55
+          },
+          "text": "(name=None, pkgs=None, purge=False, **kwargs)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 10
+              },
+              "end": {
+                "row": 0,
+                "column": 11
+              },
+              "text": "("
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 11
+              },
+              "end": {
+                "row": 0,
+                "column": 20
+              },
+              "text": "name=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 15
+                  },
+                  "text": "name"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 16
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 16
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 20
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 20
+              },
+              "end": {
+                "row": 0,
+                "column": 21
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 22
+              },
+              "end": {
+                "row": 0,
+                "column": 31
+              },
+              "text": "pkgs=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 26
+                  },
+                  "text": "pkgs"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 27
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 31
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 31
+              },
+              "end": {
+                "row": 0,
+                "column": 32
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 33
+              },
+              "end": {
+                "row": 0,
+                "column": 44
+              },
+              "text": "purge=False",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "text": "purge"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 39
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "false",
+                  "start": {
+                    "row": 0,
+                    "column": 39
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 44
+                  },
+                  "text": "False"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 44
+              },
+              "end": {
+                "row": 0,
+                "column": 45
+              },
+              "text": ","
+            },
+            {
+              "type": "dictionary_splat_pattern",
+              "start": {
+                "row": 0,
+                "column": 46
+              },
+              "end": {
+                "row": 0,
+                "column": 54
+              },
+              "text": "**kwargs",
+              "children": [
+                {
+                  "type": "**",
+                  "start": {
+                    "row": 0,
+                    "column": 46
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 48
+                  },
+                  "text": "**"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 48
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 54
+                  },
+                  "text": "kwargs"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 54
+              },
+              "end": {
+                "row": 0,
+                "column": 55
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 55
+          },
+          "end": {
+            "row": 0,
+            "column": 56
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 4
+          },
+          "end": {
+            "row": 61,
+            "column": 14
+          },
+          "text": "'''\n    Remove a single package with pkg_delete\n\n    Multiple Package Options:\n\n    pkgs\n        A list of packages to delete. Must be passed as a python list. The\n        ``name`` parameter will be ignored if this option is passed.\n\n    .. versionadded:: 0.16.0\n\n\n    Returns a dict containing the changes.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' pkg.remove <package name>\n        salt '*' pkg.remove <package1>,<package2>,<package3>\n        salt '*' pkg.remove pkgs='[\"foo\", \"bar\"]'\n    '''\n    try:\n        pkg_params = [x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]\n    except MinionError as exc:\n        raise CommandExecutionError(exc)\n\n    old = list_pkgs()\n    targets = [x for x in pkg_params if x in old]\n    if not targets:\n        return {}\n\n    cmd = ['pkg_delete', '-Ix', '-Ddependencies']\n\n    if purge:\n        cmd.append('-cqq')\n\n    cmd.extend(targets)\n\n    out = __salt__['cmd.run_all'](\n        cmd,\n        python_shell=False,\n        output_loglevel='trace'\n    )\n    if out['retcode'] != 0 and out['stderr']:\n        errors = [out['stderr']]\n    else:\n        errors = []\n\n    __context__.pop('pkg.list_pkgs', None)\n    new = list_pkgs()\n    ret = salt.utils.data.compare_dicts(old, new)\n\n    if errors:\n        raise CommandExecutionError(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )\n\n    return ret",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 4
+              },
+              "end": {
+                "row": 22,
+                "column": 7
+              },
+              "text": "'''\n    Remove a single package with pkg_delete\n\n    Multiple Package Options:\n\n    pkgs\n        A list of packages to delete. Must be passed as a python list. The\n        ``name`` parameter will be ignored if this option is passed.\n\n    .. versionadded:: 0.16.0\n\n\n    Returns a dict containing the changes.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' pkg.remove <package name>\n        salt '*' pkg.remove <package1>,<package2>,<package3>\n        salt '*' pkg.remove pkgs='[\"foo\", \"bar\"]'\n    '''",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 7
+                  },
+                  "text": "'''\n    Remove a single package with pkg_delete\n\n    Multiple Package Options:\n\n    pkgs\n        A list of packages to delete. Must be passed as a python list. The\n        ``name`` parameter will be ignored if this option is passed.\n\n    .. versionadded:: 0.16.0\n\n\n    Returns a dict containing the changes.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' pkg.remove <package name>\n        salt '*' pkg.remove <package1>,<package2>,<package3>\n        salt '*' pkg.remove pkgs='[\"foo\", \"bar\"]'\n    '''",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 4
+                      },
+                      "text": "\n    Remove a single package with pkg_delete\n\n    Multiple Package Options:\n\n    pkgs\n        A list of packages to delete. Must be passed as a python list. The\n        ``name`` parameter will be ignored if this option is passed.\n\n    .. versionadded:: 0.16.0\n\n\n    Returns a dict containing the changes.\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' pkg.remove <package name>\n        salt '*' pkg.remove <package1>,<package2>,<package3>\n        salt '*' pkg.remove pkgs='[\"foo\", \"bar\"]'\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 22,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "try_statement",
+              "start": {
+                "row": 23,
+                "column": 4
+              },
+              "end": {
+                "row": 27,
+                "column": 40
+              },
+              "text": "try:\n        pkg_params = [x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]\n    except MinionError as exc:\n        raise CommandExecutionError(exc)",
+              "children": [
+                {
+                  "type": "try",
+                  "start": {
+                    "row": 23,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 7
+                  },
+                  "text": "try"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 23,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 8
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 24,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 76
+                  },
+                  "text": "pkg_params = [x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 24,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 76
+                      },
+                      "text": "pkg_params = [x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 24,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 76
+                          },
+                          "text": "pkg_params = [x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 18
+                              },
+                              "text": "pkg_params"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 24,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "list_comprehension",
+                              "start": {
+                                "row": 24,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 76
+                              },
+                              "text": "[x.split('--')[0] for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]]",
+                              "children": [
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 22
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "subscript",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 38
+                                  },
+                                  "text": "x.split('--')[0]",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 35
+                                      },
+                                      "text": "x.split('--')",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 24,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 24,
+                                            "column": 29
+                                          },
+                                          "text": "x.split",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 24,
+                                                "column": 22
+                                              },
+                                              "end": {
+                                                "row": 24,
+                                                "column": 23
+                                              },
+                                              "text": "x"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 24,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 24,
+                                                "column": 24
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 24,
+                                                "column": 24
+                                              },
+                                              "end": {
+                                                "row": 24,
+                                                "column": 29
+                                              },
+                                              "text": "split"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 24,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 24,
+                                            "column": 35
+                                          },
+                                          "text": "('--')",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 24,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 24,
+                                                "column": 30
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 24,
+                                                "column": 30
+                                              },
+                                              "end": {
+                                                "row": 24,
+                                                "column": 34
+                                              },
+                                              "text": "'--'",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 24,
+                                                    "column": 30
+                                                  },
+                                                  "end": {
+                                                    "row": 24,
+                                                    "column": 31
+                                                  },
+                                                  "text": "'"
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 24,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 24,
+                                                    "column": 33
+                                                  },
+                                                  "text": "--"
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 24,
+                                                    "column": 33
+                                                  },
+                                                  "end": {
+                                                    "row": 24,
+                                                    "column": 34
+                                                  },
+                                                  "text": "'"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 24,
+                                                "column": 34
+                                              },
+                                              "end": {
+                                                "row": 24,
+                                                "column": 35
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 36
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 37
+                                      },
+                                      "text": "0"
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 38
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "for_in_clause",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 75
+                                  },
+                                  "text": "for x in\n                      __salt__['pkg_resource.parse_targets'](name, pkgs)[0]",
+                                  "children": [
+                                    {
+                                      "type": "for",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 42
+                                      },
+                                      "text": "for"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 44
+                                      },
+                                      "text": "x"
+                                    },
+                                    {
+                                      "type": "in",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 47
+                                      },
+                                      "text": "in"
+                                    },
+                                    {
+                                      "type": "subscript",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 75
+                                      },
+                                      "text": "__salt__['pkg_resource.parse_targets'](name, pkgs)[0]",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 72
+                                          },
+                                          "text": "__salt__['pkg_resource.parse_targets'](name, pkgs)",
+                                          "children": [
+                                            {
+                                              "type": "subscript",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 22
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 60
+                                              },
+                                              "text": "__salt__['pkg_resource.parse_targets']",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 22
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 30
+                                                  },
+                                                  "text": "__salt__"
+                                                },
+                                                {
+                                                  "type": "[",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 30
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 31
+                                                  },
+                                                  "text": "["
+                                                },
+                                                {
+                                                  "type": "string",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 31
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 59
+                                                  },
+                                                  "text": "'pkg_resource.parse_targets'",
+                                                  "children": [
+                                                    {
+                                                      "type": "string_start",
+                                                      "start": {
+                                                        "row": 25,
+                                                        "column": 31
+                                                      },
+                                                      "end": {
+                                                        "row": 25,
+                                                        "column": 32
+                                                      },
+                                                      "text": "'"
+                                                    },
+                                                    {
+                                                      "type": "string_content",
+                                                      "start": {
+                                                        "row": 25,
+                                                        "column": 32
+                                                      },
+                                                      "end": {
+                                                        "row": 25,
+                                                        "column": 58
+                                                      },
+                                                      "text": "pkg_resource.parse_targets"
+                                                    },
+                                                    {
+                                                      "type": "string_end",
+                                                      "start": {
+                                                        "row": 25,
+                                                        "column": 58
+                                                      },
+                                                      "end": {
+                                                        "row": 25,
+                                                        "column": 59
+                                                      },
+                                                      "text": "'"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "]",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 59
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 60
+                                                  },
+                                                  "text": "]"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 25,
+                                                "column": 60
+                                              },
+                                              "end": {
+                                                "row": 25,
+                                                "column": 72
+                                              },
+                                              "text": "(name, pkgs)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 60
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 61
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 61
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 65
+                                                  },
+                                                  "text": "name"
+                                                },
+                                                {
+                                                  "type": ",",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 65
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 66
+                                                  },
+                                                  "text": ","
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 67
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 71
+                                                  },
+                                                  "text": "pkgs"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 25,
+                                                    "column": 71
+                                                  },
+                                                  "end": {
+                                                    "row": 25,
+                                                    "column": 72
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 72
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 73
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "integer",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 73
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 74
+                                          },
+                                          "text": "0"
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 74
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 75
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 75
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 76
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "except_clause",
+                  "start": {
+                    "row": 26,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 40
+                  },
+                  "text": "except MinionError as exc:\n        raise CommandExecutionError(exc)",
+                  "children": [
+                    {
+                      "type": "except",
+                      "start": {
+                        "row": 26,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 10
+                      },
+                      "text": "except"
+                    },
+                    {
+                      "type": "as_pattern",
+                      "start": {
+                        "row": 26,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 29
+                      },
+                      "text": "MinionError as exc",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 26,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 22
+                          },
+                          "text": "MinionError"
+                        },
+                        {
+                          "type": "as",
+                          "start": {
+                            "row": 26,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 25
+                          },
+                          "text": "as"
+                        },
+                        {
+                          "type": "as_pattern_target",
+                          "start": {
+                            "row": 26,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 26,
+                            "column": 29
+                          },
+                          "text": "exc",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 26,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 29
+                              },
+                              "text": "exc"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 26,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 26,
+                        "column": 30
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 27,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 40
+                      },
+                      "text": "raise CommandExecutionError(exc)",
+                      "children": [
+                        {
+                          "type": "raise_statement",
+                          "start": {
+                            "row": 27,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 40
+                          },
+                          "text": "raise CommandExecutionError(exc)",
+                          "children": [
+                            {
+                              "type": "raise",
+                              "start": {
+                                "row": 27,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 13
+                              },
+                              "text": "raise"
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 27,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 40
+                              },
+                              "text": "CommandExecutionError(exc)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 35
+                                  },
+                                  "text": "CommandExecutionError"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 40
+                                  },
+                                  "text": "(exc)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 36
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 39
+                                      },
+                                      "text": "exc"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 40
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 29,
+                "column": 4
+              },
+              "end": {
+                "row": 29,
+                "column": 21
+              },
+              "text": "old = list_pkgs()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 29,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 21
+                  },
+                  "text": "old = list_pkgs()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 29,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 7
+                      },
+                      "text": "old"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 29,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 29,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 21
+                      },
+                      "text": "list_pkgs()",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 29,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 19
+                          },
+                          "text": "list_pkgs"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 29,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 21
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 29,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 20
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 29,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 21
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 30,
+                "column": 4
+              },
+              "end": {
+                "row": 30,
+                "column": 49
+              },
+              "text": "targets = [x for x in pkg_params if x in old]",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 30,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 49
+                  },
+                  "text": "targets = [x for x in pkg_params if x in old]",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 30,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 11
+                      },
+                      "text": "targets"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 30,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 13
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "list_comprehension",
+                      "start": {
+                        "row": 30,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 49
+                      },
+                      "text": "[x for x in pkg_params if x in old]",
+                      "children": [
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 30,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 15
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 30,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 16
+                          },
+                          "text": "x"
+                        },
+                        {
+                          "type": "for_in_clause",
+                          "start": {
+                            "row": 30,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 36
+                          },
+                          "text": "for x in pkg_params",
+                          "children": [
+                            {
+                              "type": "for",
+                              "start": {
+                                "row": 30,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 20
+                              },
+                              "text": "for"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 30,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 22
+                              },
+                              "text": "x"
+                            },
+                            {
+                              "type": "in",
+                              "start": {
+                                "row": 30,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 25
+                              },
+                              "text": "in"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 30,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 36
+                              },
+                              "text": "pkg_params"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "if_clause",
+                          "start": {
+                            "row": 30,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 48
+                          },
+                          "text": "if x in old",
+                          "children": [
+                            {
+                              "type": "if",
+                              "start": {
+                                "row": 30,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 39
+                              },
+                              "text": "if"
+                            },
+                            {
+                              "type": "comparison_operator",
+                              "start": {
+                                "row": 30,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 48
+                              },
+                              "text": "x in old",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 41
+                                  },
+                                  "text": "x"
+                                },
+                                {
+                                  "type": "in",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 44
+                                  },
+                                  "text": "in"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 45
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 48
+                                  },
+                                  "text": "old"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 30,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 49
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 31,
+                "column": 4
+              },
+              "end": {
+                "row": 32,
+                "column": 17
+              },
+              "text": "if not targets:\n        return {}",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 31,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "not_operator",
+                  "start": {
+                    "row": 31,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 18
+                  },
+                  "text": "not targets",
+                  "children": [
+                    {
+                      "type": "not",
+                      "start": {
+                        "row": 31,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 10
+                      },
+                      "text": "not"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 31,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 18
+                      },
+                      "text": "targets"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 31,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 19
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 32,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 17
+                  },
+                  "text": "return {}",
+                  "children": [
+                    {
+                      "type": "return_statement",
+                      "start": {
+                        "row": 32,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 17
+                      },
+                      "text": "return {}",
+                      "children": [
+                        {
+                          "type": "return",
+                          "start": {
+                            "row": 32,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 14
+                          },
+                          "text": "return"
+                        },
+                        {
+                          "type": "dictionary",
+                          "start": {
+                            "row": 32,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 17
+                          },
+                          "text": "{}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 32,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 16
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 32,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 17
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 34,
+                "column": 4
+              },
+              "end": {
+                "row": 34,
+                "column": 49
+              },
+              "text": "cmd = ['pkg_delete', '-Ix', '-Ddependencies']",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 34,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 49
+                  },
+                  "text": "cmd = ['pkg_delete', '-Ix', '-Ddependencies']",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 34,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 7
+                      },
+                      "text": "cmd"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 34,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "list",
+                      "start": {
+                        "row": 34,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 49
+                      },
+                      "text": "['pkg_delete', '-Ix', '-Ddependencies']",
+                      "children": [
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 34,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 11
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 34,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 23
+                          },
+                          "text": "'pkg_delete'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 34,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 12
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 34,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 22
+                              },
+                              "text": "pkg_delete"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 34,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 23
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 34,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 24
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 34,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 30
+                          },
+                          "text": "'-Ix'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 34,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 26
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 34,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 29
+                              },
+                              "text": "-Ix"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 34,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 30
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 34,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 31
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 34,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 48
+                          },
+                          "text": "'-Ddependencies'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 34,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 33
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 34,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 47
+                              },
+                              "text": "-Ddependencies"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 34,
+                                "column": 47
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 48
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 34,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 49
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 36,
+                "column": 4
+              },
+              "end": {
+                "row": 37,
+                "column": 26
+              },
+              "text": "if purge:\n        cmd.append('-cqq')",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 36,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 36,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 12
+                  },
+                  "text": "purge"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 36,
+                    "column": 12
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 13
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 37,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 26
+                  },
+                  "text": "cmd.append('-cqq')",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 37,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 26
+                      },
+                      "text": "cmd.append('-cqq')",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 37,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 26
+                          },
+                          "text": "cmd.append('-cqq')",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 37,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 18
+                              },
+                              "text": "cmd.append",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 11
+                                  },
+                                  "text": "cmd"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 12
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 18
+                                  },
+                                  "text": "append"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 37,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 26
+                              },
+                              "text": "('-cqq')",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 19
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 25
+                                  },
+                                  "text": "'-cqq'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 20
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 24
+                                      },
+                                      "text": "-cqq"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 25
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 26
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 39,
+                "column": 4
+              },
+              "end": {
+                "row": 39,
+                "column": 23
+              },
+              "text": "cmd.extend(targets)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 39,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 23
+                  },
+                  "text": "cmd.extend(targets)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 39,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 14
+                      },
+                      "text": "cmd.extend",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 39,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 7
+                          },
+                          "text": "cmd"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 39,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 8
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 39,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 14
+                          },
+                          "text": "extend"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 39,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 23
+                      },
+                      "text": "(targets)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 39,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 15
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 39,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 22
+                          },
+                          "text": "targets"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 39,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 23
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 41,
+                "column": 4
+              },
+              "end": {
+                "row": 45,
+                "column": 5
+              },
+              "text": "out = __salt__['cmd.run_all'](\n        cmd,\n        python_shell=False,\n        output_loglevel='trace'\n    )",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 41,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 45,
+                    "column": 5
+                  },
+                  "text": "out = __salt__['cmd.run_all'](\n        cmd,\n        python_shell=False,\n        output_loglevel='trace'\n    )",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 41,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 7
+                      },
+                      "text": "out"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 41,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 41,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 5
+                      },
+                      "text": "__salt__['cmd.run_all'](\n        cmd,\n        python_shell=False,\n        output_loglevel='trace'\n    )",
+                      "children": [
+                        {
+                          "type": "subscript",
+                          "start": {
+                            "row": 41,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 33
+                          },
+                          "text": "__salt__['cmd.run_all']",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 41,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 18
+                              },
+                              "text": "__salt__"
+                            },
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 41,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 19
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 41,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 32
+                              },
+                              "text": "'cmd.run_all'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 20
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 31
+                                  },
+                                  "text": "cmd.run_all"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 32
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 41,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 33
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 41,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 5
+                          },
+                          "text": "(\n        cmd,\n        python_shell=False,\n        output_loglevel='trace'\n    )",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 41,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 34
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 42,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 11
+                              },
+                              "text": "cmd"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 42,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 12
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 43,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 26
+                              },
+                              "text": "python_shell=False",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 20
+                                  },
+                                  "text": "python_shell"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 21
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "false",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 26
+                                  },
+                                  "text": "False"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 43,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 27
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "keyword_argument",
+                              "start": {
+                                "row": 44,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 31
+                              },
+                              "text": "output_loglevel='trace'",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 23
+                                  },
+                                  "text": "output_loglevel"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 24
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 44,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 31
+                                  },
+                                  "text": "'trace'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 44,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 44,
+                                        "column": 25
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 44,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 44,
+                                        "column": 30
+                                      },
+                                      "text": "trace"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 44,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 44,
+                                        "column": 31
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 45,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 5
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 46,
+                "column": 4
+              },
+              "end": {
+                "row": 49,
+                "column": 19
+              },
+              "text": "if out['retcode'] != 0 and out['stderr']:\n        errors = [out['stderr']]\n    else:\n        errors = []",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 46,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "boolean_operator",
+                  "start": {
+                    "row": 46,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 44
+                  },
+                  "text": "out['retcode'] != 0 and out['stderr']",
+                  "children": [
+                    {
+                      "type": "comparison_operator",
+                      "start": {
+                        "row": 46,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 26
+                      },
+                      "text": "out['retcode'] != 0",
+                      "children": [
+                        {
+                          "type": "subscript",
+                          "start": {
+                            "row": 46,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 21
+                          },
+                          "text": "out['retcode']",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 10
+                              },
+                              "text": "out"
+                            },
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 46,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 11
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 46,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 20
+                              },
+                              "text": "'retcode'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 12
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 19
+                                  },
+                                  "text": "retcode"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 20
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 46,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 21
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "!=",
+                          "start": {
+                            "row": 46,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 24
+                          },
+                          "text": "!="
+                        },
+                        {
+                          "type": "integer",
+                          "start": {
+                            "row": 46,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 26
+                          },
+                          "text": "0"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "and",
+                      "start": {
+                        "row": 46,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 30
+                      },
+                      "text": "and"
+                    },
+                    {
+                      "type": "subscript",
+                      "start": {
+                        "row": 46,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 44
+                      },
+                      "text": "out['stderr']",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 46,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 34
+                          },
+                          "text": "out"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 46,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 35
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 46,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 43
+                          },
+                          "text": "'stderr'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 46,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 36
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 46,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 42
+                              },
+                              "text": "stderr"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 46,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 43
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 46,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 44
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 46,
+                    "column": 44
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 45
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 47,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 47,
+                    "column": 32
+                  },
+                  "text": "errors = [out['stderr']]",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 47,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 32
+                      },
+                      "text": "errors = [out['stderr']]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 47,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 32
+                          },
+                          "text": "errors = [out['stderr']]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 47,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 14
+                              },
+                              "text": "errors"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 47,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 16
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "list",
+                              "start": {
+                                "row": 47,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 47,
+                                "column": 32
+                              },
+                              "text": "[out['stderr']]",
+                              "children": [
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 18
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "subscript",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 31
+                                  },
+                                  "text": "out['stderr']",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 47,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 21
+                                      },
+                                      "text": "out"
+                                    },
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 47,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 22
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 47,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 30
+                                      },
+                                      "text": "'stderr'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 23
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 29
+                                          },
+                                          "text": "stderr"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 47,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 47,
+                                            "column": 30
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 47,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 47,
+                                        "column": 31
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 47,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 47,
+                                    "column": 32
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "else_clause",
+                  "start": {
+                    "row": 48,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 19
+                  },
+                  "text": "else:\n        errors = []",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 48,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 48,
+                        "column": 8
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 48,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 48,
+                        "column": 9
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 49,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 49,
+                        "column": 19
+                      },
+                      "text": "errors = []",
+                      "children": [
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 49,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 49,
+                            "column": 19
+                          },
+                          "text": "errors = []",
+                          "children": [
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 49,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 49,
+                                "column": 19
+                              },
+                              "text": "errors = []",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 49,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 49,
+                                    "column": 14
+                                  },
+                                  "text": "errors"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 49,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 49,
+                                    "column": 16
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "list",
+                                  "start": {
+                                    "row": 49,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 49,
+                                    "column": 19
+                                  },
+                                  "text": "[]",
+                                  "children": [
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 49,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 49,
+                                        "column": 18
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 49,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 49,
+                                        "column": 19
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 51,
+                "column": 4
+              },
+              "end": {
+                "row": 51,
+                "column": 42
+              },
+              "text": "__context__.pop('pkg.list_pkgs', None)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 51,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 51,
+                    "column": 42
+                  },
+                  "text": "__context__.pop('pkg.list_pkgs', None)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 51,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 51,
+                        "column": 19
+                      },
+                      "text": "__context__.pop",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 51,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 15
+                          },
+                          "text": "__context__"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 51,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 16
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 51,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 19
+                          },
+                          "text": "pop"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 51,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 51,
+                        "column": 42
+                      },
+                      "text": "('pkg.list_pkgs', None)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 51,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 20
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 51,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 35
+                          },
+                          "text": "'pkg.list_pkgs'",
+                          "children": [
+                            {
+                              "type": "string_start",
+                              "start": {
+                                "row": 51,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 21
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 51,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 34
+                              },
+                              "text": "pkg.list_pkgs"
+                            },
+                            {
+                              "type": "string_end",
+                              "start": {
+                                "row": 51,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 35
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 51,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 36
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "none",
+                          "start": {
+                            "row": 51,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 41
+                          },
+                          "text": "None"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 51,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 42
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 52,
+                "column": 4
+              },
+              "end": {
+                "row": 52,
+                "column": 21
+              },
+              "text": "new = list_pkgs()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 52,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 52,
+                    "column": 21
+                  },
+                  "text": "new = list_pkgs()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 52,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 7
+                      },
+                      "text": "new"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 52,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 52,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 52,
+                        "column": 21
+                      },
+                      "text": "list_pkgs()",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 52,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 19
+                          },
+                          "text": "list_pkgs"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 52,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 52,
+                            "column": 21
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 52,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 20
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 52,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 52,
+                                "column": 21
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 53,
+                "column": 4
+              },
+              "end": {
+                "row": 53,
+                "column": 49
+              },
+              "text": "ret = salt.utils.data.compare_dicts(old, new)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 53,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 53,
+                    "column": 49
+                  },
+                  "text": "ret = salt.utils.data.compare_dicts(old, new)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 53,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 53,
+                        "column": 7
+                      },
+                      "text": "ret"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 53,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 53,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 53,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 53,
+                        "column": 49
+                      },
+                      "text": "salt.utils.data.compare_dicts(old, new)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 53,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 53,
+                            "column": 39
+                          },
+                          "text": "salt.utils.data.compare_dicts",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 53,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 25
+                              },
+                              "text": "salt.utils.data",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 20
+                                  },
+                                  "text": "salt.utils",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 10
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 14
+                                      },
+                                      "text": "salt"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 15
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 53,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 53,
+                                        "column": 20
+                                      },
+                                      "text": "utils"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 21
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 53,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 53,
+                                    "column": 25
+                                  },
+                                  "text": "data"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 53,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 26
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 53,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 39
+                              },
+                              "text": "compare_dicts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 53,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 53,
+                            "column": 49
+                          },
+                          "text": "(old, new)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 53,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 40
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 53,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 43
+                              },
+                              "text": "old"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 53,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 44
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 53,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 48
+                              },
+                              "text": "new"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 53,
+                                "column": 48
+                              },
+                              "end": {
+                                "row": 53,
+                                "column": 49
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 55,
+                "column": 4
+              },
+              "end": {
+                "row": 59,
+                "column": 9
+              },
+              "text": "if errors:\n        raise CommandExecutionError(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 55,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 55,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 55,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 55,
+                    "column": 13
+                  },
+                  "text": "errors"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 55,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 55,
+                    "column": 14
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 56,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 59,
+                    "column": 9
+                  },
+                  "text": "raise CommandExecutionError(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 56,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 59,
+                        "column": 9
+                      },
+                      "text": "raise CommandExecutionError(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 56,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 56,
+                            "column": 13
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 56,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 59,
+                            "column": 9
+                          },
+                          "text": "CommandExecutionError(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 56,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 56,
+                                "column": 35
+                              },
+                              "text": "CommandExecutionError"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 56,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 59,
+                                "column": 9
+                              },
+                              "text": "(\n            'Problem encountered removing package(s)',\n            info={'errors': errors, 'changes': ret}\n        )",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 56,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 56,
+                                    "column": 36
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 53
+                                  },
+                                  "text": "'Problem encountered removing package(s)'",
+                                  "children": [
+                                    {
+                                      "type": "string_start",
+                                      "start": {
+                                        "row": 57,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 57,
+                                        "column": 13
+                                      },
+                                      "text": "'"
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 57,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 57,
+                                        "column": 52
+                                      },
+                                      "text": "Problem encountered removing package(s)"
+                                    },
+                                    {
+                                      "type": "string_end",
+                                      "start": {
+                                        "row": 57,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 57,
+                                        "column": 53
+                                      },
+                                      "text": "'"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 57,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 57,
+                                    "column": 54
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "keyword_argument",
+                                  "start": {
+                                    "row": 58,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 58,
+                                    "column": 51
+                                  },
+                                  "text": "info={'errors': errors, 'changes': ret}",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 58,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 58,
+                                        "column": 16
+                                      },
+                                      "text": "info"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 58,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 58,
+                                        "column": 17
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "dictionary",
+                                      "start": {
+                                        "row": 58,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 58,
+                                        "column": 51
+                                      },
+                                      "text": "{'errors': errors, 'changes': ret}",
+                                      "children": [
+                                        {
+                                          "type": "{",
+                                          "start": {
+                                            "row": 58,
+                                            "column": 17
+                                          },
+                                          "end": {
+                                            "row": 58,
+                                            "column": 18
+                                          },
+                                          "text": "{"
+                                        },
+                                        {
+                                          "type": "pair",
+                                          "start": {
+                                            "row": 58,
+                                            "column": 18
+                                          },
+                                          "end": {
+                                            "row": 58,
+                                            "column": 34
+                                          },
+                                          "text": "'errors': errors",
+                                          "children": [
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 58,
+                                                "column": 18
+                                              },
+                                              "end": {
+                                                "row": 58,
+                                                "column": 26
+                                              },
+                                              "text": "'errors'",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 58,
+                                                    "column": 18
+                                                  },
+                                                  "end": {
+                                                    "row": 58,
+                                                    "column": 19
+                                                  },
+                                                  "text": "'"
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 58,
+                                                    "column": 19
+                                                  },
+                                                  "end": {
+                                                    "row": 58,
+                                                    "column": 25
+                                                  },
+                                                  "text": "errors"
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 58,
+                                                    "column": 25
+                                                  },
+                                                  "end": {
+                                                    "row": 58,
+                                                    "column": 26
+                                                  },
+                                                  "text": "'"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ":",
+                                              "start": {
+                                                "row": 58,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 58,
+                                                "column": 27
+                                              },
+                                              "text": ":"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 58,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 58,
+                                                "column": 34
+                                              },
+                                              "text": "errors"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 58,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 58,
+                                            "column": 35
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "pair",
+                                          "start": {
+                                            "row": 58,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 58,
+                                            "column": 50
+                                          },
+                                          "text": "'changes': ret",
+                                          "children": [
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 58,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 58,
+                                                "column": 45
+                                              },
+                                              "text": "'changes'",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 58,
+                                                    "column": 36
+                                                  },
+                                                  "end": {
+                                                    "row": 58,
+                                                    "column": 37
+                                                  },
+                                                  "text": "'"
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 58,
+                                                    "column": 37
+                                                  },
+                                                  "end": {
+                                                    "row": 58,
+                                                    "column": 44
+                                                  },
+                                                  "text": "changes"
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 58,
+                                                    "column": 44
+                                                  },
+                                                  "end": {
+                                                    "row": 58,
+                                                    "column": 45
+                                                  },
+                                                  "text": "'"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ":",
+                                              "start": {
+                                                "row": 58,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 58,
+                                                "column": 46
+                                              },
+                                              "text": ":"
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 58,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 58,
+                                                "column": 50
+                                              },
+                                              "text": "ret"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "}",
+                                          "start": {
+                                            "row": 58,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 58,
+                                            "column": 51
+                                          },
+                                          "text": "}"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 59,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 59,
+                                    "column": 9
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 61,
+                "column": 4
+              },
+              "end": {
+                "row": 61,
+                "column": 14
+              },
+              "text": "return ret",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 61,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 61,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 61,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 61,
+                    "column": 14
+                  },
+                  "text": "ret"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

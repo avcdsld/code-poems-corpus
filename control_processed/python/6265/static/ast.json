@@ -1,0 +1,3782 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 51,
+    "column": 42
+  },
+  "text": "def add_positional_features(tensor: torch.Tensor,\n                            min_timescale: float = 1.0,\n                            max_timescale: float = 1.0e4):\n    # pylint: disable=line-too-long\n    \"\"\"\n    Implements the frequency-based positional encoding described\n    in `Attention is all you Need\n    <https://www.semanticscholar.org/paper/Attention-Is-All-You-Need-Vaswani-Shazeer/0737da0767d77606169cbf4187b83e1ab62f6077>`_ .\n\n    Adds sinusoids of different frequencies to a ``Tensor``. A sinusoid of a\n    different frequency and phase is added to each dimension of the input ``Tensor``.\n    This allows the attention heads to use absolute and relative positions.\n\n    The number of timescales is equal to hidden_dim / 2 within the range\n    (min_timescale, max_timescale). For each timescale, the two sinusoidal\n    signals sin(timestep / timescale) and cos(timestep / timescale) are\n    generated and concatenated along the hidden_dim dimension.\n\n    Parameters\n    ----------\n    tensor : ``torch.Tensor``\n        a Tensor with shape (batch_size, timesteps, hidden_dim).\n    min_timescale : ``float``, optional (default = 1.0)\n        The smallest timescale to use.\n    max_timescale : ``float``, optional (default = 1.0e4)\n        The largest timescale to use.\n\n    Returns\n    -------\n    The input tensor augmented with the sinusoidal frequencies.\n    \"\"\"\n    _, timesteps, hidden_dim = tensor.size()\n\n    timestep_range = get_range_vector(timesteps, get_device_of(tensor)).data.float()\n    # We're generating both cos and sin frequencies,\n    # so half for each.\n    num_timescales = hidden_dim // 2\n    timescale_range = get_range_vector(num_timescales, get_device_of(tensor)).data.float()\n\n    log_timescale_increments = math.log(float(max_timescale) / float(min_timescale)) / float(num_timescales - 1)\n    inverse_timescales = min_timescale * torch.exp(timescale_range * -log_timescale_increments)\n\n    # Broadcasted multiplication - shape (timesteps, num_timescales)\n    scaled_time = timestep_range.unsqueeze(1) * inverse_timescales.unsqueeze(0)\n    # shape (timesteps, 2 * num_timescales)\n    sinusoids = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 1)\n    if hidden_dim % 2 != 0:\n        # if the number of dimensions is odd, the cos and sin\n        # timescales had size (hidden_dim - 1) / 2, so we need\n        # to add a row of zeros to make up the difference.\n        sinusoids = torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)\n    return tensor + sinusoids.unsqueeze(0)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 51,
+        "column": 42
+      },
+      "text": "def add_positional_features(tensor: torch.Tensor,\n                            min_timescale: float = 1.0,\n                            max_timescale: float = 1.0e4):\n    # pylint: disable=line-too-long\n    \"\"\"\n    Implements the frequency-based positional encoding described\n    in `Attention is all you Need\n    <https://www.semanticscholar.org/paper/Attention-Is-All-You-Need-Vaswani-Shazeer/0737da0767d77606169cbf4187b83e1ab62f6077>`_ .\n\n    Adds sinusoids of different frequencies to a ``Tensor``. A sinusoid of a\n    different frequency and phase is added to each dimension of the input ``Tensor``.\n    This allows the attention heads to use absolute and relative positions.\n\n    The number of timescales is equal to hidden_dim / 2 within the range\n    (min_timescale, max_timescale). For each timescale, the two sinusoidal\n    signals sin(timestep / timescale) and cos(timestep / timescale) are\n    generated and concatenated along the hidden_dim dimension.\n\n    Parameters\n    ----------\n    tensor : ``torch.Tensor``\n        a Tensor with shape (batch_size, timesteps, hidden_dim).\n    min_timescale : ``float``, optional (default = 1.0)\n        The smallest timescale to use.\n    max_timescale : ``float``, optional (default = 1.0e4)\n        The largest timescale to use.\n\n    Returns\n    -------\n    The input tensor augmented with the sinusoidal frequencies.\n    \"\"\"\n    _, timesteps, hidden_dim = tensor.size()\n\n    timestep_range = get_range_vector(timesteps, get_device_of(tensor)).data.float()\n    # We're generating both cos and sin frequencies,\n    # so half for each.\n    num_timescales = hidden_dim // 2\n    timescale_range = get_range_vector(num_timescales, get_device_of(tensor)).data.float()\n\n    log_timescale_increments = math.log(float(max_timescale) / float(min_timescale)) / float(num_timescales - 1)\n    inverse_timescales = min_timescale * torch.exp(timescale_range * -log_timescale_increments)\n\n    # Broadcasted multiplication - shape (timesteps, num_timescales)\n    scaled_time = timestep_range.unsqueeze(1) * inverse_timescales.unsqueeze(0)\n    # shape (timesteps, 2 * num_timescales)\n    sinusoids = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 1)\n    if hidden_dim % 2 != 0:\n        # if the number of dimensions is odd, the cos and sin\n        # timescales had size (hidden_dim - 1) / 2, so we need\n        # to add a row of zeros to make up the difference.\n        sinusoids = torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)\n    return tensor + sinusoids.unsqueeze(0)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 27
+          },
+          "text": "add_positional_features"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 27
+          },
+          "end": {
+            "row": 2,
+            "column": 57
+          },
+          "text": "(tensor: torch.Tensor,\n                            min_timescale: float = 1.0,\n                            max_timescale: float = 1.0e4)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 27
+              },
+              "end": {
+                "row": 0,
+                "column": 28
+              },
+              "text": "("
+            },
+            {
+              "type": "typed_parameter",
+              "start": {
+                "row": 0,
+                "column": 28
+              },
+              "end": {
+                "row": 0,
+                "column": 48
+              },
+              "text": "tensor: torch.Tensor",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 28
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "text": "tensor"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 0,
+                    "column": 34
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 35
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "type",
+                  "start": {
+                    "row": 0,
+                    "column": 36
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 48
+                  },
+                  "text": "torch.Tensor",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 0,
+                        "column": 36
+                      },
+                      "end": {
+                        "row": 0,
+                        "column": 48
+                      },
+                      "text": "torch.Tensor",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 0,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 0,
+                            "column": 41
+                          },
+                          "text": "torch"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 0,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 0,
+                            "column": 42
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 0,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 0,
+                            "column": 48
+                          },
+                          "text": "Tensor"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 48
+              },
+              "end": {
+                "row": 0,
+                "column": 49
+              },
+              "text": ","
+            },
+            {
+              "type": "typed_default_parameter",
+              "start": {
+                "row": 1,
+                "column": 28
+              },
+              "end": {
+                "row": 1,
+                "column": 54
+              },
+              "text": "min_timescale: float = 1.0",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 1,
+                    "column": 28
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 41
+                  },
+                  "text": "min_timescale"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 1,
+                    "column": 41
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 42
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "type",
+                  "start": {
+                    "row": 1,
+                    "column": 43
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 48
+                  },
+                  "text": "float",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 48
+                      },
+                      "text": "float"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 1,
+                    "column": 49
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 50
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "float",
+                  "start": {
+                    "row": 1,
+                    "column": 51
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 54
+                  },
+                  "text": "1.0"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 1,
+                "column": 54
+              },
+              "end": {
+                "row": 1,
+                "column": 55
+              },
+              "text": ","
+            },
+            {
+              "type": "typed_default_parameter",
+              "start": {
+                "row": 2,
+                "column": 28
+              },
+              "end": {
+                "row": 2,
+                "column": 56
+              },
+              "text": "max_timescale: float = 1.0e4",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 2,
+                    "column": 28
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 41
+                  },
+                  "text": "max_timescale"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 2,
+                    "column": 41
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 42
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "type",
+                  "start": {
+                    "row": 2,
+                    "column": 43
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 48
+                  },
+                  "text": "float",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 2,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 48
+                      },
+                      "text": "float"
+                    }
+                  ]
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 2,
+                    "column": 49
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 50
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "float",
+                  "start": {
+                    "row": 2,
+                    "column": 51
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 56
+                  },
+                  "text": "1.0e4"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 2,
+                "column": 56
+              },
+              "end": {
+                "row": 2,
+                "column": 57
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 2,
+            "column": 57
+          },
+          "end": {
+            "row": 2,
+            "column": 58
+          },
+          "text": ":"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 3,
+            "column": 4
+          },
+          "end": {
+            "row": 3,
+            "column": 35
+          },
+          "text": "# pylint: disable=line-too-long"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 4,
+            "column": 4
+          },
+          "end": {
+            "row": 51,
+            "column": 42
+          },
+          "text": "\"\"\"\n    Implements the frequency-based positional encoding described\n    in `Attention is all you Need\n    <https://www.semanticscholar.org/paper/Attention-Is-All-You-Need-Vaswani-Shazeer/0737da0767d77606169cbf4187b83e1ab62f6077>`_ .\n\n    Adds sinusoids of different frequencies to a ``Tensor``. A sinusoid of a\n    different frequency and phase is added to each dimension of the input ``Tensor``.\n    This allows the attention heads to use absolute and relative positions.\n\n    The number of timescales is equal to hidden_dim / 2 within the range\n    (min_timescale, max_timescale). For each timescale, the two sinusoidal\n    signals sin(timestep / timescale) and cos(timestep / timescale) are\n    generated and concatenated along the hidden_dim dimension.\n\n    Parameters\n    ----------\n    tensor : ``torch.Tensor``\n        a Tensor with shape (batch_size, timesteps, hidden_dim).\n    min_timescale : ``float``, optional (default = 1.0)\n        The smallest timescale to use.\n    max_timescale : ``float``, optional (default = 1.0e4)\n        The largest timescale to use.\n\n    Returns\n    -------\n    The input tensor augmented with the sinusoidal frequencies.\n    \"\"\"\n    _, timesteps, hidden_dim = tensor.size()\n\n    timestep_range = get_range_vector(timesteps, get_device_of(tensor)).data.float()\n    # We're generating both cos and sin frequencies,\n    # so half for each.\n    num_timescales = hidden_dim // 2\n    timescale_range = get_range_vector(num_timescales, get_device_of(tensor)).data.float()\n\n    log_timescale_increments = math.log(float(max_timescale) / float(min_timescale)) / float(num_timescales - 1)\n    inverse_timescales = min_timescale * torch.exp(timescale_range * -log_timescale_increments)\n\n    # Broadcasted multiplication - shape (timesteps, num_timescales)\n    scaled_time = timestep_range.unsqueeze(1) * inverse_timescales.unsqueeze(0)\n    # shape (timesteps, 2 * num_timescales)\n    sinusoids = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 1)\n    if hidden_dim % 2 != 0:\n        # if the number of dimensions is odd, the cos and sin\n        # timescales had size (hidden_dim - 1) / 2, so we need\n        # to add a row of zeros to make up the difference.\n        sinusoids = torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)\n    return tensor + sinusoids.unsqueeze(0)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 4,
+                "column": 4
+              },
+              "end": {
+                "row": 30,
+                "column": 7
+              },
+              "text": "\"\"\"\n    Implements the frequency-based positional encoding described\n    in `Attention is all you Need\n    <https://www.semanticscholar.org/paper/Attention-Is-All-You-Need-Vaswani-Shazeer/0737da0767d77606169cbf4187b83e1ab62f6077>`_ .\n\n    Adds sinusoids of different frequencies to a ``Tensor``. A sinusoid of a\n    different frequency and phase is added to each dimension of the input ``Tensor``.\n    This allows the attention heads to use absolute and relative positions.\n\n    The number of timescales is equal to hidden_dim / 2 within the range\n    (min_timescale, max_timescale). For each timescale, the two sinusoidal\n    signals sin(timestep / timescale) and cos(timestep / timescale) are\n    generated and concatenated along the hidden_dim dimension.\n\n    Parameters\n    ----------\n    tensor : ``torch.Tensor``\n        a Tensor with shape (batch_size, timesteps, hidden_dim).\n    min_timescale : ``float``, optional (default = 1.0)\n        The smallest timescale to use.\n    max_timescale : ``float``, optional (default = 1.0e4)\n        The largest timescale to use.\n\n    Returns\n    -------\n    The input tensor augmented with the sinusoidal frequencies.\n    \"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 4,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 7
+                  },
+                  "text": "\"\"\"\n    Implements the frequency-based positional encoding described\n    in `Attention is all you Need\n    <https://www.semanticscholar.org/paper/Attention-Is-All-You-Need-Vaswani-Shazeer/0737da0767d77606169cbf4187b83e1ab62f6077>`_ .\n\n    Adds sinusoids of different frequencies to a ``Tensor``. A sinusoid of a\n    different frequency and phase is added to each dimension of the input ``Tensor``.\n    This allows the attention heads to use absolute and relative positions.\n\n    The number of timescales is equal to hidden_dim / 2 within the range\n    (min_timescale, max_timescale). For each timescale, the two sinusoidal\n    signals sin(timestep / timescale) and cos(timestep / timescale) are\n    generated and concatenated along the hidden_dim dimension.\n\n    Parameters\n    ----------\n    tensor : ``torch.Tensor``\n        a Tensor with shape (batch_size, timesteps, hidden_dim).\n    min_timescale : ``float``, optional (default = 1.0)\n        The smallest timescale to use.\n    max_timescale : ``float``, optional (default = 1.0e4)\n        The largest timescale to use.\n\n    Returns\n    -------\n    The input tensor augmented with the sinusoidal frequencies.\n    \"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 4,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 4,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 4
+                      },
+                      "text": "\n    Implements the frequency-based positional encoding described\n    in `Attention is all you Need\n    <https://www.semanticscholar.org/paper/Attention-Is-All-You-Need-Vaswani-Shazeer/0737da0767d77606169cbf4187b83e1ab62f6077>`_ .\n\n    Adds sinusoids of different frequencies to a ``Tensor``. A sinusoid of a\n    different frequency and phase is added to each dimension of the input ``Tensor``.\n    This allows the attention heads to use absolute and relative positions.\n\n    The number of timescales is equal to hidden_dim / 2 within the range\n    (min_timescale, max_timescale). For each timescale, the two sinusoidal\n    signals sin(timestep / timescale) and cos(timestep / timescale) are\n    generated and concatenated along the hidden_dim dimension.\n\n    Parameters\n    ----------\n    tensor : ``torch.Tensor``\n        a Tensor with shape (batch_size, timesteps, hidden_dim).\n    min_timescale : ``float``, optional (default = 1.0)\n        The smallest timescale to use.\n    max_timescale : ``float``, optional (default = 1.0e4)\n        The largest timescale to use.\n\n    Returns\n    -------\n    The input tensor augmented with the sinusoidal frequencies.\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 30,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 7
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 31,
+                "column": 4
+              },
+              "end": {
+                "row": 31,
+                "column": 44
+              },
+              "text": "_, timesteps, hidden_dim = tensor.size()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 31,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 31,
+                    "column": 44
+                  },
+                  "text": "_, timesteps, hidden_dim = tensor.size()",
+                  "children": [
+                    {
+                      "type": "pattern_list",
+                      "start": {
+                        "row": 31,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 28
+                      },
+                      "text": "_, timesteps, hidden_dim",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 31,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 5
+                          },
+                          "text": "_"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 31,
+                            "column": 5
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 6
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 31,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 16
+                          },
+                          "text": "timesteps"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 31,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 17
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 31,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 28
+                          },
+                          "text": "hidden_dim"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 31,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 30
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 31,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 44
+                      },
+                      "text": "tensor.size()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 31,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 42
+                          },
+                          "text": "tensor.size",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 31,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 37
+                              },
+                              "text": "tensor"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 31,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 38
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 31,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 42
+                              },
+                              "text": "size"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 31,
+                            "column": 42
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 44
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 31,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 43
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 31,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 44
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 33,
+                "column": 4
+              },
+              "end": {
+                "row": 33,
+                "column": 84
+              },
+              "text": "timestep_range = get_range_vector(timesteps, get_device_of(tensor)).data.float()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 33,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 33,
+                    "column": 84
+                  },
+                  "text": "timestep_range = get_range_vector(timesteps, get_device_of(tensor)).data.float()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 33,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 18
+                      },
+                      "text": "timestep_range"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 33,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 20
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 33,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 84
+                      },
+                      "text": "get_range_vector(timesteps, get_device_of(tensor)).data.float()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 33,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 82
+                          },
+                          "text": "get_range_vector(timesteps, get_device_of(tensor)).data.float",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 33,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 76
+                              },
+                              "text": "get_range_vector(timesteps, get_device_of(tensor)).data",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 71
+                                  },
+                                  "text": "get_range_vector(timesteps, get_device_of(tensor))",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 37
+                                      },
+                                      "text": "get_range_vector"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 33,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 33,
+                                        "column": 71
+                                      },
+                                      "text": "(timesteps, get_device_of(tensor))",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 37
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 38
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 47
+                                          },
+                                          "text": "timesteps"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 48
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 70
+                                          },
+                                          "text": "get_device_of(tensor)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 33,
+                                                "column": 49
+                                              },
+                                              "end": {
+                                                "row": 33,
+                                                "column": 62
+                                              },
+                                              "text": "get_device_of"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 33,
+                                                "column": 62
+                                              },
+                                              "end": {
+                                                "row": 33,
+                                                "column": 70
+                                              },
+                                              "text": "(tensor)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 33,
+                                                    "column": 62
+                                                  },
+                                                  "end": {
+                                                    "row": 33,
+                                                    "column": 63
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 33,
+                                                    "column": 63
+                                                  },
+                                                  "end": {
+                                                    "row": 33,
+                                                    "column": 69
+                                                  },
+                                                  "text": "tensor"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 33,
+                                                    "column": 69
+                                                  },
+                                                  "end": {
+                                                    "row": 33,
+                                                    "column": 70
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 33,
+                                            "column": 70
+                                          },
+                                          "end": {
+                                            "row": 33,
+                                            "column": 71
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 71
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 72
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 33,
+                                    "column": 72
+                                  },
+                                  "end": {
+                                    "row": 33,
+                                    "column": 76
+                                  },
+                                  "text": "data"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 33,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 77
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 33,
+                                "column": 77
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 82
+                              },
+                              "text": "float"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 33,
+                            "column": 82
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 84
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 33,
+                                "column": 82
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 83
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 33,
+                                "column": 83
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 84
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 34,
+                "column": 4
+              },
+              "end": {
+                "row": 34,
+                "column": 52
+              },
+              "text": "# We're generating both cos and sin frequencies,"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 35,
+                "column": 4
+              },
+              "end": {
+                "row": 35,
+                "column": 23
+              },
+              "text": "# so half for each."
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 36,
+                "column": 4
+              },
+              "end": {
+                "row": 36,
+                "column": 36
+              },
+              "text": "num_timescales = hidden_dim // 2",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 36,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 36,
+                    "column": 36
+                  },
+                  "text": "num_timescales = hidden_dim // 2",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 36,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 18
+                      },
+                      "text": "num_timescales"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 36,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 20
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "binary_operator",
+                      "start": {
+                        "row": 36,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 36
+                      },
+                      "text": "hidden_dim // 2",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 36,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 31
+                          },
+                          "text": "hidden_dim"
+                        },
+                        {
+                          "type": "//",
+                          "start": {
+                            "row": 36,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 34
+                          },
+                          "text": "//"
+                        },
+                        {
+                          "type": "integer",
+                          "start": {
+                            "row": 36,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 36
+                          },
+                          "text": "2"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 37,
+                "column": 4
+              },
+              "end": {
+                "row": 37,
+                "column": 90
+              },
+              "text": "timescale_range = get_range_vector(num_timescales, get_device_of(tensor)).data.float()",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 37,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 90
+                  },
+                  "text": "timescale_range = get_range_vector(num_timescales, get_device_of(tensor)).data.float()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 37,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 19
+                      },
+                      "text": "timescale_range"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 37,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 21
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 37,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 90
+                      },
+                      "text": "get_range_vector(num_timescales, get_device_of(tensor)).data.float()",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 37,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 88
+                          },
+                          "text": "get_range_vector(num_timescales, get_device_of(tensor)).data.float",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 37,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 82
+                              },
+                              "text": "get_range_vector(num_timescales, get_device_of(tensor)).data",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 77
+                                  },
+                                  "text": "get_range_vector(num_timescales, get_device_of(tensor))",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 38
+                                      },
+                                      "text": "get_range_vector"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 77
+                                      },
+                                      "text": "(num_timescales, get_device_of(tensor))",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 39
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 39
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 53
+                                          },
+                                          "text": "num_timescales"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 53
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 54
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 55
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 76
+                                          },
+                                          "text": "get_device_of(tensor)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 37,
+                                                "column": 55
+                                              },
+                                              "end": {
+                                                "row": 37,
+                                                "column": 68
+                                              },
+                                              "text": "get_device_of"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 37,
+                                                "column": 68
+                                              },
+                                              "end": {
+                                                "row": 37,
+                                                "column": 76
+                                              },
+                                              "text": "(tensor)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 37,
+                                                    "column": 68
+                                                  },
+                                                  "end": {
+                                                    "row": 37,
+                                                    "column": 69
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 37,
+                                                    "column": 69
+                                                  },
+                                                  "end": {
+                                                    "row": 37,
+                                                    "column": 75
+                                                  },
+                                                  "text": "tensor"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 37,
+                                                    "column": 75
+                                                  },
+                                                  "end": {
+                                                    "row": 37,
+                                                    "column": 76
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 76
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 77
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 77
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 78
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 78
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 82
+                                  },
+                                  "text": "data"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 37,
+                                "column": 82
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 83
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 83
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 88
+                              },
+                              "text": "float"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 37,
+                            "column": 88
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 90
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 37,
+                                "column": 88
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 89
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 37,
+                                "column": 89
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 90
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 39,
+                "column": 4
+              },
+              "end": {
+                "row": 39,
+                "column": 112
+              },
+              "text": "log_timescale_increments = math.log(float(max_timescale) / float(min_timescale)) / float(num_timescales - 1)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 39,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 112
+                  },
+                  "text": "log_timescale_increments = math.log(float(max_timescale) / float(min_timescale)) / float(num_timescales - 1)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 39,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 28
+                      },
+                      "text": "log_timescale_increments"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 39,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 30
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "binary_operator",
+                      "start": {
+                        "row": 39,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 112
+                      },
+                      "text": "math.log(float(max_timescale) / float(min_timescale)) / float(num_timescales - 1)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 39,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 84
+                          },
+                          "text": "math.log(float(max_timescale) / float(min_timescale))",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 39,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 39
+                              },
+                              "text": "math.log",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 35
+                                  },
+                                  "text": "math"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 36
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 39
+                                  },
+                                  "text": "log"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 39,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 84
+                              },
+                              "text": "(float(max_timescale) / float(min_timescale))",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 40
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "binary_operator",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 83
+                                  },
+                                  "text": "float(max_timescale) / float(min_timescale)",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 60
+                                      },
+                                      "text": "float(max_timescale)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 45
+                                          },
+                                          "text": "float"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 60
+                                          },
+                                          "text": "(max_timescale)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 39,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 39,
+                                                "column": 46
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 39,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 39,
+                                                "column": 59
+                                              },
+                                              "text": "max_timescale"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 39,
+                                                "column": 59
+                                              },
+                                              "end": {
+                                                "row": 39,
+                                                "column": 60
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "/",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 61
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 62
+                                      },
+                                      "text": "/"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 63
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 83
+                                      },
+                                      "text": "float(min_timescale)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 63
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 68
+                                          },
+                                          "text": "float"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 68
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 83
+                                          },
+                                          "text": "(min_timescale)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 39,
+                                                "column": 68
+                                              },
+                                              "end": {
+                                                "row": 39,
+                                                "column": 69
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 39,
+                                                "column": 69
+                                              },
+                                              "end": {
+                                                "row": 39,
+                                                "column": 82
+                                              },
+                                              "text": "min_timescale"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 39,
+                                                "column": 82
+                                              },
+                                              "end": {
+                                                "row": 39,
+                                                "column": 83
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 83
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 84
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "/",
+                          "start": {
+                            "row": 39,
+                            "column": 85
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 86
+                          },
+                          "text": "/"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 39,
+                            "column": 87
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 112
+                          },
+                          "text": "float(num_timescales - 1)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 39,
+                                "column": 87
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 92
+                              },
+                              "text": "float"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 39,
+                                "column": 92
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 112
+                              },
+                              "text": "(num_timescales - 1)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 92
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 93
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "binary_operator",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 93
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 111
+                                  },
+                                  "text": "num_timescales - 1",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 93
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 107
+                                      },
+                                      "text": "num_timescales"
+                                    },
+                                    {
+                                      "type": "-",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 108
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 109
+                                      },
+                                      "text": "-"
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 110
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 111
+                                      },
+                                      "text": "1"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 111
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 112
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 40,
+                "column": 4
+              },
+              "end": {
+                "row": 40,
+                "column": 95
+              },
+              "text": "inverse_timescales = min_timescale * torch.exp(timescale_range * -log_timescale_increments)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 40,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 40,
+                    "column": 95
+                  },
+                  "text": "inverse_timescales = min_timescale * torch.exp(timescale_range * -log_timescale_increments)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 40,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 40,
+                        "column": 22
+                      },
+                      "text": "inverse_timescales"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 40,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 40,
+                        "column": 24
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "binary_operator",
+                      "start": {
+                        "row": 40,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 40,
+                        "column": 95
+                      },
+                      "text": "min_timescale * torch.exp(timescale_range * -log_timescale_increments)",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 40,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 38
+                          },
+                          "text": "min_timescale"
+                        },
+                        {
+                          "type": "*",
+                          "start": {
+                            "row": 40,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 40
+                          },
+                          "text": "*"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 40,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 95
+                          },
+                          "text": "torch.exp(timescale_range * -log_timescale_increments)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 40,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 50
+                              },
+                              "text": "torch.exp",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 46
+                                  },
+                                  "text": "torch"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 47
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 50
+                                  },
+                                  "text": "exp"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 40,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 95
+                              },
+                              "text": "(timescale_range * -log_timescale_increments)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 51
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "binary_operator",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 94
+                                  },
+                                  "text": "timescale_range * -log_timescale_increments",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 66
+                                      },
+                                      "text": "timescale_range"
+                                    },
+                                    {
+                                      "type": "*",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 67
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 68
+                                      },
+                                      "text": "*"
+                                    },
+                                    {
+                                      "type": "unary_operator",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 69
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 94
+                                      },
+                                      "text": "-log_timescale_increments",
+                                      "children": [
+                                        {
+                                          "type": "-",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 69
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 70
+                                          },
+                                          "text": "-"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 70
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 94
+                                          },
+                                          "text": "log_timescale_increments"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 94
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 95
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 42,
+                "column": 4
+              },
+              "end": {
+                "row": 42,
+                "column": 68
+              },
+              "text": "# Broadcasted multiplication - shape (timesteps, num_timescales)"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 43,
+                "column": 4
+              },
+              "end": {
+                "row": 43,
+                "column": 79
+              },
+              "text": "scaled_time = timestep_range.unsqueeze(1) * inverse_timescales.unsqueeze(0)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 43,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 79
+                  },
+                  "text": "scaled_time = timestep_range.unsqueeze(1) * inverse_timescales.unsqueeze(0)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 43,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 15
+                      },
+                      "text": "scaled_time"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 43,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 17
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "binary_operator",
+                      "start": {
+                        "row": 43,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 79
+                      },
+                      "text": "timestep_range.unsqueeze(1) * inverse_timescales.unsqueeze(0)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 43,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 45
+                          },
+                          "text": "timestep_range.unsqueeze(1)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 43,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 42
+                              },
+                              "text": "timestep_range.unsqueeze",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 32
+                                  },
+                                  "text": "timestep_range"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 33
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 42
+                                  },
+                                  "text": "unsqueeze"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 43,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 45
+                              },
+                              "text": "(1)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 43
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 44
+                                  },
+                                  "text": "1"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 45
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "*",
+                          "start": {
+                            "row": 43,
+                            "column": 46
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 47
+                          },
+                          "text": "*"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 43,
+                            "column": 48
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 79
+                          },
+                          "text": "inverse_timescales.unsqueeze(0)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 43,
+                                "column": 48
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 76
+                              },
+                              "text": "inverse_timescales.unsqueeze",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 48
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 66
+                                  },
+                                  "text": "inverse_timescales"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 67
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 67
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 76
+                                  },
+                                  "text": "unsqueeze"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 43,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 79
+                              },
+                              "text": "(0)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 76
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 77
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "integer",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 77
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 78
+                                  },
+                                  "text": "0"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 43,
+                                    "column": 78
+                                  },
+                                  "end": {
+                                    "row": 43,
+                                    "column": 79
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 44,
+                "column": 4
+              },
+              "end": {
+                "row": 44,
+                "column": 43
+              },
+              "text": "# shape (timesteps, 2 * num_timescales)"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 45,
+                "column": 4
+              },
+              "end": {
+                "row": 45,
+                "column": 78
+              },
+              "text": "sinusoids = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 1)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 45,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 45,
+                    "column": 78
+                  },
+                  "text": "sinusoids = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 1)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 45,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 13
+                      },
+                      "text": "sinusoids"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 45,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 15
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 45,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 78
+                      },
+                      "text": "torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], 1)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 45,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 25
+                          },
+                          "text": "torch.cat",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 45,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 21
+                              },
+                              "text": "torch"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 45,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 22
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 45,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 25
+                              },
+                              "text": "cat"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 45,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 78
+                          },
+                          "text": "([torch.sin(scaled_time), torch.cos(scaled_time)], 1)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 45,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 26
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "list",
+                              "start": {
+                                "row": 45,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 74
+                              },
+                              "text": "[torch.sin(scaled_time), torch.cos(scaled_time)]",
+                              "children": [
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 27
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 49
+                                  },
+                                  "text": "torch.sin(scaled_time)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 36
+                                      },
+                                      "text": "torch.sin",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 32
+                                          },
+                                          "text": "torch"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 33
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 33
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 36
+                                          },
+                                          "text": "sin"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 49
+                                      },
+                                      "text": "(scaled_time)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 37
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 37
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 48
+                                          },
+                                          "text": "scaled_time"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 49
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 49
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 50
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 73
+                                  },
+                                  "text": "torch.cos(scaled_time)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 60
+                                      },
+                                      "text": "torch.cos",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 51
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 56
+                                          },
+                                          "text": "torch"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 56
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 57
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 57
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 60
+                                          },
+                                          "text": "cos"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 45,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 45,
+                                        "column": 73
+                                      },
+                                      "text": "(scaled_time)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 60
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 61
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 61
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 72
+                                          },
+                                          "text": "scaled_time"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 45,
+                                            "column": 72
+                                          },
+                                          "end": {
+                                            "row": 45,
+                                            "column": 73
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 45,
+                                    "column": 73
+                                  },
+                                  "end": {
+                                    "row": 45,
+                                    "column": 74
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 45,
+                                "column": 74
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 75
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 45,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 77
+                              },
+                              "text": "1"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 45,
+                                "column": 77
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 78
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 46,
+                "column": 4
+              },
+              "end": {
+                "row": 50,
+                "column": 80
+              },
+              "text": "if hidden_dim % 2 != 0:\n        # if the number of dimensions is odd, the cos and sin\n        # timescales had size (hidden_dim - 1) / 2, so we need\n        # to add a row of zeros to make up the difference.\n        sinusoids = torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 46,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "comparison_operator",
+                  "start": {
+                    "row": 46,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 26
+                  },
+                  "text": "hidden_dim % 2 != 0",
+                  "children": [
+                    {
+                      "type": "binary_operator",
+                      "start": {
+                        "row": 46,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 21
+                      },
+                      "text": "hidden_dim % 2",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 46,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 17
+                          },
+                          "text": "hidden_dim"
+                        },
+                        {
+                          "type": "%",
+                          "start": {
+                            "row": 46,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 19
+                          },
+                          "text": "%"
+                        },
+                        {
+                          "type": "integer",
+                          "start": {
+                            "row": 46,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 21
+                          },
+                          "text": "2"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "!=",
+                      "start": {
+                        "row": 46,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 24
+                      },
+                      "text": "!="
+                    },
+                    {
+                      "type": "integer",
+                      "start": {
+                        "row": 46,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 26
+                      },
+                      "text": "0"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 46,
+                    "column": 26
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 27
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 47,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 47,
+                    "column": 61
+                  },
+                  "text": "# if the number of dimensions is odd, the cos and sin"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 48,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 48,
+                    "column": 62
+                  },
+                  "text": "# timescales had size (hidden_dim - 1) / 2, so we need"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 49,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 49,
+                    "column": 58
+                  },
+                  "text": "# to add a row of zeros to make up the difference."
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 50,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 50,
+                    "column": 80
+                  },
+                  "text": "sinusoids = torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 50,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 50,
+                        "column": 80
+                      },
+                      "text": "sinusoids = torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 50,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 50,
+                            "column": 80
+                          },
+                          "text": "sinusoids = torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 50,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 17
+                              },
+                              "text": "sinusoids"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 50,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 19
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 50,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 50,
+                                "column": 80
+                              },
+                              "text": "torch.cat([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 50,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 50,
+                                    "column": 29
+                                  },
+                                  "text": "torch.cat",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 25
+                                      },
+                                      "text": "torch"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 26
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 29
+                                      },
+                                      "text": "cat"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 50,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 50,
+                                    "column": 80
+                                  },
+                                  "text": "([sinusoids, sinusoids.new_zeros(timesteps, 1)], 1)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 30
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "list",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 76
+                                      },
+                                      "text": "[sinusoids, sinusoids.new_zeros(timesteps, 1)]",
+                                      "children": [
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 31
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 40
+                                          },
+                                          "text": "sinusoids"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 41
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 75
+                                          },
+                                          "text": "sinusoids.new_zeros(timesteps, 1)",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 50,
+                                                "column": 42
+                                              },
+                                              "end": {
+                                                "row": 50,
+                                                "column": 61
+                                              },
+                                              "text": "sinusoids.new_zeros",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 42
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 51
+                                                  },
+                                                  "text": "sinusoids"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 51
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 52
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 52
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 61
+                                                  },
+                                                  "text": "new_zeros"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 50,
+                                                "column": 61
+                                              },
+                                              "end": {
+                                                "row": 50,
+                                                "column": 75
+                                              },
+                                              "text": "(timesteps, 1)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 61
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 62
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 62
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 71
+                                                  },
+                                                  "text": "timesteps"
+                                                },
+                                                {
+                                                  "type": ",",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 71
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 72
+                                                  },
+                                                  "text": ","
+                                                },
+                                                {
+                                                  "type": "integer",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 73
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 74
+                                                  },
+                                                  "text": "1"
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 50,
+                                                    "column": 74
+                                                  },
+                                                  "end": {
+                                                    "row": 50,
+                                                    "column": 75
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 50,
+                                            "column": 75
+                                          },
+                                          "end": {
+                                            "row": 50,
+                                            "column": 76
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 76
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 77
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "integer",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 78
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 79
+                                      },
+                                      "text": "1"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 50,
+                                        "column": 79
+                                      },
+                                      "end": {
+                                        "row": 50,
+                                        "column": 80
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 51,
+                "column": 4
+              },
+              "end": {
+                "row": 51,
+                "column": 42
+              },
+              "text": "return tensor + sinusoids.unsqueeze(0)",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 51,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 51,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "binary_operator",
+                  "start": {
+                    "row": 51,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 51,
+                    "column": 42
+                  },
+                  "text": "tensor + sinusoids.unsqueeze(0)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 51,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 51,
+                        "column": 17
+                      },
+                      "text": "tensor"
+                    },
+                    {
+                      "type": "+",
+                      "start": {
+                        "row": 51,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 51,
+                        "column": 19
+                      },
+                      "text": "+"
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 51,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 51,
+                        "column": 42
+                      },
+                      "text": "sinusoids.unsqueeze(0)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 51,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 39
+                          },
+                          "text": "sinusoids.unsqueeze",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 51,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 29
+                              },
+                              "text": "sinusoids"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 51,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 30
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 51,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 39
+                              },
+                              "text": "unsqueeze"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 51,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 51,
+                            "column": 42
+                          },
+                          "text": "(0)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 51,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 40
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "integer",
+                              "start": {
+                                "row": 51,
+                                "column": 40
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 41
+                              },
+                              "text": "0"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 51,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 51,
+                                "column": 42
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

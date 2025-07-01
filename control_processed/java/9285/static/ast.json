@@ -1,0 +1,4180 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 35,
+    "column": 5
+  },
+  "text": "public void seek(String binlogfilename, Long binlogPosition, String gtid, SinkFunction func) throws IOException {\n        updateSettings();\n        loadBinlogChecksum();\n        sendBinlogDump(binlogfilename, binlogPosition);\n        DirectLogFetcher fetcher = new DirectLogFetcher(connector.getReceiveBufferSize());\n        fetcher.start(connector.getChannel());\n        LogDecoder decoder = new LogDecoder();\n        decoder.handle(LogEvent.ROTATE_EVENT);\n        decoder.handle(LogEvent.FORMAT_DESCRIPTION_EVENT);\n        decoder.handle(LogEvent.QUERY_EVENT);\n        decoder.handle(LogEvent.XID_EVENT);\n        LogContext context = new LogContext();\n        // 若entry position存在gtid，则使用传入的gtid作为gtidSet\n        // 拼接的标准,否则同时开启gtid和tsdb时，会导致丢失gtid\n        // 而当源端数据库gtid 有purged时会有如下类似报错\n        // 'errno = 1236, sqlstate = HY000 errmsg = The slave is connecting\n        // using CHANGE MASTER TO MASTER_AUTO_POSITION = 1 ...\n        if (StringUtils.isNotEmpty(gtid)) {\n            decoder.handle(LogEvent.GTID_LOG_EVENT);\n            context.setGtidSet(MysqlGTIDSet.parse(gtid));\n        }\n        context.setFormatDescription(new FormatDescriptionLogEvent(4, binlogChecksum));\n        while (fetcher.fetch()) {\n            accumulateReceivedBytes(fetcher.limit());\n            LogEvent event = null;\n            event = decoder.decode(fetcher, context);\n\n            if (event == null) {\n                throw new CanalParseException(\"parse failed\");\n            }\n\n            if (!func.sink(event)) {\n                break;\n            }\n        }\n    }",
+  "children": [
+    {
+      "type": "method_declaration",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 35,
+        "column": 5
+      },
+      "text": "public void seek(String binlogfilename, Long binlogPosition, String gtid, SinkFunction func) throws IOException {\n        updateSettings();\n        loadBinlogChecksum();\n        sendBinlogDump(binlogfilename, binlogPosition);\n        DirectLogFetcher fetcher = new DirectLogFetcher(connector.getReceiveBufferSize());\n        fetcher.start(connector.getChannel());\n        LogDecoder decoder = new LogDecoder();\n        decoder.handle(LogEvent.ROTATE_EVENT);\n        decoder.handle(LogEvent.FORMAT_DESCRIPTION_EVENT);\n        decoder.handle(LogEvent.QUERY_EVENT);\n        decoder.handle(LogEvent.XID_EVENT);\n        LogContext context = new LogContext();\n        // 若entry position存在gtid，则使用传入的gtid作为gtidSet\n        // 拼接的标准,否则同时开启gtid和tsdb时，会导致丢失gtid\n        // 而当源端数据库gtid 有purged时会有如下类似报错\n        // 'errno = 1236, sqlstate = HY000 errmsg = The slave is connecting\n        // using CHANGE MASTER TO MASTER_AUTO_POSITION = 1 ...\n        if (StringUtils.isNotEmpty(gtid)) {\n            decoder.handle(LogEvent.GTID_LOG_EVENT);\n            context.setGtidSet(MysqlGTIDSet.parse(gtid));\n        }\n        context.setFormatDescription(new FormatDescriptionLogEvent(4, binlogChecksum));\n        while (fetcher.fetch()) {\n            accumulateReceivedBytes(fetcher.limit());\n            LogEvent event = null;\n            event = decoder.decode(fetcher, context);\n\n            if (event == null) {\n                throw new CanalParseException(\"parse failed\");\n            }\n\n            if (!func.sink(event)) {\n                break;\n            }\n        }\n    }",
+      "children": [
+        {
+          "type": "modifiers",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 6
+          },
+          "text": "public",
+          "children": [
+            {
+              "type": "public",
+              "start": {
+                "row": 0,
+                "column": 0
+              },
+              "end": {
+                "row": 0,
+                "column": 6
+              },
+              "text": "public"
+            }
+          ]
+        },
+        {
+          "type": "void_type",
+          "start": {
+            "row": 0,
+            "column": 7
+          },
+          "end": {
+            "row": 0,
+            "column": 11
+          },
+          "text": "void"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 12
+          },
+          "end": {
+            "row": 0,
+            "column": 16
+          },
+          "text": "seek"
+        },
+        {
+          "type": "formal_parameters",
+          "start": {
+            "row": 0,
+            "column": 16
+          },
+          "end": {
+            "row": 0,
+            "column": 92
+          },
+          "text": "(String binlogfilename, Long binlogPosition, String gtid, SinkFunction func)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 16
+              },
+              "end": {
+                "row": 0,
+                "column": 17
+              },
+              "text": "("
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 17
+              },
+              "end": {
+                "row": 0,
+                "column": 38
+              },
+              "text": "String binlogfilename",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 17
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 23
+                  },
+                  "text": "String"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 38
+                  },
+                  "text": "binlogfilename"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 38
+              },
+              "end": {
+                "row": 0,
+                "column": 39
+              },
+              "text": ","
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 40
+              },
+              "end": {
+                "row": 0,
+                "column": 59
+              },
+              "text": "Long binlogPosition",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 40
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 44
+                  },
+                  "text": "Long"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 45
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 59
+                  },
+                  "text": "binlogPosition"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 59
+              },
+              "end": {
+                "row": 0,
+                "column": 60
+              },
+              "text": ","
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 61
+              },
+              "end": {
+                "row": 0,
+                "column": 72
+              },
+              "text": "String gtid",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 61
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 67
+                  },
+                  "text": "String"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 68
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 72
+                  },
+                  "text": "gtid"
+                }
+              ]
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 72
+              },
+              "end": {
+                "row": 0,
+                "column": 73
+              },
+              "text": ","
+            },
+            {
+              "type": "formal_parameter",
+              "start": {
+                "row": 0,
+                "column": 74
+              },
+              "end": {
+                "row": 0,
+                "column": 91
+              },
+              "text": "SinkFunction func",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 74
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 86
+                  },
+                  "text": "SinkFunction"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 87
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 91
+                  },
+                  "text": "func"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 91
+              },
+              "end": {
+                "row": 0,
+                "column": 92
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": "throws",
+          "start": {
+            "row": 0,
+            "column": 93
+          },
+          "end": {
+            "row": 0,
+            "column": 111
+          },
+          "text": "throws IOException",
+          "children": [
+            {
+              "type": "throws",
+              "start": {
+                "row": 0,
+                "column": 93
+              },
+              "end": {
+                "row": 0,
+                "column": 99
+              },
+              "text": "throws"
+            },
+            {
+              "type": "type_identifier",
+              "start": {
+                "row": 0,
+                "column": 100
+              },
+              "end": {
+                "row": 0,
+                "column": 111
+              },
+              "text": "IOException"
+            }
+          ]
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 0,
+            "column": 112
+          },
+          "end": {
+            "row": 35,
+            "column": 5
+          },
+          "text": "{\n        updateSettings();\n        loadBinlogChecksum();\n        sendBinlogDump(binlogfilename, binlogPosition);\n        DirectLogFetcher fetcher = new DirectLogFetcher(connector.getReceiveBufferSize());\n        fetcher.start(connector.getChannel());\n        LogDecoder decoder = new LogDecoder();\n        decoder.handle(LogEvent.ROTATE_EVENT);\n        decoder.handle(LogEvent.FORMAT_DESCRIPTION_EVENT);\n        decoder.handle(LogEvent.QUERY_EVENT);\n        decoder.handle(LogEvent.XID_EVENT);\n        LogContext context = new LogContext();\n        // 若entry position存在gtid，则使用传入的gtid作为gtidSet\n        // 拼接的标准,否则同时开启gtid和tsdb时，会导致丢失gtid\n        // 而当源端数据库gtid 有purged时会有如下类似报错\n        // 'errno = 1236, sqlstate = HY000 errmsg = The slave is connecting\n        // using CHANGE MASTER TO MASTER_AUTO_POSITION = 1 ...\n        if (StringUtils.isNotEmpty(gtid)) {\n            decoder.handle(LogEvent.GTID_LOG_EVENT);\n            context.setGtidSet(MysqlGTIDSet.parse(gtid));\n        }\n        context.setFormatDescription(new FormatDescriptionLogEvent(4, binlogChecksum));\n        while (fetcher.fetch()) {\n            accumulateReceivedBytes(fetcher.limit());\n            LogEvent event = null;\n            event = decoder.decode(fetcher, context);\n\n            if (event == null) {\n                throw new CanalParseException(\"parse failed\");\n            }\n\n            if (!func.sink(event)) {\n                break;\n            }\n        }\n    }",
+          "children": [
+            {
+              "type": "{",
+              "start": {
+                "row": 0,
+                "column": 112
+              },
+              "end": {
+                "row": 0,
+                "column": 113
+              },
+              "text": "{"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 8
+              },
+              "end": {
+                "row": 1,
+                "column": 25
+              },
+              "text": "updateSettings();",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 1,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 24
+                  },
+                  "text": "updateSettings()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 1,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 22
+                      },
+                      "text": "updateSettings"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 1,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 24
+                      },
+                      "text": "()",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 1,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 1,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 24
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 1,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 25
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 2,
+                "column": 8
+              },
+              "end": {
+                "row": 2,
+                "column": 29
+              },
+              "text": "loadBinlogChecksum();",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 2,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 28
+                  },
+                  "text": "loadBinlogChecksum()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 2,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 26
+                      },
+                      "text": "loadBinlogChecksum"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 2,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 28
+                      },
+                      "text": "()",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 2,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 27
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 2,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 28
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 2,
+                    "column": 28
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 29
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 3,
+                "column": 8
+              },
+              "end": {
+                "row": 3,
+                "column": 55
+              },
+              "text": "sendBinlogDump(binlogfilename, binlogPosition);",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 3,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 54
+                  },
+                  "text": "sendBinlogDump(binlogfilename, binlogPosition)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 3,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 22
+                      },
+                      "text": "sendBinlogDump"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 3,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 3,
+                        "column": 54
+                      },
+                      "text": "(binlogfilename, binlogPosition)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 3,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 3,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 37
+                          },
+                          "text": "binlogfilename"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 3,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 38
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 3,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 53
+                          },
+                          "text": "binlogPosition"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 3,
+                            "column": 53
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 54
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 3,
+                    "column": 54
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 55
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "local_variable_declaration",
+              "start": {
+                "row": 4,
+                "column": 8
+              },
+              "end": {
+                "row": 4,
+                "column": 90
+              },
+              "text": "DirectLogFetcher fetcher = new DirectLogFetcher(connector.getReceiveBufferSize());",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 4,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 24
+                  },
+                  "text": "DirectLogFetcher"
+                },
+                {
+                  "type": "variable_declarator",
+                  "start": {
+                    "row": 4,
+                    "column": 25
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 89
+                  },
+                  "text": "fetcher = new DirectLogFetcher(connector.getReceiveBufferSize())",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 4,
+                        "column": 25
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 32
+                      },
+                      "text": "fetcher"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 4,
+                        "column": 33
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 34
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "object_creation_expression",
+                      "start": {
+                        "row": 4,
+                        "column": 35
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 89
+                      },
+                      "text": "new DirectLogFetcher(connector.getReceiveBufferSize())",
+                      "children": [
+                        {
+                          "type": "new",
+                          "start": {
+                            "row": 4,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 38
+                          },
+                          "text": "new"
+                        },
+                        {
+                          "type": "type_identifier",
+                          "start": {
+                            "row": 4,
+                            "column": 39
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 55
+                          },
+                          "text": "DirectLogFetcher"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 4,
+                            "column": 55
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 89
+                          },
+                          "text": "(connector.getReceiveBufferSize())",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 4,
+                                "column": 55
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 56
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "method_invocation",
+                              "start": {
+                                "row": 4,
+                                "column": 56
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 88
+                              },
+                              "text": "connector.getReceiveBufferSize()",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 56
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 65
+                                  },
+                                  "text": "connector"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 65
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 66
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 86
+                                  },
+                                  "text": "getReceiveBufferSize"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 86
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 88
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 86
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 87
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 87
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 88
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 4,
+                                "column": 88
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 89
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 4,
+                    "column": 89
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 90
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 5,
+                "column": 8
+              },
+              "end": {
+                "row": 5,
+                "column": 46
+              },
+              "text": "fetcher.start(connector.getChannel());",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 5,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 45
+                  },
+                  "text": "fetcher.start(connector.getChannel())",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 15
+                      },
+                      "text": "fetcher"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 5,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 16
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 5,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 21
+                      },
+                      "text": "start"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 5,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 5,
+                        "column": 45
+                      },
+                      "text": "(connector.getChannel())",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 5,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 22
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 5,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 44
+                          },
+                          "text": "connector.getChannel()",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 5,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 31
+                              },
+                              "text": "connector"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 5,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 32
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 5,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 42
+                              },
+                              "text": "getChannel"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 5,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 5,
+                                "column": 44
+                              },
+                              "text": "()",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 43
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 5,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 5,
+                                    "column": 44
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 5,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 5,
+                            "column": 45
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 5,
+                    "column": 45
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 46
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "local_variable_declaration",
+              "start": {
+                "row": 6,
+                "column": 8
+              },
+              "end": {
+                "row": 6,
+                "column": 46
+              },
+              "text": "LogDecoder decoder = new LogDecoder();",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 6,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 18
+                  },
+                  "text": "LogDecoder"
+                },
+                {
+                  "type": "variable_declarator",
+                  "start": {
+                    "row": 6,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 45
+                  },
+                  "text": "decoder = new LogDecoder()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 6,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 26
+                      },
+                      "text": "decoder"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 6,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 28
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "object_creation_expression",
+                      "start": {
+                        "row": 6,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 45
+                      },
+                      "text": "new LogDecoder()",
+                      "children": [
+                        {
+                          "type": "new",
+                          "start": {
+                            "row": 6,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 32
+                          },
+                          "text": "new"
+                        },
+                        {
+                          "type": "type_identifier",
+                          "start": {
+                            "row": 6,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 43
+                          },
+                          "text": "LogDecoder"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 6,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 45
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 6,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 44
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 6,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 45
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 6,
+                    "column": 45
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 46
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 7,
+                "column": 8
+              },
+              "end": {
+                "row": 7,
+                "column": 46
+              },
+              "text": "decoder.handle(LogEvent.ROTATE_EVENT);",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 7,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 45
+                  },
+                  "text": "decoder.handle(LogEvent.ROTATE_EVENT)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 7,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 15
+                      },
+                      "text": "decoder"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 7,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 16
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 7,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 22
+                      },
+                      "text": "handle"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 7,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 45
+                      },
+                      "text": "(LogEvent.ROTATE_EVENT)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 7,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "field_access",
+                          "start": {
+                            "row": 7,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 44
+                          },
+                          "text": "LogEvent.ROTATE_EVENT",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 7,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 31
+                              },
+                              "text": "LogEvent"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 7,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 32
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 7,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 7,
+                                "column": 44
+                              },
+                              "text": "ROTATE_EVENT"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 7,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 7,
+                            "column": 45
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 7,
+                    "column": 45
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 46
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 8,
+                "column": 8
+              },
+              "end": {
+                "row": 8,
+                "column": 58
+              },
+              "text": "decoder.handle(LogEvent.FORMAT_DESCRIPTION_EVENT);",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 8,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 57
+                  },
+                  "text": "decoder.handle(LogEvent.FORMAT_DESCRIPTION_EVENT)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 8,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 15
+                      },
+                      "text": "decoder"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 8,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 16
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 8,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 22
+                      },
+                      "text": "handle"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 8,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 57
+                      },
+                      "text": "(LogEvent.FORMAT_DESCRIPTION_EVENT)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 8,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "field_access",
+                          "start": {
+                            "row": 8,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 56
+                          },
+                          "text": "LogEvent.FORMAT_DESCRIPTION_EVENT",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 31
+                              },
+                              "text": "LogEvent"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 8,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 32
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 56
+                              },
+                              "text": "FORMAT_DESCRIPTION_EVENT"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 8,
+                            "column": 56
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 57
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 8,
+                    "column": 57
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 58
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 9,
+                "column": 8
+              },
+              "end": {
+                "row": 9,
+                "column": 45
+              },
+              "text": "decoder.handle(LogEvent.QUERY_EVENT);",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 9,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 44
+                  },
+                  "text": "decoder.handle(LogEvent.QUERY_EVENT)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 15
+                      },
+                      "text": "decoder"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 9,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 16
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 22
+                      },
+                      "text": "handle"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 9,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 44
+                      },
+                      "text": "(LogEvent.QUERY_EVENT)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 9,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "field_access",
+                          "start": {
+                            "row": 9,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 43
+                          },
+                          "text": "LogEvent.QUERY_EVENT",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 31
+                              },
+                              "text": "LogEvent"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 9,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 32
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 9,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 43
+                              },
+                              "text": "QUERY_EVENT"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 9,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 44
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 9,
+                    "column": 44
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 45
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 10,
+                "column": 8
+              },
+              "end": {
+                "row": 10,
+                "column": 43
+              },
+              "text": "decoder.handle(LogEvent.XID_EVENT);",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 10,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 42
+                  },
+                  "text": "decoder.handle(LogEvent.XID_EVENT)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 10,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 15
+                      },
+                      "text": "decoder"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 10,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 16
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 10,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 22
+                      },
+                      "text": "handle"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 10,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 42
+                      },
+                      "text": "(LogEvent.XID_EVENT)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 10,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 23
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "field_access",
+                          "start": {
+                            "row": 10,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 41
+                          },
+                          "text": "LogEvent.XID_EVENT",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 31
+                              },
+                              "text": "LogEvent"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 10,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 32
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 10,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 41
+                              },
+                              "text": "XID_EVENT"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 10,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 42
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 10,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 43
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "local_variable_declaration",
+              "start": {
+                "row": 11,
+                "column": 8
+              },
+              "end": {
+                "row": 11,
+                "column": 46
+              },
+              "text": "LogContext context = new LogContext();",
+              "children": [
+                {
+                  "type": "type_identifier",
+                  "start": {
+                    "row": 11,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 18
+                  },
+                  "text": "LogContext"
+                },
+                {
+                  "type": "variable_declarator",
+                  "start": {
+                    "row": 11,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 45
+                  },
+                  "text": "context = new LogContext()",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 11,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 26
+                      },
+                      "text": "context"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 11,
+                        "column": 27
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 28
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "object_creation_expression",
+                      "start": {
+                        "row": 11,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 45
+                      },
+                      "text": "new LogContext()",
+                      "children": [
+                        {
+                          "type": "new",
+                          "start": {
+                            "row": 11,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 32
+                          },
+                          "text": "new"
+                        },
+                        {
+                          "type": "type_identifier",
+                          "start": {
+                            "row": 11,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 43
+                          },
+                          "text": "LogContext"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 11,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 45
+                          },
+                          "text": "()",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 11,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 44
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 11,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 45
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 11,
+                    "column": 45
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 46
+                  },
+                  "text": ";"
+                }
+              ]
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 12,
+                "column": 8
+              },
+              "end": {
+                "row": 12,
+                "column": 76
+              },
+              "text": "// 若entry position存在gtid，则使用传入的gtid作为gtidSet\n        // 拼接的标准,否则同时开启"
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 13,
+                "column": 8
+              },
+              "end": {
+                "row": 13,
+                "column": 81
+              },
+              "text": "时，会导致丢失gtid\n        // 而当源端数据库gtid 有purged时会有如下类似报错\n        // 'errno = 1"
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 14,
+                "column": 8
+              },
+              "end": {
+                "row": 14,
+                "column": 73
+              },
+              "text": "tate = HY000 errmsg = The slave is connecting\n        // using CH"
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 15,
+                "column": 8
+              },
+              "end": {
+                "row": 15,
+                "column": 75
+              },
+              "text": "ER TO MASTER_AUTO_POSITION = 1 ...\n        if (StringUtils.isNotEmp"
+            },
+            {
+              "type": "line_comment",
+              "start": {
+                "row": 16,
+                "column": 8
+              },
+              "end": {
+                "row": 16,
+                "column": 62
+              },
+              "text": " {\n            decoder.handle(LogEvent.GTID_LOG_EVENT)"
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 17,
+                "column": 8
+              },
+              "end": {
+                "row": 20,
+                "column": 9
+              },
+              "text": "     context.setGtidSet(MysqlGTIDSet.parse(gtid));\n        }\n        context.setFormatDescription(new FormatDescriptionLogEvent(4, binlogChecksum));\n       ",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 17,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 10
+                  },
+                  "text": "  "
+                },
+                {
+                  "type": "condition",
+                  "start": {
+                    "row": 17,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 41
+                  },
+                  "text": "  context.setGtidSet(MysqlGTID",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 17,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 12
+                      },
+                      "text": " "
+                    },
+                    {
+                      "type": "method_invocation",
+                      "start": {
+                        "row": 17,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 40
+                      },
+                      "text": " context.setGtidSet(MysqlGTI",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 23
+                          },
+                          "text": " context.se"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 17,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 24
+                          },
+                          "text": "t"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 34
+                          },
+                          "text": "GtidSet(My"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 17,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 40
+                          },
+                          "text": "sqlGTI",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 17,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 35
+                              },
+                              "text": "s"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 17,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 39
+                              },
+                              "text": "qlGT"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 17,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 40
+                              },
+                              "text": "I"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 17,
+                        "column": 40
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 41
+                      },
+                      "text": "D"
+                    }
+                  ]
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 17,
+                    "column": 42
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 9
+                  },
+                  "text": "et.parse(gtid));\n        }\n        context.setFormatDescription(new FormatDescriptionLogEvent(4, binlogChecksum));\n       ",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 17,
+                        "column": 42
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 43
+                      },
+                      "text": "e"
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 18,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 52
+                      },
+                      "text": ");\n        }\n        context.setFormatDe",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 18,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 51
+                          },
+                          "text": ");\n        }\n        context.setFormatD",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 18,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 19
+                              },
+                              "text": ");\n    "
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 18,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 20
+                              },
+                              "text": " "
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 18,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 26
+                              },
+                              "text": "   }\n "
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 18,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 18,
+                                "column": 51
+                              },
+                              "text": "       context.setFormatD",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 27
+                                  },
+                                  "text": " "
+                                },
+                                {
+                                  "type": "field_access",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 50
+                                  },
+                                  "text": "      context.setFormat",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 35
+                                      },
+                                      "text": "      co"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 36
+                                      },
+                                      "text": "n"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 50
+                                      },
+                                      "text": "text.setFormat"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 51
+                                  },
+                                  "text": "D"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 18,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 18,
+                            "column": 52
+                          },
+                          "text": "e"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 19,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 57
+                      },
+                      "text": " FormatDescriptionLogEvent(4, binlogChecksum)",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 19,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 56
+                          },
+                          "text": " FormatDescriptionLogEvent(4, binlogChecksum",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 19,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 19
+                              },
+                              "text": " Format"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 19,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 20
+                              },
+                              "text": "D"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 19,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 30
+                              },
+                              "text": "escription"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 19,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 56
+                              },
+                              "text": "LogEvent(4, binlogChecksum",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 31
+                                  },
+                                  "text": "L"
+                                },
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 55
+                                  },
+                                  "text": "ogEvent(4, binlogChecksu",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 43
+                                      },
+                                      "text": "ogEvent(4, b"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 44
+                                      },
+                                      "text": "i"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 49
+                                      },
+                                      "text": "nlogC"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 55
+                                      },
+                                      "text": "hecksu",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 50
+                                          },
+                                          "text": "h"
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 54
+                                          },
+                                          "text": "ecks"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 54
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 55
+                                          },
+                                          "text": "u"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 55
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 56
+                                  },
+                                  "text": "m"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 19,
+                            "column": 56
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 57
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 20,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 9
+                      },
+                      "text": " "
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 21,
+                "column": 8
+              },
+              "end": {
+                "row": 21,
+                "column": 87
+              },
+              "text": "etcher.fetch()) {\n            accumulateReceivedBytes(fetcher.limit());\n       ",
+              "children": [
+                {
+                  "type": "method_invocation",
+                  "start": {
+                    "row": 21,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 86
+                  },
+                  "text": "etcher.fetch()) {\n            accumulateReceivedBytes(fetcher.limit());\n      ",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 21,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 15
+                      },
+                      "text": "etcher."
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 21,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 16
+                      },
+                      "text": "f"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 21,
+                        "column": 16
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 36
+                      },
+                      "text": "etch()) {\n          "
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 21,
+                        "column": 36
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 86
+                      },
+                      "text": "  accumulateReceivedBytes(fetcher.limit());\n      ",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 21,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 37
+                          },
+                          "text": " "
+                        },
+                        {
+                          "type": "object_creation_expression",
+                          "start": {
+                            "row": 21,
+                            "column": 37
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 85
+                          },
+                          "text": " accumulateReceivedBytes(fetcher.limit());\n     ",
+                          "children": [
+                            {
+                              "type": "new",
+                              "start": {
+                                "row": 21,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 40
+                              },
+                              "text": " ac"
+                            },
+                            {
+                              "type": "type_identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 66
+                              },
+                              "text": "umulateReceivedBytes(fetc"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 21,
+                                "column": 66
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 85
+                              },
+                              "text": "her.limit());\n     ",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 66
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 67
+                                  },
+                                  "text": "h"
+                                },
+                                {
+                                  "type": "decimal_integer_literal",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 67
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 68
+                                  },
+                                  "text": "e"
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 68
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 69
+                                  },
+                                  "text": "r"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 70
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 84
+                                  },
+                                  "text": "limit());\n    "
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 84
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 85
+                                  },
+                                  "text": " "
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 21,
+                            "column": 85
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 86
+                          },
+                          "text": " "
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ";",
+                  "start": {
+                    "row": 21,
+                    "column": 86
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 87
+                  },
+                  "text": " "
+                }
+              ]
+            },
+            {
+              "type": "while_statement",
+              "start": {
+                "row": 22,
+                "column": 8
+              },
+              "end": {
+                "row": 34,
+                "column": 9
+              },
+              "text": "vent event = null;\n            event = decoder.decode(fetcher, context);\n\n            if (event == null) {\n                throw new CanalParseException(\"parse failed\");\n            }\n\n            if (!func.sink(event)) {\n                break;\n            }\n        }\n    }",
+              "children": [
+                {
+                  "type": "while",
+                  "start": {
+                    "row": 22,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 13
+                  },
+                  "text": "vent "
+                },
+                {
+                  "type": "condition",
+                  "start": {
+                    "row": 22,
+                    "column": 14
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 31
+                  },
+                  "text": "vent = null;\n    ",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 22,
+                        "column": 14
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 15
+                      },
+                      "text": "v"
+                    },
+                    {
+                      "type": "method_invocation",
+                      "start": {
+                        "row": 22,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 30
+                      },
+                      "text": "ent = null;\n   ",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 22,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 22
+                          },
+                          "text": "ent = n"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 22,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 23
+                          },
+                          "text": "u"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 22,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 28
+                          },
+                          "text": "ll;\n "
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 22,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 30
+                          },
+                          "text": "  ",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 22,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 29
+                              },
+                              "text": " "
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 22,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 30
+                              },
+                              "text": " "
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 22,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 31
+                      },
+                      "text": " "
+                    }
+                  ]
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 22,
+                    "column": 32
+                  },
+                  "end": {
+                    "row": 34,
+                    "column": 9
+                  },
+                  "text": "       event = decoder.decode(fetcher, context);\n\n            if (event == null) {\n                throw new CanalParseException(\"parse failed\");\n            }\n\n            if (!func.sink(event)) {\n                break;\n            }\n        }\n    }",
+                  "children": [
+                    {
+                      "type": "{",
+                      "start": {
+                        "row": 22,
+                        "column": 32
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 33
+                      },
+                      "text": " "
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 23,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 53
+                      },
+                      "text": " decoder.decode(fetcher, context);\n\n     ",
+                      "children": [
+                        {
+                          "type": "method_invocation",
+                          "start": {
+                            "row": 23,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 52
+                          },
+                          "text": " decoder.decode(fetcher, context);\n\n    ",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 35
+                              },
+                              "text": " decoder.decode(fetcher"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 23,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 52
+                              },
+                              "text": ", context);\n\n    ",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 35
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 36
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 51
+                                  },
+                                  "text": " context);\n\n   ",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 43
+                                      },
+                                      "text": " contex"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 44
+                                      },
+                                      "text": "t"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 49
+                                      },
+                                      "text": ");\n\n "
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 51
+                                      },
+                                      "text": "  ",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 50
+                                          },
+                                          "text": " "
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 51
+                                          },
+                                          "text": " "
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 52
+                                  },
+                                  "text": " "
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 23,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 53
+                          },
+                          "text": " "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "local_variable_declaration",
+                      "start": {
+                        "row": 24,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 34
+                      },
+                      "text": "ent == null) {\n       ",
+                      "children": [
+                        {
+                          "type": "type_identifier",
+                          "start": {
+                            "row": 24,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 20
+                          },
+                          "text": "ent == n"
+                        },
+                        {
+                          "type": "variable_declarator",
+                          "start": {
+                            "row": 24,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 33
+                          },
+                          "text": "ll) {\n      ",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 26
+                              },
+                              "text": "ll) {"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 24,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 28
+                              },
+                              "text": " "
+                            },
+                            {
+                              "type": "null_literal",
+                              "start": {
+                                "row": 24,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 33
+                              },
+                              "text": "    "
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 24,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 34
+                          },
+                          "text": " "
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 25,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 53
+                      },
+                      "text": "w new CanalParseException(\"parse failed\")",
+                      "children": [
+                        {
+                          "type": "assignment_expression",
+                          "start": {
+                            "row": 25,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 52
+                          },
+                          "text": "w new CanalParseException(\"parse failed\"",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 25,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 17
+                              },
+                              "text": "w new"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 25,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 19
+                              },
+                              "text": "C"
+                            },
+                            {
+                              "type": "method_invocation",
+                              "start": {
+                                "row": 25,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 52
+                              },
+                              "text": "nalParseException(\"parse failed\"",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 27
+                                  },
+                                  "text": "nalPars"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 28
+                                  },
+                                  "text": "e"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 34
+                                  },
+                                  "text": "Except"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 52
+                                  },
+                                  "text": "ion(\"parse failed\"",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 35
+                                      },
+                                      "text": "i"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 42
+                                      },
+                                      "text": "on(\"par"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 42
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 43
+                                      },
+                                      "text": "s"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 51
+                                      },
+                                      "text": " failed"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 52
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ";",
+                          "start": {
+                            "row": 25,
+                            "column": 52
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 53
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 27,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 13
+                      },
+                      "text": "}\n\n            if (!func.sink(event)) {\n                break;\n            }\n        }\n    }",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 27,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 14
+                          },
+                          "text": "}\n"
+                        },
+                        {
+                          "type": "condition",
+                          "start": {
+                            "row": 27,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 30
+                          },
+                          "text": "            if ",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 27,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 16
+                              },
+                              "text": " "
+                            },
+                            {
+                              "type": "binary_expression",
+                              "start": {
+                                "row": 27,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 29
+                              },
+                              "text": "           if",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 21
+                                  },
+                                  "text": "     "
+                                },
+                                {
+                                  "type": "==",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 24
+                                  },
+                                  "text": "  "
+                                },
+                                {
+                                  "type": "null_literal",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 29
+                                  },
+                                  "text": "  if"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 27,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 30
+                              },
+                              "text": " "
+                            }
+                          ]
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 27,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 29,
+                            "column": 13
+                          },
+                          "text": "!func.sink(event)) {\n                break;\n            }\n        }\n    }",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 27,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 32
+                              },
+                              "text": "!"
+                            },
+                            {
+                              "type": "throw_statement",
+                              "start": {
+                                "row": 28,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 62
+                              },
+                              "text": " {\n                break;\n            }\n      ",
+                              "children": [
+                                {
+                                  "type": "throw",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 21
+                                  },
+                                  "text": " {\n  "
+                                },
+                                {
+                                  "type": "object_creation_expression",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 61
+                                  },
+                                  "text": "             break;\n            }\n     ",
+                                  "children": [
+                                    {
+                                      "type": "new",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 25
+                                      },
+                                      "text": "   "
+                                    },
+                                    {
+                                      "type": "type_identifier",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 45
+                                      },
+                                      "text": "         break;\n   "
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 61
+                                      },
+                                      "text": "         }\n     ",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 46
+                                          },
+                                          "text": " "
+                                        },
+                                        {
+                                          "type": "string_literal",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 60
+                                          },
+                                          "text": "        }\n    ",
+                                          "children": [
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 47
+                                              },
+                                              "text": " "
+                                            },
+                                            {
+                                              "type": "string_fragment",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 59
+                                              },
+                                              "text": "       }\n   "
+                                            },
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 59
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 60
+                                              },
+                                              "text": " "
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 60
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 61
+                                          },
+                                          "text": " "
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 62
+                                  },
+                                  "text": " "
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 29,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 29,
+                                "column": 13
+                              },
+                              "text": ""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 31,
+                        "column": 12
+                      },
+                      "end": {
+                        "row": 33,
+                        "column": 13
+                      },
+                      "text": "",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 31,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 14
+                          },
+                          "text": ""
+                        },
+                        {
+                          "type": "condition",
+                          "start": {
+                            "row": 31,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 34
+                          },
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 31,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 16
+                              },
+                              "text": ""
+                            },
+                            {
+                              "type": "unary_expression",
+                              "start": {
+                                "row": 31,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 33
+                              },
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "!",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 17
+                                  },
+                                  "text": ""
+                                },
+                                {
+                                  "type": "method_invocation",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 33
+                                  },
+                                  "text": "",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 31,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 21
+                                      },
+                                      "text": ""
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 31,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 22
+                                      },
+                                      "text": ""
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 31,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 26
+                                      },
+                                      "text": ""
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 31,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 31,
+                                        "column": 33
+                                      },
+                                      "text": "",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 27
+                                          },
+                                          "text": ""
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 27
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 32
+                                          },
+                                          "text": ""
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 31,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 31,
+                                            "column": 33
+                                          },
+                                          "text": ""
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 31,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 34
+                              },
+                              "text": ""
+                            }
+                          ]
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 31,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 33,
+                            "column": 13
+                          },
+                          "text": "",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 31,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 36
+                              },
+                              "text": ""
+                            },
+                            {
+                              "type": "break_statement",
+                              "start": {
+                                "row": 32,
+                                "column": 16
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 22
+                              },
+                              "text": "",
+                              "children": [
+                                {
+                                  "type": "break",
+                                  "start": {
+                                    "row": 32,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 32,
+                                    "column": 21
+                                  },
+                                  "text": ""
+                                },
+                                {
+                                  "type": ";",
+                                  "start": {
+                                    "row": 32,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 32,
+                                    "column": 22
+                                  },
+                                  "text": ""
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 33,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 33,
+                                "column": 13
+                              },
+                              "text": ""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "}",
+                      "start": {
+                        "row": 34,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 9
+                      },
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "}",
+              "start": {
+                "row": 35,
+                "column": 4
+              },
+              "end": {
+                "row": 35,
+                "column": 5
+              },
+              "text": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

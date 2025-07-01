@@ -1,0 +1,4 @@
+def show_guiref(self):
+        """Show qtconsole help"""
+        from qtconsole.usage import gui_reference
+        self.main.help.show_rich_text(gui_reference, collapse=True)

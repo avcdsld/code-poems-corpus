@@ -1,0 +1,9 @@
+public Img cut(Rectangle rectangle) {
+		final BufferedImage srcImage = getValidSrcImg();
+		rectangle = fixRectangle(rectangle, srcImage.getWidth(), srcImage.getHeight());
+
+		final ImageFilter cropFilter = new CropImageFilter(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+		final Image image = Toolkit.getDefaultToolkit().createImage(new FilteredImageSource(srcImage.getSource(), cropFilter));
+		this.targetImage = ImgUtil.toBufferedImage(image);
+		return this;
+	}

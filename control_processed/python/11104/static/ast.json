@@ -1,0 +1,2580 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 20,
+    "column": 54
+  },
+  "text": "def _write_tfrecords_from_generator(generator, output_files, shuffle=True):\n  \"\"\"Writes generated str records to output_files in round-robin order.\"\"\"\n  if do_files_exist(output_files):\n    raise ValueError(\n        \"Pre-processed files already exists: {}.\".format(output_files))\n\n  with _incomplete_files(output_files) as tmp_files:\n    # Write all shards\n    writers = [tf.io.TFRecordWriter(fname) for fname in tmp_files]\n    with _close_on_exit(writers) as writers:\n      logging.info(\"Writing TFRecords\")\n      _round_robin_write(writers, generator)\n    # Shuffle each shard\n    if shuffle:\n      # WARNING: Using np instead of Python random because Python random\n      # produce different values between Python 2 and 3 and between\n      # architectures\n      random_gen = np.random.RandomState(42)\n      for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 20,
+        "column": 54
+      },
+      "text": "def _write_tfrecords_from_generator(generator, output_files, shuffle=True):\n  \"\"\"Writes generated str records to output_files in round-robin order.\"\"\"\n  if do_files_exist(output_files):\n    raise ValueError(\n        \"Pre-processed files already exists: {}.\".format(output_files))\n\n  with _incomplete_files(output_files) as tmp_files:\n    # Write all shards\n    writers = [tf.io.TFRecordWriter(fname) for fname in tmp_files]\n    with _close_on_exit(writers) as writers:\n      logging.info(\"Writing TFRecords\")\n      _round_robin_write(writers, generator)\n    # Shuffle each shard\n    if shuffle:\n      # WARNING: Using np instead of Python random because Python random\n      # produce different values between Python 2 and 3 and between\n      # architectures\n      random_gen = np.random.RandomState(42)\n      for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 35
+          },
+          "text": "_write_tfrecords_from_generator"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 35
+          },
+          "end": {
+            "row": 0,
+            "column": 74
+          },
+          "text": "(generator, output_files, shuffle=True)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 35
+              },
+              "end": {
+                "row": 0,
+                "column": 36
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 36
+              },
+              "end": {
+                "row": 0,
+                "column": 45
+              },
+              "text": "generator"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 45
+              },
+              "end": {
+                "row": 0,
+                "column": 46
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 47
+              },
+              "end": {
+                "row": 0,
+                "column": 59
+              },
+              "text": "output_files"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 59
+              },
+              "end": {
+                "row": 0,
+                "column": 60
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 61
+              },
+              "end": {
+                "row": 0,
+                "column": 73
+              },
+              "text": "shuffle=True",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 61
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 68
+                  },
+                  "text": "shuffle"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 68
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 69
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "true",
+                  "start": {
+                    "row": 0,
+                    "column": 69
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 73
+                  },
+                  "text": "True"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 73
+              },
+              "end": {
+                "row": 0,
+                "column": 74
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 74
+          },
+          "end": {
+            "row": 0,
+            "column": 75
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 2
+          },
+          "end": {
+            "row": 20,
+            "column": 54
+          },
+          "text": "\"\"\"Writes generated str records to output_files in round-robin order.\"\"\"\n  if do_files_exist(output_files):\n    raise ValueError(\n        \"Pre-processed files already exists: {}.\".format(output_files))\n\n  with _incomplete_files(output_files) as tmp_files:\n    # Write all shards\n    writers = [tf.io.TFRecordWriter(fname) for fname in tmp_files]\n    with _close_on_exit(writers) as writers:\n      logging.info(\"Writing TFRecords\")\n      _round_robin_write(writers, generator)\n    # Shuffle each shard\n    if shuffle:\n      # WARNING: Using np instead of Python random because Python random\n      # produce different values between Python 2 and 3 and between\n      # architectures\n      random_gen = np.random.RandomState(42)\n      for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 2
+              },
+              "end": {
+                "row": 1,
+                "column": 74
+              },
+              "text": "\"\"\"Writes generated str records to output_files in round-robin order.\"\"\"",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 74
+                  },
+                  "text": "\"\"\"Writes generated str records to output_files in round-robin order.\"\"\"",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 5
+                      },
+                      "text": "\"\"\""
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 5
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 71
+                      },
+                      "text": "Writes generated str records to output_files in round-robin order."
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 1,
+                        "column": 71
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 74
+                      },
+                      "text": "\"\"\""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 2,
+                "column": 2
+              },
+              "end": {
+                "row": 4,
+                "column": 71
+              },
+              "text": "if do_files_exist(output_files):\n    raise ValueError(\n        \"Pre-processed files already exists: {}.\".format(output_files))",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 2,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 4
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 2,
+                    "column": 5
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 33
+                  },
+                  "text": "do_files_exist(output_files)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 2,
+                        "column": 5
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 19
+                      },
+                      "text": "do_files_exist"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 2,
+                        "column": 19
+                      },
+                      "end": {
+                        "row": 2,
+                        "column": 33
+                      },
+                      "text": "(output_files)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 2,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 20
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 2,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 32
+                          },
+                          "text": "output_files"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 2,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 2,
+                            "column": 33
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 2,
+                    "column": 33
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 34
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 3,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 71
+                  },
+                  "text": "raise ValueError(\n        \"Pre-processed files already exists: {}.\".format(output_files))",
+                  "children": [
+                    {
+                      "type": "raise_statement",
+                      "start": {
+                        "row": 3,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 4,
+                        "column": 71
+                      },
+                      "text": "raise ValueError(\n        \"Pre-processed files already exists: {}.\".format(output_files))",
+                      "children": [
+                        {
+                          "type": "raise",
+                          "start": {
+                            "row": 3,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 3,
+                            "column": 9
+                          },
+                          "text": "raise"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 3,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 4,
+                            "column": 71
+                          },
+                          "text": "ValueError(\n        \"Pre-processed files already exists: {}.\".format(output_files))",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 3,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 3,
+                                "column": 20
+                              },
+                              "text": "ValueError"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 3,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 4,
+                                "column": 71
+                              },
+                              "text": "(\n        \"Pre-processed files already exists: {}.\".format(output_files))",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 3,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 3,
+                                    "column": 21
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 70
+                                  },
+                                  "text": "\"Pre-processed files already exists: {}.\".format(output_files)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 56
+                                      },
+                                      "text": "\"Pre-processed files already exists: {}.\".format",
+                                      "children": [
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 49
+                                          },
+                                          "text": "\"Pre-processed files already exists: {}.\"",
+                                          "children": [
+                                            {
+                                              "type": "string_start",
+                                              "start": {
+                                                "row": 4,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 4,
+                                                "column": 9
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 4,
+                                                "column": 9
+                                              },
+                                              "end": {
+                                                "row": 4,
+                                                "column": 48
+                                              },
+                                              "text": "Pre-processed files already exists: {}."
+                                            },
+                                            {
+                                              "type": "string_end",
+                                              "start": {
+                                                "row": 4,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 4,
+                                                "column": 49
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 50
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 56
+                                          },
+                                          "text": "format"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 4,
+                                        "column": 56
+                                      },
+                                      "end": {
+                                        "row": 4,
+                                        "column": 70
+                                      },
+                                      "text": "(output_files)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 56
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 57
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 57
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 69
+                                          },
+                                          "text": "output_files"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 4,
+                                            "column": 69
+                                          },
+                                          "end": {
+                                            "row": 4,
+                                            "column": 70
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 4,
+                                    "column": 70
+                                  },
+                                  "end": {
+                                    "row": 4,
+                                    "column": 71
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "with_statement",
+              "start": {
+                "row": 6,
+                "column": 2
+              },
+              "end": {
+                "row": 20,
+                "column": 54
+              },
+              "text": "with _incomplete_files(output_files) as tmp_files:\n    # Write all shards\n    writers = [tf.io.TFRecordWriter(fname) for fname in tmp_files]\n    with _close_on_exit(writers) as writers:\n      logging.info(\"Writing TFRecords\")\n      _round_robin_write(writers, generator)\n    # Shuffle each shard\n    if shuffle:\n      # WARNING: Using np instead of Python random because Python random\n      # produce different values between Python 2 and 3 and between\n      # architectures\n      random_gen = np.random.RandomState(42)\n      for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+              "children": [
+                {
+                  "type": "with",
+                  "start": {
+                    "row": 6,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 6
+                  },
+                  "text": "with"
+                },
+                {
+                  "type": "with_clause",
+                  "start": {
+                    "row": 6,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 51
+                  },
+                  "text": "_incomplete_files(output_files) as tmp_files",
+                  "children": [
+                    {
+                      "type": "with_item",
+                      "start": {
+                        "row": 6,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 6,
+                        "column": 51
+                      },
+                      "text": "_incomplete_files(output_files) as tmp_files",
+                      "children": [
+                        {
+                          "type": "as_pattern",
+                          "start": {
+                            "row": 6,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 6,
+                            "column": 51
+                          },
+                          "text": "_incomplete_files(output_files) as tmp_files",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 6,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 38
+                              },
+                              "text": "_incomplete_files(output_files)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 6,
+                                    "column": 7
+                                  },
+                                  "end": {
+                                    "row": 6,
+                                    "column": 24
+                                  },
+                                  "text": "_incomplete_files"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 6,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 6,
+                                    "column": 38
+                                  },
+                                  "text": "(output_files)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 6,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 6,
+                                        "column": 25
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 6,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 6,
+                                        "column": 37
+                                      },
+                                      "text": "output_files"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 6,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 6,
+                                        "column": 38
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "as",
+                              "start": {
+                                "row": 6,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 41
+                              },
+                              "text": "as"
+                            },
+                            {
+                              "type": "as_pattern_target",
+                              "start": {
+                                "row": 6,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 6,
+                                "column": 51
+                              },
+                              "text": "tmp_files",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 6,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 6,
+                                    "column": 51
+                                  },
+                                  "text": "tmp_files"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 6,
+                    "column": 51
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 52
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 7,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 22
+                  },
+                  "text": "# Write all shards"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 8,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 54
+                  },
+                  "text": "writers = [tf.io.TFRecordWriter(fname) for fname in tmp_files]\n    with _close_on_exit(writers) as writers:\n      logging.info(\"Writing TFRecords\")\n      _round_robin_write(writers, generator)\n    # Shuffle each shard\n    if shuffle:\n      # WARNING: Using np instead of Python random because Python random\n      # produce different values between Python 2 and 3 and between\n      # architectures\n      random_gen = np.random.RandomState(42)\n      for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 8,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 8,
+                        "column": 66
+                      },
+                      "text": "writers = [tf.io.TFRecordWriter(fname) for fname in tmp_files]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 8,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 8,
+                            "column": 66
+                          },
+                          "text": "writers = [tf.io.TFRecordWriter(fname) for fname in tmp_files]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 8,
+                                "column": 4
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 11
+                              },
+                              "text": "writers"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 8,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 13
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "list_comprehension",
+                              "start": {
+                                "row": 8,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 8,
+                                "column": 66
+                              },
+                              "text": "[tf.io.TFRecordWriter(fname) for fname in tmp_files]",
+                              "children": [
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 15
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 42
+                                  },
+                                  "text": "tf.io.TFRecordWriter(fname)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 35
+                                      },
+                                      "text": "tf.io.TFRecordWriter",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 20
+                                          },
+                                          "text": "tf.io",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 15
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 17
+                                              },
+                                              "text": "tf"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 17
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 18
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 8,
+                                                "column": 18
+                                              },
+                                              "end": {
+                                                "row": 8,
+                                                "column": 20
+                                              },
+                                              "text": "io"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 21
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 35
+                                          },
+                                          "text": "TFRecordWriter"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 42
+                                      },
+                                      "text": "(fname)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 36
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 41
+                                          },
+                                          "text": "fname"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 8,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 8,
+                                            "column": 42
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "for_in_clause",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 65
+                                  },
+                                  "text": "for fname in tmp_files",
+                                  "children": [
+                                    {
+                                      "type": "for",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 46
+                                      },
+                                      "text": "for"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 52
+                                      },
+                                      "text": "fname"
+                                    },
+                                    {
+                                      "type": "in",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 55
+                                      },
+                                      "text": "in"
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 8,
+                                        "column": 56
+                                      },
+                                      "end": {
+                                        "row": 8,
+                                        "column": 65
+                                      },
+                                      "text": "tmp_files"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 8,
+                                    "column": 65
+                                  },
+                                  "end": {
+                                    "row": 8,
+                                    "column": 66
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "with_statement",
+                      "start": {
+                        "row": 9,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 44
+                      },
+                      "text": "with _close_on_exit(writers) as writers:\n      logging.info(\"Writing TFRecords\")\n      _round_robin_write(writers, generator)",
+                      "children": [
+                        {
+                          "type": "with",
+                          "start": {
+                            "row": 9,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 8
+                          },
+                          "text": "with"
+                        },
+                        {
+                          "type": "with_clause",
+                          "start": {
+                            "row": 9,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 43
+                          },
+                          "text": "_close_on_exit(writers) as writers",
+                          "children": [
+                            {
+                              "type": "with_item",
+                              "start": {
+                                "row": 9,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 9,
+                                "column": 43
+                              },
+                              "text": "_close_on_exit(writers) as writers",
+                              "children": [
+                                {
+                                  "type": "as_pattern",
+                                  "start": {
+                                    "row": 9,
+                                    "column": 9
+                                  },
+                                  "end": {
+                                    "row": 9,
+                                    "column": 43
+                                  },
+                                  "text": "_close_on_exit(writers) as writers",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 9
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 32
+                                      },
+                                      "text": "_close_on_exit(writers)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 9
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 23
+                                          },
+                                          "text": "_close_on_exit"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 32
+                                          },
+                                          "text": "(writers)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 24
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 24
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 31
+                                              },
+                                              "text": "writers"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 9,
+                                                "column": 31
+                                              },
+                                              "end": {
+                                                "row": 9,
+                                                "column": 32
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "as",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 35
+                                      },
+                                      "text": "as"
+                                    },
+                                    {
+                                      "type": "as_pattern_target",
+                                      "start": {
+                                        "row": 9,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 9,
+                                        "column": 43
+                                      },
+                                      "text": "writers",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 9,
+                                            "column": 36
+                                          },
+                                          "end": {
+                                            "row": 9,
+                                            "column": 43
+                                          },
+                                          "text": "writers"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 9,
+                            "column": 43
+                          },
+                          "end": {
+                            "row": 9,
+                            "column": 44
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 10,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 11,
+                            "column": 44
+                          },
+                          "text": "logging.info(\"Writing TFRecords\")\n      _round_robin_write(writers, generator)",
+                          "children": [
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 10,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 39
+                              },
+                              "text": "logging.info(\"Writing TFRecords\")",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 10,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 10,
+                                    "column": 39
+                                  },
+                                  "text": "logging.info(\"Writing TFRecords\")",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 10,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 10,
+                                        "column": 18
+                                      },
+                                      "text": "logging.info",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 6
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 13
+                                          },
+                                          "text": "logging"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 13
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 14
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 18
+                                          },
+                                          "text": "info"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 10,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 10,
+                                        "column": 39
+                                      },
+                                      "text": "(\"Writing TFRecords\")",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 18
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 19
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 38
+                                          },
+                                          "text": "\"Writing TFRecords\"",
+                                          "children": [
+                                            {
+                                              "type": "string_start",
+                                              "start": {
+                                                "row": 10,
+                                                "column": 19
+                                              },
+                                              "end": {
+                                                "row": 10,
+                                                "column": 20
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "string_content",
+                                              "start": {
+                                                "row": 10,
+                                                "column": 20
+                                              },
+                                              "end": {
+                                                "row": 10,
+                                                "column": 37
+                                              },
+                                              "text": "Writing TFRecords"
+                                            },
+                                            {
+                                              "type": "string_end",
+                                              "start": {
+                                                "row": 10,
+                                                "column": 37
+                                              },
+                                              "end": {
+                                                "row": 10,
+                                                "column": 38
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 10,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 10,
+                                            "column": 39
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 11,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 11,
+                                "column": 44
+                              },
+                              "text": "_round_robin_write(writers, generator)",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 11,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 11,
+                                    "column": 44
+                                  },
+                                  "text": "_round_robin_write(writers, generator)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 24
+                                      },
+                                      "text": "_round_robin_write"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 11,
+                                        "column": 24
+                                      },
+                                      "end": {
+                                        "row": 11,
+                                        "column": 44
+                                      },
+                                      "text": "(writers, generator)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 25
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 32
+                                          },
+                                          "text": "writers"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 33
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 43
+                                          },
+                                          "text": "generator"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 11,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 11,
+                                            "column": 44
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "comment",
+                      "start": {
+                        "row": 12,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 24
+                      },
+                      "text": "# Shuffle each shard"
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 13,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 54
+                      },
+                      "text": "if shuffle:\n      # WARNING: Using np instead of Python random because Python random\n      # produce different values between Python 2 and 3 and between\n      # architectures\n      random_gen = np.random.RandomState(42)\n      for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 13,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 6
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 13,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 14
+                          },
+                          "text": "shuffle"
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 13,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 15
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 14,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 72
+                          },
+                          "text": "# WARNING: Using np instead of Python random because Python random"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 15,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 67
+                          },
+                          "text": "# produce different values between Python 2 and 3 and between"
+                        },
+                        {
+                          "type": "comment",
+                          "start": {
+                            "row": 16,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 21
+                          },
+                          "text": "# architectures"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 17,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 54
+                          },
+                          "text": "random_gen = np.random.RandomState(42)\n      for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+                          "children": [
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 17,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 44
+                              },
+                              "text": "random_gen = np.random.RandomState(42)",
+                              "children": [
+                                {
+                                  "type": "assignment",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 44
+                                  },
+                                  "text": "random_gen = np.random.RandomState(42)",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 6
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 16
+                                      },
+                                      "text": "random_gen"
+                                    },
+                                    {
+                                      "type": "=",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 17
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 18
+                                      },
+                                      "text": "="
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 17,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 17,
+                                        "column": 44
+                                      },
+                                      "text": "np.random.RandomState(42)",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 40
+                                          },
+                                          "text": "np.random.RandomState",
+                                          "children": [
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 19
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 28
+                                              },
+                                              "text": "np.random",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 19
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 21
+                                                  },
+                                                  "text": "np"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 21
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 22
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 17,
+                                                    "column": 22
+                                                  },
+                                                  "end": {
+                                                    "row": 17,
+                                                    "column": 28
+                                                  },
+                                                  "text": "random"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 28
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 29
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 29
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 40
+                                              },
+                                              "text": "RandomState"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 17,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 17,
+                                            "column": 44
+                                          },
+                                          "text": "(42)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 40
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 41
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "integer",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 41
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 43
+                                              },
+                                              "text": "42"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 17,
+                                                "column": 43
+                                              },
+                                              "end": {
+                                                "row": 17,
+                                                "column": 44
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "for_statement",
+                              "start": {
+                                "row": 18,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 54
+                              },
+                              "text": "for path in utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False):\n        _shuffle_tfrecord(path, random_gen=random_gen)",
+                              "children": [
+                                {
+                                  "type": "for",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 9
+                                  },
+                                  "text": "for"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 14
+                                  },
+                                  "text": "path"
+                                },
+                                {
+                                  "type": "in",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 18,
+                                    "column": 17
+                                  },
+                                  "text": "in"
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 18,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 69
+                                  },
+                                  "text": "utils.tqdm(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 18,
+                                        "column": 28
+                                      },
+                                      "text": "utils.tqdm",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 18
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 23
+                                          },
+                                          "text": "utils"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 24
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 28
+                                          },
+                                          "text": "tqdm"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 18,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 69
+                                      },
+                                      "text": "(\n          tmp_files, desc=\"Shuffling...\", unit=\" shard\", leave=False)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 18,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 18,
+                                            "column": 29
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 10
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 19
+                                          },
+                                          "text": "tmp_files"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 20
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "keyword_argument",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 40
+                                          },
+                                          "text": "desc=\"Shuffling...\"",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 21
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 25
+                                              },
+                                              "text": "desc"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 25
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 26
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 26
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 40
+                                              },
+                                              "text": "\"Shuffling...\"",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 27
+                                                  },
+                                                  "text": "\""
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 27
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 39
+                                                  },
+                                                  "text": "Shuffling..."
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 39
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 40
+                                                  },
+                                                  "text": "\""
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 41
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "keyword_argument",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 42
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 55
+                                          },
+                                          "text": "unit=\" shard\"",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 42
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 46
+                                              },
+                                              "text": "unit"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 47
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 55
+                                              },
+                                              "text": "\" shard\"",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 47
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 48
+                                                  },
+                                                  "text": "\""
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 48
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 54
+                                                  },
+                                                  "text": " shard"
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 19,
+                                                    "column": 54
+                                                  },
+                                                  "end": {
+                                                    "row": 19,
+                                                    "column": 55
+                                                  },
+                                                  "text": "\""
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 55
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 56
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "keyword_argument",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 57
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 68
+                                          },
+                                          "text": "leave=False",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 57
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 62
+                                              },
+                                              "text": "leave"
+                                            },
+                                            {
+                                              "type": "=",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 62
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 63
+                                              },
+                                              "text": "="
+                                            },
+                                            {
+                                              "type": "false",
+                                              "start": {
+                                                "row": 19,
+                                                "column": 63
+                                              },
+                                              "end": {
+                                                "row": 19,
+                                                "column": 68
+                                              },
+                                              "text": "False"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 68
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 69
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 69
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 70
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "block",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 54
+                                  },
+                                  "text": "_shuffle_tfrecord(path, random_gen=random_gen)",
+                                  "children": [
+                                    {
+                                      "type": "expression_statement",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 8
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 54
+                                      },
+                                      "text": "_shuffle_tfrecord(path, random_gen=random_gen)",
+                                      "children": [
+                                        {
+                                          "type": "call",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 54
+                                          },
+                                          "text": "_shuffle_tfrecord(path, random_gen=random_gen)",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 8
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 25
+                                              },
+                                              "text": "_shuffle_tfrecord"
+                                            },
+                                            {
+                                              "type": "argument_list",
+                                              "start": {
+                                                "row": 20,
+                                                "column": 25
+                                              },
+                                              "end": {
+                                                "row": 20,
+                                                "column": 54
+                                              },
+                                              "text": "(path, random_gen=random_gen)",
+                                              "children": [
+                                                {
+                                                  "type": "(",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 25
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 26
+                                                  },
+                                                  "text": "("
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 26
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 30
+                                                  },
+                                                  "text": "path"
+                                                },
+                                                {
+                                                  "type": ",",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 30
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 31
+                                                  },
+                                                  "text": ","
+                                                },
+                                                {
+                                                  "type": "keyword_argument",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 32
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 53
+                                                  },
+                                                  "text": "random_gen=random_gen",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 32
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 42
+                                                      },
+                                                      "text": "random_gen"
+                                                    },
+                                                    {
+                                                      "type": "=",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 42
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 43
+                                                      },
+                                                      "text": "="
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 20,
+                                                        "column": 43
+                                                      },
+                                                      "end": {
+                                                        "row": 20,
+                                                        "column": 53
+                                                      },
+                                                      "text": "random_gen"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": ")",
+                                                  "start": {
+                                                    "row": 20,
+                                                    "column": 53
+                                                  },
+                                                  "end": {
+                                                    "row": 20,
+                                                    "column": 54
+                                                  },
+                                                  "text": ")"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

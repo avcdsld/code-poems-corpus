@@ -1,0 +1,3550 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 47,
+    "column": 2
+  },
+  "text": "function(mComponent) {\n\t\tthis._mComponent = mComponent;\n\t\t//_mChanges contains:\n\t\t// - mChanges: map of changes (selector id)\n\t\t// - mDependencies: map of changes (change key) that need to be applied before any change. Used to check if a change can be applied. Format:\n\t\t//\t\tmDependencies: {\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange2,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange1USERnamespace\"]\n\t\t//\t\t\t},\n\t\t//\t\t\t\"fileNameChange3USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange3,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange2USERnamespace\"]\n\t\t//\t\t\t}\n\t\t//\t\t}\n\t\t// - mDependentChangesOnMe: map of changes (change key) that cannot be applied before the change. Used to remove dependencies faster. Format:\n\t\t//\t\tmDependentChangesOnMe: {\n\t\t//\t\t\t\"fileNameChange1USERnamespace\": [oChange2],\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": [oChange3]\n\t\t//\t\t}\n\t\t// - aChanges: array of changes ordered by layer and creation time\n\t\t//\t\taChanges: [oChange1, oChange2, oChange3]\n\t\tthis._mChanges = {\n\t\t\tmChanges: {},\n\t\t\tmDependencies: {},\n\t\t\tmDependentChangesOnMe: {},\n\t\t\taChanges: []\n\t\t};\n\n\t\t//_mChangesInitial contains a clone of _mChanges to recreated dependencies if changes need to be reapplied\n\t\tthis._mChangesInitial = merge({}, this._mChanges);\n\n\t\tthis._mVariantsChanges = {};\n\n\t\tif (!this._mComponent || !this._mComponent.name) {\n\t\t\tUtils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\");\n\t\t\tthrow new Error(\"Missing component name.\");\n\t\t}\n\n\t\tthis._oVariantController = new VariantController(this._mComponent.name, this._mComponent.appVersion, {});\n\t\tthis._oTransportSelection = new TransportSelection();\n\t\tthis._oConnector = this._createLrepConnector();\n\t\tthis._aDirtyChanges = [];\n\t\tthis._oMessagebundle = undefined;\n\t\tthis._mChangesEntries = {};\n\t\tthis._bHasChangesOverMaxLayer = false;\n\t\tthis.HIGHER_LAYER_CHANGES_EXIST = \"higher_layer_changes_exist\";\n\t}",
+  "children": [
+    {
+      "type": "expression_statement",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 47,
+        "column": 2
+      },
+      "text": "function(mComponent) {\n\t\tthis._mComponent = mComponent;\n\t\t//_mChanges contains:\n\t\t// - mChanges: map of changes (selector id)\n\t\t// - mDependencies: map of changes (change key) that need to be applied before any change. Used to check if a change can be applied. Format:\n\t\t//\t\tmDependencies: {\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange2,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange1USERnamespace\"]\n\t\t//\t\t\t},\n\t\t//\t\t\t\"fileNameChange3USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange3,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange2USERnamespace\"]\n\t\t//\t\t\t}\n\t\t//\t\t}\n\t\t// - mDependentChangesOnMe: map of changes (change key) that cannot be applied before the change. Used to remove dependencies faster. Format:\n\t\t//\t\tmDependentChangesOnMe: {\n\t\t//\t\t\t\"fileNameChange1USERnamespace\": [oChange2],\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": [oChange3]\n\t\t//\t\t}\n\t\t// - aChanges: array of changes ordered by layer and creation time\n\t\t//\t\taChanges: [oChange1, oChange2, oChange3]\n\t\tthis._mChanges = {\n\t\t\tmChanges: {},\n\t\t\tmDependencies: {},\n\t\t\tmDependentChangesOnMe: {},\n\t\t\taChanges: []\n\t\t};\n\n\t\t//_mChangesInitial contains a clone of _mChanges to recreated dependencies if changes need to be reapplied\n\t\tthis._mChangesInitial = merge({}, this._mChanges);\n\n\t\tthis._mVariantsChanges = {};\n\n\t\tif (!this._mComponent || !this._mComponent.name) {\n\t\t\tUtils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\");\n\t\t\tthrow new Error(\"Missing component name.\");\n\t\t}\n\n\t\tthis._oVariantController = new VariantController(this._mComponent.name, this._mComponent.appVersion, {});\n\t\tthis._oTransportSelection = new TransportSelection();\n\t\tthis._oConnector = this._createLrepConnector();\n\t\tthis._aDirtyChanges = [];\n\t\tthis._oMessagebundle = undefined;\n\t\tthis._mChangesEntries = {};\n\t\tthis._bHasChangesOverMaxLayer = false;\n\t\tthis.HIGHER_LAYER_CHANGES_EXIST = \"higher_layer_changes_exist\";\n\t}",
+      "children": [
+        {
+          "type": "function",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 47,
+            "column": 2
+          },
+          "text": "function(mComponent) {\n\t\tthis._mComponent = mComponent;\n\t\t//_mChanges contains:\n\t\t// - mChanges: map of changes (selector id)\n\t\t// - mDependencies: map of changes (change key) that need to be applied before any change. Used to check if a change can be applied. Format:\n\t\t//\t\tmDependencies: {\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange2,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange1USERnamespace\"]\n\t\t//\t\t\t},\n\t\t//\t\t\t\"fileNameChange3USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange3,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange2USERnamespace\"]\n\t\t//\t\t\t}\n\t\t//\t\t}\n\t\t// - mDependentChangesOnMe: map of changes (change key) that cannot be applied before the change. Used to remove dependencies faster. Format:\n\t\t//\t\tmDependentChangesOnMe: {\n\t\t//\t\t\t\"fileNameChange1USERnamespace\": [oChange2],\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": [oChange3]\n\t\t//\t\t}\n\t\t// - aChanges: array of changes ordered by layer and creation time\n\t\t//\t\taChanges: [oChange1, oChange2, oChange3]\n\t\tthis._mChanges = {\n\t\t\tmChanges: {},\n\t\t\tmDependencies: {},\n\t\t\tmDependentChangesOnMe: {},\n\t\t\taChanges: []\n\t\t};\n\n\t\t//_mChangesInitial contains a clone of _mChanges to recreated dependencies if changes need to be reapplied\n\t\tthis._mChangesInitial = merge({}, this._mChanges);\n\n\t\tthis._mVariantsChanges = {};\n\n\t\tif (!this._mComponent || !this._mComponent.name) {\n\t\t\tUtils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\");\n\t\t\tthrow new Error(\"Missing component name.\");\n\t\t}\n\n\t\tthis._oVariantController = new VariantController(this._mComponent.name, this._mComponent.appVersion, {});\n\t\tthis._oTransportSelection = new TransportSelection();\n\t\tthis._oConnector = this._createLrepConnector();\n\t\tthis._aDirtyChanges = [];\n\t\tthis._oMessagebundle = undefined;\n\t\tthis._mChangesEntries = {};\n\t\tthis._bHasChangesOverMaxLayer = false;\n\t\tthis.HIGHER_LAYER_CHANGES_EXIST = \"higher_layer_changes_exist\";\n\t}",
+          "children": [
+            {
+              "type": "function",
+              "start": {
+                "row": 0,
+                "column": 0
+              },
+              "end": {
+                "row": 0,
+                "column": 8
+              },
+              "text": "function"
+            },
+            {
+              "type": "formal_parameters",
+              "start": {
+                "row": 0,
+                "column": 8
+              },
+              "end": {
+                "row": 0,
+                "column": 20
+              },
+              "text": "(mComponent)",
+              "children": [
+                {
+                  "type": "(",
+                  "start": {
+                    "row": 0,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 9
+                  },
+                  "text": "("
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 19
+                  },
+                  "text": "mComponent"
+                },
+                {
+                  "type": ")",
+                  "start": {
+                    "row": 0,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 20
+                  },
+                  "text": ")"
+                }
+              ]
+            },
+            {
+              "type": "statement_block",
+              "start": {
+                "row": 0,
+                "column": 21
+              },
+              "end": {
+                "row": 47,
+                "column": 2
+              },
+              "text": "{\n\t\tthis._mComponent = mComponent;\n\t\t//_mChanges contains:\n\t\t// - mChanges: map of changes (selector id)\n\t\t// - mDependencies: map of changes (change key) that need to be applied before any change. Used to check if a change can be applied. Format:\n\t\t//\t\tmDependencies: {\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange2,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange1USERnamespace\"]\n\t\t//\t\t\t},\n\t\t//\t\t\t\"fileNameChange3USERnamespace\": {\n\t\t//\t\t\t\t\"changeObject\": oChange3,\n\t\t//\t\t\t\t\"dependencies\": [\"fileNameChange2USERnamespace\"]\n\t\t//\t\t\t}\n\t\t//\t\t}\n\t\t// - mDependentChangesOnMe: map of changes (change key) that cannot be applied before the change. Used to remove dependencies faster. Format:\n\t\t//\t\tmDependentChangesOnMe: {\n\t\t//\t\t\t\"fileNameChange1USERnamespace\": [oChange2],\n\t\t//\t\t\t\"fileNameChange2USERnamespace\": [oChange3]\n\t\t//\t\t}\n\t\t// - aChanges: array of changes ordered by layer and creation time\n\t\t//\t\taChanges: [oChange1, oChange2, oChange3]\n\t\tthis._mChanges = {\n\t\t\tmChanges: {},\n\t\t\tmDependencies: {},\n\t\t\tmDependentChangesOnMe: {},\n\t\t\taChanges: []\n\t\t};\n\n\t\t//_mChangesInitial contains a clone of _mChanges to recreated dependencies if changes need to be reapplied\n\t\tthis._mChangesInitial = merge({}, this._mChanges);\n\n\t\tthis._mVariantsChanges = {};\n\n\t\tif (!this._mComponent || !this._mComponent.name) {\n\t\t\tUtils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\");\n\t\t\tthrow new Error(\"Missing component name.\");\n\t\t}\n\n\t\tthis._oVariantController = new VariantController(this._mComponent.name, this._mComponent.appVersion, {});\n\t\tthis._oTransportSelection = new TransportSelection();\n\t\tthis._oConnector = this._createLrepConnector();\n\t\tthis._aDirtyChanges = [];\n\t\tthis._oMessagebundle = undefined;\n\t\tthis._mChangesEntries = {};\n\t\tthis._bHasChangesOverMaxLayer = false;\n\t\tthis.HIGHER_LAYER_CHANGES_EXIST = \"higher_layer_changes_exist\";\n\t}",
+              "children": [
+                {
+                  "type": "{",
+                  "start": {
+                    "row": 0,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 22
+                  },
+                  "text": "{"
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 1,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 1,
+                    "column": 32
+                  },
+                  "text": "this._mComponent = mComponent;",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 1,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 31
+                      },
+                      "text": "this._mComponent = mComponent",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 1,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 18
+                          },
+                          "text": "this._mComponent",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 1,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 1,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 1,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 1,
+                                "column": 18
+                              },
+                              "text": "_mComponent"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 1,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 20
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 1,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 1,
+                            "column": 31
+                          },
+                          "text": "mComponent"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 1,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 32
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 2,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 2,
+                    "column": 23
+                  },
+                  "text": "//_mChanges contains:"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 3,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 3,
+                    "column": 45
+                  },
+                  "text": "// - mChanges: map of changes (selector id)"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 4,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 4,
+                    "column": 142
+                  },
+                  "text": "// - mDependencies: map of changes (change key) that need to be applied before any change. Used to check if a change can be applied. Format:"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 5,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 5,
+                    "column": 22
+                  },
+                  "text": "//\t\tmDependencies: {"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 6,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 6,
+                    "column": 40
+                  },
+                  "text": "//\t\t\t\"fileNameChange2USERnamespace\": {"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 7,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 33
+                  },
+                  "text": "//\t\t\t\t\"changeObject\": oChange2,"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 8,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 8,
+                    "column": 56
+                  },
+                  "text": "//\t\t\t\t\"dependencies\": [\"fileNameChange1USERnamespace\"]"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 9,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 9
+                  },
+                  "text": "//\t\t\t},"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 10,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 40
+                  },
+                  "text": "//\t\t\t\"fileNameChange3USERnamespace\": {"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 11,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 33
+                  },
+                  "text": "//\t\t\t\t\"changeObject\": oChange3,"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 12,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 56
+                  },
+                  "text": "//\t\t\t\t\"dependencies\": [\"fileNameChange2USERnamespace\"]"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 13,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 13,
+                    "column": 8
+                  },
+                  "text": "//\t\t\t}"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 14,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 7
+                  },
+                  "text": "//\t\t}"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 15,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 15,
+                    "column": 143
+                  },
+                  "text": "// - mDependentChangesOnMe: map of changes (change key) that cannot be applied before the change. Used to remove dependencies faster. Format:"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 16,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 16,
+                    "column": 30
+                  },
+                  "text": "//\t\tmDependentChangesOnMe: {"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 17,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 50
+                  },
+                  "text": "//\t\t\t\"fileNameChange1USERnamespace\": [oChange2],"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 18,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 49
+                  },
+                  "text": "//\t\t\t\"fileNameChange2USERnamespace\": [oChange3]"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 19,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 7
+                  },
+                  "text": "//\t\t}"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 20,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 68
+                  },
+                  "text": "// - aChanges: array of changes ordered by layer and creation time"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 21,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 46
+                  },
+                  "text": "//\t\taChanges: [oChange1, oChange2, oChange3]"
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 22,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 4
+                  },
+                  "text": "this._mChanges = {\n\t\t\tmChanges: {},\n\t\t\tmDependencies: {},\n\t\t\tmDependentChangesOnMe: {},\n\t\t\taChanges: []\n\t\t};",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 22,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 3
+                      },
+                      "text": "this._mChanges = {\n\t\t\tmChanges: {},\n\t\t\tmDependencies: {},\n\t\t\tmDependentChangesOnMe: {},\n\t\t\taChanges: []\n\t\t}",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 22,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 16
+                          },
+                          "text": "this._mChanges",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 22,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 22,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 22,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 16
+                              },
+                              "text": "_mChanges"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 22,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 18
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "object",
+                          "start": {
+                            "row": 22,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 3
+                          },
+                          "text": "{\n\t\t\tmChanges: {},\n\t\t\tmDependencies: {},\n\t\t\tmDependentChangesOnMe: {},\n\t\t\taChanges: []\n\t\t}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 22,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 20
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 23,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 15
+                              },
+                              "text": "mChanges: {}",
+                              "children": [
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 3
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 11
+                                  },
+                                  "text": "mChanges"
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 12
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "object",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 15
+                                  },
+                                  "text": "{}",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 14
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 15
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 23,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 16
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 24,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 20
+                              },
+                              "text": "mDependencies: {}",
+                              "children": [
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 3
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 16
+                                  },
+                                  "text": "mDependencies"
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 17
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "object",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 20
+                                  },
+                                  "text": "{}",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 19
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 20
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 24,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 21
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 25,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 28
+                              },
+                              "text": "mDependentChangesOnMe: {}",
+                              "children": [
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 3
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 24
+                                  },
+                                  "text": "mDependentChangesOnMe"
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 25
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "object",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 28
+                                  },
+                                  "text": "{}",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 27
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 28
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 25,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 29
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "pair",
+                              "start": {
+                                "row": 26,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 26,
+                                "column": 15
+                              },
+                              "text": "aChanges: []",
+                              "children": [
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 3
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 11
+                                  },
+                                  "text": "aChanges"
+                                },
+                                {
+                                  "type": ":",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 12
+                                  },
+                                  "text": ":"
+                                },
+                                {
+                                  "type": "array",
+                                  "start": {
+                                    "row": 26,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 26,
+                                    "column": 15
+                                  },
+                                  "text": "[]",
+                                  "children": [
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 14
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 26,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 26,
+                                        "column": 15
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 27,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 3
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 27,
+                        "column": 3
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 4
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 29,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 29,
+                    "column": 108
+                  },
+                  "text": "//_mChangesInitial contains a clone of _mChanges to recreated dependencies if changes need to be reapplied"
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 30,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 52
+                  },
+                  "text": "this._mChangesInitial = merge({}, this._mChanges);",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 30,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 51
+                      },
+                      "text": "this._mChangesInitial = merge({}, this._mChanges)",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 30,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 23
+                          },
+                          "text": "this._mChangesInitial",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 30,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 30,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 30,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 23
+                              },
+                              "text": "_mChangesInitial"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 30,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 25
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call_expression",
+                          "start": {
+                            "row": 30,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 51
+                          },
+                          "text": "merge({}, this._mChanges)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 30,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 31
+                              },
+                              "text": "merge"
+                            },
+                            {
+                              "type": "arguments",
+                              "start": {
+                                "row": 30,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 51
+                              },
+                              "text": "({}, this._mChanges)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 32
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "object",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 34
+                                  },
+                                  "text": "{}",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 33
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 34
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 35
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 50
+                                  },
+                                  "text": "this._mChanges",
+                                  "children": [
+                                    {
+                                      "type": "this",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 40
+                                      },
+                                      "text": "this"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 41
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 41
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 50
+                                      },
+                                      "text": "_mChanges"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 51
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 30,
+                        "column": 51
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 52
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 32,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 30
+                  },
+                  "text": "this._mVariantsChanges = {};",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 32,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 29
+                      },
+                      "text": "this._mVariantsChanges = {}",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 32,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 24
+                          },
+                          "text": "this._mVariantsChanges",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 32,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 32,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 32,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 24
+                              },
+                              "text": "_mVariantsChanges"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 32,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 26
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "object",
+                          "start": {
+                            "row": 32,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 29
+                          },
+                          "text": "{}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 32,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 28
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 32,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 29
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 32,
+                        "column": 29
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 30
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "if_statement",
+                  "start": {
+                    "row": 34,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 37,
+                    "column": 3
+                  },
+                  "text": "if (!this._mComponent || !this._mComponent.name) {\n\t\t\tUtils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\");\n\t\t\tthrow new Error(\"Missing component name.\");\n\t\t}",
+                  "children": [
+                    {
+                      "type": "if",
+                      "start": {
+                        "row": 34,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 4
+                      },
+                      "text": "if"
+                    },
+                    {
+                      "type": "parenthesized_expression",
+                      "start": {
+                        "row": 34,
+                        "column": 5
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 50
+                      },
+                      "text": "(!this._mComponent || !this._mComponent.name)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 34,
+                            "column": 5
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 6
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "binary_expression",
+                          "start": {
+                            "row": 34,
+                            "column": 6
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 49
+                          },
+                          "text": "!this._mComponent || !this._mComponent.name",
+                          "children": [
+                            {
+                              "type": "unary_expression",
+                              "start": {
+                                "row": 34,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 23
+                              },
+                              "text": "!this._mComponent",
+                              "children": [
+                                {
+                                  "type": "!",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 6
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 7
+                                  },
+                                  "text": "!"
+                                },
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 7
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 23
+                                  },
+                                  "text": "this._mComponent",
+                                  "children": [
+                                    {
+                                      "type": "this",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 7
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 11
+                                      },
+                                      "text": "this"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 11
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 12
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 23
+                                      },
+                                      "text": "_mComponent"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "||",
+                              "start": {
+                                "row": 34,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 26
+                              },
+                              "text": "||"
+                            },
+                            {
+                              "type": "unary_expression",
+                              "start": {
+                                "row": 34,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 49
+                              },
+                              "text": "!this._mComponent.name",
+                              "children": [
+                                {
+                                  "type": "!",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 27
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 28
+                                  },
+                                  "text": "!"
+                                },
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 49
+                                  },
+                                  "text": "this._mComponent.name",
+                                  "children": [
+                                    {
+                                      "type": "member_expression",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 44
+                                      },
+                                      "text": "this._mComponent",
+                                      "children": [
+                                        {
+                                          "type": "this",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 32
+                                          },
+                                          "text": "this"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 33
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "property_identifier",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 33
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 44
+                                          },
+                                          "text": "_mComponent"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 45
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 49
+                                      },
+                                      "text": "name"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 34,
+                            "column": 49
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 50
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "statement_block",
+                      "start": {
+                        "row": 34,
+                        "column": 51
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 3
+                      },
+                      "text": "{\n\t\t\tUtils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\");\n\t\t\tthrow new Error(\"Missing component name.\");\n\t\t}",
+                      "children": [
+                        {
+                          "type": "{",
+                          "start": {
+                            "row": 34,
+                            "column": 51
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 52
+                          },
+                          "text": "{"
+                        },
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 35,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 147
+                          },
+                          "text": "Utils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\");",
+                          "children": [
+                            {
+                              "type": "call_expression",
+                              "start": {
+                                "row": 35,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 146
+                              },
+                              "text": "Utils.log.error(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\")",
+                              "children": [
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 3
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 18
+                                  },
+                                  "text": "Utils.log.error",
+                                  "children": [
+                                    {
+                                      "type": "member_expression",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 3
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 12
+                                      },
+                                      "text": "Utils.log",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 3
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 8
+                                          },
+                                          "text": "Utils"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 8
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 9
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "property_identifier",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 9
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 12
+                                          },
+                                          "text": "log"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 13
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 18
+                                      },
+                                      "text": "error"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "arguments",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 146
+                                  },
+                                  "text": "(\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\")",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 19
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 145
+                                      },
+                                      "text": "\"The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected.\"",
+                                      "children": [
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 20
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_fragment",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 144
+                                          },
+                                          "text": "The Control does not belong to an SAPUI5 component. Personalization and changes for this control might not work as expected."
+                                        },
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 144
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 145
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 145
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 146
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ";",
+                              "start": {
+                                "row": 35,
+                                "column": 146
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 147
+                              },
+                              "text": ";"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "throw_statement",
+                          "start": {
+                            "row": 36,
+                            "column": 3
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 46
+                          },
+                          "text": "throw new Error(\"Missing component name.\");",
+                          "children": [
+                            {
+                              "type": "throw",
+                              "start": {
+                                "row": 36,
+                                "column": 3
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 8
+                              },
+                              "text": "throw"
+                            },
+                            {
+                              "type": "new_expression",
+                              "start": {
+                                "row": 36,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 45
+                              },
+                              "text": "new Error(\"Missing component name.\")",
+                              "children": [
+                                {
+                                  "type": "new",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 9
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 12
+                                  },
+                                  "text": "new"
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 18
+                                  },
+                                  "text": "Error"
+                                },
+                                {
+                                  "type": "arguments",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 45
+                                  },
+                                  "text": "(\"Missing component name.\")",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 18
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 19
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 44
+                                      },
+                                      "text": "\"Missing component name.\"",
+                                      "children": [
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 20
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_fragment",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 43
+                                          },
+                                          "text": "Missing component name."
+                                        },
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 43
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 44
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 45
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ";",
+                              "start": {
+                                "row": 36,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 46
+                              },
+                              "text": ";"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "}",
+                          "start": {
+                            "row": 37,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 3
+                          },
+                          "text": "}"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 39,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 39,
+                    "column": 107
+                  },
+                  "text": "this._oVariantController = new VariantController(this._mComponent.name, this._mComponent.appVersion, {});",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 39,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 106
+                      },
+                      "text": "this._oVariantController = new VariantController(this._mComponent.name, this._mComponent.appVersion, {})",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 39,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 26
+                          },
+                          "text": "this._oVariantController",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 39,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 39,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 39,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 26
+                              },
+                              "text": "_oVariantController"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 39,
+                            "column": 27
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 28
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "new_expression",
+                          "start": {
+                            "row": 39,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 39,
+                            "column": 106
+                          },
+                          "text": "new VariantController(this._mComponent.name, this._mComponent.appVersion, {})",
+                          "children": [
+                            {
+                              "type": "new",
+                              "start": {
+                                "row": 39,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 32
+                              },
+                              "text": "new"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 39,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 50
+                              },
+                              "text": "VariantController"
+                            },
+                            {
+                              "type": "arguments",
+                              "start": {
+                                "row": 39,
+                                "column": 50
+                              },
+                              "end": {
+                                "row": 39,
+                                "column": 106
+                              },
+                              "text": "(this._mComponent.name, this._mComponent.appVersion, {})",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 51
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 72
+                                  },
+                                  "text": "this._mComponent.name",
+                                  "children": [
+                                    {
+                                      "type": "member_expression",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 67
+                                      },
+                                      "text": "this._mComponent",
+                                      "children": [
+                                        {
+                                          "type": "this",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 51
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 55
+                                          },
+                                          "text": "this"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 55
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 56
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "property_identifier",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 56
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 67
+                                          },
+                                          "text": "_mComponent"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 67
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 68
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 68
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 72
+                                      },
+                                      "text": "name"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 72
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 73
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "member_expression",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 74
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 101
+                                  },
+                                  "text": "this._mComponent.appVersion",
+                                  "children": [
+                                    {
+                                      "type": "member_expression",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 74
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 90
+                                      },
+                                      "text": "this._mComponent",
+                                      "children": [
+                                        {
+                                          "type": "this",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 74
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 78
+                                          },
+                                          "text": "this"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 78
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 79
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "property_identifier",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 79
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 90
+                                          },
+                                          "text": "_mComponent"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 90
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 91
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "property_identifier",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 91
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 101
+                                      },
+                                      "text": "appVersion"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ",",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 101
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 102
+                                  },
+                                  "text": ","
+                                },
+                                {
+                                  "type": "object",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 103
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 105
+                                  },
+                                  "text": "{}",
+                                  "children": [
+                                    {
+                                      "type": "{",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 103
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 104
+                                      },
+                                      "text": "{"
+                                    },
+                                    {
+                                      "type": "}",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 104
+                                      },
+                                      "end": {
+                                        "row": 39,
+                                        "column": 105
+                                      },
+                                      "text": "}"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 39,
+                                    "column": 105
+                                  },
+                                  "end": {
+                                    "row": 39,
+                                    "column": 106
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 39,
+                        "column": 106
+                      },
+                      "end": {
+                        "row": 39,
+                        "column": 107
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 40,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 40,
+                    "column": 55
+                  },
+                  "text": "this._oTransportSelection = new TransportSelection();",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 40,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 40,
+                        "column": 54
+                      },
+                      "text": "this._oTransportSelection = new TransportSelection()",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 40,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 27
+                          },
+                          "text": "this._oTransportSelection",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 40,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 40,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 27
+                              },
+                              "text": "_oTransportSelection"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 40,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 29
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "new_expression",
+                          "start": {
+                            "row": 40,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 54
+                          },
+                          "text": "new TransportSelection()",
+                          "children": [
+                            {
+                              "type": "new",
+                              "start": {
+                                "row": 40,
+                                "column": 30
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 33
+                              },
+                              "text": "new"
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 52
+                              },
+                              "text": "TransportSelection"
+                            },
+                            {
+                              "type": "arguments",
+                              "start": {
+                                "row": 40,
+                                "column": 52
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 54
+                              },
+                              "text": "()",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 53
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 54
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 40,
+                        "column": 54
+                      },
+                      "end": {
+                        "row": 40,
+                        "column": 55
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 41,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 41,
+                    "column": 49
+                  },
+                  "text": "this._oConnector = this._createLrepConnector();",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 41,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 48
+                      },
+                      "text": "this._oConnector = this._createLrepConnector()",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 41,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 18
+                          },
+                          "text": "this._oConnector",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 41,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 41,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 41,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 18
+                              },
+                              "text": "_oConnector"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 41,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 20
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call_expression",
+                          "start": {
+                            "row": 41,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 41,
+                            "column": 48
+                          },
+                          "text": "this._createLrepConnector()",
+                          "children": [
+                            {
+                              "type": "member_expression",
+                              "start": {
+                                "row": 41,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 46
+                              },
+                              "text": "this._createLrepConnector",
+                              "children": [
+                                {
+                                  "type": "this",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 25
+                                  },
+                                  "text": "this"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 26
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "property_identifier",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 46
+                                  },
+                                  "text": "_createLrepConnector"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "arguments",
+                              "start": {
+                                "row": 41,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 41,
+                                "column": 48
+                              },
+                              "text": "()",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 47
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 41,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 41,
+                                    "column": 48
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 41,
+                        "column": 48
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 49
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 42,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 27
+                  },
+                  "text": "this._aDirtyChanges = [];",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 42,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 26
+                      },
+                      "text": "this._aDirtyChanges = []",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 42,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 21
+                          },
+                          "text": "this._aDirtyChanges",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 42,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 42,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 42,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 21
+                              },
+                              "text": "_aDirtyChanges"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 42,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 23
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "array",
+                          "start": {
+                            "row": 42,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 26
+                          },
+                          "text": "[]",
+                          "children": [
+                            {
+                              "type": "[",
+                              "start": {
+                                "row": 42,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 25
+                              },
+                              "text": "["
+                            },
+                            {
+                              "type": "]",
+                              "start": {
+                                "row": 42,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 26
+                              },
+                              "text": "]"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 42,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 27
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 43,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 43,
+                    "column": 35
+                  },
+                  "text": "this._oMessagebundle = undefined;",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 43,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 34
+                      },
+                      "text": "this._oMessagebundle = undefined",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 43,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 22
+                          },
+                          "text": "this._oMessagebundle",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 43,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 43,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 43,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 43,
+                                "column": 22
+                              },
+                              "text": "_oMessagebundle"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 43,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 24
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "undefined",
+                          "start": {
+                            "row": 43,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 43,
+                            "column": 34
+                          },
+                          "text": "undefined"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 43,
+                        "column": 34
+                      },
+                      "end": {
+                        "row": 43,
+                        "column": 35
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 44,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 29
+                  },
+                  "text": "this._mChangesEntries = {};",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 44,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 28
+                      },
+                      "text": "this._mChangesEntries = {}",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 44,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 23
+                          },
+                          "text": "this._mChangesEntries",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 44,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 44,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 44,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 23
+                              },
+                              "text": "_mChangesEntries"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 44,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 25
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "object",
+                          "start": {
+                            "row": 44,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 28
+                          },
+                          "text": "{}",
+                          "children": [
+                            {
+                              "type": "{",
+                              "start": {
+                                "row": 44,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 27
+                              },
+                              "text": "{"
+                            },
+                            {
+                              "type": "}",
+                              "start": {
+                                "row": 44,
+                                "column": 27
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 28
+                              },
+                              "text": "}"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 44,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 29
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 45,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 45,
+                    "column": 40
+                  },
+                  "text": "this._bHasChangesOverMaxLayer = false;",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 45,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 39
+                      },
+                      "text": "this._bHasChangesOverMaxLayer = false",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 45,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 31
+                          },
+                          "text": "this._bHasChangesOverMaxLayer",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 45,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 45,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 45,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 45,
+                                "column": 31
+                              },
+                              "text": "_bHasChangesOverMaxLayer"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 45,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 33
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "false",
+                          "start": {
+                            "row": 45,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 45,
+                            "column": 39
+                          },
+                          "text": "false"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 45,
+                        "column": 39
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 40
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "expression_statement",
+                  "start": {
+                    "row": 46,
+                    "column": 2
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 65
+                  },
+                  "text": "this.HIGHER_LAYER_CHANGES_EXIST = \"higher_layer_changes_exist\";",
+                  "children": [
+                    {
+                      "type": "assignment_expression",
+                      "start": {
+                        "row": 46,
+                        "column": 2
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 64
+                      },
+                      "text": "this.HIGHER_LAYER_CHANGES_EXIST = \"higher_layer_changes_exist\"",
+                      "children": [
+                        {
+                          "type": "member_expression",
+                          "start": {
+                            "row": 46,
+                            "column": 2
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 33
+                          },
+                          "text": "this.HIGHER_LAYER_CHANGES_EXIST",
+                          "children": [
+                            {
+                              "type": "this",
+                              "start": {
+                                "row": 46,
+                                "column": 2
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 6
+                              },
+                              "text": "this"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 46,
+                                "column": 6
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 7
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "property_identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 33
+                              },
+                              "text": "HIGHER_LAYER_CHANGES_EXIST"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 46,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 35
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 46,
+                            "column": 36
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 64
+                          },
+                          "text": "\"higher_layer_changes_exist\"",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 46,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 37
+                              },
+                              "text": "\""
+                            },
+                            {
+                              "type": "string_fragment",
+                              "start": {
+                                "row": 46,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 63
+                              },
+                              "text": "higher_layer_changes_exist"
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 46,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 64
+                              },
+                              "text": "\""
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ";",
+                      "start": {
+                        "row": 46,
+                        "column": 64
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 65
+                      },
+                      "text": ";"
+                    }
+                  ]
+                },
+                {
+                  "type": "}",
+                  "start": {
+                    "row": 47,
+                    "column": 1
+                  },
+                  "end": {
+                    "row": 47,
+                    "column": 2
+                  },
+                  "text": "}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2018 @@
+{
+  "type": "program",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 32,
+    "column": 7
+  },
+  "text": "def target_name\n      # cmdkey command is used for accessing windows credential manager.\n      # Multiple credentials get created in windows credential manager for a single Azure account in xplat-cli\n      # One of them is for common tanent id, which can't be used\n      # Others end with --0-x,--1-x,--2-x etc, where x represents the total no. of credentails across which the token is divided\n      # The one ending with --0-x has the complete accessToken in the credentialBlob.\n      # Refresh Token is split across both credentials (ending with --0-x and --1-x).\n      # Xplat splits the credentials based on the number of bytes of the tokens.\n      # Hence the access token is always found in the one which start with --0-\n      # So selecting the credential on the basis of --0-\n      xplat_creds_cmd = Mixlib::ShellOut.new('cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common')\n      result = xplat_creds_cmd.run_command\n      target_names = []\n\n      if result.stdout.empty?\n        Chef::Log.debug(\"Unable to find a credential with --0- and falling back to looking for any credential.\")\n        xplat_creds_cmd = Mixlib::ShellOut.new(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")\n        result = xplat_creds_cmd.run_command\n\n        if result.stdout.empty?\n          raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"\n        else\n          target_names = result.stdout.split(\"\\n\")\n        end\n      else\n        target_names = result.stdout.split(\"\\n\")\n      end\n\n      # If \"azure login\" is run for multiple users, there will be multiple credentials\n      # Picking up the latest logged in user's credentials\n      latest_target = latest_credential_target target_names\n      latest_target\n    end",
+  "children": [
+    {
+      "type": "method",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 32,
+        "column": 7
+      },
+      "text": "def target_name\n      # cmdkey command is used for accessing windows credential manager.\n      # Multiple credentials get created in windows credential manager for a single Azure account in xplat-cli\n      # One of them is for common tanent id, which can't be used\n      # Others end with --0-x,--1-x,--2-x etc, where x represents the total no. of credentails across which the token is divided\n      # The one ending with --0-x has the complete accessToken in the credentialBlob.\n      # Refresh Token is split across both credentials (ending with --0-x and --1-x).\n      # Xplat splits the credentials based on the number of bytes of the tokens.\n      # Hence the access token is always found in the one which start with --0-\n      # So selecting the credential on the basis of --0-\n      xplat_creds_cmd = Mixlib::ShellOut.new('cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common')\n      result = xplat_creds_cmd.run_command\n      target_names = []\n\n      if result.stdout.empty?\n        Chef::Log.debug(\"Unable to find a credential with --0- and falling back to looking for any credential.\")\n        xplat_creds_cmd = Mixlib::ShellOut.new(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")\n        result = xplat_creds_cmd.run_command\n\n        if result.stdout.empty?\n          raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"\n        else\n          target_names = result.stdout.split(\"\\n\")\n        end\n      else\n        target_names = result.stdout.split(\"\\n\")\n      end\n\n      # If \"azure login\" is run for multiple users, there will be multiple credentials\n      # Picking up the latest logged in user's credentials\n      latest_target = latest_credential_target target_names\n      latest_target\n    end",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 15
+          },
+          "text": "target_name"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 1,
+            "column": 6
+          },
+          "end": {
+            "row": 1,
+            "column": 72
+          },
+          "text": "# cmdkey command is used for accessing windows credential manager."
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 2,
+            "column": 6
+          },
+          "end": {
+            "row": 2,
+            "column": 110
+          },
+          "text": "# Multiple credentials get created in windows credential manager for a single Azure account in xplat-cli"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 3,
+            "column": 6
+          },
+          "end": {
+            "row": 3,
+            "column": 64
+          },
+          "text": "# One of them is for common tanent id, which can't be used"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 4,
+            "column": 6
+          },
+          "end": {
+            "row": 4,
+            "column": 128
+          },
+          "text": "# Others end with --0-x,--1-x,--2-x etc, where x represents the total no. of credentails across which the token is divided"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 5,
+            "column": 6
+          },
+          "end": {
+            "row": 5,
+            "column": 85
+          },
+          "text": "# The one ending with --0-x has the complete accessToken in the credentialBlob."
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 6,
+            "column": 6
+          },
+          "end": {
+            "row": 6,
+            "column": 85
+          },
+          "text": "# Refresh Token is split across both credentials (ending with --0-x and --1-x)."
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 7,
+            "column": 6
+          },
+          "end": {
+            "row": 7,
+            "column": 80
+          },
+          "text": "# Xplat splits the credentials based on the number of bytes of the tokens."
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 8,
+            "column": 6
+          },
+          "end": {
+            "row": 8,
+            "column": 79
+          },
+          "text": "# Hence the access token is always found in the one which start with --0-"
+        },
+        {
+          "type": "comment",
+          "start": {
+            "row": 9,
+            "column": 6
+          },
+          "end": {
+            "row": 9,
+            "column": 56
+          },
+          "text": "# So selecting the credential on the basis of --0-"
+        },
+        {
+          "type": "body_statement",
+          "start": {
+            "row": 10,
+            "column": 6
+          },
+          "end": {
+            "row": 31,
+            "column": 19
+          },
+          "text": "xplat_creds_cmd = Mixlib::ShellOut.new('cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common')\n      result = xplat_creds_cmd.run_command\n      target_names = []\n\n      if result.stdout.empty?\n        Chef::Log.debug(\"Unable to find a credential with --0- and falling back to looking for any credential.\")\n        xplat_creds_cmd = Mixlib::ShellOut.new(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")\n        result = xplat_creds_cmd.run_command\n\n        if result.stdout.empty?\n          raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"\n        else\n          target_names = result.stdout.split(\"\\n\")\n        end\n      else\n        target_names = result.stdout.split(\"\\n\")\n      end\n\n      # If \"azure login\" is run for multiple users, there will be multiple credentials\n      # Picking up the latest logged in user's credentials\n      latest_target = latest_credential_target target_names\n      latest_target",
+          "children": [
+            {
+              "type": "assignment",
+              "start": {
+                "row": 10,
+                "column": 6
+              },
+              "end": {
+                "row": 10,
+                "column": 120
+              },
+              "text": "xplat_creds_cmd = Mixlib::ShellOut.new('cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common')",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 10,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 21
+                  },
+                  "text": "xplat_creds_cmd"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 10,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 23
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 10,
+                    "column": 24
+                  },
+                  "end": {
+                    "row": 10,
+                    "column": 120
+                  },
+                  "text": "Mixlib::ShellOut.new('cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common')",
+                  "children": [
+                    {
+                      "type": "scope_resolution",
+                      "start": {
+                        "row": 10,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 40
+                      },
+                      "text": "Mixlib::ShellOut",
+                      "children": [
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 10,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 30
+                          },
+                          "text": "Mixlib"
+                        },
+                        {
+                          "type": "::",
+                          "start": {
+                            "row": 10,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 32
+                          },
+                          "text": "::"
+                        },
+                        {
+                          "type": "constant",
+                          "start": {
+                            "row": 10,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 40
+                          },
+                          "text": "ShellOut"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 10,
+                        "column": 40
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 41
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 10,
+                        "column": 41
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 44
+                      },
+                      "text": "new"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 10,
+                        "column": 44
+                      },
+                      "end": {
+                        "row": 10,
+                        "column": 120
+                      },
+                      "text": "('cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common')",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 10,
+                            "column": 44
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 45
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "string",
+                          "start": {
+                            "row": 10,
+                            "column": 45
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 119
+                          },
+                          "text": "'cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common'",
+                          "children": [
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 10,
+                                "column": 45
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 46
+                              },
+                              "text": "'"
+                            },
+                            {
+                              "type": "string_content",
+                              "start": {
+                                "row": 10,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 118
+                              },
+                              "text": "cmdkey /list | findstr AzureXplatCli | findstr \\--0- | findstr -v common"
+                            },
+                            {
+                              "type": "\"",
+                              "start": {
+                                "row": 10,
+                                "column": 118
+                              },
+                              "end": {
+                                "row": 10,
+                                "column": 119
+                              },
+                              "text": "'"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 10,
+                            "column": 119
+                          },
+                          "end": {
+                            "row": 10,
+                            "column": 120
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 11,
+                "column": 6
+              },
+              "end": {
+                "row": 11,
+                "column": 42
+              },
+              "text": "result = xplat_creds_cmd.run_command",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 11,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 12
+                  },
+                  "text": "result"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 11,
+                    "column": 13
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 14
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 11,
+                    "column": 15
+                  },
+                  "end": {
+                    "row": 11,
+                    "column": 42
+                  },
+                  "text": "xplat_creds_cmd.run_command",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 11,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 30
+                      },
+                      "text": "xplat_creds_cmd"
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 11,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 31
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 11,
+                        "column": 31
+                      },
+                      "end": {
+                        "row": 11,
+                        "column": 42
+                      },
+                      "text": "run_command"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 12,
+                "column": 6
+              },
+              "end": {
+                "row": 12,
+                "column": 23
+              },
+              "text": "target_names = []",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 12,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 18
+                  },
+                  "text": "target_names"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 12,
+                    "column": 19
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 20
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "array",
+                  "start": {
+                    "row": 12,
+                    "column": 21
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 23
+                  },
+                  "text": "[]",
+                  "children": [
+                    {
+                      "type": "[",
+                      "start": {
+                        "row": 12,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 22
+                      },
+                      "text": "["
+                    },
+                    {
+                      "type": "]",
+                      "start": {
+                        "row": 12,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 23
+                      },
+                      "text": "]"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if",
+              "start": {
+                "row": 14,
+                "column": 6
+              },
+              "end": {
+                "row": 26,
+                "column": 9
+              },
+              "text": "if result.stdout.empty?\n        Chef::Log.debug(\"Unable to find a credential with --0- and falling back to looking for any credential.\")\n        xplat_creds_cmd = Mixlib::ShellOut.new(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")\n        result = xplat_creds_cmd.run_command\n\n        if result.stdout.empty?\n          raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"\n        else\n          target_names = result.stdout.split(\"\\n\")\n        end\n      else\n        target_names = result.stdout.split(\"\\n\")\n      end",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 14,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 8
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 14,
+                    "column": 9
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 29
+                  },
+                  "text": "result.stdout.empty?",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 14,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 22
+                      },
+                      "text": "result.stdout",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 9
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 15
+                          },
+                          "text": "result"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 14,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 16
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 14,
+                            "column": 16
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 22
+                          },
+                          "text": "stdout"
+                        }
+                      ]
+                    },
+                    {
+                      "type": ".",
+                      "start": {
+                        "row": 14,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 23
+                      },
+                      "text": "."
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 14,
+                        "column": 23
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 29
+                      },
+                      "text": "empty?"
+                    }
+                  ]
+                },
+                {
+                  "type": "then",
+                  "start": {
+                    "row": 14,
+                    "column": 29
+                  },
+                  "end": {
+                    "row": 23,
+                    "column": 11
+                  },
+                  "text": "\n        Chef::Log.debug(\"Unable to find a credential with --0- and falling back to looking for any credential.\")\n        xplat_creds_cmd = Mixlib::ShellOut.new(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")\n        result = xplat_creds_cmd.run_command\n\n        if result.stdout.empty?\n          raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"\n        else\n          target_names = result.stdout.split(\"\\n\")\n        end",
+                  "children": [
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 15,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 112
+                      },
+                      "text": "Chef::Log.debug(\"Unable to find a credential with --0- and falling back to looking for any credential.\")",
+                      "children": [
+                        {
+                          "type": "scope_resolution",
+                          "start": {
+                            "row": 15,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 17
+                          },
+                          "text": "Chef::Log",
+                          "children": [
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 15,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 12
+                              },
+                              "text": "Chef"
+                            },
+                            {
+                              "type": "::",
+                              "start": {
+                                "row": 15,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 14
+                              },
+                              "text": "::"
+                            },
+                            {
+                              "type": "constant",
+                              "start": {
+                                "row": 15,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 17
+                              },
+                              "text": "Log"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 15,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 18
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 15,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 23
+                          },
+                          "text": "debug"
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 15,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 15,
+                            "column": 112
+                          },
+                          "text": "(\"Unable to find a credential with --0- and falling back to looking for any credential.\")",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 15,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 24
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 15,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 111
+                              },
+                              "text": "\"Unable to find a credential with --0- and falling back to looking for any credential.\"",
+                              "children": [
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 25
+                                  },
+                                  "text": "\""
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 110
+                                  },
+                                  "text": "Unable to find a credential with --0- and falling back to looking for any credential."
+                                },
+                                {
+                                  "type": "\"",
+                                  "start": {
+                                    "row": 15,
+                                    "column": 110
+                                  },
+                                  "end": {
+                                    "row": 15,
+                                    "column": 111
+                                  },
+                                  "text": "\""
+                                }
+                              ]
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 15,
+                                "column": 111
+                              },
+                              "end": {
+                                "row": 15,
+                                "column": 112
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "assignment",
+                      "start": {
+                        "row": 16,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 16,
+                        "column": 106
+                      },
+                      "text": "xplat_creds_cmd = Mixlib::ShellOut.new(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 16,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 23
+                          },
+                          "text": "xplat_creds_cmd"
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 16,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 25
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 16,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 106
+                          },
+                          "text": "Mixlib::ShellOut.new(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")",
+                          "children": [
+                            {
+                              "type": "scope_resolution",
+                              "start": {
+                                "row": 16,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 42
+                              },
+                              "text": "Mixlib::ShellOut",
+                              "children": [
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 32
+                                  },
+                                  "text": "Mixlib"
+                                },
+                                {
+                                  "type": "::",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 34
+                                  },
+                                  "text": "::"
+                                },
+                                {
+                                  "type": "constant",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 42
+                                  },
+                                  "text": "ShellOut"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 16,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 43
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 16,
+                                "column": 43
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 46
+                              },
+                              "text": "new"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 16,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 106
+                              },
+                              "text": "(\"cmdkey /list | findstr AzureXplatCli | findstr -v common\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 47
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 105
+                                  },
+                                  "text": "\"cmdkey /list | findstr AzureXplatCli | findstr -v common\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 48
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "string_content",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 104
+                                      },
+                                      "text": "cmdkey /list | findstr AzureXplatCli | findstr -v common"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 104
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 105
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 105
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 106
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "assignment",
+                      "start": {
+                        "row": 17,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 44
+                      },
+                      "text": "result = xplat_creds_cmd.run_command",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 17,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 14
+                          },
+                          "text": "result"
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 17,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 16
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 17,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 44
+                          },
+                          "text": "xplat_creds_cmd.run_command",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 17,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 32
+                              },
+                              "text": "xplat_creds_cmd"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 17,
+                                "column": 32
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 33
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 17,
+                                "column": 33
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 44
+                              },
+                              "text": "run_command"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if",
+                      "start": {
+                        "row": 19,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 11
+                      },
+                      "text": "if result.stdout.empty?\n          raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"\n        else\n          target_names = result.stdout.split(\"\\n\")\n        end",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 19,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 10
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 19,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 31
+                          },
+                          "text": "result.stdout.empty?",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 19,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 24
+                              },
+                              "text": "result.stdout",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 17
+                                  },
+                                  "text": "result"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 18
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 24
+                                  },
+                                  "text": "stdout"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 19,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 25
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 19,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 31
+                              },
+                              "text": "empty?"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "then",
+                          "start": {
+                            "row": 19,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 87
+                          },
+                          "text": "\n          raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 20,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 87
+                              },
+                              "text": "raise \"Azure Credentials not found. Please run xplat's 'azure login' command\"",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 15
+                                  },
+                                  "text": "raise"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 20,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 20,
+                                    "column": 87
+                                  },
+                                  "text": "\"Azure Credentials not found. Please run xplat's 'azure login' command\"",
+                                  "children": [
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 20,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 20,
+                                        "column": 87
+                                      },
+                                      "text": "\"Azure Credentials not found. Please run xplat's 'azure login' command\"",
+                                      "children": [
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 17
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 17
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 86
+                                          },
+                                          "text": "Azure Credentials not found. Please run xplat's 'azure login' command"
+                                        },
+                                        {
+                                          "type": "\"",
+                                          "start": {
+                                            "row": 20,
+                                            "column": 86
+                                          },
+                                          "end": {
+                                            "row": 20,
+                                            "column": 87
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else",
+                          "start": {
+                            "row": 21,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 50
+                          },
+                          "text": "else\n          target_names = result.stdout.split(\"\\n\")",
+                          "children": [
+                            {
+                              "type": "else",
+                              "start": {
+                                "row": 21,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 12
+                              },
+                              "text": "else"
+                            },
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 22,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 50
+                              },
+                              "text": "target_names = result.stdout.split(\"\\n\")",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 22
+                                  },
+                                  "text": "target_names"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 24
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 22,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 22,
+                                    "column": 50
+                                  },
+                                  "text": "result.stdout.split(\"\\n\")",
+                                  "children": [
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 25
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 38
+                                      },
+                                      "text": "result.stdout",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 25
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 31
+                                          },
+                                          "text": "result"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 32
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 38
+                                          },
+                                          "text": "stdout"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 39
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 44
+                                      },
+                                      "text": "split"
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 22,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 22,
+                                        "column": 50
+                                      },
+                                      "text": "(\"\\n\")",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 44
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 45
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "string",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 49
+                                          },
+                                          "text": "\"\\n\"",
+                                          "children": [
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 45
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 46
+                                              },
+                                              "text": "\""
+                                            },
+                                            {
+                                              "type": "escape_sequence",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 46
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 48
+                                              },
+                                              "text": "\\n"
+                                            },
+                                            {
+                                              "type": "\"",
+                                              "start": {
+                                                "row": 22,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 22,
+                                                "column": 49
+                                              },
+                                              "text": "\""
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 22,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 22,
+                                            "column": 50
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "end",
+                          "start": {
+                            "row": 23,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 11
+                          },
+                          "text": "end"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "else",
+                  "start": {
+                    "row": 24,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 48
+                  },
+                  "text": "else\n        target_names = result.stdout.split(\"\\n\")",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 24,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 24,
+                        "column": 10
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": "assignment",
+                      "start": {
+                        "row": 25,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 48
+                      },
+                      "text": "target_names = result.stdout.split(\"\\n\")",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 25,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 20
+                          },
+                          "text": "target_names"
+                        },
+                        {
+                          "type": "=",
+                          "start": {
+                            "row": 25,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 22
+                          },
+                          "text": "="
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 25,
+                            "column": 23
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 48
+                          },
+                          "text": "result.stdout.split(\"\\n\")",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 25,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 36
+                              },
+                              "text": "result.stdout",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 29
+                                  },
+                                  "text": "result"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 29
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 30
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 30
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 36
+                                  },
+                                  "text": "stdout"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 25,
+                                "column": 36
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 37
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 25,
+                                "column": 37
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 42
+                              },
+                              "text": "split"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 25,
+                                "column": 42
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 48
+                              },
+                              "text": "(\"\\n\")",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 42
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 43
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "string",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 47
+                                  },
+                                  "text": "\"\\n\"",
+                                  "children": [
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 44
+                                      },
+                                      "text": "\""
+                                    },
+                                    {
+                                      "type": "escape_sequence",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 46
+                                      },
+                                      "text": "\\n"
+                                    },
+                                    {
+                                      "type": "\"",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 47
+                                      },
+                                      "text": "\""
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 48
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "end",
+                  "start": {
+                    "row": 26,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 9
+                  },
+                  "text": "end"
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 28,
+                "column": 6
+              },
+              "end": {
+                "row": 28,
+                "column": 86
+              },
+              "text": "# If \"azure login\" is run for multiple users, there will be multiple credentials"
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 29,
+                "column": 6
+              },
+              "end": {
+                "row": 29,
+                "column": 58
+              },
+              "text": "# Picking up the latest logged in user's credentials"
+            },
+            {
+              "type": "assignment",
+              "start": {
+                "row": 30,
+                "column": 6
+              },
+              "end": {
+                "row": 30,
+                "column": 59
+              },
+              "text": "latest_target = latest_credential_target target_names",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 30,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 19
+                  },
+                  "text": "latest_target"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 30,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 21
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 30,
+                    "column": 22
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 59
+                  },
+                  "text": "latest_credential_target target_names",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 30,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 46
+                      },
+                      "text": "latest_credential_target"
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 30,
+                        "column": 47
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 59
+                      },
+                      "text": "target_names",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 30,
+                            "column": 47
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 59
+                          },
+                          "text": "target_names"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 31,
+                "column": 6
+              },
+              "end": {
+                "row": 31,
+                "column": 19
+              },
+              "text": "latest_target"
+            }
+          ]
+        },
+        {
+          "type": "end",
+          "start": {
+            "row": 32,
+            "column": 4
+          },
+          "end": {
+            "row": 32,
+            "column": 7
+          },
+          "text": "end"
+        }
+      ]
+    }
+  ]
+}

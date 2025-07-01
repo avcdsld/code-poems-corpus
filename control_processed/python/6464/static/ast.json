@@ -1,0 +1,3740 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 46,
+    "column": 29
+  },
+  "text": "def deaggregate_record(decoded_data):\n    '''Given a Kinesis record data that is decoded, deaggregate if it was packed using the\n    Kinesis Producer Library into individual records.  This method will be a no-op for any\n    records that are not aggregated (but will still return them).\n    \n    decoded_data - the base64 decoded data that comprises either the KPL aggregated data, or the Kinesis payload directly.    \n    return value - A list of deaggregated Kinesis record payloads (if the data is not aggregated, we just return a list with the payload alone) \n    '''\n    \n    is_aggregated = True\n    \n    #Verify the magic header\n    data_magic = None\n    if(len(decoded_data) >= len(aws_kinesis_agg.MAGIC)):\n        data_magic = decoded_data[:len(aws_kinesis_agg.MAGIC)]\n    else:\n        print(\"Not aggregated\") \n        is_aggregated = False\n    \n    decoded_data_no_magic = decoded_data[len(aws_kinesis_agg.MAGIC):]\n    \n    if aws_kinesis_agg.MAGIC != data_magic or len(decoded_data_no_magic) <= aws_kinesis_agg.DIGEST_SIZE:\n        is_aggregated = False\n        \n    if is_aggregated:            \n        \n        #verify the MD5 digest\n        message_digest = decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]\n        message_data = decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]\n        \n        md5_calc = md5.new()\n        md5_calc.update(message_data)\n        calculated_digest = md5_calc.digest()\n        \n        if message_digest != calculated_digest:            \n            return [decoded_data]            \n        else:                            \n            #Extract the protobuf message\n            try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e                   \n    else:\n        return [decoded_data]",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 46,
+        "column": 29
+      },
+      "text": "def deaggregate_record(decoded_data):\n    '''Given a Kinesis record data that is decoded, deaggregate if it was packed using the\n    Kinesis Producer Library into individual records.  This method will be a no-op for any\n    records that are not aggregated (but will still return them).\n    \n    decoded_data - the base64 decoded data that comprises either the KPL aggregated data, or the Kinesis payload directly.    \n    return value - A list of deaggregated Kinesis record payloads (if the data is not aggregated, we just return a list with the payload alone) \n    '''\n    \n    is_aggregated = True\n    \n    #Verify the magic header\n    data_magic = None\n    if(len(decoded_data) >= len(aws_kinesis_agg.MAGIC)):\n        data_magic = decoded_data[:len(aws_kinesis_agg.MAGIC)]\n    else:\n        print(\"Not aggregated\") \n        is_aggregated = False\n    \n    decoded_data_no_magic = decoded_data[len(aws_kinesis_agg.MAGIC):]\n    \n    if aws_kinesis_agg.MAGIC != data_magic or len(decoded_data_no_magic) <= aws_kinesis_agg.DIGEST_SIZE:\n        is_aggregated = False\n        \n    if is_aggregated:            \n        \n        #verify the MD5 digest\n        message_digest = decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]\n        message_data = decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]\n        \n        md5_calc = md5.new()\n        md5_calc.update(message_data)\n        calculated_digest = md5_calc.digest()\n        \n        if message_digest != calculated_digest:            \n            return [decoded_data]            \n        else:                            \n            #Extract the protobuf message\n            try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e                   \n    else:\n        return [decoded_data]",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 22
+          },
+          "text": "deaggregate_record"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 22
+          },
+          "end": {
+            "row": 0,
+            "column": 36
+          },
+          "text": "(decoded_data)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 22
+              },
+              "end": {
+                "row": 0,
+                "column": 23
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 23
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": "decoded_data"
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 35
+              },
+              "end": {
+                "row": 0,
+                "column": 36
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 36
+          },
+          "end": {
+            "row": 0,
+            "column": 37
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 4
+          },
+          "end": {
+            "row": 46,
+            "column": 29
+          },
+          "text": "'''Given a Kinesis record data that is decoded, deaggregate if it was packed using the\n    Kinesis Producer Library into individual records.  This method will be a no-op for any\n    records that are not aggregated (but will still return them).\n    \n    decoded_data - the base64 decoded data that comprises either the KPL aggregated data, or the Kinesis payload directly.    \n    return value - A list of deaggregated Kinesis record payloads (if the data is not aggregated, we just return a list with the payload alone) \n    '''\n    \n    is_aggregated = True\n    \n    #Verify the magic header\n    data_magic = None\n    if(len(decoded_data) >= len(aws_kinesis_agg.MAGIC)):\n        data_magic = decoded_data[:len(aws_kinesis_agg.MAGIC)]\n    else:\n        print(\"Not aggregated\") \n        is_aggregated = False\n    \n    decoded_data_no_magic = decoded_data[len(aws_kinesis_agg.MAGIC):]\n    \n    if aws_kinesis_agg.MAGIC != data_magic or len(decoded_data_no_magic) <= aws_kinesis_agg.DIGEST_SIZE:\n        is_aggregated = False\n        \n    if is_aggregated:            \n        \n        #verify the MD5 digest\n        message_digest = decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]\n        message_data = decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]\n        \n        md5_calc = md5.new()\n        md5_calc.update(message_data)\n        calculated_digest = md5_calc.digest()\n        \n        if message_digest != calculated_digest:            \n            return [decoded_data]            \n        else:                            \n            #Extract the protobuf message\n            try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e                   \n    else:\n        return [decoded_data]",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 4
+              },
+              "end": {
+                "row": 7,
+                "column": 7
+              },
+              "text": "'''Given a Kinesis record data that is decoded, deaggregate if it was packed using the\n    Kinesis Producer Library into individual records.  This method will be a no-op for any\n    records that are not aggregated (but will still return them).\n    \n    decoded_data - the base64 decoded data that comprises either the KPL aggregated data, or the Kinesis payload directly.    \n    return value - A list of deaggregated Kinesis record payloads (if the data is not aggregated, we just return a list with the payload alone) \n    '''",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 7,
+                    "column": 7
+                  },
+                  "text": "'''Given a Kinesis record data that is decoded, deaggregate if it was packed using the\n    Kinesis Producer Library into individual records.  This method will be a no-op for any\n    records that are not aggregated (but will still return them).\n    \n    decoded_data - the base64 decoded data that comprises either the KPL aggregated data, or the Kinesis payload directly.    \n    return value - A list of deaggregated Kinesis record payloads (if the data is not aggregated, we just return a list with the payload alone) \n    '''",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 4
+                      },
+                      "text": "Given a Kinesis record data that is decoded, deaggregate if it was packed using the\n    Kinesis Producer Library into individual records.  This method will be a no-op for any\n    records that are not aggregated (but will still return them).\n    \n    decoded_data - the base64 decoded data that comprises either the KPL aggregated data, or the Kinesis payload directly.    \n    return value - A list of deaggregated Kinesis record payloads (if the data is not aggregated, we just return a list with the payload alone) \n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 7,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 7,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 9,
+                "column": 4
+              },
+              "end": {
+                "row": 9,
+                "column": 24
+              },
+              "text": "is_aggregated = True",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 9,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 9,
+                    "column": 24
+                  },
+                  "text": "is_aggregated = True",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 9,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 17
+                      },
+                      "text": "is_aggregated"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 9,
+                        "column": 18
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 19
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "true",
+                      "start": {
+                        "row": 9,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 9,
+                        "column": 24
+                      },
+                      "text": "True"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "comment",
+              "start": {
+                "row": 11,
+                "column": 4
+              },
+              "end": {
+                "row": 11,
+                "column": 28
+              },
+              "text": "#Verify the magic header"
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 12,
+                "column": 4
+              },
+              "end": {
+                "row": 12,
+                "column": 21
+              },
+              "text": "data_magic = None",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 12,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 12,
+                    "column": 21
+                  },
+                  "text": "data_magic = None",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 12,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 14
+                      },
+                      "text": "data_magic"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 12,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 16
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "none",
+                      "start": {
+                        "row": 12,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 12,
+                        "column": 21
+                      },
+                      "text": "None"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 13,
+                "column": 4
+              },
+              "end": {
+                "row": 17,
+                "column": 29
+              },
+              "text": "if(len(decoded_data) >= len(aws_kinesis_agg.MAGIC)):\n        data_magic = decoded_data[:len(aws_kinesis_agg.MAGIC)]\n    else:\n        print(\"Not aggregated\") \n        is_aggregated = False",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 13,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 13,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "parenthesized_expression",
+                  "start": {
+                    "row": 13,
+                    "column": 6
+                  },
+                  "end": {
+                    "row": 13,
+                    "column": 55
+                  },
+                  "text": "(len(decoded_data) >= len(aws_kinesis_agg.MAGIC))",
+                  "children": [
+                    {
+                      "type": "(",
+                      "start": {
+                        "row": 13,
+                        "column": 6
+                      },
+                      "end": {
+                        "row": 13,
+                        "column": 7
+                      },
+                      "text": "("
+                    },
+                    {
+                      "type": "comparison_operator",
+                      "start": {
+                        "row": 13,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 13,
+                        "column": 54
+                      },
+                      "text": "len(decoded_data) >= len(aws_kinesis_agg.MAGIC)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 13,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 24
+                          },
+                          "text": "len(decoded_data)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 13,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 10
+                              },
+                              "text": "len"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 13,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 24
+                              },
+                              "text": "(decoded_data)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 10
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 11
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 11
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 23
+                                  },
+                                  "text": "decoded_data"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 24
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ">=",
+                          "start": {
+                            "row": 13,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 27
+                          },
+                          "text": ">="
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 13,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 13,
+                            "column": 54
+                          },
+                          "text": "len(aws_kinesis_agg.MAGIC)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 13,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 31
+                              },
+                              "text": "len"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 13,
+                                "column": 31
+                              },
+                              "end": {
+                                "row": 13,
+                                "column": 54
+                              },
+                              "text": "(aws_kinesis_agg.MAGIC)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 31
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 32
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 32
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 53
+                                  },
+                                  "text": "aws_kinesis_agg.MAGIC",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 47
+                                      },
+                                      "text": "aws_kinesis_agg"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 48
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 13,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 13,
+                                        "column": 53
+                                      },
+                                      "text": "MAGIC"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 13,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 13,
+                                    "column": 54
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": ")",
+                      "start": {
+                        "row": 13,
+                        "column": 54
+                      },
+                      "end": {
+                        "row": 13,
+                        "column": 55
+                      },
+                      "text": ")"
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 13,
+                    "column": 55
+                  },
+                  "end": {
+                    "row": 13,
+                    "column": 56
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 14,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 14,
+                    "column": 62
+                  },
+                  "text": "data_magic = decoded_data[:len(aws_kinesis_agg.MAGIC)]",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 14,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 14,
+                        "column": 62
+                      },
+                      "text": "data_magic = decoded_data[:len(aws_kinesis_agg.MAGIC)]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 14,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 14,
+                            "column": 62
+                          },
+                          "text": "data_magic = decoded_data[:len(aws_kinesis_agg.MAGIC)]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 14,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 18
+                              },
+                              "text": "data_magic"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 14,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 14,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 14,
+                                "column": 62
+                              },
+                              "text": "decoded_data[:len(aws_kinesis_agg.MAGIC)]",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 33
+                                  },
+                                  "text": "decoded_data"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 34
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "slice",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 61
+                                  },
+                                  "text": ":len(aws_kinesis_agg.MAGIC)",
+                                  "children": [
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 35
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 14,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 14,
+                                        "column": 61
+                                      },
+                                      "text": "len(aws_kinesis_agg.MAGIC)",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 35
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 38
+                                          },
+                                          "text": "len"
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 14,
+                                            "column": 38
+                                          },
+                                          "end": {
+                                            "row": 14,
+                                            "column": 61
+                                          },
+                                          "text": "(aws_kinesis_agg.MAGIC)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 38
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 39
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "attribute",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 39
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 60
+                                              },
+                                              "text": "aws_kinesis_agg.MAGIC",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 14,
+                                                    "column": 39
+                                                  },
+                                                  "end": {
+                                                    "row": 14,
+                                                    "column": 54
+                                                  },
+                                                  "text": "aws_kinesis_agg"
+                                                },
+                                                {
+                                                  "type": ".",
+                                                  "start": {
+                                                    "row": 14,
+                                                    "column": 54
+                                                  },
+                                                  "end": {
+                                                    "row": 14,
+                                                    "column": 55
+                                                  },
+                                                  "text": "."
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 14,
+                                                    "column": 55
+                                                  },
+                                                  "end": {
+                                                    "row": 14,
+                                                    "column": 60
+                                                  },
+                                                  "text": "MAGIC"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 14,
+                                                "column": 60
+                                              },
+                                              "end": {
+                                                "row": 14,
+                                                "column": 61
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 14,
+                                    "column": 61
+                                  },
+                                  "end": {
+                                    "row": 14,
+                                    "column": 62
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "else_clause",
+                  "start": {
+                    "row": 15,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 17,
+                    "column": 29
+                  },
+                  "text": "else:\n        print(\"Not aggregated\") \n        is_aggregated = False",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 15,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 8
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 15,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 15,
+                        "column": 9
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 16,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 17,
+                        "column": 29
+                      },
+                      "text": "print(\"Not aggregated\") \n        is_aggregated = False",
+                      "children": [
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 16,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 16,
+                            "column": 31
+                          },
+                          "text": "print(\"Not aggregated\")",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 16,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 16,
+                                "column": 31
+                              },
+                              "text": "print(\"Not aggregated\")",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 13
+                                  },
+                                  "text": "print"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 16,
+                                    "column": 13
+                                  },
+                                  "end": {
+                                    "row": 16,
+                                    "column": 31
+                                  },
+                                  "text": "(\"Not aggregated\")",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 13
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 14
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 14
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 30
+                                      },
+                                      "text": "\"Not aggregated\"",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 14
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 15
+                                          },
+                                          "text": "\""
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 15
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 29
+                                          },
+                                          "text": "Not aggregated"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 16,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 16,
+                                            "column": 30
+                                          },
+                                          "text": "\""
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 16,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 16,
+                                        "column": 31
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 17,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 17,
+                            "column": 29
+                          },
+                          "text": "is_aggregated = False",
+                          "children": [
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 17,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 17,
+                                "column": 29
+                              },
+                              "text": "is_aggregated = False",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 21
+                                  },
+                                  "text": "is_aggregated"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 23
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "false",
+                                  "start": {
+                                    "row": 17,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 17,
+                                    "column": 29
+                                  },
+                                  "text": "False"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 19,
+                "column": 4
+              },
+              "end": {
+                "row": 19,
+                "column": 69
+              },
+              "text": "decoded_data_no_magic = decoded_data[len(aws_kinesis_agg.MAGIC):]",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 19,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 69
+                  },
+                  "text": "decoded_data_no_magic = decoded_data[len(aws_kinesis_agg.MAGIC):]",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 19,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 25
+                      },
+                      "text": "decoded_data_no_magic"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 19,
+                        "column": 26
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 27
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "subscript",
+                      "start": {
+                        "row": 19,
+                        "column": 28
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 69
+                      },
+                      "text": "decoded_data[len(aws_kinesis_agg.MAGIC):]",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 19,
+                            "column": 28
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 40
+                          },
+                          "text": "decoded_data"
+                        },
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 19,
+                            "column": 40
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 41
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "slice",
+                          "start": {
+                            "row": 19,
+                            "column": 41
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 68
+                          },
+                          "text": "len(aws_kinesis_agg.MAGIC):",
+                          "children": [
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 19,
+                                "column": 41
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 67
+                              },
+                              "text": "len(aws_kinesis_agg.MAGIC)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 41
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 44
+                                  },
+                                  "text": "len"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 19,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 19,
+                                    "column": 67
+                                  },
+                                  "text": "(aws_kinesis_agg.MAGIC)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 45
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 66
+                                      },
+                                      "text": "aws_kinesis_agg.MAGIC",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 60
+                                          },
+                                          "text": "aws_kinesis_agg"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 60
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 61
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 19,
+                                            "column": 61
+                                          },
+                                          "end": {
+                                            "row": 19,
+                                            "column": 66
+                                          },
+                                          "text": "MAGIC"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 19,
+                                        "column": 66
+                                      },
+                                      "end": {
+                                        "row": 19,
+                                        "column": 67
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 19,
+                                "column": 67
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 68
+                              },
+                              "text": ":"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 19,
+                            "column": 68
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 69
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 21,
+                "column": 4
+              },
+              "end": {
+                "row": 22,
+                "column": 29
+              },
+              "text": "if aws_kinesis_agg.MAGIC != data_magic or len(decoded_data_no_magic) <= aws_kinesis_agg.DIGEST_SIZE:\n        is_aggregated = False",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 21,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "boolean_operator",
+                  "start": {
+                    "row": 21,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 103
+                  },
+                  "text": "aws_kinesis_agg.MAGIC != data_magic or len(decoded_data_no_magic) <= aws_kinesis_agg.DIGEST_SIZE",
+                  "children": [
+                    {
+                      "type": "comparison_operator",
+                      "start": {
+                        "row": 21,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 42
+                      },
+                      "text": "aws_kinesis_agg.MAGIC != data_magic",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 21,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 28
+                          },
+                          "text": "aws_kinesis_agg.MAGIC",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 22
+                              },
+                              "text": "aws_kinesis_agg"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 21,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 23
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 28
+                              },
+                              "text": "MAGIC"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "!=",
+                          "start": {
+                            "row": 21,
+                            "column": 29
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 31
+                          },
+                          "text": "!="
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 21,
+                            "column": 32
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 42
+                          },
+                          "text": "data_magic"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "or",
+                      "start": {
+                        "row": 21,
+                        "column": 43
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 45
+                      },
+                      "text": "or"
+                    },
+                    {
+                      "type": "comparison_operator",
+                      "start": {
+                        "row": 21,
+                        "column": 46
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 103
+                      },
+                      "text": "len(decoded_data_no_magic) <= aws_kinesis_agg.DIGEST_SIZE",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 21,
+                            "column": 46
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 72
+                          },
+                          "text": "len(decoded_data_no_magic)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 49
+                              },
+                              "text": "len"
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 21,
+                                "column": 49
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 72
+                              },
+                              "text": "(decoded_data_no_magic)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 49
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 50
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 50
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 71
+                                  },
+                                  "text": "decoded_data_no_magic"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 21,
+                                    "column": 71
+                                  },
+                                  "end": {
+                                    "row": 21,
+                                    "column": 72
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "<=",
+                          "start": {
+                            "row": 21,
+                            "column": 73
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 75
+                          },
+                          "text": "<="
+                        },
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 21,
+                            "column": 76
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 103
+                          },
+                          "text": "aws_kinesis_agg.DIGEST_SIZE",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 76
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 91
+                              },
+                              "text": "aws_kinesis_agg"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 21,
+                                "column": 91
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 92
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 21,
+                                "column": 92
+                              },
+                              "end": {
+                                "row": 21,
+                                "column": 103
+                              },
+                              "text": "DIGEST_SIZE"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 21,
+                    "column": 103
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 104
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 22,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 29
+                  },
+                  "text": "is_aggregated = False",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 22,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 29
+                      },
+                      "text": "is_aggregated = False",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 22,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 29
+                          },
+                          "text": "is_aggregated = False",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 22,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 21
+                              },
+                              "text": "is_aggregated"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 22,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 23
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "false",
+                              "start": {
+                                "row": 22,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 29
+                              },
+                              "text": "False"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 24,
+                "column": 4
+              },
+              "end": {
+                "row": 46,
+                "column": 29
+              },
+              "text": "if is_aggregated:            \n        \n        #verify the MD5 digest\n        message_digest = decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]\n        message_data = decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]\n        \n        md5_calc = md5.new()\n        md5_calc.update(message_data)\n        calculated_digest = md5_calc.digest()\n        \n        if message_digest != calculated_digest:            \n            return [decoded_data]            \n        else:                            \n            #Extract the protobuf message\n            try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e                   \n    else:\n        return [decoded_data]",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 24,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 24,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 20
+                  },
+                  "text": "is_aggregated"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 24,
+                    "column": 20
+                  },
+                  "end": {
+                    "row": 24,
+                    "column": 21
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 26,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 26,
+                    "column": 30
+                  },
+                  "text": "#verify the MD5 digest"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 27,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 23
+                  },
+                  "text": "message_digest = decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]\n        message_data = decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]\n        \n        md5_calc = md5.new()\n        md5_calc.update(message_data)\n        calculated_digest = md5_calc.digest()\n        \n        if message_digest != calculated_digest:            \n            return [decoded_data]            \n        else:                            \n            #Extract the protobuf message\n            try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 27,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 27,
+                        "column": 77
+                      },
+                      "text": "message_digest = decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 27,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 27,
+                            "column": 77
+                          },
+                          "text": "message_digest = decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 27,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 22
+                              },
+                              "text": "message_digest"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 27,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 24
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 27,
+                                "column": 25
+                              },
+                              "end": {
+                                "row": 27,
+                                "column": 77
+                              },
+                              "text": "decoded_data_no_magic[-aws_kinesis_agg.DIGEST_SIZE:]",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 46
+                                  },
+                                  "text": "decoded_data_no_magic"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 46
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 47
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "slice",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 47
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 76
+                                  },
+                                  "text": "-aws_kinesis_agg.DIGEST_SIZE:",
+                                  "children": [
+                                    {
+                                      "type": "unary_operator",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 47
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 75
+                                      },
+                                      "text": "-aws_kinesis_agg.DIGEST_SIZE",
+                                      "children": [
+                                        {
+                                          "type": "-",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 48
+                                          },
+                                          "text": "-"
+                                        },
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 27,
+                                            "column": 48
+                                          },
+                                          "end": {
+                                            "row": 27,
+                                            "column": 75
+                                          },
+                                          "text": "aws_kinesis_agg.DIGEST_SIZE",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 27,
+                                                "column": 48
+                                              },
+                                              "end": {
+                                                "row": 27,
+                                                "column": 63
+                                              },
+                                              "text": "aws_kinesis_agg"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 27,
+                                                "column": 63
+                                              },
+                                              "end": {
+                                                "row": 27,
+                                                "column": 64
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 27,
+                                                "column": 64
+                                              },
+                                              "end": {
+                                                "row": 27,
+                                                "column": 75
+                                              },
+                                              "text": "DIGEST_SIZE"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 27,
+                                        "column": 75
+                                      },
+                                      "end": {
+                                        "row": 27,
+                                        "column": 76
+                                      },
+                                      "text": ":"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 27,
+                                    "column": 76
+                                  },
+                                  "end": {
+                                    "row": 27,
+                                    "column": 77
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 28,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 75
+                      },
+                      "text": "message_data = decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 28,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 75
+                          },
+                          "text": "message_data = decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 28,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 20
+                              },
+                              "text": "message_data"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 28,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 22
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "subscript",
+                              "start": {
+                                "row": 28,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 75
+                              },
+                              "text": "decoded_data_no_magic[:-aws_kinesis_agg.DIGEST_SIZE]",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 44
+                                  },
+                                  "text": "decoded_data_no_magic"
+                                },
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 44
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 45
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "slice",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 45
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 74
+                                  },
+                                  "text": ":-aws_kinesis_agg.DIGEST_SIZE",
+                                  "children": [
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 45
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 46
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "unary_operator",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 46
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 74
+                                      },
+                                      "text": "-aws_kinesis_agg.DIGEST_SIZE",
+                                      "children": [
+                                        {
+                                          "type": "-",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 46
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 47
+                                          },
+                                          "text": "-"
+                                        },
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 47
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 74
+                                          },
+                                          "text": "aws_kinesis_agg.DIGEST_SIZE",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 47
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 62
+                                              },
+                                              "text": "aws_kinesis_agg"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 62
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 63
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 28,
+                                                "column": 63
+                                              },
+                                              "end": {
+                                                "row": 28,
+                                                "column": 74
+                                              },
+                                              "text": "DIGEST_SIZE"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 74
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 75
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 30,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 28
+                      },
+                      "text": "md5_calc = md5.new()",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 30,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 28
+                          },
+                          "text": "md5_calc = md5.new()",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 30,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 16
+                              },
+                              "text": "md5_calc"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 30,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 18
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 30,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 28
+                              },
+                              "text": "md5.new()",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 26
+                                  },
+                                  "text": "md5.new",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 22
+                                      },
+                                      "text": "md5"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 23
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 23
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 26
+                                      },
+                                      "text": "new"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 28
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 27
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 27
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 28
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 31,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 31,
+                        "column": 37
+                      },
+                      "text": "md5_calc.update(message_data)",
+                      "children": [
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 31,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 31,
+                            "column": 37
+                          },
+                          "text": "md5_calc.update(message_data)",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 31,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 23
+                              },
+                              "text": "md5_calc.update",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 16
+                                  },
+                                  "text": "md5_calc"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 17
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 17
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 23
+                                  },
+                                  "text": "update"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 31,
+                                "column": 23
+                              },
+                              "end": {
+                                "row": 31,
+                                "column": 37
+                              },
+                              "text": "(message_data)",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 23
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 24
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 24
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 36
+                                  },
+                                  "text": "message_data"
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 31,
+                                    "column": 36
+                                  },
+                                  "end": {
+                                    "row": 31,
+                                    "column": 37
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 32,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 32,
+                        "column": 45
+                      },
+                      "text": "calculated_digest = md5_calc.digest()",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 32,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 32,
+                            "column": 45
+                          },
+                          "text": "calculated_digest = md5_calc.digest()",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 32,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 25
+                              },
+                              "text": "calculated_digest"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 32,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 27
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 32,
+                                "column": 28
+                              },
+                              "end": {
+                                "row": 32,
+                                "column": 45
+                              },
+                              "text": "md5_calc.digest()",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 32,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 32,
+                                    "column": 43
+                                  },
+                                  "text": "md5_calc.digest",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 32,
+                                        "column": 28
+                                      },
+                                      "end": {
+                                        "row": 32,
+                                        "column": 36
+                                      },
+                                      "text": "md5_calc"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 32,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 32,
+                                        "column": 37
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 32,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 32,
+                                        "column": 43
+                                      },
+                                      "text": "digest"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 32,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 32,
+                                    "column": 45
+                                  },
+                                  "text": "()",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 32,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 32,
+                                        "column": 44
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 32,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 32,
+                                        "column": 45
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "if_statement",
+                      "start": {
+                        "row": 34,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 23
+                      },
+                      "text": "if message_digest != calculated_digest:            \n            return [decoded_data]            \n        else:                            \n            #Extract the protobuf message\n            try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e",
+                      "children": [
+                        {
+                          "type": "if",
+                          "start": {
+                            "row": 34,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 10
+                          },
+                          "text": "if"
+                        },
+                        {
+                          "type": "comparison_operator",
+                          "start": {
+                            "row": 34,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 46
+                          },
+                          "text": "message_digest != calculated_digest",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 34,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 25
+                              },
+                              "text": "message_digest"
+                            },
+                            {
+                              "type": "!=",
+                              "start": {
+                                "row": 34,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 28
+                              },
+                              "text": "!="
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 34,
+                                "column": 29
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 46
+                              },
+                              "text": "calculated_digest"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 34,
+                            "column": 46
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 47
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 35,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 33
+                          },
+                          "text": "return [decoded_data]",
+                          "children": [
+                            {
+                              "type": "return_statement",
+                              "start": {
+                                "row": 35,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 33
+                              },
+                              "text": "return [decoded_data]",
+                              "children": [
+                                {
+                                  "type": "return",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 18
+                                  },
+                                  "text": "return"
+                                },
+                                {
+                                  "type": "list",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 19
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 33
+                                  },
+                                  "text": "[decoded_data]",
+                                  "children": [
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 19
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 20
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 32
+                                      },
+                                      "text": "decoded_data"
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 32
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 33
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "else_clause",
+                          "start": {
+                            "row": 36,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 23
+                          },
+                          "text": "else:                            \n            #Extract the protobuf message\n            try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e",
+                          "children": [
+                            {
+                              "type": "else",
+                              "start": {
+                                "row": 36,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 12
+                              },
+                              "text": "else"
+                            },
+                            {
+                              "type": ":",
+                              "start": {
+                                "row": 36,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 13
+                              },
+                              "text": ":"
+                            },
+                            {
+                              "type": "comment",
+                              "start": {
+                                "row": 37,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 41
+                              },
+                              "text": "#Extract the protobuf message"
+                            },
+                            {
+                              "type": "block",
+                              "start": {
+                                "row": 38,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 44,
+                                "column": 23
+                              },
+                              "text": "try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e",
+                              "children": [
+                                {
+                                  "type": "try_statement",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 44,
+                                    "column": 23
+                                  },
+                                  "text": "try:    \n                ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]\n            except BaseException as e:\n                raise e",
+                                  "children": [
+                                    {
+                                      "type": "try",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 15
+                                      },
+                                      "text": "try"
+                                    },
+                                    {
+                                      "type": ":",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 15
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 16
+                                      },
+                                      "text": ":"
+                                    },
+                                    {
+                                      "type": "block",
+                                      "start": {
+                                        "row": 39,
+                                        "column": 16
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 53
+                                      },
+                                      "text": "ar = kpl_pb2.AggregatedRecord()\n                ar.ParseFromString(message_data)\n                \n                return [mr.data for mr in ar.records]",
+                                      "children": [
+                                        {
+                                          "type": "expression_statement",
+                                          "start": {
+                                            "row": 39,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 39,
+                                            "column": 47
+                                          },
+                                          "text": "ar = kpl_pb2.AggregatedRecord()",
+                                          "children": [
+                                            {
+                                              "type": "assignment",
+                                              "start": {
+                                                "row": 39,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 39,
+                                                "column": 47
+                                              },
+                                              "text": "ar = kpl_pb2.AggregatedRecord()",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 39,
+                                                    "column": 16
+                                                  },
+                                                  "end": {
+                                                    "row": 39,
+                                                    "column": 18
+                                                  },
+                                                  "text": "ar"
+                                                },
+                                                {
+                                                  "type": "=",
+                                                  "start": {
+                                                    "row": 39,
+                                                    "column": 19
+                                                  },
+                                                  "end": {
+                                                    "row": 39,
+                                                    "column": 20
+                                                  },
+                                                  "text": "="
+                                                },
+                                                {
+                                                  "type": "call",
+                                                  "start": {
+                                                    "row": 39,
+                                                    "column": 21
+                                                  },
+                                                  "end": {
+                                                    "row": 39,
+                                                    "column": 47
+                                                  },
+                                                  "text": "kpl_pb2.AggregatedRecord()",
+                                                  "children": [
+                                                    {
+                                                      "type": "attribute",
+                                                      "start": {
+                                                        "row": 39,
+                                                        "column": 21
+                                                      },
+                                                      "end": {
+                                                        "row": 39,
+                                                        "column": 45
+                                                      },
+                                                      "text": "kpl_pb2.AggregatedRecord",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 39,
+                                                            "column": 21
+                                                          },
+                                                          "end": {
+                                                            "row": 39,
+                                                            "column": 28
+                                                          },
+                                                          "text": "kpl_pb2"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 39,
+                                                            "column": 28
+                                                          },
+                                                          "end": {
+                                                            "row": 39,
+                                                            "column": 29
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 39,
+                                                            "column": 29
+                                                          },
+                                                          "end": {
+                                                            "row": 39,
+                                                            "column": 45
+                                                          },
+                                                          "text": "AggregatedRecord"
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "argument_list",
+                                                      "start": {
+                                                        "row": 39,
+                                                        "column": 45
+                                                      },
+                                                      "end": {
+                                                        "row": 39,
+                                                        "column": 47
+                                                      },
+                                                      "text": "()",
+                                                      "children": [
+                                                        {
+                                                          "type": "(",
+                                                          "start": {
+                                                            "row": 39,
+                                                            "column": 45
+                                                          },
+                                                          "end": {
+                                                            "row": 39,
+                                                            "column": 46
+                                                          },
+                                                          "text": "("
+                                                        },
+                                                        {
+                                                          "type": ")",
+                                                          "start": {
+                                                            "row": 39,
+                                                            "column": 46
+                                                          },
+                                                          "end": {
+                                                            "row": 39,
+                                                            "column": 47
+                                                          },
+                                                          "text": ")"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "expression_statement",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 48
+                                          },
+                                          "text": "ar.ParseFromString(message_data)",
+                                          "children": [
+                                            {
+                                              "type": "call",
+                                              "start": {
+                                                "row": 40,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 40,
+                                                "column": 48
+                                              },
+                                              "text": "ar.ParseFromString(message_data)",
+                                              "children": [
+                                                {
+                                                  "type": "attribute",
+                                                  "start": {
+                                                    "row": 40,
+                                                    "column": 16
+                                                  },
+                                                  "end": {
+                                                    "row": 40,
+                                                    "column": 34
+                                                  },
+                                                  "text": "ar.ParseFromString",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 40,
+                                                        "column": 16
+                                                      },
+                                                      "end": {
+                                                        "row": 40,
+                                                        "column": 18
+                                                      },
+                                                      "text": "ar"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 40,
+                                                        "column": 18
+                                                      },
+                                                      "end": {
+                                                        "row": 40,
+                                                        "column": 19
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 40,
+                                                        "column": 19
+                                                      },
+                                                      "end": {
+                                                        "row": 40,
+                                                        "column": 34
+                                                      },
+                                                      "text": "ParseFromString"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "argument_list",
+                                                  "start": {
+                                                    "row": 40,
+                                                    "column": 34
+                                                  },
+                                                  "end": {
+                                                    "row": 40,
+                                                    "column": 48
+                                                  },
+                                                  "text": "(message_data)",
+                                                  "children": [
+                                                    {
+                                                      "type": "(",
+                                                      "start": {
+                                                        "row": 40,
+                                                        "column": 34
+                                                      },
+                                                      "end": {
+                                                        "row": 40,
+                                                        "column": 35
+                                                      },
+                                                      "text": "("
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 40,
+                                                        "column": 35
+                                                      },
+                                                      "end": {
+                                                        "row": 40,
+                                                        "column": 47
+                                                      },
+                                                      "text": "message_data"
+                                                    },
+                                                    {
+                                                      "type": ")",
+                                                      "start": {
+                                                        "row": 40,
+                                                        "column": 47
+                                                      },
+                                                      "end": {
+                                                        "row": 40,
+                                                        "column": 48
+                                                      },
+                                                      "text": ")"
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "return_statement",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 53
+                                          },
+                                          "text": "return [mr.data for mr in ar.records]",
+                                          "children": [
+                                            {
+                                              "type": "return",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 22
+                                              },
+                                              "text": "return"
+                                            },
+                                            {
+                                              "type": "list_comprehension",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 53
+                                              },
+                                              "text": "[mr.data for mr in ar.records]",
+                                              "children": [
+                                                {
+                                                  "type": "[",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 23
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 24
+                                                  },
+                                                  "text": "["
+                                                },
+                                                {
+                                                  "type": "attribute",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 24
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 31
+                                                  },
+                                                  "text": "mr.data",
+                                                  "children": [
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 42,
+                                                        "column": 24
+                                                      },
+                                                      "end": {
+                                                        "row": 42,
+                                                        "column": 26
+                                                      },
+                                                      "text": "mr"
+                                                    },
+                                                    {
+                                                      "type": ".",
+                                                      "start": {
+                                                        "row": 42,
+                                                        "column": 26
+                                                      },
+                                                      "end": {
+                                                        "row": 42,
+                                                        "column": 27
+                                                      },
+                                                      "text": "."
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 42,
+                                                        "column": 27
+                                                      },
+                                                      "end": {
+                                                        "row": 42,
+                                                        "column": 31
+                                                      },
+                                                      "text": "data"
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "for_in_clause",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 32
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 52
+                                                  },
+                                                  "text": "for mr in ar.records",
+                                                  "children": [
+                                                    {
+                                                      "type": "for",
+                                                      "start": {
+                                                        "row": 42,
+                                                        "column": 32
+                                                      },
+                                                      "end": {
+                                                        "row": 42,
+                                                        "column": 35
+                                                      },
+                                                      "text": "for"
+                                                    },
+                                                    {
+                                                      "type": "identifier",
+                                                      "start": {
+                                                        "row": 42,
+                                                        "column": 36
+                                                      },
+                                                      "end": {
+                                                        "row": 42,
+                                                        "column": 38
+                                                      },
+                                                      "text": "mr"
+                                                    },
+                                                    {
+                                                      "type": "in",
+                                                      "start": {
+                                                        "row": 42,
+                                                        "column": 39
+                                                      },
+                                                      "end": {
+                                                        "row": 42,
+                                                        "column": 41
+                                                      },
+                                                      "text": "in"
+                                                    },
+                                                    {
+                                                      "type": "attribute",
+                                                      "start": {
+                                                        "row": 42,
+                                                        "column": 42
+                                                      },
+                                                      "end": {
+                                                        "row": 42,
+                                                        "column": 52
+                                                      },
+                                                      "text": "ar.records",
+                                                      "children": [
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 42,
+                                                            "column": 42
+                                                          },
+                                                          "end": {
+                                                            "row": 42,
+                                                            "column": 44
+                                                          },
+                                                          "text": "ar"
+                                                        },
+                                                        {
+                                                          "type": ".",
+                                                          "start": {
+                                                            "row": 42,
+                                                            "column": 44
+                                                          },
+                                                          "end": {
+                                                            "row": 42,
+                                                            "column": 45
+                                                          },
+                                                          "text": "."
+                                                        },
+                                                        {
+                                                          "type": "identifier",
+                                                          "start": {
+                                                            "row": 42,
+                                                            "column": 45
+                                                          },
+                                                          "end": {
+                                                            "row": 42,
+                                                            "column": 52
+                                                          },
+                                                          "text": "records"
+                                                        }
+                                                      ]
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  "type": "]",
+                                                  "start": {
+                                                    "row": 42,
+                                                    "column": 52
+                                                  },
+                                                  "end": {
+                                                    "row": 42,
+                                                    "column": 53
+                                                  },
+                                                  "text": "]"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "except_clause",
+                                      "start": {
+                                        "row": 43,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 44,
+                                        "column": 23
+                                      },
+                                      "text": "except BaseException as e:\n                raise e",
+                                      "children": [
+                                        {
+                                          "type": "except",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 18
+                                          },
+                                          "text": "except"
+                                        },
+                                        {
+                                          "type": "as_pattern",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 19
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 37
+                                          },
+                                          "text": "BaseException as e",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 19
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 32
+                                              },
+                                              "text": "BaseException"
+                                            },
+                                            {
+                                              "type": "as",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 33
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 35
+                                              },
+                                              "text": "as"
+                                            },
+                                            {
+                                              "type": "as_pattern_target",
+                                              "start": {
+                                                "row": 43,
+                                                "column": 36
+                                              },
+                                              "end": {
+                                                "row": 43,
+                                                "column": 37
+                                              },
+                                              "text": "e",
+                                              "children": [
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 43,
+                                                    "column": 36
+                                                  },
+                                                  "end": {
+                                                    "row": 43,
+                                                    "column": 37
+                                                  },
+                                                  "text": "e"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ":",
+                                          "start": {
+                                            "row": 43,
+                                            "column": 37
+                                          },
+                                          "end": {
+                                            "row": 43,
+                                            "column": 38
+                                          },
+                                          "text": ":"
+                                        },
+                                        {
+                                          "type": "block",
+                                          "start": {
+                                            "row": 44,
+                                            "column": 16
+                                          },
+                                          "end": {
+                                            "row": 44,
+                                            "column": 23
+                                          },
+                                          "text": "raise e",
+                                          "children": [
+                                            {
+                                              "type": "raise_statement",
+                                              "start": {
+                                                "row": 44,
+                                                "column": 16
+                                              },
+                                              "end": {
+                                                "row": 44,
+                                                "column": 23
+                                              },
+                                              "text": "raise e",
+                                              "children": [
+                                                {
+                                                  "type": "raise",
+                                                  "start": {
+                                                    "row": 44,
+                                                    "column": 16
+                                                  },
+                                                  "end": {
+                                                    "row": 44,
+                                                    "column": 21
+                                                  },
+                                                  "text": "raise"
+                                                },
+                                                {
+                                                  "type": "identifier",
+                                                  "start": {
+                                                    "row": 44,
+                                                    "column": 22
+                                                  },
+                                                  "end": {
+                                                    "row": 44,
+                                                    "column": 23
+                                                  },
+                                                  "text": "e"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "else_clause",
+                  "start": {
+                    "row": 45,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 29
+                  },
+                  "text": "else:\n        return [decoded_data]",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 45,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 8
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 45,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 45,
+                        "column": 9
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 46,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 29
+                      },
+                      "text": "return [decoded_data]",
+                      "children": [
+                        {
+                          "type": "return_statement",
+                          "start": {
+                            "row": 46,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 29
+                          },
+                          "text": "return [decoded_data]",
+                          "children": [
+                            {
+                              "type": "return",
+                              "start": {
+                                "row": 46,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 14
+                              },
+                              "text": "return"
+                            },
+                            {
+                              "type": "list",
+                              "start": {
+                                "row": 46,
+                                "column": 15
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 29
+                              },
+                              "text": "[decoded_data]",
+                              "children": [
+                                {
+                                  "type": "[",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 15
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 16
+                                  },
+                                  "text": "["
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 16
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 28
+                                  },
+                                  "text": "decoded_data"
+                                },
+                                {
+                                  "type": "]",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 28
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 29
+                                  },
+                                  "text": "]"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

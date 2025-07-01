@@ -1,0 +1,4504 @@
+{
+  "type": "module",
+  "start": {
+    "row": 0,
+    "column": 0
+  },
+  "end": {
+    "row": 48,
+    "column": 15
+  },
+  "text": "def add(name, keystore, passphrase, certificate, private_key=None):\n    '''\n    Adds certificates to an existing keystore or creates a new one if necesssary.\n\n    :param name: alias for the certificate\n    :param keystore: The path to the keystore file to query\n    :param passphrase: The passphrase to use to decode the keystore\n    :param certificate: The PEM public certificate to add to keystore. Can be a string for file.\n    :param private_key: (Optional for TrustedCert) The PEM private key to add to the keystore\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' keystore.add aliasname /tmp/test.store changeit /tmp/testcert.crt\n        salt '*' keystore.add aliasname /tmp/test.store changeit certificate=\"-----BEGIN CERTIFICATE-----SIb...BM=-----END CERTIFICATE-----\"\n        salt '*' keystore.add keyname /tmp/test.store changeit /tmp/512.cert private_key=/tmp/512.key\n\n    '''\n    ASN1 = OpenSSL.crypto.FILETYPE_ASN1\n    PEM = OpenSSL.crypto.FILETYPE_PEM\n    certs_list = []\n    if os.path.isfile(keystore):\n        keystore_object = jks.KeyStore.load(keystore, passphrase)\n        for alias, loaded_cert in keystore_object.entries.items():\n            certs_list.append(loaded_cert)\n\n    try:\n        cert_string = __salt__['x509.get_pem_entry'](certificate)\n    except SaltInvocationError:\n        raise SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))\n\n    if private_key:\n        # Accept PEM input format, but convert to DES for loading into new keystore\n        key_string = __salt__['x509.get_pem_entry'](private_key)\n        loaded_cert = OpenSSL.crypto.load_certificate(PEM, cert_string)\n        loaded_key = OpenSSL.crypto.load_privatekey(PEM, key_string)\n        dumped_cert = OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)\n        dumped_key = OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)\n\n        new_entry = jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')\n    else:\n        new_entry = jks.TrustedCertEntry.new(name, cert_string)\n\n    certs_list.append(new_entry)\n\n    keystore_object = jks.KeyStore.new('jks', certs_list)\n    keystore_object.save(keystore, passphrase)\n    return True",
+  "children": [
+    {
+      "type": "function_definition",
+      "start": {
+        "row": 0,
+        "column": 0
+      },
+      "end": {
+        "row": 48,
+        "column": 15
+      },
+      "text": "def add(name, keystore, passphrase, certificate, private_key=None):\n    '''\n    Adds certificates to an existing keystore or creates a new one if necesssary.\n\n    :param name: alias for the certificate\n    :param keystore: The path to the keystore file to query\n    :param passphrase: The passphrase to use to decode the keystore\n    :param certificate: The PEM public certificate to add to keystore. Can be a string for file.\n    :param private_key: (Optional for TrustedCert) The PEM private key to add to the keystore\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' keystore.add aliasname /tmp/test.store changeit /tmp/testcert.crt\n        salt '*' keystore.add aliasname /tmp/test.store changeit certificate=\"-----BEGIN CERTIFICATE-----SIb...BM=-----END CERTIFICATE-----\"\n        salt '*' keystore.add keyname /tmp/test.store changeit /tmp/512.cert private_key=/tmp/512.key\n\n    '''\n    ASN1 = OpenSSL.crypto.FILETYPE_ASN1\n    PEM = OpenSSL.crypto.FILETYPE_PEM\n    certs_list = []\n    if os.path.isfile(keystore):\n        keystore_object = jks.KeyStore.load(keystore, passphrase)\n        for alias, loaded_cert in keystore_object.entries.items():\n            certs_list.append(loaded_cert)\n\n    try:\n        cert_string = __salt__['x509.get_pem_entry'](certificate)\n    except SaltInvocationError:\n        raise SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))\n\n    if private_key:\n        # Accept PEM input format, but convert to DES for loading into new keystore\n        key_string = __salt__['x509.get_pem_entry'](private_key)\n        loaded_cert = OpenSSL.crypto.load_certificate(PEM, cert_string)\n        loaded_key = OpenSSL.crypto.load_privatekey(PEM, key_string)\n        dumped_cert = OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)\n        dumped_key = OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)\n\n        new_entry = jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')\n    else:\n        new_entry = jks.TrustedCertEntry.new(name, cert_string)\n\n    certs_list.append(new_entry)\n\n    keystore_object = jks.KeyStore.new('jks', certs_list)\n    keystore_object.save(keystore, passphrase)\n    return True",
+      "children": [
+        {
+          "type": "def",
+          "start": {
+            "row": 0,
+            "column": 0
+          },
+          "end": {
+            "row": 0,
+            "column": 3
+          },
+          "text": "def"
+        },
+        {
+          "type": "identifier",
+          "start": {
+            "row": 0,
+            "column": 4
+          },
+          "end": {
+            "row": 0,
+            "column": 7
+          },
+          "text": "add"
+        },
+        {
+          "type": "parameters",
+          "start": {
+            "row": 0,
+            "column": 7
+          },
+          "end": {
+            "row": 0,
+            "column": 66
+          },
+          "text": "(name, keystore, passphrase, certificate, private_key=None)",
+          "children": [
+            {
+              "type": "(",
+              "start": {
+                "row": 0,
+                "column": 7
+              },
+              "end": {
+                "row": 0,
+                "column": 8
+              },
+              "text": "("
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 8
+              },
+              "end": {
+                "row": 0,
+                "column": 12
+              },
+              "text": "name"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 12
+              },
+              "end": {
+                "row": 0,
+                "column": 13
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 14
+              },
+              "end": {
+                "row": 0,
+                "column": 22
+              },
+              "text": "keystore"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 22
+              },
+              "end": {
+                "row": 0,
+                "column": 23
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 24
+              },
+              "end": {
+                "row": 0,
+                "column": 34
+              },
+              "text": "passphrase"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 34
+              },
+              "end": {
+                "row": 0,
+                "column": 35
+              },
+              "text": ","
+            },
+            {
+              "type": "identifier",
+              "start": {
+                "row": 0,
+                "column": 36
+              },
+              "end": {
+                "row": 0,
+                "column": 47
+              },
+              "text": "certificate"
+            },
+            {
+              "type": ",",
+              "start": {
+                "row": 0,
+                "column": 47
+              },
+              "end": {
+                "row": 0,
+                "column": 48
+              },
+              "text": ","
+            },
+            {
+              "type": "default_parameter",
+              "start": {
+                "row": 0,
+                "column": 49
+              },
+              "end": {
+                "row": 0,
+                "column": 65
+              },
+              "text": "private_key=None",
+              "children": [
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 0,
+                    "column": 49
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 60
+                  },
+                  "text": "private_key"
+                },
+                {
+                  "type": "=",
+                  "start": {
+                    "row": 0,
+                    "column": 60
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 61
+                  },
+                  "text": "="
+                },
+                {
+                  "type": "none",
+                  "start": {
+                    "row": 0,
+                    "column": 61
+                  },
+                  "end": {
+                    "row": 0,
+                    "column": 65
+                  },
+                  "text": "None"
+                }
+              ]
+            },
+            {
+              "type": ")",
+              "start": {
+                "row": 0,
+                "column": 65
+              },
+              "end": {
+                "row": 0,
+                "column": 66
+              },
+              "text": ")"
+            }
+          ]
+        },
+        {
+          "type": ":",
+          "start": {
+            "row": 0,
+            "column": 66
+          },
+          "end": {
+            "row": 0,
+            "column": 67
+          },
+          "text": ":"
+        },
+        {
+          "type": "block",
+          "start": {
+            "row": 1,
+            "column": 4
+          },
+          "end": {
+            "row": 48,
+            "column": 15
+          },
+          "text": "'''\n    Adds certificates to an existing keystore or creates a new one if necesssary.\n\n    :param name: alias for the certificate\n    :param keystore: The path to the keystore file to query\n    :param passphrase: The passphrase to use to decode the keystore\n    :param certificate: The PEM public certificate to add to keystore. Can be a string for file.\n    :param private_key: (Optional for TrustedCert) The PEM private key to add to the keystore\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' keystore.add aliasname /tmp/test.store changeit /tmp/testcert.crt\n        salt '*' keystore.add aliasname /tmp/test.store changeit certificate=\"-----BEGIN CERTIFICATE-----SIb...BM=-----END CERTIFICATE-----\"\n        salt '*' keystore.add keyname /tmp/test.store changeit /tmp/512.cert private_key=/tmp/512.key\n\n    '''\n    ASN1 = OpenSSL.crypto.FILETYPE_ASN1\n    PEM = OpenSSL.crypto.FILETYPE_PEM\n    certs_list = []\n    if os.path.isfile(keystore):\n        keystore_object = jks.KeyStore.load(keystore, passphrase)\n        for alias, loaded_cert in keystore_object.entries.items():\n            certs_list.append(loaded_cert)\n\n    try:\n        cert_string = __salt__['x509.get_pem_entry'](certificate)\n    except SaltInvocationError:\n        raise SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))\n\n    if private_key:\n        # Accept PEM input format, but convert to DES for loading into new keystore\n        key_string = __salt__['x509.get_pem_entry'](private_key)\n        loaded_cert = OpenSSL.crypto.load_certificate(PEM, cert_string)\n        loaded_key = OpenSSL.crypto.load_privatekey(PEM, key_string)\n        dumped_cert = OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)\n        dumped_key = OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)\n\n        new_entry = jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')\n    else:\n        new_entry = jks.TrustedCertEntry.new(name, cert_string)\n\n    certs_list.append(new_entry)\n\n    keystore_object = jks.KeyStore.new('jks', certs_list)\n    keystore_object.save(keystore, passphrase)\n    return True",
+          "children": [
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 1,
+                "column": 4
+              },
+              "end": {
+                "row": 18,
+                "column": 7
+              },
+              "text": "'''\n    Adds certificates to an existing keystore or creates a new one if necesssary.\n\n    :param name: alias for the certificate\n    :param keystore: The path to the keystore file to query\n    :param passphrase: The passphrase to use to decode the keystore\n    :param certificate: The PEM public certificate to add to keystore. Can be a string for file.\n    :param private_key: (Optional for TrustedCert) The PEM private key to add to the keystore\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' keystore.add aliasname /tmp/test.store changeit /tmp/testcert.crt\n        salt '*' keystore.add aliasname /tmp/test.store changeit certificate=\"-----BEGIN CERTIFICATE-----SIb...BM=-----END CERTIFICATE-----\"\n        salt '*' keystore.add keyname /tmp/test.store changeit /tmp/512.cert private_key=/tmp/512.key\n\n    '''",
+              "children": [
+                {
+                  "type": "string",
+                  "start": {
+                    "row": 1,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 18,
+                    "column": 7
+                  },
+                  "text": "'''\n    Adds certificates to an existing keystore or creates a new one if necesssary.\n\n    :param name: alias for the certificate\n    :param keystore: The path to the keystore file to query\n    :param passphrase: The passphrase to use to decode the keystore\n    :param certificate: The PEM public certificate to add to keystore. Can be a string for file.\n    :param private_key: (Optional for TrustedCert) The PEM private key to add to the keystore\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' keystore.add aliasname /tmp/test.store changeit /tmp/testcert.crt\n        salt '*' keystore.add aliasname /tmp/test.store changeit certificate=\"-----BEGIN CERTIFICATE-----SIb...BM=-----END CERTIFICATE-----\"\n        salt '*' keystore.add keyname /tmp/test.store changeit /tmp/512.cert private_key=/tmp/512.key\n\n    '''",
+                  "children": [
+                    {
+                      "type": "string_start",
+                      "start": {
+                        "row": 1,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    },
+                    {
+                      "type": "string_content",
+                      "start": {
+                        "row": 1,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 4
+                      },
+                      "text": "\n    Adds certificates to an existing keystore or creates a new one if necesssary.\n\n    :param name: alias for the certificate\n    :param keystore: The path to the keystore file to query\n    :param passphrase: The passphrase to use to decode the keystore\n    :param certificate: The PEM public certificate to add to keystore. Can be a string for file.\n    :param private_key: (Optional for TrustedCert) The PEM private key to add to the keystore\n\n    CLI Example:\n\n    .. code-block:: bash\n\n        salt '*' keystore.add aliasname /tmp/test.store changeit /tmp/testcert.crt\n        salt '*' keystore.add aliasname /tmp/test.store changeit certificate=\"-----BEGIN CERTIFICATE-----SIb...BM=-----END CERTIFICATE-----\"\n        salt '*' keystore.add keyname /tmp/test.store changeit /tmp/512.cert private_key=/tmp/512.key\n\n    "
+                    },
+                    {
+                      "type": "string_end",
+                      "start": {
+                        "row": 18,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 18,
+                        "column": 7
+                      },
+                      "text": "'''"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 19,
+                "column": 4
+              },
+              "end": {
+                "row": 19,
+                "column": 39
+              },
+              "text": "ASN1 = OpenSSL.crypto.FILETYPE_ASN1",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 19,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 19,
+                    "column": 39
+                  },
+                  "text": "ASN1 = OpenSSL.crypto.FILETYPE_ASN1",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 19,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 8
+                      },
+                      "text": "ASN1"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 19,
+                        "column": 9
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 10
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 19,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 19,
+                        "column": 39
+                      },
+                      "text": "OpenSSL.crypto.FILETYPE_ASN1",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 19,
+                            "column": 11
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 25
+                          },
+                          "text": "OpenSSL.crypto",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 19,
+                                "column": 11
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 18
+                              },
+                              "text": "OpenSSL"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 19,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 19
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 19,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 19,
+                                "column": 25
+                              },
+                              "text": "crypto"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 19,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 26
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 19,
+                            "column": 26
+                          },
+                          "end": {
+                            "row": 19,
+                            "column": 39
+                          },
+                          "text": "FILETYPE_ASN1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 20,
+                "column": 4
+              },
+              "end": {
+                "row": 20,
+                "column": 37
+              },
+              "text": "PEM = OpenSSL.crypto.FILETYPE_PEM",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 20,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 20,
+                    "column": 37
+                  },
+                  "text": "PEM = OpenSSL.crypto.FILETYPE_PEM",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 20,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 7
+                      },
+                      "text": "PEM"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 20,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 9
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 20,
+                        "column": 10
+                      },
+                      "end": {
+                        "row": 20,
+                        "column": 37
+                      },
+                      "text": "OpenSSL.crypto.FILETYPE_PEM",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 20,
+                            "column": 10
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 24
+                          },
+                          "text": "OpenSSL.crypto",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 20,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 17
+                              },
+                              "text": "OpenSSL"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 20,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 18
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 20,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 20,
+                                "column": 24
+                              },
+                              "text": "crypto"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 20,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 25
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 20,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 20,
+                            "column": 37
+                          },
+                          "text": "FILETYPE_PEM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 21,
+                "column": 4
+              },
+              "end": {
+                "row": 21,
+                "column": 19
+              },
+              "text": "certs_list = []",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 21,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 21,
+                    "column": 19
+                  },
+                  "text": "certs_list = []",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 21,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 14
+                      },
+                      "text": "certs_list"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 21,
+                        "column": 15
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 16
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "list",
+                      "start": {
+                        "row": 21,
+                        "column": 17
+                      },
+                      "end": {
+                        "row": 21,
+                        "column": 19
+                      },
+                      "text": "[]",
+                      "children": [
+                        {
+                          "type": "[",
+                          "start": {
+                            "row": 21,
+                            "column": 17
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 18
+                          },
+                          "text": "["
+                        },
+                        {
+                          "type": "]",
+                          "start": {
+                            "row": 21,
+                            "column": 18
+                          },
+                          "end": {
+                            "row": 21,
+                            "column": 19
+                          },
+                          "text": "]"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 22,
+                "column": 4
+              },
+              "end": {
+                "row": 25,
+                "column": 42
+              },
+              "text": "if os.path.isfile(keystore):\n        keystore_object = jks.KeyStore.load(keystore, passphrase)\n        for alias, loaded_cert in keystore_object.entries.items():\n            certs_list.append(loaded_cert)",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 22,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 22,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 31
+                  },
+                  "text": "os.path.isfile(keystore)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 22,
+                        "column": 7
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 21
+                      },
+                      "text": "os.path.isfile",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 22,
+                            "column": 7
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 14
+                          },
+                          "text": "os.path",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 22,
+                                "column": 7
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 9
+                              },
+                              "text": "os"
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 22,
+                                "column": 9
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 10
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 22,
+                                "column": 10
+                              },
+                              "end": {
+                                "row": 22,
+                                "column": 14
+                              },
+                              "text": "path"
+                            }
+                          ]
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 22,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 15
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 22,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 21
+                          },
+                          "text": "isfile"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 22,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 22,
+                        "column": 31
+                      },
+                      "text": "(keystore)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 22,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 22
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 22,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 30
+                          },
+                          "text": "keystore"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 22,
+                            "column": 30
+                          },
+                          "end": {
+                            "row": 22,
+                            "column": 31
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 22,
+                    "column": 31
+                  },
+                  "end": {
+                    "row": 22,
+                    "column": 32
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 23,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 25,
+                    "column": 42
+                  },
+                  "text": "keystore_object = jks.KeyStore.load(keystore, passphrase)\n        for alias, loaded_cert in keystore_object.entries.items():\n            certs_list.append(loaded_cert)",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 23,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 23,
+                        "column": 65
+                      },
+                      "text": "keystore_object = jks.KeyStore.load(keystore, passphrase)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 23,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 23,
+                            "column": 65
+                          },
+                          "text": "keystore_object = jks.KeyStore.load(keystore, passphrase)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 23,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 23
+                              },
+                              "text": "keystore_object"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 23,
+                                "column": 24
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 25
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 23,
+                                "column": 26
+                              },
+                              "end": {
+                                "row": 23,
+                                "column": 65
+                              },
+                              "text": "jks.KeyStore.load(keystore, passphrase)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 43
+                                  },
+                                  "text": "jks.KeyStore.load",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 26
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 38
+                                      },
+                                      "text": "jks.KeyStore",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 26
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 29
+                                          },
+                                          "text": "jks"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 30
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 23,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 23,
+                                            "column": 38
+                                          },
+                                          "text": "KeyStore"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 38
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 39
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 43
+                                      },
+                                      "text": "load"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 23,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 23,
+                                    "column": 65
+                                  },
+                                  "text": "(keystore, passphrase)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 44
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 52
+                                      },
+                                      "text": "keystore"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 53
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 54
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 64
+                                      },
+                                      "text": "passphrase"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 23,
+                                        "column": 64
+                                      },
+                                      "end": {
+                                        "row": 23,
+                                        "column": 65
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "for_statement",
+                      "start": {
+                        "row": 24,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 25,
+                        "column": 42
+                      },
+                      "text": "for alias, loaded_cert in keystore_object.entries.items():\n            certs_list.append(loaded_cert)",
+                      "children": [
+                        {
+                          "type": "for",
+                          "start": {
+                            "row": 24,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 11
+                          },
+                          "text": "for"
+                        },
+                        {
+                          "type": "pattern_list",
+                          "start": {
+                            "row": 24,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 30
+                          },
+                          "text": "alias, loaded_cert",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 17
+                              },
+                              "text": "alias"
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 24,
+                                "column": 17
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 18
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 24,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 30
+                              },
+                              "text": "loaded_cert"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "in",
+                          "start": {
+                            "row": 24,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 33
+                          },
+                          "text": "in"
+                        },
+                        {
+                          "type": "call",
+                          "start": {
+                            "row": 24,
+                            "column": 34
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 65
+                          },
+                          "text": "keystore_object.entries.items()",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 24,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 63
+                              },
+                              "text": "keystore_object.entries.items",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 34
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 57
+                                  },
+                                  "text": "keystore_object.entries",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 49
+                                      },
+                                      "text": "keystore_object"
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 49
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 50
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 24,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 24,
+                                        "column": 57
+                                      },
+                                      "text": "entries"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 57
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 58
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 58
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 63
+                                  },
+                                  "text": "items"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "argument_list",
+                              "start": {
+                                "row": 24,
+                                "column": 63
+                              },
+                              "end": {
+                                "row": 24,
+                                "column": 65
+                              },
+                              "text": "()",
+                              "children": [
+                                {
+                                  "type": "(",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 63
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 64
+                                  },
+                                  "text": "("
+                                },
+                                {
+                                  "type": ")",
+                                  "start": {
+                                    "row": 24,
+                                    "column": 64
+                                  },
+                                  "end": {
+                                    "row": 24,
+                                    "column": 65
+                                  },
+                                  "text": ")"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": ":",
+                          "start": {
+                            "row": 24,
+                            "column": 65
+                          },
+                          "end": {
+                            "row": 24,
+                            "column": 66
+                          },
+                          "text": ":"
+                        },
+                        {
+                          "type": "block",
+                          "start": {
+                            "row": 25,
+                            "column": 12
+                          },
+                          "end": {
+                            "row": 25,
+                            "column": 42
+                          },
+                          "text": "certs_list.append(loaded_cert)",
+                          "children": [
+                            {
+                              "type": "expression_statement",
+                              "start": {
+                                "row": 25,
+                                "column": 12
+                              },
+                              "end": {
+                                "row": 25,
+                                "column": 42
+                              },
+                              "text": "certs_list.append(loaded_cert)",
+                              "children": [
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 25,
+                                    "column": 12
+                                  },
+                                  "end": {
+                                    "row": 25,
+                                    "column": 42
+                                  },
+                                  "text": "certs_list.append(loaded_cert)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 12
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 29
+                                      },
+                                      "text": "certs_list.append",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 12
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 22
+                                          },
+                                          "text": "certs_list"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 23
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 29
+                                          },
+                                          "text": "append"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 25,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 25,
+                                        "column": 42
+                                      },
+                                      "text": "(loaded_cert)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 30
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 41
+                                          },
+                                          "text": "loaded_cert"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 25,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 25,
+                                            "column": 42
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "try_statement",
+              "start": {
+                "row": 27,
+                "column": 4
+              },
+              "end": {
+                "row": 30,
+                "column": 96
+              },
+              "text": "try:\n        cert_string = __salt__['x509.get_pem_entry'](certificate)\n    except SaltInvocationError:\n        raise SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))",
+              "children": [
+                {
+                  "type": "try",
+                  "start": {
+                    "row": 27,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 7
+                  },
+                  "text": "try"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 27,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 27,
+                    "column": 8
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 28,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 28,
+                    "column": 65
+                  },
+                  "text": "cert_string = __salt__['x509.get_pem_entry'](certificate)",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 28,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 28,
+                        "column": 65
+                      },
+                      "text": "cert_string = __salt__['x509.get_pem_entry'](certificate)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 28,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 28,
+                            "column": 65
+                          },
+                          "text": "cert_string = __salt__['x509.get_pem_entry'](certificate)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 28,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 19
+                              },
+                              "text": "cert_string"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 28,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 21
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 28,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 28,
+                                "column": 65
+                              },
+                              "text": "__salt__['x509.get_pem_entry'](certificate)",
+                              "children": [
+                                {
+                                  "type": "subscript",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 52
+                                  },
+                                  "text": "__salt__['x509.get_pem_entry']",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 30
+                                      },
+                                      "text": "__salt__"
+                                    },
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 31
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 31
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 51
+                                      },
+                                      "text": "'x509.get_pem_entry'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 32
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 32
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 50
+                                          },
+                                          "text": "x509.get_pem_entry"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 28,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 28,
+                                            "column": 51
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 52
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 28,
+                                    "column": 52
+                                  },
+                                  "end": {
+                                    "row": 28,
+                                    "column": 65
+                                  },
+                                  "text": "(certificate)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 53
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 64
+                                      },
+                                      "text": "certificate"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 28,
+                                        "column": 64
+                                      },
+                                      "end": {
+                                        "row": 28,
+                                        "column": 65
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "except_clause",
+                  "start": {
+                    "row": 29,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 30,
+                    "column": 96
+                  },
+                  "text": "except SaltInvocationError:\n        raise SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))",
+                  "children": [
+                    {
+                      "type": "except",
+                      "start": {
+                        "row": 29,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 10
+                      },
+                      "text": "except"
+                    },
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 29,
+                        "column": 11
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 30
+                      },
+                      "text": "SaltInvocationError"
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 29,
+                        "column": 30
+                      },
+                      "end": {
+                        "row": 29,
+                        "column": 31
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 30,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 30,
+                        "column": 96
+                      },
+                      "text": "raise SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))",
+                      "children": [
+                        {
+                          "type": "raise_statement",
+                          "start": {
+                            "row": 30,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 30,
+                            "column": 96
+                          },
+                          "text": "raise SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))",
+                          "children": [
+                            {
+                              "type": "raise",
+                              "start": {
+                                "row": 30,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 13
+                              },
+                              "text": "raise"
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 30,
+                                "column": 14
+                              },
+                              "end": {
+                                "row": 30,
+                                "column": 96
+                              },
+                              "text": "SaltInvocationError('Invalid certificate file or string: {0}'.format(certificate))",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 14
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 33
+                                  },
+                                  "text": "SaltInvocationError"
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 30,
+                                    "column": 33
+                                  },
+                                  "end": {
+                                    "row": 30,
+                                    "column": 96
+                                  },
+                                  "text": "('Invalid certificate file or string: {0}'.format(certificate))",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 33
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 34
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "call",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 34
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 95
+                                      },
+                                      "text": "'Invalid certificate file or string: {0}'.format(certificate)",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 34
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 82
+                                          },
+                                          "text": "'Invalid certificate file or string: {0}'.format",
+                                          "children": [
+                                            {
+                                              "type": "string",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 34
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 75
+                                              },
+                                              "text": "'Invalid certificate file or string: {0}'",
+                                              "children": [
+                                                {
+                                                  "type": "string_start",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 34
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 35
+                                                  },
+                                                  "text": "'"
+                                                },
+                                                {
+                                                  "type": "string_content",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 35
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 74
+                                                  },
+                                                  "text": "Invalid certificate file or string: {0}"
+                                                },
+                                                {
+                                                  "type": "string_end",
+                                                  "start": {
+                                                    "row": 30,
+                                                    "column": 74
+                                                  },
+                                                  "end": {
+                                                    "row": 30,
+                                                    "column": 75
+                                                  },
+                                                  "text": "'"
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 75
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 76
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 76
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 82
+                                              },
+                                              "text": "format"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "argument_list",
+                                          "start": {
+                                            "row": 30,
+                                            "column": 82
+                                          },
+                                          "end": {
+                                            "row": 30,
+                                            "column": 95
+                                          },
+                                          "text": "(certificate)",
+                                          "children": [
+                                            {
+                                              "type": "(",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 82
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 83
+                                              },
+                                              "text": "("
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 83
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 94
+                                              },
+                                              "text": "certificate"
+                                            },
+                                            {
+                                              "type": ")",
+                                              "start": {
+                                                "row": 30,
+                                                "column": 94
+                                              },
+                                              "end": {
+                                                "row": 30,
+                                                "column": 95
+                                              },
+                                              "text": ")"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 30,
+                                        "column": 95
+                                      },
+                                      "end": {
+                                        "row": 30,
+                                        "column": 96
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "if_statement",
+              "start": {
+                "row": 32,
+                "column": 4
+              },
+              "end": {
+                "row": 42,
+                "column": 63
+              },
+              "text": "if private_key:\n        # Accept PEM input format, but convert to DES for loading into new keystore\n        key_string = __salt__['x509.get_pem_entry'](private_key)\n        loaded_cert = OpenSSL.crypto.load_certificate(PEM, cert_string)\n        loaded_key = OpenSSL.crypto.load_privatekey(PEM, key_string)\n        dumped_cert = OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)\n        dumped_key = OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)\n\n        new_entry = jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')\n    else:\n        new_entry = jks.TrustedCertEntry.new(name, cert_string)",
+              "children": [
+                {
+                  "type": "if",
+                  "start": {
+                    "row": 32,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 6
+                  },
+                  "text": "if"
+                },
+                {
+                  "type": "identifier",
+                  "start": {
+                    "row": 32,
+                    "column": 7
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 18
+                  },
+                  "text": "private_key"
+                },
+                {
+                  "type": ":",
+                  "start": {
+                    "row": 32,
+                    "column": 18
+                  },
+                  "end": {
+                    "row": 32,
+                    "column": 19
+                  },
+                  "text": ":"
+                },
+                {
+                  "type": "comment",
+                  "start": {
+                    "row": 33,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 33,
+                    "column": 83
+                  },
+                  "text": "# Accept PEM input format, but convert to DES for loading into new keystore"
+                },
+                {
+                  "type": "block",
+                  "start": {
+                    "row": 34,
+                    "column": 8
+                  },
+                  "end": {
+                    "row": 40,
+                    "column": 87
+                  },
+                  "text": "key_string = __salt__['x509.get_pem_entry'](private_key)\n        loaded_cert = OpenSSL.crypto.load_certificate(PEM, cert_string)\n        loaded_key = OpenSSL.crypto.load_privatekey(PEM, key_string)\n        dumped_cert = OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)\n        dumped_key = OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)\n\n        new_entry = jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')",
+                  "children": [
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 34,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 34,
+                        "column": 64
+                      },
+                      "text": "key_string = __salt__['x509.get_pem_entry'](private_key)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 34,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 34,
+                            "column": 64
+                          },
+                          "text": "key_string = __salt__['x509.get_pem_entry'](private_key)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 34,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 18
+                              },
+                              "text": "key_string"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 34,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 34,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 34,
+                                "column": 64
+                              },
+                              "text": "__salt__['x509.get_pem_entry'](private_key)",
+                              "children": [
+                                {
+                                  "type": "subscript",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 51
+                                  },
+                                  "text": "__salt__['x509.get_pem_entry']",
+                                  "children": [
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 29
+                                      },
+                                      "text": "__salt__"
+                                    },
+                                    {
+                                      "type": "[",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 29
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 30
+                                      },
+                                      "text": "["
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 30
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 50
+                                      },
+                                      "text": "'x509.get_pem_entry'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 31
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 31
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 49
+                                          },
+                                          "text": "x509.get_pem_entry"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 34,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 34,
+                                            "column": 50
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "]",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 51
+                                      },
+                                      "text": "]"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 34,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 34,
+                                    "column": 64
+                                  },
+                                  "text": "(private_key)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 52
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 63
+                                      },
+                                      "text": "private_key"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 34,
+                                        "column": 63
+                                      },
+                                      "end": {
+                                        "row": 34,
+                                        "column": 64
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 35,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 35,
+                        "column": 71
+                      },
+                      "text": "loaded_cert = OpenSSL.crypto.load_certificate(PEM, cert_string)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 35,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 35,
+                            "column": 71
+                          },
+                          "text": "loaded_cert = OpenSSL.crypto.load_certificate(PEM, cert_string)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 35,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 19
+                              },
+                              "text": "loaded_cert"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 35,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 21
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 35,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 35,
+                                "column": 71
+                              },
+                              "text": "OpenSSL.crypto.load_certificate(PEM, cert_string)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 53
+                                  },
+                                  "text": "OpenSSL.crypto.load_certificate",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 36
+                                      },
+                                      "text": "OpenSSL.crypto",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 29
+                                          },
+                                          "text": "OpenSSL"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 30
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 35,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 35,
+                                            "column": 36
+                                          },
+                                          "text": "crypto"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 37
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 53
+                                      },
+                                      "text": "load_certificate"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 35,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 35,
+                                    "column": 71
+                                  },
+                                  "text": "(PEM, cert_string)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 54
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 54
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 57
+                                      },
+                                      "text": "PEM"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 57
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 58
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 59
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 70
+                                      },
+                                      "text": "cert_string"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 35,
+                                        "column": 70
+                                      },
+                                      "end": {
+                                        "row": 35,
+                                        "column": 71
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 36,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 36,
+                        "column": 68
+                      },
+                      "text": "loaded_key = OpenSSL.crypto.load_privatekey(PEM, key_string)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 36,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 36,
+                            "column": 68
+                          },
+                          "text": "loaded_key = OpenSSL.crypto.load_privatekey(PEM, key_string)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 36,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 18
+                              },
+                              "text": "loaded_key"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 36,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 36,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 36,
+                                "column": 68
+                              },
+                              "text": "OpenSSL.crypto.load_privatekey(PEM, key_string)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 51
+                                  },
+                                  "text": "OpenSSL.crypto.load_privatekey",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 35
+                                      },
+                                      "text": "OpenSSL.crypto",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 28
+                                          },
+                                          "text": "OpenSSL"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 29
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 36,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 36,
+                                            "column": 35
+                                          },
+                                          "text": "crypto"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 36
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 51
+                                      },
+                                      "text": "load_privatekey"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 36,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 36,
+                                    "column": 68
+                                  },
+                                  "text": "(PEM, key_string)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 52
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 55
+                                      },
+                                      "text": "PEM"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 55
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 56
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 57
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 67
+                                      },
+                                      "text": "key_string"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 36,
+                                        "column": 67
+                                      },
+                                      "end": {
+                                        "row": 36,
+                                        "column": 68
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 37,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 37,
+                        "column": 72
+                      },
+                      "text": "dumped_cert = OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 37,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 37,
+                            "column": 72
+                          },
+                          "text": "dumped_cert = OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 37,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 19
+                              },
+                              "text": "dumped_cert"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 37,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 21
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 37,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 37,
+                                "column": 72
+                              },
+                              "text": "OpenSSL.crypto.dump_certificate(ASN1, loaded_cert)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 53
+                                  },
+                                  "text": "OpenSSL.crypto.dump_certificate",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 22
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 36
+                                      },
+                                      "text": "OpenSSL.crypto",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 22
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 29
+                                          },
+                                          "text": "OpenSSL"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 30
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 37,
+                                            "column": 30
+                                          },
+                                          "end": {
+                                            "row": 37,
+                                            "column": 36
+                                          },
+                                          "text": "crypto"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 37
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 37
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 53
+                                      },
+                                      "text": "dump_certificate"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 37,
+                                    "column": 53
+                                  },
+                                  "end": {
+                                    "row": 37,
+                                    "column": 72
+                                  },
+                                  "text": "(ASN1, loaded_cert)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 53
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 54
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 54
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 58
+                                      },
+                                      "text": "ASN1"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 59
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 60
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 71
+                                      },
+                                      "text": "loaded_cert"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 37,
+                                        "column": 71
+                                      },
+                                      "end": {
+                                        "row": 37,
+                                        "column": 72
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 38,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 38,
+                        "column": 69
+                      },
+                      "text": "dumped_key = OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 38,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 38,
+                            "column": 69
+                          },
+                          "text": "dumped_key = OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 38,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 18
+                              },
+                              "text": "dumped_key"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 38,
+                                "column": 19
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 20
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 38,
+                                "column": 21
+                              },
+                              "end": {
+                                "row": 38,
+                                "column": 69
+                              },
+                              "text": "OpenSSL.crypto.dump_privatekey(ASN1, loaded_key)",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 21
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 51
+                                  },
+                                  "text": "OpenSSL.crypto.dump_privatekey",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 21
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 35
+                                      },
+                                      "text": "OpenSSL.crypto",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 38,
+                                            "column": 21
+                                          },
+                                          "end": {
+                                            "row": 38,
+                                            "column": 28
+                                          },
+                                          "text": "OpenSSL"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 38,
+                                            "column": 28
+                                          },
+                                          "end": {
+                                            "row": 38,
+                                            "column": 29
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 38,
+                                            "column": 29
+                                          },
+                                          "end": {
+                                            "row": 38,
+                                            "column": 35
+                                          },
+                                          "text": "crypto"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 35
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 36
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 36
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 51
+                                      },
+                                      "text": "dump_privatekey"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 38,
+                                    "column": 51
+                                  },
+                                  "end": {
+                                    "row": 38,
+                                    "column": 69
+                                  },
+                                  "text": "(ASN1, loaded_key)",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 51
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 52
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 52
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 56
+                                      },
+                                      "text": "ASN1"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 56
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 57
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 58
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 68
+                                      },
+                                      "text": "loaded_key"
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 38,
+                                        "column": 68
+                                      },
+                                      "end": {
+                                        "row": 38,
+                                        "column": 69
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "expression_statement",
+                      "start": {
+                        "row": 40,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 40,
+                        "column": 87
+                      },
+                      "text": "new_entry = jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')",
+                      "children": [
+                        {
+                          "type": "assignment",
+                          "start": {
+                            "row": 40,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 40,
+                            "column": 87
+                          },
+                          "text": "new_entry = jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')",
+                          "children": [
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 40,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 17
+                              },
+                              "text": "new_entry"
+                            },
+                            {
+                              "type": "=",
+                              "start": {
+                                "row": 40,
+                                "column": 18
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 19
+                              },
+                              "text": "="
+                            },
+                            {
+                              "type": "call",
+                              "start": {
+                                "row": 40,
+                                "column": 20
+                              },
+                              "end": {
+                                "row": 40,
+                                "column": 87
+                              },
+                              "text": "jks.PrivateKeyEntry.new(name, [dumped_cert], dumped_key, 'rsa_raw')",
+                              "children": [
+                                {
+                                  "type": "attribute",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 43
+                                  },
+                                  "text": "jks.PrivateKeyEntry.new",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 39
+                                      },
+                                      "text": "jks.PrivateKeyEntry",
+                                      "children": [
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 23
+                                          },
+                                          "text": "jks"
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 23
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 24
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 24
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 39
+                                          },
+                                          "text": "PrivateKeyEntry"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ".",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 39
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 40
+                                      },
+                                      "text": "."
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 40
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 43
+                                      },
+                                      "text": "new"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "argument_list",
+                                  "start": {
+                                    "row": 40,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 40,
+                                    "column": 87
+                                  },
+                                  "text": "(name, [dumped_cert], dumped_key, 'rsa_raw')",
+                                  "children": [
+                                    {
+                                      "type": "(",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 43
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 44
+                                      },
+                                      "text": "("
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 48
+                                      },
+                                      "text": "name"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 48
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 49
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "list",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 50
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 63
+                                      },
+                                      "text": "[dumped_cert]",
+                                      "children": [
+                                        {
+                                          "type": "[",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 50
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 51
+                                          },
+                                          "text": "["
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 51
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 62
+                                          },
+                                          "text": "dumped_cert"
+                                        },
+                                        {
+                                          "type": "]",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 62
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 63
+                                          },
+                                          "text": "]"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 63
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 64
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "identifier",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 65
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 75
+                                      },
+                                      "text": "dumped_key"
+                                    },
+                                    {
+                                      "type": ",",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 75
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 76
+                                      },
+                                      "text": ","
+                                    },
+                                    {
+                                      "type": "string",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 77
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 86
+                                      },
+                                      "text": "'rsa_raw'",
+                                      "children": [
+                                        {
+                                          "type": "string_start",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 77
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 78
+                                          },
+                                          "text": "'"
+                                        },
+                                        {
+                                          "type": "string_content",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 78
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 85
+                                          },
+                                          "text": "rsa_raw"
+                                        },
+                                        {
+                                          "type": "string_end",
+                                          "start": {
+                                            "row": 40,
+                                            "column": 85
+                                          },
+                                          "end": {
+                                            "row": 40,
+                                            "column": 86
+                                          },
+                                          "text": "'"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": ")",
+                                      "start": {
+                                        "row": 40,
+                                        "column": 86
+                                      },
+                                      "end": {
+                                        "row": 40,
+                                        "column": 87
+                                      },
+                                      "text": ")"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "else_clause",
+                  "start": {
+                    "row": 41,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 42,
+                    "column": 63
+                  },
+                  "text": "else:\n        new_entry = jks.TrustedCertEntry.new(name, cert_string)",
+                  "children": [
+                    {
+                      "type": "else",
+                      "start": {
+                        "row": 41,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 8
+                      },
+                      "text": "else"
+                    },
+                    {
+                      "type": ":",
+                      "start": {
+                        "row": 41,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 41,
+                        "column": 9
+                      },
+                      "text": ":"
+                    },
+                    {
+                      "type": "block",
+                      "start": {
+                        "row": 42,
+                        "column": 8
+                      },
+                      "end": {
+                        "row": 42,
+                        "column": 63
+                      },
+                      "text": "new_entry = jks.TrustedCertEntry.new(name, cert_string)",
+                      "children": [
+                        {
+                          "type": "expression_statement",
+                          "start": {
+                            "row": 42,
+                            "column": 8
+                          },
+                          "end": {
+                            "row": 42,
+                            "column": 63
+                          },
+                          "text": "new_entry = jks.TrustedCertEntry.new(name, cert_string)",
+                          "children": [
+                            {
+                              "type": "assignment",
+                              "start": {
+                                "row": 42,
+                                "column": 8
+                              },
+                              "end": {
+                                "row": 42,
+                                "column": 63
+                              },
+                              "text": "new_entry = jks.TrustedCertEntry.new(name, cert_string)",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 8
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 17
+                                  },
+                                  "text": "new_entry"
+                                },
+                                {
+                                  "type": "=",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 18
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 19
+                                  },
+                                  "text": "="
+                                },
+                                {
+                                  "type": "call",
+                                  "start": {
+                                    "row": 42,
+                                    "column": 20
+                                  },
+                                  "end": {
+                                    "row": 42,
+                                    "column": 63
+                                  },
+                                  "text": "jks.TrustedCertEntry.new(name, cert_string)",
+                                  "children": [
+                                    {
+                                      "type": "attribute",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 20
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 44
+                                      },
+                                      "text": "jks.TrustedCertEntry.new",
+                                      "children": [
+                                        {
+                                          "type": "attribute",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 20
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 40
+                                          },
+                                          "text": "jks.TrustedCertEntry",
+                                          "children": [
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 20
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 23
+                                              },
+                                              "text": "jks"
+                                            },
+                                            {
+                                              "type": ".",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 23
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 24
+                                              },
+                                              "text": "."
+                                            },
+                                            {
+                                              "type": "identifier",
+                                              "start": {
+                                                "row": 42,
+                                                "column": 24
+                                              },
+                                              "end": {
+                                                "row": 42,
+                                                "column": 40
+                                              },
+                                              "text": "TrustedCertEntry"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": ".",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 40
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 41
+                                          },
+                                          "text": "."
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 41
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 44
+                                          },
+                                          "text": "new"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "argument_list",
+                                      "start": {
+                                        "row": 42,
+                                        "column": 44
+                                      },
+                                      "end": {
+                                        "row": 42,
+                                        "column": 63
+                                      },
+                                      "text": "(name, cert_string)",
+                                      "children": [
+                                        {
+                                          "type": "(",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 44
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 45
+                                          },
+                                          "text": "("
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 45
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 49
+                                          },
+                                          "text": "name"
+                                        },
+                                        {
+                                          "type": ",",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 49
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 50
+                                          },
+                                          "text": ","
+                                        },
+                                        {
+                                          "type": "identifier",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 51
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 62
+                                          },
+                                          "text": "cert_string"
+                                        },
+                                        {
+                                          "type": ")",
+                                          "start": {
+                                            "row": 42,
+                                            "column": 62
+                                          },
+                                          "end": {
+                                            "row": 42,
+                                            "column": 63
+                                          },
+                                          "text": ")"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 44,
+                "column": 4
+              },
+              "end": {
+                "row": 44,
+                "column": 32
+              },
+              "text": "certs_list.append(new_entry)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 44,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 44,
+                    "column": 32
+                  },
+                  "text": "certs_list.append(new_entry)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 44,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 21
+                      },
+                      "text": "certs_list.append",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 44,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 14
+                          },
+                          "text": "certs_list"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 44,
+                            "column": 14
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 15
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 44,
+                            "column": 15
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 21
+                          },
+                          "text": "append"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 44,
+                        "column": 21
+                      },
+                      "end": {
+                        "row": 44,
+                        "column": 32
+                      },
+                      "text": "(new_entry)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 44,
+                            "column": 21
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 22
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 44,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 31
+                          },
+                          "text": "new_entry"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 44,
+                            "column": 31
+                          },
+                          "end": {
+                            "row": 44,
+                            "column": 32
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 46,
+                "column": 4
+              },
+              "end": {
+                "row": 46,
+                "column": 57
+              },
+              "text": "keystore_object = jks.KeyStore.new('jks', certs_list)",
+              "children": [
+                {
+                  "type": "assignment",
+                  "start": {
+                    "row": 46,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 46,
+                    "column": 57
+                  },
+                  "text": "keystore_object = jks.KeyStore.new('jks', certs_list)",
+                  "children": [
+                    {
+                      "type": "identifier",
+                      "start": {
+                        "row": 46,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 19
+                      },
+                      "text": "keystore_object"
+                    },
+                    {
+                      "type": "=",
+                      "start": {
+                        "row": 46,
+                        "column": 20
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 21
+                      },
+                      "text": "="
+                    },
+                    {
+                      "type": "call",
+                      "start": {
+                        "row": 46,
+                        "column": 22
+                      },
+                      "end": {
+                        "row": 46,
+                        "column": 57
+                      },
+                      "text": "jks.KeyStore.new('jks', certs_list)",
+                      "children": [
+                        {
+                          "type": "attribute",
+                          "start": {
+                            "row": 46,
+                            "column": 22
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 38
+                          },
+                          "text": "jks.KeyStore.new",
+                          "children": [
+                            {
+                              "type": "attribute",
+                              "start": {
+                                "row": 46,
+                                "column": 22
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 34
+                              },
+                              "text": "jks.KeyStore",
+                              "children": [
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 22
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 25
+                                  },
+                                  "text": "jks"
+                                },
+                                {
+                                  "type": ".",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 25
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 26
+                                  },
+                                  "text": "."
+                                },
+                                {
+                                  "type": "identifier",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 26
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 34
+                                  },
+                                  "text": "KeyStore"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ".",
+                              "start": {
+                                "row": 46,
+                                "column": 34
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 35
+                              },
+                              "text": "."
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 35
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 38
+                              },
+                              "text": "new"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "argument_list",
+                          "start": {
+                            "row": 46,
+                            "column": 38
+                          },
+                          "end": {
+                            "row": 46,
+                            "column": 57
+                          },
+                          "text": "('jks', certs_list)",
+                          "children": [
+                            {
+                              "type": "(",
+                              "start": {
+                                "row": 46,
+                                "column": 38
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 39
+                              },
+                              "text": "("
+                            },
+                            {
+                              "type": "string",
+                              "start": {
+                                "row": 46,
+                                "column": 39
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 44
+                              },
+                              "text": "'jks'",
+                              "children": [
+                                {
+                                  "type": "string_start",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 39
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 40
+                                  },
+                                  "text": "'"
+                                },
+                                {
+                                  "type": "string_content",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 40
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 43
+                                  },
+                                  "text": "jks"
+                                },
+                                {
+                                  "type": "string_end",
+                                  "start": {
+                                    "row": 46,
+                                    "column": 43
+                                  },
+                                  "end": {
+                                    "row": 46,
+                                    "column": 44
+                                  },
+                                  "text": "'"
+                                }
+                              ]
+                            },
+                            {
+                              "type": ",",
+                              "start": {
+                                "row": 46,
+                                "column": 44
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 45
+                              },
+                              "text": ","
+                            },
+                            {
+                              "type": "identifier",
+                              "start": {
+                                "row": 46,
+                                "column": 46
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 56
+                              },
+                              "text": "certs_list"
+                            },
+                            {
+                              "type": ")",
+                              "start": {
+                                "row": 46,
+                                "column": 56
+                              },
+                              "end": {
+                                "row": 46,
+                                "column": 57
+                              },
+                              "text": ")"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "expression_statement",
+              "start": {
+                "row": 47,
+                "column": 4
+              },
+              "end": {
+                "row": 47,
+                "column": 46
+              },
+              "text": "keystore_object.save(keystore, passphrase)",
+              "children": [
+                {
+                  "type": "call",
+                  "start": {
+                    "row": 47,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 47,
+                    "column": 46
+                  },
+                  "text": "keystore_object.save(keystore, passphrase)",
+                  "children": [
+                    {
+                      "type": "attribute",
+                      "start": {
+                        "row": 47,
+                        "column": 4
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 24
+                      },
+                      "text": "keystore_object.save",
+                      "children": [
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 47,
+                            "column": 4
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 19
+                          },
+                          "text": "keystore_object"
+                        },
+                        {
+                          "type": ".",
+                          "start": {
+                            "row": 47,
+                            "column": 19
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 20
+                          },
+                          "text": "."
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 47,
+                            "column": 20
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 24
+                          },
+                          "text": "save"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "argument_list",
+                      "start": {
+                        "row": 47,
+                        "column": 24
+                      },
+                      "end": {
+                        "row": 47,
+                        "column": 46
+                      },
+                      "text": "(keystore, passphrase)",
+                      "children": [
+                        {
+                          "type": "(",
+                          "start": {
+                            "row": 47,
+                            "column": 24
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 25
+                          },
+                          "text": "("
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 47,
+                            "column": 25
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 33
+                          },
+                          "text": "keystore"
+                        },
+                        {
+                          "type": ",",
+                          "start": {
+                            "row": 47,
+                            "column": 33
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 34
+                          },
+                          "text": ","
+                        },
+                        {
+                          "type": "identifier",
+                          "start": {
+                            "row": 47,
+                            "column": 35
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 45
+                          },
+                          "text": "passphrase"
+                        },
+                        {
+                          "type": ")",
+                          "start": {
+                            "row": 47,
+                            "column": 45
+                          },
+                          "end": {
+                            "row": 47,
+                            "column": 46
+                          },
+                          "text": ")"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "return_statement",
+              "start": {
+                "row": 48,
+                "column": 4
+              },
+              "end": {
+                "row": 48,
+                "column": 15
+              },
+              "text": "return True",
+              "children": [
+                {
+                  "type": "return",
+                  "start": {
+                    "row": 48,
+                    "column": 4
+                  },
+                  "end": {
+                    "row": 48,
+                    "column": 10
+                  },
+                  "text": "return"
+                },
+                {
+                  "type": "true",
+                  "start": {
+                    "row": 48,
+                    "column": 11
+                  },
+                  "end": {
+                    "row": 48,
+                    "column": 15
+                  },
+                  "text": "True"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

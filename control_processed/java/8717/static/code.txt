@@ -1,0 +1,4 @@
+@SuppressWarnings("unchecked")
+	public static <T> T convertByClassName(String className, Object value) throws ConvertException{
+		return (T) convert(ClassUtil.loadClass(className), value);
+	}
