@@ -1,7 +1,0 @@
-public static Excel03SaxReader read03BySax(String path, int sheetIndex, RowHandler rowHandler) {
-		try {
-			return new Excel03SaxReader(rowHandler).read(path, sheetIndex);
-		} catch (NoClassDefFoundError e) {
-			throw new DependencyException(ObjectUtil.defaultIfNull(e.getCause(), e), PoiChecker.NO_POI_ERROR_MSG);
-		}
-	}

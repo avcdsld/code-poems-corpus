@@ -1,3 +1,0 @@
-public static MapProxy create(Map<?, ?> map) {
-		return (map instanceof MapProxy) ? (MapProxy) map : new MapProxy(map);
-	}

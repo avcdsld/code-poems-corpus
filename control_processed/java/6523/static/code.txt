@@ -1,4 +1,0 @@
-@SuppressWarnings("unchecked")
-	public static <T> Class<T> loadClass(String className, boolean isInitialized) {
-		return (Class<T>) ClassLoaderUtil.loadClass(className, isInitialized);
-	}

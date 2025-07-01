@@ -1,5 +1,0 @@
-public static long convertTime(long sourceDuration, TimeUnit sourceUnit, TimeUnit destUnit) {
-		Assert.notNull(sourceUnit, "sourceUnit is null !");
-		Assert.notNull(destUnit, "destUnit is null !");
-		return destUnit.convert(sourceDuration, sourceUnit);
-	}
