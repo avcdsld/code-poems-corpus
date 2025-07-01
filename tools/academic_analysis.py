@@ -967,70 +967,114 @@ class CodePoetryAnalyzer:
         """ノードタイプ使用頻度の可視化"""
         logger.info("ノードタイプ使用頻度の可視化開始")
         
-        # 1. 言語別の上位ノードタイプ棒グラフ
+        # プレゼンテーション用のスタイル設定
+        plt.style.use('seaborn-v0_8-talk')  # より大きなフォントとクリアな表示
+        
+        # 1. 言語別の上位ノードタイプ棒グラフ（プレゼン用）
         for lang in ['java', 'python', 'js']:
-            plt.figure(figsize=(15, 8))
+            plt.figure(figsize=(16, 9))  # 16:9のアスペクト比
             
             # データ準備
             poetry_data = usage_stats['poetry'][lang]
             control_data = usage_stats['control'][lang]
             
-            # 上位10個のノードタイプを取得
-            top_types = set()
-            for data in [poetry_data, control_data]:
-                sorted_types = sorted(data.items(), key=lambda x: x[1], reverse=True)[:10]
-                top_types.update(type_name for type_name, _ in sorted_types)
-            top_types = list(top_types)
-            
             # データ正規化
             poetry_total = sum(poetry_data.values())
             control_total = sum(control_data.values())
             
-            poetry_values = [poetry_data.get(t, 0) / poetry_total * 100 for t in top_types]
-            control_values = [control_data.get(t, 0) / control_total * 100 for t in top_types]
+            # 正規化したデータを作成
+            poetry_normalized = {k: v / poetry_total * 100 for k, v in poetry_data.items()}
+            control_normalized = {k: v / control_total * 100 for k, v in control_data.items()}
             
-            # プロット作成
+            # 全ノードタイプの平均使用頻度を計算してソート
+            all_types = set(poetry_normalized.keys()) | set(control_normalized.keys())
+            type_avg_freq = {
+                t: (poetry_normalized.get(t, 0) + control_normalized.get(t, 0)) / 2
+                for t in all_types
+            }
+            
+            # 平均頻度で降順ソート
+            sorted_types = sorted(type_avg_freq.items(), key=lambda x: x[1], reverse=True)[:8]
+            top_types = [t[0] for t in sorted_types]
+            
+            # データ準備
+            poetry_values = [poetry_normalized.get(t, 0) for t in top_types]
+            control_values = [control_normalized.get(t, 0) for t in top_types]
+            
+            # プロット
             x = np.arange(len(top_types))
             width = 0.35
             
             ax = plt.gca()
-            rects1 = ax.bar(x - width/2, poetry_values, width, label='Code Poetry', color='lightblue', alpha=0.7)
-            rects2 = ax.bar(x + width/2, control_values, width, label='Control Group', color='lightcoral', alpha=0.7)
+            rects1 = ax.bar(x - width/2, poetry_values, width, label='Code Poetry', color='#2ecc71', alpha=0.8)
+            rects2 = ax.bar(x + width/2, control_values, width, label='Control Group', color='#e74c3c', alpha=0.8)
             
             # グラフの装飾
-            plt.title(f'{lang.upper()} - Node Type Usage Frequency (%)')
-            plt.xlabel('Node Type')
-            plt.ylabel('Usage Frequency (%)')
-            plt.xticks(x, top_types, rotation=45, ha='right')
-            plt.legend()
-            plt.grid(True, alpha=0.3)
+            plt.title(f'{lang.upper()}\nNode Type Usage Frequency (%)', pad=20)
+            plt.xlabel('Node Type', labelpad=15)
+            plt.ylabel('Usage Frequency (%)', labelpad=15)
+            
+            # X軸ラベルを見やすく調整
+            plt.xticks(x, [t.replace('_', '\n') for t in top_types], rotation=0)
+            
+            # 凡例を見やすい位置に
+            plt.legend(loc='upper right', bbox_to_anchor=(1, 1))
+            
+            # グリッド追加（薄く）
+            plt.grid(True, alpha=0.3, axis='y')
+            
+            # 値のラベルを追加
+            def autolabel(rects):
+                for rect in rects:
+                    height = rect.get_height()
+                    ax.annotate(f'{height:.1f}%',
+                              xy=(rect.get_x() + rect.get_width() / 2, height),
+                              xytext=(0, 3),  # 3 points vertical offset
+                              textcoords="offset points",
+                              ha='center', va='bottom',
+                              fontsize=10)
+            
+            autolabel(rects1)
+            autolabel(rects2)
             
             # レイアウト調整
             plt.tight_layout()
             
-            # 保存
-            plt.savefig(self.output_dir / f"node_type_frequency_{lang}.png", dpi=300, bbox_inches='tight')
+            # 保存（高解像度、白背景）
+            plt.savefig(self.output_dir / f"node_type_frequency_{lang}_presentation.png",
+                       dpi=300, bbox_inches='tight', facecolor='white')
             plt.close()
         
-        # 2. 比率のヒートマップ
-        plt.figure(figsize=(12, 8))
+        # 2. 比率のヒートマップ（プレゼン用）
+        plt.figure(figsize=(16, 9))
         
         # データ準備
-        ratio_data = []
-        node_types = set()
         languages = ['java', 'python', 'js']
+        node_types = set()
         
-        # 全言語の主要なノードタイプを収集
+        # 全言語の主要なノードタイプを収集（上位8個に制限）
         for lang in languages:
             poetry_data = usage_stats['poetry'][lang]
             control_data = usage_stats['control'][lang]
             
-            # 上位10個のノードタイプを追加
-            for data in [poetry_data, control_data]:
-                sorted_types = sorted(data.items(), key=lambda x: x[1], reverse=True)[:10]
-                node_types.update(type_name for type_name, _ in sorted_types)
+            poetry_total = sum(poetry_data.values())
+            control_total = sum(control_data.values())
+            
+            poetry_normalized = {k: v / poetry_total * 100 for k, v in poetry_data.items()}
+            control_normalized = {k: v / control_total * 100 for k, v in control_data.items()}
+            
+            # 平均使用頻度でソート
+            all_types = set(poetry_normalized.keys()) | set(control_normalized.keys())
+            type_avg_freq = {
+                t: (poetry_normalized.get(t, 0) + control_normalized.get(t, 0)) / 2
+                for t in all_types
+            }
+            sorted_types = sorted(type_avg_freq.items(), key=lambda x: x[1], reverse=True)[:8]
+            node_types.update(t[0] for t in sorted_types)
         
-        node_types = list(node_types)
+        node_types = sorted(node_types, key=lambda t: max(
+            [type_avg_freq.get(t, 0) for lang in languages]
+        ), reverse=True)
         
         # 比率行列の作成
         ratio_matrix = np.zeros((len(languages), len(node_types)))
@@ -1047,27 +1091,28 @@ class CodePoetryAnalyzer:
                 control_ratio = control_data.get(node_type, 0) / control_total if control_total > 0 else 0
                 
                 if control_ratio > 0:
-                    ratio = np.log2(poetry_ratio / control_ratio)  # 対数スケール
+                    ratio = np.log2(poetry_ratio / control_ratio)
                 else:
                     ratio = 0
                 ratio_matrix[i, j] = ratio
         
         # ヒートマップの作成
         sns.heatmap(ratio_matrix,
-                   xticklabels=node_types,
+                   xticklabels=[t.replace('_', '\n') for t in node_types],
                    yticklabels=[l.upper() for l in languages],
                    cmap='RdBu_r',
                    center=0,
                    annot=True,
                    fmt='.2f',
-                   cbar_kws={'label': 'Code Poetry/Control Group Ratio (log2)'})
+                   cbar_kws={'label': 'Code Poetry/Control Group Ratio (log2)'},
+                   square=True)
         
-        plt.title('Node Type Usage Ratio by Language (Code Poetry vs Control Group)')
-        plt.xticks(rotation=45, ha='right')
+        plt.title('Node Type Usage Ratio by Language\n(Code Poetry vs Control Group)', pad=20)
         plt.tight_layout()
         
         # 保存
-        plt.savefig(self.output_dir / "node_type_ratio_heatmap.png", dpi=300, bbox_inches='tight')
+        plt.savefig(self.output_dir / "node_type_ratio_heatmap_presentation.png",
+                   dpi=300, bbox_inches='tight', facecolor='white')
         plt.close()
         
         logger.info("ノードタイプ使用頻度の可視化を完了")
@@ -1103,7 +1148,7 @@ class CodePoetryAnalyzer:
             for sample in self.control_data[lang][:20]:
                 count_node_types(sample['ast'], lang, 'control')
         
-        # 結果の出力
+        # 結果の出力（テキスト形式）
         report_path = self.output_dir / "node_type_usage_report.txt"
         with open(report_path, 'w', encoding='utf-8') as f:
             f.write("=== ノードタイプ使用頻度分析 ===\n\n")
@@ -1155,7 +1200,105 @@ class CodePoetryAnalyzer:
                 
                 f.write("\n" + "="*50 + "\n")
         
+        # Frequency詳細の出力（CSV形式）
+        freq_path = self.output_dir / "node_type_frequencies.csv"
+        with open(freq_path, 'w', encoding='utf-8') as f:
+            f.write("Language,Group,Node Type,Category,Count,Frequency(%),Rank\n")
+            
+            # 言語ごとに処理
+            for lang in ['java', 'python', 'js']:
+                # Poetry と Control のデータを準備
+                poetry_total = sum(usage_stats['poetry'][lang].values())
+                control_total = sum(usage_stats['control'][lang].values())
+                
+                # データを整形
+                poetry_data = [
+                    {
+                        'Language': lang,
+                        'Group': 'poetry',
+                        'Node Type': node_type,
+                        'Category': self._categorize_node_type(node_type, lang) or 'Uncategorized',
+                        'Count': count,
+                        'Frequency': (count / poetry_total * 100) if poetry_total > 0 else 0
+                    }
+                    for node_type, count in usage_stats['poetry'][lang].items()
+                ]
+                
+                control_data = [
+                    {
+                        'Language': lang,
+                        'Group': 'control',
+                        'Node Type': node_type,
+                        'Category': self._categorize_node_type(node_type, lang) or 'Uncategorized',
+                        'Count': count,
+                        'Frequency': (count / control_total * 100) if control_total > 0 else 0
+                    }
+                    for node_type, count in usage_stats['control'][lang].items()
+                ]
+                
+                # Frequencyで降順ソート
+                poetry_data = sorted(poetry_data, key=lambda x: x['Frequency'], reverse=True)
+                control_data = sorted(control_data, key=lambda x: x['Frequency'], reverse=True)
+                
+                # ランク付け
+                for i, item in enumerate(poetry_data, 1):
+                    item['Rank'] = i
+                for i, item in enumerate(control_data, 1):
+                    item['Rank'] = i
+                
+                # データを書き出し
+                for item in poetry_data:
+                    f.write(f"{item['Language']},{item['Group']},{item['Node Type']},{item['Category']},"
+                           f"{item['Count']},{item['Frequency']:.2f},{item['Rank']}\n")
+                for item in control_data:
+                    f.write(f"{item['Language']},{item['Group']},{item['Node Type']},{item['Category']},"
+                           f"{item['Count']},{item['Frequency']:.2f},{item['Rank']}\n")
+                
+                # 言語間の区切りを追加
+                f.write("\n")
+        
+        # サマリーレポートの出力（テキスト形式）
+        summary_path = self.output_dir / "node_type_frequency_summary.txt"
+        with open(summary_path, 'w', encoding='utf-8') as f:
+            f.write("=== Node Type Frequency Summary ===\n\n")
+            
+            for lang in ['java', 'python', 'js']:
+                f.write(f"\n{lang.upper()}\n")
+                f.write("=" * 50 + "\n\n")
+                
+                # Poetry の上位10
+                f.write("Top 10 Node Types in Code Poetry:\n")
+                f.write("-" * 40 + "\n")
+                poetry_total = sum(usage_stats['poetry'][lang].values())
+                sorted_poetry = sorted(
+                    [(k, v / poetry_total * 100) for k, v in usage_stats['poetry'][lang].items()],
+                    key=lambda x: x[1],
+                    reverse=True
+                )[:10]
+                
+                for i, (node_type, freq) in enumerate(sorted_poetry, 1):
+                    category = self._categorize_node_type(node_type, lang) or 'Uncategorized'
+                    f.write(f"{i:2d}. {node_type:30} ({category:15}) : {freq:6.2f}%\n")
+                
+                # Control の上位10
+                f.write("\nTop 10 Node Types in Control Group:\n")
+                f.write("-" * 40 + "\n")
+                control_total = sum(usage_stats['control'][lang].values())
+                sorted_control = sorted(
+                    [(k, v / control_total * 100) for k, v in usage_stats['control'][lang].items()],
+                    key=lambda x: x[1],
+                    reverse=True
+                )[:10]
+                
+                for i, (node_type, freq) in enumerate(sorted_control, 1):
+                    category = self._categorize_node_type(node_type, lang) or 'Uncategorized'
+                    f.write(f"{i:2d}. {node_type:30} ({category:15}) : {freq:6.2f}%\n")
+                
+                f.write("\n" + "=" * 50 + "\n")
+        
         logger.info(f"ノードタイプ使用頻度レポートを生成: {report_path}")
+        logger.info(f"ノードタイプ頻度詳細を生成: {freq_path}")
+        logger.info(f"ノードタイプ頻度サマリーを生成: {summary_path}")
         
         # 可視化の作成
         self.create_node_type_visualizations(usage_stats)
