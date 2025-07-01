@@ -1,0 +1,15 @@
+@Override
+    public void shutdown(boolean compact) {
+        try {
+            if (view != null) {
+                view.getRequestPanel().saveConfig(model.getOptionsParam().getConfig());
+                view.getResponsePanel().saveConfig(model.getOptionsParam().getConfig());
+            }
+
+            getProxy(null).stopServer();
+            super.shutdown(compact);
+        } finally {
+            // Ensure all extensions' config changes done during shutdown are saved.
+            saveConfigurations();
+        }
+    }

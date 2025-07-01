@@ -1,0 +1,10 @@
+protected ForkJoinTask<?> pollSubmission() {
+        WorkQueue[] ws; WorkQueue w; ForkJoinTask<?> t;
+        if ((ws = workQueues) != null) {
+            for (int i = 0; i < ws.length; i += 2) {
+                if ((w = ws[i]) != null && (t = w.poll()) != null)
+                    return t;
+            }
+        }
+        return null;
+    }

@@ -1,0 +1,10 @@
+public ExcelExtractor getExtractor() {
+		ExcelExtractor extractor;
+		Workbook wb = this.workbook;
+		if (wb instanceof HSSFWorkbook) {
+			extractor = new org.apache.poi.hssf.extractor.ExcelExtractor((HSSFWorkbook) wb);
+		} else {
+			extractor = new XSSFExcelExtractor((XSSFWorkbook) wb);
+		}
+		return extractor;
+	}

@@ -1,0 +1,52 @@
+public synchronized HttpMessage pollPath(HttpMessage msg) {
+        SiteNode resultNode = null;
+        URI uri = msg.getRequestHeader().getURI();
+        
+        SiteNode parent = getRoot();
+        String folder;
+        
+        try {
+            String host = getHostName(uri);
+            
+            // no host yet
+            parent = findChild(parent, host);
+            if (parent == null) {
+                return null;
+        	}
+            List<String> path = model.getSession().getTreePath(uri);
+            if (path.size() == 0) {
+            	// Its a top level node
+            	resultNode = parent;
+            }
+            for (int i=0; i < path.size(); i++) {
+            	folder = path.get(i);
+                if (folder != null && !folder.equals("")) {
+                    if (i == path.size()-1) {
+                        String leafName = getLeafName(folder, msg);
+                        resultNode = findChild(parent, leafName);
+                    } else {
+                        parent = findChild(parent, folder);
+                        if (parent == null) {
+                            return null;
+                        }
+                    }
+                }
+            }
+        } catch (URIException e) {
+            // ZAP: Added error
+            log.error(e.getMessage(), e);
+        }
+        
+        if (resultNode == null || resultNode.getHistoryReference() == null) {
+            return null;
+        }
+        
+        HttpMessage nodeMsg = null;
+        try {
+            nodeMsg = resultNode.getHistoryReference().getHttpMessage();
+        } catch (Exception e) {
+            // ZAP: Added error
+            log.error(e.getMessage(), e);
+        }
+        return nodeMsg;
+    }

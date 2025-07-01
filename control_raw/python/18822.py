@@ -1,0 +1,6 @@
+def columnCount(self, qindex=QModelIndex()):
+        """Array column number"""
+        if self.total_cols <= self.cols_loaded:
+            return self.total_cols
+        else:
+            return self.cols_loaded

@@ -1,0 +1,6 @@
+public static <T extends CharSequence> T validateMac(T value, String errorMsg) throws ValidateException {
+		if (false == isMac(value)) {
+			throw new ValidateException(errorMsg);
+		}
+		return value;
+	}

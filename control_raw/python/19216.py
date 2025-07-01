@@ -1,0 +1,9 @@
+def open(self, fnames=None):
+        """Open files with the appropriate application"""
+        if fnames is None:
+            fnames = self.get_selected_filenames()
+        for fname in fnames:
+            if osp.isfile(fname) and encoding.is_text_file(fname):
+                self.parent_widget.sig_open_file.emit(fname)
+            else:
+                self.open_outside_spyder([fname])

@@ -1,0 +1,5 @@
+def is_cursor_on_last_line(self):
+        """Return True if cursor is on the last line"""
+        cursor = self.textCursor()
+        cursor.movePosition(QTextCursor.EndOfBlock)
+        return cursor.atEnd()

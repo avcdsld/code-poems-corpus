@@ -1,0 +1,3 @@
+public static Boolean toBool(Object value, Boolean defaultValue) {
+		return convert(Boolean.class, value, defaultValue);
+	}

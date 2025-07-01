@@ -1,0 +1,5 @@
+public static List<WordInfo> extractWords(BufferedReader reader, int size, boolean newWordsOnly) throws IOException
+    {
+        NewWordDiscover discover = new NewWordDiscover(4, 0.0f, .5f, 100f, newWordsOnly);
+        return discover.discover(reader, size);
+    }

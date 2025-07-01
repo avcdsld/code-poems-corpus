@@ -1,0 +1,3 @@
+public static long between(Date beginDate, Date endDate, DateUnit unit, boolean isAbs) {
+		return new DateBetween(beginDate, endDate, isAbs).between(unit);
+	}

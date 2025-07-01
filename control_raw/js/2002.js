@@ -1,0 +1,12 @@
+function (element) {
+        if (element === null ||
+            !element.tagName ||
+            !element.childNodes) {
+            throw {
+                name: "StropheError",
+                message: "Cannot queue non-DOMElement."
+            };
+        }
+
+        this._data.push(element);
+    }

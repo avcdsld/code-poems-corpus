@@ -1,0 +1,40 @@
+def sort(self, column, order=Qt.AscendingOrder):
+        """Overriding sort method"""
+        if self.complex_intran is not None:
+            if self.complex_intran.any(axis=0).iloc[column]:
+                QMessageBox.critical(self.dialog, "Error",
+                                     "TypeError error: no ordering "
+                                     "relation is defined for complex numbers")
+                return False
+        try:
+            ascending = order == Qt.AscendingOrder
+            if column >= 0:
+                try:
+                    self.df.sort_values(by=self.df.columns[column],
+                                        ascending=ascending, inplace=True,
+                                        kind='mergesort')
+                except AttributeError:
+                    # for pandas version < 0.17
+                    self.df.sort(columns=self.df.columns[column],
+                                 ascending=ascending, inplace=True,
+                                 kind='mergesort')
+                except ValueError as e:
+                    # Not possible to sort on duplicate columns #5225
+                    QMessageBox.critical(self.dialog, "Error",
+                                         "ValueError: %s" % to_text_string(e))
+                except SystemError as e:
+                    # Not possible to sort on category dtypes #5361
+                    QMessageBox.critical(self.dialog, "Error",
+                                         "SystemError: %s" % to_text_string(e))
+                self.update_df_index()
+            else:
+                # To sort by index
+                self.df.sort_index(inplace=True, ascending=ascending)
+                self.update_df_index()
+        except TypeError as e:
+            QMessageBox.critical(self.dialog, "Error",
+                                 "TypeError error: %s" % str(e))
+            return False
+
+        self.reset()
+        return True

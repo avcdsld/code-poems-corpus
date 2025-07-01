@@ -1,0 +1,9 @@
+@Override
+	public void dismissed(ExtensionPopupMenuComponent selectedMenuComponent) {
+		for (int i = 0; i < getMenuComponentCount(); ++i) {
+			Component menuComponent = getMenuComponent(i);
+			if (PopupMenuUtils.isExtensionPopupMenuComponent(menuComponent)) {
+				((ExtensionPopupMenuComponent) menuComponent).dismissed(selectedMenuComponent);
+			}
+		}
+	}

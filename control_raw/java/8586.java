@@ -1,0 +1,3 @@
+public static boolean isEmpty(Object value) {
+		return (null == value || (value instanceof String && StrUtil.isEmpty((String) value)));
+	}

@@ -1,0 +1,15 @@
+function () {
+              var ambiguity_list = AMBIGUITIES[timezone_name],
+                  length = ambiguity_list.length,
+                  i = 0,
+                  tz = ambiguity_list[0];
+
+              for (; i < length; i += 1) {
+                  tz = ambiguity_list[i];
+
+                  if (jstz.date_is_dst(jstz.dst_start_for(tz))) {
+                      timezone_name = tz;
+                      return;
+                  }
+              }
+          }

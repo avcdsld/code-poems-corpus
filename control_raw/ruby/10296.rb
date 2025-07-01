@@ -1,0 +1,3 @@
+def retrieve_default_definition_with_http_info(resource_group_name, job_name, function_name, function_retrieve_default_definition_parameters:nil, custom_headers:nil)
+      retrieve_default_definition_async(resource_group_name, job_name, function_name, function_retrieve_default_definition_parameters:function_retrieve_default_definition_parameters, custom_headers:custom_headers).value!
+    end

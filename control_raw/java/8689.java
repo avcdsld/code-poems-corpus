@@ -1,0 +1,7 @@
+public static Class<?> getElementType(Iterable<?> iterable) {
+		if (null != iterable) {
+			final Iterator<?> iterator = iterable.iterator();
+			return getElementType(iterator);
+		}
+		return null;
+	}

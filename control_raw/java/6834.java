@@ -1,0 +1,21 @@
+public long writeBody(File destFile, StreamProgress streamProgress) {
+		if (null == destFile) {
+			throw new NullPointerException("[destFile] is null!");
+		}
+		if (destFile.isDirectory()) {
+			// 从头信息中获取文件名
+			String fileName = getFileNameFromDisposition();
+			if (StrUtil.isBlank(fileName)) {
+				final String path = this.httpConnection.getUrl().getPath();
+				// 从路径中获取文件名
+				fileName = StrUtil.subSuf(path, path.lastIndexOf('/') + 1);
+				if (StrUtil.isBlank(fileName)) {
+					// 编码后的路径做为文件名
+					fileName = URLUtil.encodeQuery(path, CharsetUtil.CHARSET_UTF_8);
+				}
+			}
+			destFile = FileUtil.file(destFile, fileName);
+		}
+
+		return writeBody(FileUtil.getOutputStream(destFile), true, streamProgress);
+	}

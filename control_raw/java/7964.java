@@ -1,0 +1,6 @@
+private void processLastCell(LastCellOfRowDummyRecord lastCell) {
+		// 每行结束时， 调用handle() 方法
+		this.rowHandler.handle(curSheetIndex, lastCell.getRow(), this.rowCellList);
+		// 清空行Cache
+		this.rowCellList.clear();
+	}

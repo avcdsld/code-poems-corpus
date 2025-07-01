@@ -1,0 +1,7 @@
+public Task getTask(String id) {
+		final int index = ids.indexOf(id);
+		if (index > -1) {
+			return getTask(index);
+		}
+		return null;
+	}

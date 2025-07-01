@@ -1,0 +1,26 @@
+function(params, cb) {
+		var res;
+
+		// CREATE VERTEX without parameters
+		var db = alasql.databases[dbid];
+		var id;
+		if (typeof sharp !== 'undefined') {
+			id = sharp;
+		} else {
+			id = db.counter++;
+		}
+		var vertex = {$id: id, $node: 'VERTEX'};
+		db.objects[vertex.$id] = vertex;
+		res = vertex;
+		if (namefn) {
+			namefn(vertex);
+		}
+		if (setfn) {
+			setfn(vertex, params, alasql);
+		}
+
+		if (cb) {
+			res = cb(res);
+		}
+		return res;
+	}

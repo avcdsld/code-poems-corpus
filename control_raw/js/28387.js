@@ -1,0 +1,24 @@
+function (selected, accumulate) {
+		var point = this,
+			series = point.series,
+			chart = series.chart;
+
+		selected = pick(selected, !point.selected);
+
+		// fire the event with the defalut handler
+		point.firePointEvent(selected ? 'select' : 'unselect', { accumulate: accumulate }, function () {
+			point.selected = selected;
+			point.setState(selected && SELECT_STATE);
+
+			// unselect all other points unless Ctrl or Cmd + click
+			if (!accumulate) {
+				each(chart.getSelectedPoints(), function (loopPoint) {
+					if (loopPoint.selected && loopPoint !== point) {
+						loopPoint.selected = false;
+						loopPoint.setState(NORMAL_STATE);
+						loopPoint.firePointEvent('unselect');
+					}
+				});
+			}
+		});
+	}

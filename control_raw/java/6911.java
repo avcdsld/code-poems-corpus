@@ -1,0 +1,18 @@
+public static String toUnicode(String str, boolean isSkipAscii) {
+		if (StrUtil.isEmpty(str)) {
+			return str;
+		}
+
+		final int len = str.length();
+		final StrBuilder unicode = StrBuilder.create(str.length() * 6);
+		char c;
+		for (int i = 0; i < len; i++) {
+			c = str.charAt(i);
+			if(isSkipAscii && CharUtil.isAsciiPrintable(c) ) {
+				unicode.append(c);
+			}else {
+				unicode.append(HexUtil.toUnicodeHex(c));
+			}
+		}
+		return unicode.toString();
+	}

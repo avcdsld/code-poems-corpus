@@ -1,0 +1,46 @@
+function (alignOptions, alignByTranslate, box) {
+		var elemWrapper = this;
+
+		if (!alignOptions) { // called on resize
+			alignOptions = elemWrapper.alignOptions;
+			alignByTranslate = elemWrapper.alignByTranslate;
+		} else { // first call on instanciate
+			elemWrapper.alignOptions = alignOptions;
+			elemWrapper.alignByTranslate = alignByTranslate;
+			if (!box) { // boxes other than renderer handle this internally
+				elemWrapper.renderer.alignedObjects.push(elemWrapper);
+			}
+		}
+
+		box = pick(box, elemWrapper.renderer);
+
+		var align = alignOptions.align,
+			vAlign = alignOptions.verticalAlign,
+			x = (box.x || 0) + (alignOptions.x || 0), // default: left align
+			y = (box.y || 0) + (alignOptions.y || 0), // default: top align
+			attribs = {};
+
+
+		// align
+		if (/^(right|center)$/.test(align)) {
+			x += (box.width - (alignOptions.width || 0)) /
+					{ right: 1, center: 2 }[align];
+		}
+		attribs[alignByTranslate ? 'translateX' : 'x'] = mathRound(x);
+
+
+		// vertical align
+		if (/^(bottom|middle)$/.test(vAlign)) {
+			y += (box.height - (alignOptions.height || 0)) /
+					({ bottom: 1, middle: 2 }[vAlign] || 1);
+
+		}
+		attribs[alignByTranslate ? 'translateY' : 'y'] = mathRound(y);
+
+		// animate only if already placed
+		elemWrapper[elemWrapper.placed ? 'animate' : 'attr'](attribs);
+		elemWrapper.placed = true;
+		elemWrapper.alignAttr = attribs;
+
+		return elemWrapper;
+	}

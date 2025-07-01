@@ -1,0 +1,36 @@
+def count_lines(path, extensions=None, excluded_dirnames=None):
+    """Return number of source code lines for all filenames in subdirectories
+    of *path* with names ending with *extensions*
+    Directory names *excluded_dirnames* will be ignored"""
+    if extensions is None:
+        extensions = ['.py', '.pyw', '.ipy', '.enaml', '.c', '.h', '.cpp',
+                      '.hpp', '.inc', '.', '.hh', '.hxx', '.cc', '.cxx',
+                      '.cl', '.f', '.for', '.f77', '.f90', '.f95', '.f2k',
+                      '.f03', '.f08']
+    if excluded_dirnames is None:
+        excluded_dirnames = ['build', 'dist', '.hg', '.svn']
+    def get_filelines(path):
+        dfiles, dlines = 0, 0
+        if osp.splitext(path)[1] in extensions:
+            dfiles = 1
+            with open(path, 'rb') as textfile:
+                dlines = len(textfile.read().strip().splitlines())
+        return dfiles, dlines
+    lines = 0
+    files = 0
+    if osp.isdir(path):
+        for dirpath, dirnames, filenames in os.walk(path):
+            for d in dirnames[:]:
+                if d in excluded_dirnames:
+                    dirnames.remove(d)
+            if excluded_dirnames is None or \
+               osp.dirname(dirpath) not in excluded_dirnames:
+                for fname in filenames:
+                    dfiles, dlines = get_filelines(osp.join(dirpath, fname))
+                    files += dfiles
+                    lines += dlines
+    else:
+        dfiles, dlines = get_filelines(path)
+        files += dfiles
+        lines += dlines
+    return files, lines

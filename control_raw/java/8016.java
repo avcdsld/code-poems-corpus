@@ -1,0 +1,3 @@
+public static PreparedStatement prepareStatement(Connection conn, SqlBuilder sqlBuilder) throws SQLException {
+		return prepareStatement(conn, sqlBuilder.build(), sqlBuilder.getParamValueArray());
+	}

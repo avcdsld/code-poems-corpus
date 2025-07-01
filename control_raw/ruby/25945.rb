@@ -1,0 +1,8 @@
+def get_pitches
+      results = []
+      ab = get_vs_ab
+      ab.each do |ab|
+        results << ab.pitches
+      end
+      results.flatten
+    end

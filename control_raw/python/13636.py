@@ -1,0 +1,15 @@
+def pow(self, other, axis="columns", level=None, fill_value=None):
+        """Pow this DataFrame against another DataFrame/Series/scalar.
+
+        Args:
+            other: The object to use to apply the pow against this.
+            axis: The axis to pow over.
+            level: The Multilevel index level to apply pow over.
+            fill_value: The value to fill NaNs with.
+
+        Returns:
+            A new DataFrame with the Pow applied.
+        """
+        return self._binary_op(
+            "pow", other, axis=axis, level=level, fill_value=fill_value
+        )

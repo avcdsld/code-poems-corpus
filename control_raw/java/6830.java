@@ -1,0 +1,11 @@
+public HttpCookie getCookie(String name) {
+		List<HttpCookie> cookie = getCookies();
+		if (null != cookie) {
+			for (HttpCookie httpCookie : cookie) {
+				if (httpCookie.getName().equals(name)) {
+					return httpCookie;
+				}
+			}
+		}
+		return null;
+	}

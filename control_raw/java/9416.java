@@ -1,0 +1,3 @@
+public final Serializable nextValue(final String columName, final int columnIndex, final int type, final int meta) {
+        return nextValue(columName, columnIndex, type, meta, false);
+    }

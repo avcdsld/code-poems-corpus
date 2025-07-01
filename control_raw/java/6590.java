@@ -1,0 +1,15 @@
+public static boolean isMultipart(HttpServletRequest request) {
+		if (false == isPostMethod(request)) {
+			return false;
+		}
+
+		String contentType = request.getContentType();
+		if (StrUtil.isBlank(contentType)) {
+			return false;
+		}
+		if (contentType.toLowerCase().startsWith("multipart/")) {
+			return true;
+		}
+
+		return false;
+	}

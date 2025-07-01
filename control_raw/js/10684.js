@@ -1,0 +1,8 @@
+function removeEmptyLinesBefore(
+  node /*: postcss$node*/,
+  newline /*: '\n' | '\r\n'*/
+) /*: postcss$node*/ {
+  node.raws.before = node.raws.before.replace(/(\r?\n\s*\r?\n)+/g, newline);
+
+  return node;
+}

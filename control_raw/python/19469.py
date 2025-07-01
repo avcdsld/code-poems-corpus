@@ -1,0 +1,16 @@
+def toPlainText(self):
+        """
+        Reimplement Qt method
+        Fix PyQt4 bug on Windows and Python 3
+        """
+        # Fix what appears to be a PyQt4 bug when getting file
+        # contents under Windows and PY3. This bug leads to
+        # corruptions when saving files with certain combinations
+        # of unicode chars on them (like the one attached on
+        # Issue 1546)
+        if os.name == 'nt' and PY3:
+            text = self.get_text('sof', 'eof')
+            return text.replace('\u2028', '\n').replace('\u2029', '\n')\
+                       .replace('\u0085', '\n')
+        else:
+            return super(TextEditBaseWidget, self).toPlainText()

@@ -1,0 +1,22 @@
+def get_all_appearances(year)
+      if !@appearances
+        @appearances = []
+        all_appearances = []
+        games = get_games_for_season(year)    
+        games.each do |game|
+          @team_abbrev == game.home_team_abbrev ? status = 'home' : status = 'away'
+          if @position == 'P'
+            all_appearances.push *(game.get_pitchers(status))
+          else
+            all_appearances.push *(game.get_batters(status))
+          end
+        end
+        # now go through all appearances to find those for this player
+        all_appearances.each do |appearance|
+          if appearance.pid == @pid
+           @appearances << appearance
+          end
+        end
+      end
+      @appearances
+    end

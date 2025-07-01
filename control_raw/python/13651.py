@@ -1,0 +1,12 @@
+def to_numpy(self, dtype=None, copy=False):
+        """Convert the DataFrame to a NumPy array.
+
+        Args:
+            dtype: The dtype to pass to numpy.asarray()
+            copy: Whether to ensure that the returned value is a not a view on another
+                array.
+
+        Returns:
+            A numpy array.
+        """
+        return self._default_to_pandas("to_numpy", dtype=dtype, copy=copy)

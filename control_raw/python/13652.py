@@ -1,0 +1,15 @@
+def truediv(self, other, axis="columns", level=None, fill_value=None):
+        """Divides this DataFrame against another DataFrame/Series/scalar.
+
+        Args:
+            other: The object to use to apply the divide against this.
+            axis: The axis to divide over.
+            level: The Multilevel index level to apply divide over.
+            fill_value: The value to fill NaNs with.
+
+        Returns:
+            A new DataFrame with the Divide applied.
+        """
+        return self._binary_op(
+            "truediv", other, axis=axis, level=level, fill_value=fill_value
+        )

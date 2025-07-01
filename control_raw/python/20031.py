@@ -1,0 +1,7 @@
+def get_same_name_files(files_path_list, filename):
+    """Get a list of the path components of the files with the same name."""
+    same_name_files = []
+    for fname in files_path_list:
+        if filename == os.path.basename(fname):
+            same_name_files.append(path_components(fname))
+    return same_name_files

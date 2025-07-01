@@ -1,0 +1,3 @@
+public static <K, V> Map<K, V> toMap(Iterator<K> keys, Iterator<V> values) {
+		return toMap(keys, values, false);
+	}

@@ -1,0 +1,61 @@
+def setup(self, check_all=None, exclude_private=None,
+              exclude_uppercase=None, exclude_capitalized=None,
+              exclude_unsupported=None, excluded_names=None,
+              minmax=None, dataframe_format=None):
+        """
+        Setup the namespace browser with provided settings.
+
+        Args:
+            dataframe_format (string): default floating-point format for 
+                DataFrame editor
+        """
+        assert self.shellwidget is not None
+        
+        self.check_all = check_all
+        self.exclude_private = exclude_private
+        self.exclude_uppercase = exclude_uppercase
+        self.exclude_capitalized = exclude_capitalized
+        self.exclude_unsupported = exclude_unsupported
+        self.excluded_names = excluded_names
+        self.minmax = minmax
+        self.dataframe_format = dataframe_format
+        
+        if self.editor is not None:
+            self.editor.setup_menu(minmax)
+            self.editor.set_dataframe_format(dataframe_format)
+            self.exclude_private_action.setChecked(exclude_private)
+            self.exclude_uppercase_action.setChecked(exclude_uppercase)
+            self.exclude_capitalized_action.setChecked(exclude_capitalized)
+            self.exclude_unsupported_action.setChecked(exclude_unsupported)
+            self.refresh_table()
+            return
+
+        self.editor = RemoteCollectionsEditorTableView(
+                        self,
+                        data=None,
+                        minmax=minmax,
+                        shellwidget=self.shellwidget,
+                        dataframe_format=dataframe_format)
+
+        self.editor.sig_option_changed.connect(self.sig_option_changed.emit)
+        self.editor.sig_files_dropped.connect(self.import_data)
+        self.editor.sig_free_memory.connect(self.sig_free_memory.emit)
+
+        self.setup_option_actions(exclude_private, exclude_uppercase,
+                                  exclude_capitalized, exclude_unsupported)
+
+        # Setup toolbar layout.
+
+        self.tools_layout = QHBoxLayout()
+        toolbar = self.setup_toolbar()
+        for widget in toolbar:
+            self.tools_layout.addWidget(widget)
+        self.tools_layout.addStretch()
+        self.setup_options_button()
+
+        # Setup layout.
+
+        layout = create_plugin_layout(self.tools_layout, self.editor)
+        self.setLayout(layout)
+
+        self.sig_option_changed.connect(self.option_changed)

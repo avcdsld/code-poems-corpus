@@ -1,0 +1,8 @@
+protected boolean getBoolean(String key, boolean defaultValue) {
+        try {
+            return getConfig().getBoolean(key, defaultValue);
+        } catch (ConversionException e) {
+            logConversionException(key, e);
+        }
+        return defaultValue;
+    }

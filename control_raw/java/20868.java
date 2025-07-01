@@ -1,0 +1,11 @@
+public void addOnInstalled(AddOn addOn) {
+        for (ExtensionHook hook : extensionHooks.values()) {
+            for (AddOnInstallationStatusListener listener : hook.getAddOnInstallationStatusListeners()) {
+                try {
+                    listener.addOnInstalled(addOn);
+                } catch (Exception e) {
+                    logger.error("An error occurred while notifying: " + listener.getClass().getCanonicalName(), e);
+                }
+            }
+        }
+    }

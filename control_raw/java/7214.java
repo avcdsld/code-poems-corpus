@@ -1,0 +1,7 @@
+public static void keyClick(int... keyCodes) {
+		for (int keyCode : keyCodes) {
+			robot.keyPress(keyCode);
+			robot.keyRelease(keyCode);
+		}
+		delay();
+	}

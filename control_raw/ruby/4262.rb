@@ -1,0 +1,10 @@
+def generate_atomic_updates(mods, doc)
+      mods.unset(doc.atomic_unsets)
+      mods.pull(doc.atomic_pulls)
+      mods.set(doc.atomic_sets)
+      mods.set(doc.delayed_atomic_sets)
+      mods.push(doc.atomic_pushes)
+      mods.push(doc.atomic_array_pushes)
+      mods.add_to_set(doc.atomic_array_add_to_sets)
+      mods.pull_all(doc.atomic_array_pulls)
+    end

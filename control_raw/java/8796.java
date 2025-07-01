@@ -1,0 +1,15 @@
+public static File file(String... names) {
+		if (ArrayUtil.isEmpty(names)) {
+			return null;
+		}
+
+		File file = null;
+		for (String name : names) {
+			if (file == null) {
+				file = file(name);
+			} else {
+				file = file(file, name);
+			}
+		}
+		return file;
+	}

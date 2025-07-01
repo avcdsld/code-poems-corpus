@@ -1,0 +1,8 @@
+public String getHeader(String name) {
+        Vector<String> v = getHeaders(name);
+        if (v == null) {
+            return null;
+        }
+
+        return v.firstElement();
+    }

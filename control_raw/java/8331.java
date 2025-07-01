@@ -1,0 +1,24 @@
+public Scheduler stop(boolean clearTasks) {
+		synchronized (lock) {
+			if (false == started) {
+				throw new IllegalStateException("Scheduler not started !");
+			}
+
+			// 停止CronTimer
+			this.timer.stopTimer();
+			this.timer = null;
+			
+			//停止线程池
+			this.threadExecutor.shutdown();
+			this.threadExecutor = null;
+			
+			//可选是否清空任务表
+			if(clearTasks) {
+				clear();
+			}
+
+			// 修改标志
+			started = false;
+		}
+		return this;
+	}

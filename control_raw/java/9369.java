@@ -1,0 +1,11 @@
+public final long getBeLong48(final int pos) {
+        final int position = origin + pos;
+
+        if (pos + 5 >= limit || pos < 0) throw new IllegalArgumentException("limit excceed: "
+                                                                            + (pos < 0 ? pos : (pos + 5)));
+
+        byte[] buf = buffer;
+        return ((long) (0xff & buf[position + 5])) | ((long) (0xff & buf[position + 4]) << 8)
+               | ((long) (0xff & buf[position + 3]) << 16) | ((long) (0xff & buf[position + 2]) << 24)
+               | ((long) (0xff & buf[position + 1]) << 32) | ((long) (buf[position]) << 40);
+    }

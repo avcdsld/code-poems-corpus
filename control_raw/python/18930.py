@@ -1,0 +1,67 @@
+def import_data(self, filenames=None):
+        """Import data from text file."""
+        title = _("Import data")
+        if filenames is None:
+            if self.filename is None:
+                basedir = getcwd_or_home()
+            else:
+                basedir = osp.dirname(self.filename)
+            filenames, _selfilter = getopenfilenames(self, title, basedir,
+                                                     iofunctions.load_filters)
+            if not filenames:
+                return
+        elif is_text_string(filenames):
+            filenames = [filenames]
+
+        for filename in filenames:
+            self.filename = to_text_string(filename)
+            ext = osp.splitext(self.filename)[1].lower()
+
+            if ext not in iofunctions.load_funcs:
+                buttons = QMessageBox.Yes | QMessageBox.Cancel
+                answer = QMessageBox.question(self, title,
+                            _("<b>Unsupported file extension '%s'</b><br><br>"
+                              "Would you like to import it anyway "
+                              "(by selecting a known file format)?"
+                              ) % ext, buttons)
+                if answer == QMessageBox.Cancel:
+                    return
+                formats = list(iofunctions.load_extensions.keys())
+                item, ok = QInputDialog.getItem(self, title,
+                                                _('Open file as:'),
+                                                formats, 0, False)
+                if ok:
+                    ext = iofunctions.load_extensions[to_text_string(item)]
+                else:
+                    return
+
+            load_func = iofunctions.load_funcs[ext]
+                
+            # 'import_wizard' (self.setup_io)
+            if is_text_string(load_func):
+                # Import data with import wizard
+                error_message = None
+                try:
+                    text, _encoding = encoding.read(self.filename)
+                    base_name = osp.basename(self.filename)
+                    editor = ImportWizard(self, text, title=base_name,
+                                  varname=fix_reference_name(base_name))
+                    if editor.exec_():
+                        var_name, clip_data = editor.get_data()
+                        self.editor.new_value(var_name, clip_data)
+                except Exception as error:
+                    error_message = str(error)
+            else:
+                QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+                QApplication.processEvents()
+                error_message = self.shellwidget.load_data(self.filename, ext)
+                self.shellwidget._kernel_reply = None
+                QApplication.restoreOverrideCursor()
+                QApplication.processEvents()
+    
+            if error_message is not None:
+                QMessageBox.critical(self, title,
+                                     _("<b>Unable to load '%s'</b>"
+                                       "<br><br>Error message:<br>%s"
+                                       ) % (self.filename, error_message))
+            self.refresh_table()

@@ -1,0 +1,17 @@
+public static BufferedImage toBufferedImage(Image image, String imageType) {
+		BufferedImage bufferedImage;
+		if (false == imageType.equalsIgnoreCase(IMAGE_TYPE_PNG)) {
+			// 当目标为非PNG类图片时，源图片统一转换为RGB格式
+			if (image instanceof BufferedImage) {
+				bufferedImage = (BufferedImage) image;
+				if (BufferedImage.TYPE_INT_RGB != bufferedImage.getType()) {
+					bufferedImage = copyImage(image, BufferedImage.TYPE_INT_RGB);
+				}
+			} else {
+				bufferedImage = copyImage(image, BufferedImage.TYPE_INT_RGB);
+			}
+		} else {
+			bufferedImage = toBufferedImage(image);
+		}
+		return bufferedImage;
+	}

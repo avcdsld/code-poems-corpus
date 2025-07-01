@@ -1,0 +1,7 @@
+def _get_input_buffer(self):
+        """Return input buffer"""
+        input_buffer = ''
+        if self.current_prompt_pos is not None:
+            input_buffer = self.get_text(self.current_prompt_pos, 'eol')
+            input_buffer = input_buffer.replace(os.linesep, '\n')
+        return input_buffer

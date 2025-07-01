@@ -1,0 +1,36 @@
+def add_actions(target, actions, insert_before=None):
+    """Add actions to a QMenu or a QToolBar."""
+    previous_action = None
+    target_actions = list(target.actions())
+    if target_actions:
+        previous_action = target_actions[-1]
+        if previous_action.isSeparator():
+            previous_action = None
+    for action in actions:
+        if (action is None) and (previous_action is not None):
+            if insert_before is None:
+                target.addSeparator()
+            else:
+                target.insertSeparator(insert_before)
+        elif isinstance(action, QMenu):
+            if insert_before is None:
+                target.addMenu(action)
+            else:
+                target.insertMenu(insert_before, action)
+        elif isinstance(action, QAction):
+            if isinstance(action, SpyderAction):
+                if isinstance(target, QMenu) or not isinstance(target, QToolBar):
+                    try:
+                        action = action.no_icon_action
+                    except RuntimeError:
+                        continue
+            if insert_before is None:
+                # This is needed in order to ignore adding an action whose
+                # wrapped C/C++ object has been deleted. See issue 5074
+                try:
+                    target.addAction(action)
+                except RuntimeError:
+                    continue
+            else:
+                target.insertAction(insert_before, action)
+        previous_action = action

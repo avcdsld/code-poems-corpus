@@ -1,0 +1,14 @@
+def diff(self, periods=1, axis=0):
+        """Finds the difference between elements on the axis requested
+
+        Args:
+            periods: Periods to shift for forming difference
+            axis: Take difference over rows or columns
+
+        Returns:
+            DataFrame with the diff applied
+        """
+        axis = self._get_axis_number(axis)
+        return self.__constructor__(
+            query_compiler=self._query_compiler.diff(periods=periods, axis=axis)
+        )

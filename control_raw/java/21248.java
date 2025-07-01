@@ -1,0 +1,7 @@
+private JLabel getAddedCountValueLabel() {
+		if (addedCountValueLabel == null) {
+			addedCountValueLabel = new JLabel();
+			addedCountValueLabel.setText(ZERO_REQUESTS_LABEL_TEXT);
+		}
+		return addedCountValueLabel;
+	}

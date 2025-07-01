@@ -1,0 +1,7 @@
+def check(modname):
+    """Check if required dependency is installed"""
+    for dependency in DEPENDENCIES:
+        if dependency.modname == modname:
+            return dependency.check()
+    else:
+        raise RuntimeError("Unkwown dependency %s" % modname)

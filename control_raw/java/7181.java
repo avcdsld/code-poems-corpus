@@ -1,0 +1,3 @@
+public int del(String tableName, String field, Object value) throws SQLException {
+		return del(Entity.create(tableName).set(field, value));
+	}

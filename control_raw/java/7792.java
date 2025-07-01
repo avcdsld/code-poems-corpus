@@ -1,0 +1,3 @@
+public static VelocityTemplate wrap(org.apache.velocity.Template template) {
+		return (null == template) ? null : new VelocityTemplate(template);
+	}

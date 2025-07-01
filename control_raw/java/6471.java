@@ -1,0 +1,7 @@
+public static RenderedImage toRenderedImage(Image img) {
+		if (img instanceof RenderedImage) {
+			return (RenderedImage) img;
+		}
+
+		return copyImage(img, BufferedImage.TYPE_INT_RGB);
+	}

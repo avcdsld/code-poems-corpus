@@ -1,0 +1,3 @@
+public static Template getClassPathTemplate(String path, String templateFileName) {
+		return getTemplate(createClassPathGroupTemplate(path), templateFileName);
+	}

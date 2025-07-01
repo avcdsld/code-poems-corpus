@@ -1,0 +1,42 @@
+def generated?
+      xcode_file? ||
+      cocoapods? ||
+      carthage_build? ||
+      generated_graphql_relay? ||
+      generated_net_designer_file? ||
+      generated_net_specflow_feature_file? ||
+      composer_lock? ||
+      cargo_lock? ||
+      node_modules? ||
+      go_vendor? ||
+      go_lock? ||
+      npm_shrinkwrap_or_package_lock? ||
+      godeps? ||
+      generated_by_zephir? ||
+      minified_files? ||
+      has_source_map? ||
+      source_map? ||
+      compiled_coffeescript? ||
+      generated_parser? ||
+      generated_net_docfile? ||
+      generated_postscript? ||
+      compiled_cython_file? ||
+      generated_go? ||
+      generated_protocol_buffer? ||
+      generated_javascript_protocol_buffer? ||
+      generated_apache_thrift? ||
+      generated_jni_header? ||
+      vcr_cassette? ||
+      generated_module? ||
+      generated_unity3d_meta? ||
+      generated_racc? ||
+      generated_jflex? ||
+      generated_grammarkit? ||
+      generated_roxygen2? ||
+      generated_pkgdown? ||
+      generated_jison? ||
+      generated_grpc_cpp? ||
+      generated_dart? ||
+      generated_perl_ppport_header? ||
+      generated_gamemakerstudio?
+    end

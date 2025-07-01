@@ -1,0 +1,21 @@
+private List<ClassNameWrapper> getJarClassNames(ClassLoader cl, File file, String packageName) {
+    	List<ClassNameWrapper> classNames = new ArrayList<> ();
+        ZipEntry entry = null;
+        String className = "";
+        try (JarFile jarFile = new JarFile(file)) {
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                entry = entries.nextElement();
+                if (entry.isDirectory() || !entry.getName().endsWith(".class")) {
+                    continue;
+                }
+                className = entry.toString().replaceAll("\\.class$","").replaceAll("/",".");
+                if (className.indexOf(packageName) >= 0) {
+                    classNames.add(new ClassNameWrapper(cl, className));
+                }
+            }
+        } catch (Exception e) {
+        	logger.error("Failed to open file: " + file.getAbsolutePath(), e);
+        }
+        return classNames;
+    }

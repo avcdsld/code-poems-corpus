@@ -1,0 +1,10 @@
+protected void persistProperties() throws Exception {
+		if (isNewState()) {
+			return;
+		}
+
+		if (Database.DB_TYPE_HSQLDB.equals(model.getDb().getType())) {
+			configuration.save(new File(fileName));
+		}
+		model.getDb().getTableSession().update(getSessionId(), getSessionName());
+	}
