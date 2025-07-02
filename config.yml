@@ -31,10 +31,483 @@ languages:
     tracer: "cpp-trace"
 
 # Semiotic classification
+#  - sign_type: qualisign (質的) / sinsign (個別的) / legisign (規則的)
+#  - sign_mode: icon (類似) / index (因果/指示) / symbol (慣習)
+#
+# 分類原則
+#  - Icon: リテラル値、コメント（直接的表現・視覚的類似）
+#  - Index: 変数・関数名などの識別子（参照・指示関係）
+#  - Symbol: 型・予約語・演算子など構文規約（慣習的約束）
 semiotic_classification:
+  java:
+    # === 関数・メソッド系 ===
+    constructor_declaration: { sign_type: "legisign", sign_mode: "symbol" }  # 構築子宣言の構文規約
+    default: { sign_type: "legisign", sign_mode: "symbol" }                  # defaultキーワード、慣習的約束
+    method_declaration: { sign_type: "legisign", sign_mode: "symbol" }       # メソッド宣言の構文規約
+    method_invocation: { sign_type: "sinsign", sign_mode: "index" }          # 具体的メソッドを指示
+    method_reference: { sign_type: "sinsign", sign_mode: "index" }           # メソッドを参照
+    
+    # === クラス系 ===
+    class: { sign_type: "legisign", sign_mode: "symbol" }                    # classキーワード、構文規約
+    class_body: { sign_type: "legisign", sign_mode: "icon" }                 # クラス内部の構造表現
+    class_declaration: { sign_type: "legisign", sign_mode: "symbol" }        # クラス宣言の構文規約
+    class_literal: { sign_type: "sinsign", sign_mode: "index" }              # 具体的クラスを指示
+    
+    # === ループ・パラメータ系 ===
+    catch_formal_parameter: { sign_type: "sinsign", sign_mode: "index" }     # 例外パラメータを指示
+    do_statement: { sign_type: "legisign", sign_mode: "symbol" }             # do文の構文規約
+    enhanced_for_statement: { sign_type: "legisign", sign_mode: "symbol" }   # 拡張for文の構文規約
+    for: { sign_type: "legisign", sign_mode: "symbol" }                      # forキーワード、構文規約
+    for_statement: { sign_type: "legisign", sign_mode: "symbol" }            # for文の構文規約
+    formal_parameter: { sign_type: "sinsign", sign_mode: "index" }           # 仮パラメータを指示
+    formal_parameters: { sign_type: "legisign", sign_mode: "icon" }          # パラメータリストの構造表現
+    while: { sign_type: "legisign", sign_mode: "symbol" }                    # whileキーワード、構文規約
+    while_statement: { sign_type: "legisign", sign_mode: "symbol" }          # while文の構文規約
+    
+    # === 条件分岐系 ===
+    if: { sign_type: "legisign", sign_mode: "symbol" }                       # ifキーワード、構文規約
+    if_statement: { sign_type: "legisign", sign_mode: "symbol" }             # if文の構文規約
+    modifiers: { sign_type: "qualisign", sign_mode: "symbol" }               # アクセス修飾子、構文規約
+    resource_specification: { sign_type: "legisign", sign_mode: "icon" }     # リソース指定の構造表現
+    scoped_identifier: { sign_type: "sinsign", sign_mode: "index" }          # スコープ付き識別子を指示
+    scoped_type_identifier: { sign_type: "sinsign", sign_mode: "index" }     # スコープ付き型を指示
+    switch: { sign_type: "legisign", sign_mode: "symbol" }                   # switchキーワード、構文規約
+    switch_block: { sign_type: "legisign", sign_mode: "icon" }               # switchブロックの構造表現
+    switch_block_statement_group: { sign_type: "legisign", sign_mode: "icon" } # switch文グループの構造表現
+    switch_expression: { sign_type: "legisign", sign_mode: "symbol" }        # switch式の構文規約
+    switch_label: { sign_type: "legisign", sign_mode: "symbol" }             # switchラベルの構文規約
+    ternary_expression: { sign_type: "legisign", sign_mode: "symbol" }       # 三項演算子の構文規約
+    type_identifier: { sign_type: "qualisign", sign_mode: "symbol" }         # 型識別子、構文規約
+    
+    # === 識別子系（すべて Index） ===
+    identifier: { sign_type: "sinsign", sign_mode: "index" }                 # 識別子、参照関係
+    
+    # === リテラル系（すべて Icon） ===
+    character_literal: { sign_type: "sinsign", sign_mode: "icon" }           # 文字リテラル、直接表現
+    decimal_floating_point_literal: { sign_type: "sinsign", sign_mode: "icon" } # 浮動小数点リテラル、直接表現
+    decimal_integer_literal: { sign_type: "sinsign", sign_mode: "icon" }     # 整数リテラル、直接表現
+    hex_integer_literal: { sign_type: "sinsign", sign_mode: "icon" }         # 16進整数リテラル、直接表現
+    null_literal: { sign_type: "sinsign", sign_mode: "icon" }                # nullリテラル、直接表現
+    string_fragment: { sign_type: "sinsign", sign_mode: "icon" }             # 文字列片、直接表現
+    string_literal: { sign_type: "sinsign", sign_mode: "icon" }              # 文字列リテラル、直接表現
+    false: { sign_type: "sinsign", sign_mode: "icon" }                       # falseリテラル、直接表現
+    true: { sign_type: "sinsign", sign_mode: "icon" }                        # trueリテラル、直接表現
+    
+    # === 演算子・記号（すべて Symbol） ===
+    "%=": { sign_type: "legisign", sign_mode: "symbol" }                     # 剰余代入演算子、構文規約
+    ">>>": { sign_type: "legisign", sign_mode: "symbol" }                    # 論理右シフト演算子、構文規約
+    asterisk: { sign_type: "legisign", sign_mode: "symbol" }                 # アスタリスク、構文規約
+    binary_expression: { sign_type: "legisign", sign_mode: "symbol" }        # 二項式、演算規約
+    unary_expression: { sign_type: "legisign", sign_mode: "symbol" }         # 単項式、演算規約
+    assignment_expression: { sign_type: "legisign", sign_mode: "symbol" }    # 代入式、演算規約
+    update_expression: { sign_type: "legisign", sign_mode: "symbol" }        # 更新式、演算規約
+    
+    # === 型・キーワード系（すべて Symbol） ===
+    float: { sign_type: "qualisign", sign_mode: "symbol" }                   # floatキーワード、型の構文規約
+    floating_point_type: { sign_type: "qualisign", sign_mode: "symbol" }     # 浮動小数点型、構文規約
+    boolean_type: { sign_type: "qualisign", sign_mode: "symbol" }            # ブール型、構文規約
+    byte: { sign_type: "qualisign", sign_mode: "symbol" }                    # byte型、構文規約
+    char: { sign_type: "qualisign", sign_mode: "symbol" }                    # char型、構文規約
+    double: { sign_type: "qualisign", sign_mode: "symbol" }                  # double型、構文規約
+    int: { sign_type: "qualisign", sign_mode: "symbol" }                     # int型、構文規約
+    integral_type: { sign_type: "qualisign", sign_mode: "symbol" }           # 整数型、構文規約
+    long: { sign_type: "qualisign", sign_mode: "symbol" }                    # long型、構文規約
+    short: { sign_type: "qualisign", sign_mode: "symbol" }                   # short型、構文規約
+    void_type: { sign_type: "qualisign", sign_mode: "symbol" }               # void型、構文規約
+    
+    # === 構造表現系（Icon） ===
+    block: { sign_type: "legisign", sign_mode: "icon" }                      # ブロック、構造の視覚的表現
+    array_initializer: { sign_type: "legisign", sign_mode: "icon" }          # 配列初期化、構造表現
+    parenthesized_expression: { sign_type: "legisign", sign_mode: "icon" }   # 括弧式、構造表現
+    argument_list: { sign_type: "legisign", sign_mode: "icon" }              # 引数リスト、構造表現
+    dimensions: { sign_type: "legisign", sign_mode: "icon" }                 # 次元、構造表現
+    
+    # === 参照・アクセス系（Index） ===
+    array_access: { sign_type: "sinsign", sign_mode: "index" }               # 配列要素を指示
+    field_access: { sign_type: "sinsign", sign_mode: "index" }               # フィールドを指示
+    variable_declarator: { sign_type: "sinsign", sign_mode: "index" }        # 変数を指示
+    
+    # === コメント系（Icon） ===
+    block_comment: { sign_type: "sinsign", sign_mode: "icon" }               # ブロックコメント、直接表現
+    line_comment: { sign_type: "sinsign", sign_mode: "icon" }                # 行コメント、直接表現
+    
+    # === その他の構文要素 ===
+    annotation: { sign_type: "qualisign", sign_mode: "symbol" }              # アノテーション、構文規約
+    annotation_argument_list: { sign_type: "legisign", sign_mode: "icon" }   # アノテーション引数、構造表現
+    array_creation_expression: { sign_type: "legisign", sign_mode: "symbol" } # 配列作成、構文規約
+    array_type: { sign_type: "qualisign", sign_mode: "symbol" }              # 配列型、構文規約
+    assert: { sign_type: "legisign", sign_mode: "symbol" }                   # assertキーワード、構文規約
+    assert_statement: { sign_type: "legisign", sign_mode: "symbol" }         # assert文、構文規約
+    break: { sign_type: "legisign", sign_mode: "symbol" }                    # breakキーワード、構文規約
+    break_statement: { sign_type: "legisign", sign_mode: "symbol" }          # break文、構文規約
+    case: { sign_type: "legisign", sign_mode: "symbol" }                     # caseキーワード、構文規約
+    cast_expression: { sign_type: "legisign", sign_mode: "symbol" }          # キャスト式、構文規約
+    catch: { sign_type: "legisign", sign_mode: "symbol" }                    # catchキーワード、構文規約
+    catch_clause: { sign_type: "legisign", sign_mode: "symbol" }             # catch節、構文規約
+    catch_type: { sign_type: "qualisign", sign_mode: "symbol" }              # 例外型、構文規約
+    condition: { sign_type: "sinsign", sign_mode: "index" }                  # 条件を指示
+    constructor_body: { sign_type: "legisign", sign_mode: "icon" }           # 構築子本体、構造表現
+    continue: { sign_type: "legisign", sign_mode: "symbol" }                 # continueキーワード、構文規約
+    continue_statement: { sign_type: "legisign", sign_mode: "symbol" }       # continue文、構文規約
+    dimensions_expr: { sign_type: "sinsign", sign_mode: "index" }            # 次元式を指示
+    do: { sign_type: "legisign", sign_mode: "symbol" }                       # doキーワード、構文規約
+    element_value_array_initializer: { sign_type: "legisign", sign_mode: "icon" } # 配列初期化、構造表現
+    element_value_pair: { sign_type: "legisign", sign_mode: "icon" }         # 要素値ペア、構造表現
+    else: { sign_type: "legisign", sign_mode: "symbol" }                     # elseキーワード、構文規約
+    escape_sequence: { sign_type: "legisign", sign_mode: "symbol" }          # エスケープシーケンス、構文規約
+    expression_statement: { sign_type: "legisign", sign_mode: "symbol" }     # 式文、構文規約
+    extends: { sign_type: "legisign", sign_mode: "symbol" }                  # extendsキーワード、構文規約
+    field_declaration: { sign_type: "legisign", sign_mode: "symbol" }        # フィールド宣言、構文規約
+    final: { sign_type: "qualisign", sign_mode: "symbol" }                   # final修飾子、構文規約
+    finally: { sign_type: "legisign", sign_mode: "symbol" }                  # finallyキーワード、構文規約
+    finally_clause: { sign_type: "legisign", sign_mode: "symbol" }           # finally節、構文規約
+    generic_type: { sign_type: "qualisign", sign_mode: "symbol" }            # ジェネリック型、構文規約
+    import: { sign_type: "legisign", sign_mode: "symbol" }                   # importキーワード、構文規約
+    import_declaration: { sign_type: "legisign", sign_mode: "symbol" }       # import宣言、構文規約
+    inferred_parameters: { sign_type: "legisign", sign_mode: "icon" }        # 推論パラメータ、構造表現
+    instanceof: { sign_type: "legisign", sign_mode: "symbol" }               # instanceofキーワード、構文規約
+    instanceof_expression: { sign_type: "legisign", sign_mode: "symbol" }    # instanceof式、構文規約
+    lambda_expression: { sign_type: "legisign", sign_mode: "symbol" }        # ラムダ式、構文規約
+    local_variable_declaration: { sign_type: "legisign", sign_mode: "symbol" } # ローカル変数宣言、構文規約
+    marker_annotation: { sign_type: "qualisign", sign_mode: "symbol" }       # マーカーアノテーション、構文規約
+    new: { sign_type: "legisign", sign_mode: "symbol" }                      # newキーワード、構文規約
+    object_creation_expression: { sign_type: "legisign", sign_mode: "symbol" } # オブジェクト作成、構文規約
+    private: { sign_type: "qualisign", sign_mode: "symbol" }                 # private修飾子、構文規約
+    program: { sign_type: "legisign", sign_mode: "icon" }                    # プログラム、全体構造表現
+    protected: { sign_type: "qualisign", sign_mode: "symbol" }               # protected修飾子、構文規約
+    public: { sign_type: "qualisign", sign_mode: "symbol" }                  # public修飾子、構文規約
+    resource: { sign_type: "sinsign", sign_mode: "index" }                   # リソースを指示
+    return: { sign_type: "legisign", sign_mode: "symbol" }                   # returnキーワード、構文規約
+    return_statement: { sign_type: "legisign", sign_mode: "symbol" }         # return文、構文規約
+    spread_parameter: { sign_type: "legisign", sign_mode: "icon" }           # 可変長パラメータ、構造表現
+    static: { sign_type: "qualisign", sign_mode: "symbol" }                  # static修飾子、構文規約
+    super: { sign_type: "legisign", sign_mode: "symbol" }                    # superキーワード、構文規約
+    synchronized: { sign_type: "legisign", sign_mode: "symbol" }             # synchronizedキーワード、構文規約
+    synchronized_statement: { sign_type: "legisign", sign_mode: "symbol" }   # synchronized文、構文規約
+    this: { sign_type: "legisign", sign_mode: "symbol" }                     # thisキーワード、構文規約
+    throw: { sign_type: "legisign", sign_mode: "symbol" }                    # throwキーワード、構文規約
+    throw_statement: { sign_type: "legisign", sign_mode: "symbol" }          # throw文、構文規約
+    throws: { sign_type: "legisign", sign_mode: "symbol" }                   # throwsキーワード、構文規約
+    try: { sign_type: "legisign", sign_mode: "symbol" }                      # tryキーワード、構文規約
+    try_statement: { sign_type: "legisign", sign_mode: "symbol" }            # try文、構文規約
+    try_with_resources_statement: { sign_type: "legisign", sign_mode: "symbol" } # try-with-resources文、構文規約
+    type_arguments: { sign_type: "qualisign", sign_mode: "symbol" }          # 型引数、構文規約
+    type_bound: { sign_type: "qualisign", sign_mode: "symbol" }              # 型境界、構文規約
+    type_parameter: { sign_type: "qualisign", sign_mode: "symbol" }          # 型パラメータ、構文規約
+    type_parameters: { sign_type: "qualisign", sign_mode: "symbol" }         # 型パラメータリスト、構文規約
+    wildcard: { sign_type: "qualisign", sign_mode: "symbol" }                # ワイルドカード、構文規約
+
+  python:
+    # === 関数系 ===
+    decorated_definition: { sign_type: "legisign", sign_mode: "symbol" }     # デコレータ付き定義、構文規約
+    def: { sign_type: "legisign", sign_mode: "symbol" }                      # defキーワード、構文規約
+    default_parameter: { sign_type: "sinsign", sign_mode: "index" }          # デフォルトパラメータを指示
+    function_definition: { sign_type: "legisign", sign_mode: "symbol" }      # 関数定義、構文規約
+    typed_default_parameter: { sign_type: "sinsign", sign_mode: "index" }    # 型付きデフォルトパラメータを指示
+    
+    # === クラス系 ===
+    class: { sign_type: "legisign", sign_mode: "symbol" }                    # classキーワード、構文規約
+    class_definition: { sign_type: "legisign", sign_mode: "symbol" }         # クラス定義、構文規約
+    
+    # === ループ系 ===
+    for: { sign_type: "legisign", sign_mode: "symbol" }                      # forキーワード、構文規約
+    for_in_clause: { sign_type: "legisign", sign_mode: "icon" }              # for-in節、構造表現
+    for_statement: { sign_type: "legisign", sign_mode: "symbol" }            # for文、構文規約
+    while: { sign_type: "legisign", sign_mode: "symbol" }                    # whileキーワード、構文規約
+    while_statement: { sign_type: "legisign", sign_mode: "symbol" }          # while文、構文規約
+    
+    # === 条件系 ===
+    conditional_expression: { sign_type: "legisign", sign_mode: "symbol" }   # 条件式、構文規約
+    elif: { sign_type: "legisign", sign_mode: "symbol" }                     # elifキーワード、構文規約
+    elif_clause: { sign_type: "legisign", sign_mode: "symbol" }              # elif節、構文規約
+    if: { sign_type: "legisign", sign_mode: "symbol" }                       # ifキーワード、構文規約
+    if_clause: { sign_type: "legisign", sign_mode: "symbol" }                # if節、構文規約
+    if_statement: { sign_type: "legisign", sign_mode: "symbol" }             # if文、構文規約
+    
+    # === 識別子系（すべて Index） ===
+    identifier: { sign_type: "sinsign", sign_mode: "index" }                 # 識別子、参照関係
+    
+    # === リテラル系（すべて Icon） ===
+    concatenated_string: { sign_type: "sinsign", sign_mode: "icon" }         # 連結文字列、直接表現
+    float: { sign_type: "sinsign", sign_mode: "icon" }                       # 浮動小数点数、直接表現
+    integer: { sign_type: "sinsign", sign_mode: "icon" }                     # 整数、直接表現
+    string: { sign_type: "sinsign", sign_mode: "icon" }                      # 文字列、直接表現
+    string_content: { sign_type: "sinsign", sign_mode: "icon" }              # 文字列内容、直接表現
+    string_end: { sign_type: "sinsign", sign_mode: "icon" }                  # 文字列終端、直接表現
+    string_start: { sign_type: "sinsign", sign_mode: "icon" }                # 文字列開始、直接表現
+    false: { sign_type: "sinsign", sign_mode: "icon" }                       # falseリテラル、直接表現
+    true: { sign_type: "sinsign", sign_mode: "icon" }                        # trueリテラル、直接表現
+    none: { sign_type: "sinsign", sign_mode: "icon" }                        # Noneリテラル、直接表現
+    
+    # === 演算子系（すべて Symbol） ===
+    "**": { sign_type: "legisign", sign_mode: "symbol" }                     # べき乗演算子、構文規約
+    "//": { sign_type: "legisign", sign_mode: "symbol" }                     # 整数除算演算子、構文規約
+    "//=": { sign_type: "legisign", sign_mode: "symbol" }                    # 整数除算代入演算子、構文規約
+    and: { sign_type: "legisign", sign_mode: "symbol" }                      # 論理積、構文規約
+    binary_operator: { sign_type: "legisign", sign_mode: "symbol" }          # 二項演算子、構文規約
+    boolean_operator: { sign_type: "legisign", sign_mode: "symbol" }         # ブール演算子、構文規約
+    comparison_operator: { sign_type: "legisign", sign_mode: "symbol" }      # 比較演算子、構文規約
+    in: { sign_type: "legisign", sign_mode: "symbol" }                       # inキーワード、構文規約
+    "is": { sign_type: "legisign", sign_mode: "symbol" }                     # isキーワード、構文規約
+    "is not": { sign_type: "legisign", sign_mode: "symbol" }                 # is notキーワード、構文規約
+    not: { sign_type: "legisign", sign_mode: "symbol" }                      # notキーワード、構文規約
+    "not in": { sign_type: "legisign", sign_mode: "symbol" }                 # not inキーワード、構文規約
+    not_operator: { sign_type: "legisign", sign_mode: "symbol" }             # not演算子、構文規約
+    or: { sign_type: "legisign", sign_mode: "symbol" }                       # orキーワード、構文規約
+    unary_operator: { sign_type: "legisign", sign_mode: "symbol" }           # 単項演算子、構文規約
+    assignment: { sign_type: "legisign", sign_mode: "symbol" }               # 代入、構文規約
+    augmented_assignment: { sign_type: "legisign", sign_mode: "symbol" }     # 拡張代入、構文規約
+    
+    # === 構造表現系（Icon） ===
+    argument_list: { sign_type: "legisign", sign_mode: "icon" }              # 引数リスト、構造表現
+    block: { sign_type: "legisign", sign_mode: "icon" }                      # ブロック、構造表現
+    dictionary: { sign_type: "legisign", sign_mode: "icon" }                 # 辞書、構造表現
+    dictionary_comprehension: { sign_type: "legisign", sign_mode: "icon" }   # 辞書内包表記、構造表現
+    expression_list: { sign_type: "legisign", sign_mode: "icon" }            # 式リスト、構造表現
+    generator_expression: { sign_type: "legisign", sign_mode: "icon" }       # ジェネレータ式、構造表現
+    list: { sign_type: "legisign", sign_mode: "icon" }                       # リスト、構造表現
+    list_comprehension: { sign_type: "legisign", sign_mode: "icon" }         # リスト内包表記、構造表現
+    list_pattern: { sign_type: "legisign", sign_mode: "icon" }               # リストパターン、構造表現
+    pair: { sign_type: "legisign", sign_mode: "icon" }                       # ペア、構造表現
+    parameters: { sign_type: "legisign", sign_mode: "icon" }                 # パラメータ、構造表現
+    parenthesized_expression: { sign_type: "legisign", sign_mode: "icon" }   # 括弧式、構造表現
+    pattern_list: { sign_type: "legisign", sign_mode: "icon" }               # パターンリスト、構造表現
+    set: { sign_type: "legisign", sign_mode: "icon" }                        # 集合、構造表現
+    set_comprehension: { sign_type: "legisign", sign_mode: "icon" }          # 集合内包表記、構造表現
+    tuple: { sign_type: "legisign", sign_mode: "icon" }                      # タプル、構造表現
+    tuple_pattern: { sign_type: "legisign", sign_mode: "icon" }              # タプルパターン、構造表現
+    
+    # === 参照・アクセス系（Index） ===
+    attribute: { sign_type: "sinsign", sign_mode: "index" }                  # 属性を指示
+    call: { sign_type: "sinsign", sign_mode: "index" }                       # 関数呼び出しを指示
+    dotted_name: { sign_type: "sinsign", sign_mode: "index" }                # ドット記法名を指示
+    subscript: { sign_type: "sinsign", sign_mode: "index" }                  # 添字を指示
+    slice: { sign_type: "sinsign", sign_mode: "index" }                      # スライスを指示
+    
+    # === コメント系（Icon） ===
+    comment: { sign_type: "sinsign", sign_mode: "icon" }                     # コメント、直接表現
+    
+    # === その他の構文要素 ===
+    aliased_import: { sign_type: "legisign", sign_mode: "symbol" }           # 別名インポート、構文規約
+    as: { sign_type: "legisign", sign_mode: "symbol" }                       # asキーワード、構文規約
+    as_pattern: { sign_type: "legisign", sign_mode: "icon" }                 # asパターン、構造表現
+    as_pattern_target: { sign_type: "sinsign", sign_mode: "index" }          # asパターン対象を指示
+    assert: { sign_type: "legisign", sign_mode: "symbol" }                   # assertキーワード、構文規約
+    assert_statement: { sign_type: "legisign", sign_mode: "symbol" }         # assert文、構文規約
+    async: { sign_type: "legisign", sign_mode: "symbol" }                    # asyncキーワード、構文規約
+    await: { sign_type: "legisign", sign_mode: "symbol" }                    # awaitキーワード、構文規約
+    break: { sign_type: "legisign", sign_mode: "symbol" }                    # breakキーワード、構文規約
+    break_statement: { sign_type: "legisign", sign_mode: "symbol" }          # break文、構文規約
+    continue: { sign_type: "legisign", sign_mode: "symbol" }                 # continueキーワード、構文規約
+    continue_statement: { sign_type: "legisign", sign_mode: "symbol" }       # continue文、構文規約
+    decorator: { sign_type: "qualisign", sign_mode: "symbol" }               # デコレータ、構文規約
+    del: { sign_type: "legisign", sign_mode: "symbol" }                      # delキーワード、構文規約
+    delete_statement: { sign_type: "legisign", sign_mode: "symbol" }         # delete文、構文規約
+    dictionary_splat: { sign_type: "legisign", sign_mode: "symbol" }         # 辞書展開、構文規約
+    dictionary_splat_pattern: { sign_type: "legisign", sign_mode: "icon" }   # 辞書展開パターン、構造表現
+    ellipsis: { sign_type: "legisign", sign_mode: "symbol" }                 # 省略記号、構文規約
+    else: { sign_type: "legisign", sign_mode: "symbol" }                     # elseキーワード、構文規約
+    else_clause: { sign_type: "legisign", sign_mode: "symbol" }              # else節、構文規約
+    escape_sequence: { sign_type: "legisign", sign_mode: "symbol" }          # エスケープシーケンス、構文規約
+    except: { sign_type: "legisign", sign_mode: "symbol" }                   # exceptキーワード、構文規約
+    except_clause: { sign_type: "legisign", sign_mode: "symbol" }            # except節、構文規約
+    expression_statement: { sign_type: "legisign", sign_mode: "symbol" }     # 式文、構文規約
+    finally: { sign_type: "legisign", sign_mode: "symbol" }                  # finallyキーワード、構文規約
+    finally_clause: { sign_type: "legisign", sign_mode: "symbol" }           # finally節、構文規約
+    from: { sign_type: "legisign", sign_mode: "symbol" }                     # fromキーワード、構文規約
+    generic_type: { sign_type: "qualisign", sign_mode: "symbol" }            # ジェネリック型、構文規約
+    global: { sign_type: "legisign", sign_mode: "symbol" }                   # globalキーワード、構文規約
+    global_statement: { sign_type: "legisign", sign_mode: "symbol" }         # global文、構文規約
+    import: { sign_type: "legisign", sign_mode: "symbol" }                   # importキーワード、構文規約
+    import_from_statement: { sign_type: "legisign", sign_mode: "symbol" }    # from-import文、構文規約
+    import_prefix: { sign_type: "legisign", sign_mode: "icon" }              # インポート接頭辞、構造表現
+    import_statement: { sign_type: "legisign", sign_mode: "symbol" }         # import文、構文規約
+    interpolation: { sign_type: "sinsign", sign_mode: "index" }              # 文字列補間を指示
+    keyword_argument: { sign_type: "sinsign", sign_mode: "index" }           # キーワード引数を指示
+    keyword_separator: { sign_type: "legisign", sign_mode: "symbol" }        # キーワード区切り、構文規約
+    lambda: { sign_type: "legisign", sign_mode: "symbol" }                   # lambdaキーワード、構文規約
+    lambda_parameters: { sign_type: "legisign", sign_mode: "icon" }          # ラムダパラメータ、構造表現
+    line_continuation: { sign_type: "legisign", sign_mode: "symbol" }        # 行継続、構文規約
+    list_splat: { sign_type: "legisign", sign_mode: "symbol" }               # リスト展開、構文規約
+    list_splat_pattern: { sign_type: "legisign", sign_mode: "icon" }         # リスト展開パターン、構造表現
+    module: { sign_type: "legisign", sign_mode: "icon" }                     # モジュール、全体構造表現
+    pass: { sign_type: "legisign", sign_mode: "symbol" }                     # passキーワード、構文規約
+    pass_statement: { sign_type: "legisign", sign_mode: "symbol" }           # pass文、構文規約
+    print: { sign_type: "legisign", sign_mode: "symbol" }                    # printキーワード、構文規約
+    print_statement: { sign_type: "legisign", sign_mode: "symbol" }          # print文、構文規約
+    raise: { sign_type: "legisign", sign_mode: "symbol" }                    # raiseキーワード、構文規約
+    raise_statement: { sign_type: "legisign", sign_mode: "symbol" }          # raise文、構文規約
+    relative_import: { sign_type: "legisign", sign_mode: "symbol" }          # 相対インポート、構文規約
+    return: { sign_type: "legisign", sign_mode: "symbol" }                   # returnキーワード、構文規約
+    return_statement: { sign_type: "legisign", sign_mode: "symbol" }         # return文、構文規約
+    try: { sign_type: "legisign", sign_mode: "symbol" }                      # tryキーワード、構文規約
+    try_statement: { sign_type: "legisign", sign_mode: "symbol" }            # try文、構文規約
+    type: { sign_type: "legisign", sign_mode: "symbol" }                     # typeキーワード、構文規約
+    type_parameter: { sign_type: "qualisign", sign_mode: "symbol" }          # 型パラメータ、構文規約
+    typed_parameter: { sign_type: "sinsign", sign_mode: "index" }            # 型付きパラメータを指示
+    with: { sign_type: "legisign", sign_mode: "symbol" }                     # withキーワード、構文規約
+    with_clause: { sign_type: "legisign", sign_mode: "symbol" }              # with節、構文規約
+    with_item: { sign_type: "sinsign", sign_mode: "index" }                  # with項目を指示
+    with_statement: { sign_type: "legisign", sign_mode: "symbol" }           # with文、構文規約
+    yield: { sign_type: "legisign", sign_mode: "symbol" }                    # yieldキーワード、構文規約
+
   js:
-    variable_declaration: { sign_type: "legisign", sign_mode: "index" }
-    var: { sign_type: "legisign", sign_mode: "symbol" }
-    identifier: { sign_type: "sinsign", sign_mode: "symbol" }
-    string: { sign_type: "sinsign", sign_mode: "icon" }
-    number: { sign_type: "sinsign", sign_mode: "symbol" }
+    # === 関数系 ===
+    arrow_function: { sign_type: "legisign", sign_mode: "symbol" }           # アロー関数、構文規約
+    default: { sign_type: "legisign", sign_mode: "symbol" }                  # defaultキーワード、構文規約
+    function: { sign_type: "legisign", sign_mode: "symbol" }                 # functionキーワード、構文規約
+    function_declaration: { sign_type: "legisign", sign_mode: "symbol" }     # 関数宣言、構文規約
+    method_definition: { sign_type: "legisign", sign_mode: "symbol" }        # メソッド定義、構文規約
+    switch_default: { sign_type: "legisign", sign_mode: "symbol" }           # switchデフォルト、構文規約
+    undefined: { sign_type: "sinsign", sign_mode: "icon" }                   # undefinedリテラル、直接表現
+    
+    # === ループ・制御系 ===
+    do_statement: { sign_type: "legisign", sign_mode: "symbol" }             # do文、構文規約
+    for: { sign_type: "legisign", sign_mode: "symbol" }                      # forキーワード、構文規約
+    for_in_statement: { sign_type: "legisign", sign_mode: "symbol" }         # for-in文、構文規約
+    for_statement: { sign_type: "legisign", sign_mode: "symbol" }            # for文、構文規約
+    formal_parameters: { sign_type: "legisign", sign_mode: "icon" }          # 仮パラメータ、構造表現
+    while: { sign_type: "legisign", sign_mode: "symbol" }                    # whileキーワード、構文規約
+    while_statement: { sign_type: "legisign", sign_mode: "symbol" }          # while文、構文規約
+    
+    # === 条件分岐系 ===
+    if: { sign_type: "legisign", sign_mode: "symbol" }                       # ifキーワード、構文規約
+    if_statement: { sign_type: "legisign", sign_mode: "symbol" }             # if文、構文規約
+    property_identifier: { sign_type: "sinsign", sign_mode: "index" }        # プロパティ識別子を指示
+    shorthand_property_identifier: { sign_type: "sinsign", sign_mode: "index" } # 短縮プロパティ識別子を指示
+    shorthand_property_identifier_pattern: { sign_type: "legisign", sign_mode: "icon" } # 短縮プロパティパターン、構造表現
+    switch: { sign_type: "legisign", sign_mode: "symbol" }                   # switchキーワード、構文規約
+    switch_body: { sign_type: "legisign", sign_mode: "icon" }                # switchボディ、構造表現
+    switch_case: { sign_type: "legisign", sign_mode: "symbol" }              # switchケース、構文規約
+    switch_statement: { sign_type: "legisign", sign_mode: "symbol" }         # switch文、構文規約
+    ternary_expression: { sign_type: "legisign", sign_mode: "symbol" }       # 三項演算子、構文規約
+    
+    # === 識別子系（すべて Index） ===
+    identifier: { sign_type: "sinsign", sign_mode: "index" }                 # 識別子、参照関係
+    
+    # === リテラル系（すべて Icon） ===
+    false: { sign_type: "sinsign", sign_mode: "icon" }                       # falseリテラル、直接表現
+    null: { sign_type: "sinsign", sign_mode: "icon" }                        # nullリテラル、直接表現
+    number: { sign_type: "sinsign", sign_mode: "icon" }                      # 数値リテラル、直接表現
+    regex: { sign_type: "sinsign", sign_mode: "icon" }                       # 正規表現リテラル、直接表現
+    string: { sign_type: "sinsign", sign_mode: "icon" }                      # 文字列、直接表現
+    string_fragment: { sign_type: "sinsign", sign_mode: "icon" }             # 文字列片、直接表現
+    template_string: { sign_type: "sinsign", sign_mode: "icon" }             # テンプレート文字列、直接表現
+    true: { sign_type: "sinsign", sign_mode: "icon" }                        # trueリテラル、直接表現
+    
+    # === 演算子・記号（すべて Symbol） ===
+    "/>": { sign_type: "legisign", sign_mode: "symbol" }                     # JSX終了タグ、構文規約
+    "</": { sign_type: "legisign", sign_mode: "symbol" }                     # JSX終了タグ開始、構文規約
+    ">>>": { sign_type: "legisign", sign_mode: "symbol" }                    # 論理右シフト演算子、構文規約
+    ">>>=": { sign_type: "legisign", sign_mode: "symbol" }                   # 論理右シフト代入演算子、構文規約
+    binary_expression: { sign_type: "legisign", sign_mode: "symbol" }        # 二項式、構文規約
+    assignment_expression: { sign_type: "legisign", sign_mode: "symbol" }    # 代入式、構文規約
+    augmented_assignment_expression: { sign_type: "legisign", sign_mode: "symbol" } # 拡張代入式、構文規約
+    unary_expression: { sign_type: "legisign", sign_mode: "symbol" }         # 単項式、構文規約
+    update_expression: { sign_type: "legisign", sign_mode: "symbol" }        # 更新式、構文規約
+    
+    # === 構造表現系（Icon） ===
+    arguments: { sign_type: "legisign", sign_mode: "icon" }                  # 引数、構造表現
+    array: { sign_type: "legisign", sign_mode: "icon" }                      # 配列、構造表現
+    array_pattern: { sign_type: "legisign", sign_mode: "icon" }              # 配列パターン、構造表現
+    assignment_pattern: { sign_type: "legisign", sign_mode: "icon" }         # 代入パターン、構造表現
+    object: { sign_type: "legisign", sign_mode: "icon" }                     # オブジェクト、構造表現
+    object_assignment_pattern: { sign_type: "legisign", sign_mode: "icon" }  # オブジェクト代入パターン、構造表現
+    object_pattern: { sign_type: "legisign", sign_mode: "icon" }             # オブジェクトパターン、構造表現
+    pair: { sign_type: "legisign", sign_mode: "icon" }                       # ペア、構造表現
+    pair_pattern: { sign_type: "legisign", sign_mode: "icon" }               # ペアパターン、構造表現
+    parenthesized_expression: { sign_type: "legisign", sign_mode: "icon" }   # 括弧式、構造表現
+    program: { sign_type: "legisign", sign_mode: "icon" }                    # プログラム、全体構造表現
+    rest_pattern: { sign_type: "legisign", sign_mode: "icon" }               # レストパターン、構造表現
+    statement_block: { sign_type: "legisign", sign_mode: "icon" }            # 文ブロック、構造表現
+    
+    # === 参照・アクセス系（Index） ===
+    call_expression: { sign_type: "sinsign", sign_mode: "index" }            # 関数呼び出しを指示
+    computed_property_name: { sign_type: "sinsign", sign_mode: "index" }     # 計算プロパティ名を指示
+    member_expression: { sign_type: "sinsign", sign_mode: "index" }          # メンバーを指示
+    subscript_expression: { sign_type: "sinsign", sign_mode: "index" }       # 添字を指示
+    variable_declarator: { sign_type: "sinsign", sign_mode: "index" }        # 変数を指示
+    
+    # === コメント系（Icon） ===
+    comment: { sign_type: "sinsign", sign_mode: "icon" }                     # コメント、直接表現
+    
+    # === その他の構文要素 ===
+    async: { sign_type: "legisign", sign_mode: "symbol" }                    # asyncキーワード、構文規約
+    await: { sign_type: "legisign", sign_mode: "symbol" }                    # awaitキーワード、構文規約
+    await_expression: { sign_type: "legisign", sign_mode: "symbol" }         # await式、構文規約
+    break: { sign_type: "legisign", sign_mode: "symbol" }                    # breakキーワード、構文規約
+    break_statement: { sign_type: "legisign", sign_mode: "symbol" }          # break文、構文規約
+    case: { sign_type: "legisign", sign_mode: "symbol" }                     # caseキーワード、構文規約
+    catch: { sign_type: "legisign", sign_mode: "symbol" }                    # catchキーワード、構文規約
+    catch_clause: { sign_type: "legisign", sign_mode: "symbol" }             # catch節、構文規約
+    const: { sign_type: "legisign", sign_mode: "symbol" }                    # constキーワード、構文規約
+    continue: { sign_type: "legisign", sign_mode: "symbol" }                 # continueキーワード、構文規約
+    continue_statement: { sign_type: "legisign", sign_mode: "symbol" }       # continue文、構文規約
+    delete: { sign_type: "legisign", sign_mode: "symbol" }                   # deleteキーワード、構文規約
+    do: { sign_type: "legisign", sign_mode: "symbol" }                       # doキーワード、構文規約
+    else: { sign_type: "legisign", sign_mode: "symbol" }                     # elseキーワード、構文規約
+    else_clause: { sign_type: "legisign", sign_mode: "symbol" }              # else節、構文規約
+    empty_statement: { sign_type: "legisign", sign_mode: "symbol" }          # 空文、構文規約
+    escape_sequence: { sign_type: "legisign", sign_mode: "symbol" }          # エスケープシーケンス、構文規約
+    expression_statement: { sign_type: "legisign", sign_mode: "symbol" }     # 式文、構文規約
+    finally: { sign_type: "legisign", sign_mode: "symbol" }                  # finallyキーワード、構文規約
+    finally_clause: { sign_type: "legisign", sign_mode: "symbol" }           # finally節、構文規約
+    in: { sign_type: "legisign", sign_mode: "symbol" }                       # inキーワード、構文規約
+    instanceof: { sign_type: "legisign", sign_mode: "symbol" }               # instanceofキーワード、構文規約
+    jsx_attribute: { sign_type: "legisign", sign_mode: "icon" }              # JSX属性、構造表現
+    jsx_closing_element: { sign_type: "legisign", sign_mode: "icon" }        # JSX終了要素、構造表現
+    jsx_element: { sign_type: "legisign", sign_mode: "icon" }                # JSX要素、構造表現
+    jsx_expression: { sign_type: "sinsign", sign_mode: "index" }             # JSX式を指示
+    jsx_opening_element: { sign_type: "legisign", sign_mode: "icon" }        # JSX開始要素、構造表現
+    jsx_self_closing_element: { sign_type: "legisign", sign_mode: "icon" }   # JSX自己完結要素、構造表現
+    let: { sign_type: "legisign", sign_mode: "symbol" }                      # letキーワード、構文規約
+    lexical_declaration: { sign_type: "legisign", sign_mode: "symbol" }      # レキシカル宣言、構文規約
+    new: { sign_type: "legisign", sign_mode: "symbol" }                      # newキーワード、構文規約
+    new_expression: { sign_type: "legisign", sign_mode: "symbol" }           # new式、構文規約
+    of: { sign_type: "legisign", sign_mode: "symbol" }                       # ofキーワード、構文規約
+    regex_flags: { sign_type: "sinsign", sign_mode: "icon" }                 # 正規表現フラグ、直接表現
+    regex_pattern: { sign_type: "sinsign", sign_mode: "icon" }               # 正規表現パターン、直接表現
+    return: { sign_type: "legisign", sign_mode: "symbol" }                   # returnキーワード、構文規約
+    return_statement: { sign_type: "legisign", sign_mode: "symbol" }         # return文、構文規約
+    sequence_expression: { sign_type: "legisign", sign_mode: "symbol" }      # 順次式、構文規約
+    spread_element: { sign_type: "legisign", sign_mode: "symbol" }           # スプレッド要素、構文規約
+    template_substitution: { sign_type: "sinsign", sign_mode: "index" }      # テンプレート置換を指示
+    this: { sign_type: "legisign", sign_mode: "symbol" }                     # thisキーワード、構文規約
+    throw: { sign_type: "legisign", sign_mode: "symbol" }                    # throwキーワード、構文規約
+    throw_statement: { sign_type: "legisign", sign_mode: "symbol" }          # throw文、構文規約
+    try: { sign_type: "legisign", sign_mode: "symbol" }                      # tryキーワード、構文規約
+    try_statement: { sign_type: "legisign", sign_mode: "symbol" }            # try文、構文規約
+    typeof: { sign_type: "legisign", sign_mode: "symbol" }                   # typeofキーワード、構文規約
+    var: { sign_type: "legisign", sign_mode: "symbol" }                      # varキーワード、構文規約
+    variable_declaration: { sign_type: "legisign", sign_mode: "symbol" }     # 変数宣言、構文規約
+    void: { sign_type: "legisign", sign_mode: "symbol" }                     # voidキーワード、構文規約
+
+# === 分類原則の説明 ===
+classification_principles:
+  icon_category:
+    description: "Icon（類似関係）- 直接的表現・構造的類似"
+    examples:
+      - "リテラル値: 文字列、数値、真偽値（値そのものを表現）"
+      - "コメント: 説明テキストの直接表現"
+      - "構造要素: ブロック、配列、括弧（構造的類似性）"
+    
+  index_category:
+    description: "Index（指示関係）- 参照・指示による関係"
+    examples:
+      - "識別子: 変数名、関数名（何かを指し示す）"
+      - "アクセス: フィールドアクセス、配列アクセス（要素を指示）"
+      - "パラメータ: 仮引数、実引数（値を指示）"
+    
+  symbol_category:
+    description: "Symbol（慣習関係）- 言語仕様による約束事"
+    examples:
+      - "キーワード: if, for, class, function（構文の約束）"
+      - "演算子: +, -, *, /（演算の約束）"
+      - "型: int, string, boolean（型システムの約束）"
+
+# === 分析メトリクス定義 ===
+analysis_metrics:
+  sign_mode_distribution:
+    icon_ratio: "直接的表現の割合（リテラル・構造表現）"
+    index_ratio: "参照・指示関係の割合（識別子・アクセス）"
+    symbol_ratio: "慣習的約束の割合（キーワード・演算子）"

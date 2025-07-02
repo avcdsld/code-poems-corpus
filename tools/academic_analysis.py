@@ -108,8 +108,6 @@ class CodePoetryAnalyzer:
         
     def _initialize_node_mappings(self) -> Dict[str, Dict[str, List[str]]]:
         """言語別のノードタイプマッピングを初期化"""
-        # 注: 実際のマッピングは使用するパーサーによって異なる
-        # これは一般的な例であり、実際のデータで確認が必要
         return {
             'python': {
                 'function': ['FunctionDef', 'AsyncFunctionDef', 'function_definition'],
@@ -195,8 +193,8 @@ class CodePoetryAnalyzer:
         
         # データ読み込み結果の表示
         logger.info("データ読み込み完了:")
-        # for lang in ['java', 'python', 'js', 'ruby']:
-        for lang in ['java', 'python', 'js']:
+        # 対照群のノードタイプ収集
+        for sample in self.control_data[lang]:  # すべてのサンプルを分析
             logger.info(f"  {lang}: 詩的={len(self.poetry_data[lang])}, "
                        f"対照群={len(self.control_data[lang])}")
     
@@ -210,8 +208,8 @@ class CodePoetryAnalyzer:
             for sample in self.poetry_data[lang]:
                 self._collect_node_types(sample['ast'], lang)
             
-            # 対照群のノードタイプ収集（サンプル）
-            for sample in self.control_data[lang][:10]:  # 最初の10個だけ
+            # 対照群のノードタイプ収集
+            for sample in self.control_data[lang]:  # すべてのサンプルを分析
                 self._collect_node_types(sample['ast'], lang)
         
         # ノードタイプレポートの生成
@@ -235,7 +233,6 @@ class CodePoetryAnalyzer:
         with open(report_path, 'w', encoding='utf-8') as f:
             f.write("=== 収集されたノードタイプ（構造的ノードのみ） ===\n\n")
             
-            # for lang in ['java', 'python', 'js', 'ruby']:
             for lang in ['java', 'python', 'js']:
                 structural_types = {t for t in self.collected_node_types[lang] 
                                   if self._is_structural_node(t)}
@@ -260,13 +257,12 @@ class CodePoetryAnalyzer:
                         f.write(f"  {category}: {categorized[category]}\n")
                 
                 if uncategorized:
-                    f.write(f"  未分類: {uncategorized[:20]}\n")  # 最初の20個
+                    f.write(f"  未分類: {uncategorized}\n")  # 制限を削除
                 
                 f.write(f"  構造的ノード合計: {len(structural_types)}種類\n\n")
             
             # 統計情報
-            f.write("\n=== 統計情報 ===\n") 
-            # for lang in ['java', 'python', 'js', 'ruby']:
+            f.write("\n=== 統計情報 ===\n")
             for lang in ['java', 'python', 'js']:
                 total = len(self.collected_node_types[lang])
                 structural = len({t for t in self.collected_node_types[lang] 
@@ -812,7 +808,7 @@ class CodePoetryAnalyzer:
         plt.tight_layout()
         plt.savefig(self.output_dir / "distribution_comparison.png", dpi=300, bbox_inches='tight')
         plt.close()
-    
+
     def generate_report(self):
         """包括的なレポート生成"""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1106,6 +1102,40 @@ class CodePoetryAnalyzer:
         
         return summary
 
+    def _generate_node_type_usage_report(self, node_type_analysis: Dict):
+        """ノードタイプ使用頻度レポートを生成"""
+        report_path = self.output_dir / "node_type_usage_report.txt"
+        
+        with open(report_path, 'w', encoding='utf-8') as f:
+            f.write("=== ノードタイプ使用頻度分析 ===\n\n")
+            
+            for lang in ['java', 'python', 'js']:
+                f.write(f"{lang.upper()}:\n")
+                f.write("=" * 50 + "\n\n")
+                
+                poetry_summary = node_type_analysis[lang]['poetry']['summary']
+                control_summary = node_type_analysis[lang]['control']['summary']
+                
+                # 全ノードタイプを収集
+                all_node_types = set(poetry_summary.keys()) | set(control_summary.keys())
+                
+                for node_type in sorted(all_node_types):
+                    f.write(f"\n{node_type}:\n")
+                    
+                    # 詩的コード
+                    if node_type in poetry_summary:
+                        stats = poetry_summary[node_type]
+                        f.write(f"  詩的コード: {stats['mean']:.2f}% ± {stats['std_err']:.2f} (n={stats['n']})\n")
+                    
+                    # 対照群
+                    if node_type in control_summary:
+                        stats = control_summary[node_type]
+                        f.write(f"  対照群: {stats['mean']:.2f}% ± {stats['std_err']:.2f} (n={stats['n']})\n")
+                
+                f.write("\n" + "=" * 50 + "\n\n")
+        
+        logger.info(f"ノードタイプ使用頻度レポートを生成: {report_path}")
+
     def analyze_node_type_usage(self):
         """ノードタイプ使用頻度の分析"""
         logger.info("ノードタイプ使用頻度の分析開始")
@@ -1127,8 +1157,8 @@ class CodePoetryAnalyzer:
                 except Exception as e:
                     logger.error(f"Poetry sample分析中にエラー: {e}")
             
-            # Control samples (first 20)
-            for sample in self.control_data[lang][:20]:
+            # Control samples
+            for sample in self.control_data[lang]:  # 制限を削除
                 try:
                     sample_analysis = self._analyze_single_sample(sample['ast'])
                     node_type_analysis[lang]['control']['samples'].append(sample_analysis)
@@ -1147,58 +1177,9 @@ class CodePoetryAnalyzer:
         self._create_node_type_visualizations(node_type_analysis)
         
         # 3. レポート生成
-        self._generate_node_type_report(node_type_analysis)
+        self._generate_node_type_usage_report(node_type_analysis)
         
         logger.info("ノードタイプ使用頻度の分析完了")
-        # 平均頻度の計算
-        average_frequencies = {
-            'poetry': defaultdict(dict),
-            'control': defaultdict(dict)
-        }
-        
-        for group in ['poetry', 'control']:
-            for lang in ['java', 'python', 'js']:
-                for node_type, freq_list in frequency_stats[group][lang].items():
-                    if freq_list:
-                        average_frequencies[group][lang][node_type] = {
-                            'mean': np.mean(freq_list),
-                            'std': np.std(freq_list),
-                            'n_samples': len(freq_list)
-                        }
-        
-        # レポート生成
-        self._generate_frequency_report(average_frequencies, frequency_stats)
-        
-        return average_frequencies
-
-    def _generate_frequency_report(self, average_frequencies, node_type_stats):
-        """ノードタイプ使用頻度レポートを生成"""
-        report_path = self.output_dir / "node_type_frequency_report.txt"
-        with open(report_path, 'w', encoding='utf-8') as f:
-            f.write("=== ノードタイプ使用頻度分析 ===\n\n")
-            
-            for lang in ['java', 'python', 'js']:
-                f.write(f"\n{lang.upper()}:\n")
-                f.write("=" * 50 + "\n\n")
-                
-                # 各ノードタイプについて統計分析
-                for node_type in average_frequencies[lang]:
-                    poetry_vals = node_type_stats[lang]['poetry'].get(node_type, [])
-                    control_vals = node_type_stats[lang]['control'].get(node_type, [])
-                    
-                    if len(poetry_vals) > 1 and len(control_vals) > 1:
-                        # t検定
-                        _, p_value = stats.ttest_ind(poetry_vals, control_vals)
-                        
-                        # 効果量（Cohen's d）
-                        d = (np.mean(poetry_vals) - np.mean(control_vals)) / \
-                            np.sqrt((np.var(poetry_vals) + np.var(control_vals)) / 2)
-                    
-                    f.write(f"{node_type}: d={d:.3f}, p={p_value:.4f}\n")
-                
-                f.write("\n")
-        
-        logger.info(f"改善された頻度分析レポートを生成: {report_path}")
 
     def run_analysis(self):
         """完全な分析の実行"""
