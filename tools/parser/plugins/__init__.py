@@ -33,7 +33,7 @@ def get_parser_for_language(language: str):
     指定された言語に対応するパーサーを返す
     
     Args:
-        language (str): 言語識別子 ('python', 'java', 'js', 'ruby')
+        language (str): 言語識別子 ('python', 'java', 'js', 'ruby', 'processing')
         
     Returns:
         Parser: 言語に対応したパーサーオブジェクト。未対応の言語の場合はNone。
@@ -42,7 +42,8 @@ def get_parser_for_language(language: str):
         'python': python_plugin,
         'java': java_plugin,
         'js': js_plugin,
-        'ruby': ruby_plugin
+        'ruby': ruby_plugin,
+        'processing': java_plugin  # Processing uses Java parser
     }
     
     plugin_class = plugin_classes.get(language.lower())

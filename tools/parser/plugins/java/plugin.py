@@ -12,7 +12,7 @@ JAVA_LANGUAGE = get_language("java")
 class Plugin(ParserPlugin):
     """Java language parser plugin."""
     
-    extensions = ['.java']
+    extensions = ['.java', '.pde']
     
     def __init__(self):
         self._parser = Parser()
